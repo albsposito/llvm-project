@@ -35,42 +35,12 @@ def FCVT_D_AH : RVInstRFrm<0b0100001, RISCVOpcode<"FCVT_D_AH", 0b1010011>,
 }
 
 // Pseudo instructions
+// NOTE: the fp16alt computational/compare/convert mnemonics used to be
+// (incorrectly) aliased to the plain fp16 instructions here; they are now
+// real instructions with the proper funct3/rm encodings, see
+// RISCVInstrInfoXsmallfloat.td.
 def : InstAlias<"flah $rd, ${imm12}(${rs1})",   (FLH FPR16:$rd, GPR:$rs1, simm12:$imm12), 0>;
 def : InstAlias<"fsah $rs2, ${imm12}(${rs1})",   (FSH FPR16:$rs2, GPR:$rs1, simm12:$imm12), 0>;
-def : InstAlias<"fmadd.ah $rd, $rs1, $rs2, $rs3, $rm",   (FMADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, frmarg:$rm), 0>;
-def : InstAlias<"fmadd.ah $rd, $rs1, $rs2, $rs3",   (FMADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, 0b111), 0>;
-def : InstAlias<"fmsub.ah $rd, $rs1, $rs2, $rs3, $rm",   (FMSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, frmarg:$rm), 0>;
-def : InstAlias<"fmsub.ah $rd, $rs1, $rs2, $rs3",   (FMSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, 0b111), 0>;
-def : InstAlias<"fnmsub.ah $rd, $rs1, $rs2, $rs3, $rm",   (FNMSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, frmarg:$rm), 0>;
-def : InstAlias<"fnmsub.ah $rd, $rs1, $rs2, $rs3",   (FNMSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, 0b111), 0>;
-def : InstAlias<"fnmadd.ah $rd, $rs1, $rs2, $rs3, $rm",   (FNMADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, frmarg:$rm), 0>;
-def : InstAlias<"fnmadd.ah $rd, $rs1, $rs2, $rs3",   (FNMADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, 0b111), 0>;
-def : InstAlias<"fadd.ah $rd, $rs1, $rs2, $rm",   (FADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, frmarg:$rm), 0>;
-def : InstAlias<"fadd.ah $rd, $rs1, $rs2",   (FADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, 0b111), 0>;
-def : InstAlias<"fsub.ah $rd, $rs1, $rs2, $rm",   (FSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, frmarg:$rm), 0>;
-def : InstAlias<"fsub.ah $rd, $rs1, $rs2",   (FSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, 0b111), 0>;
-def : InstAlias<"fmul.ah $rd, $rs1, $rs2, $rm",   (FMUL_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, frmarg:$rm), 0>;
-def : InstAlias<"fmul.ah $rd, $rs1, $rs2",   (FMUL_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, 0b111), 0>;
-def : InstAlias<"fdiv.ah $rd, $rs1, $rs2, $rm",   (FDIV_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, frmarg:$rm), 0>;
-def : InstAlias<"fdiv.ah $rd, $rs1, $rs2",   (FDIV_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, 0b111), 0>;
-def : InstAlias<"fsqrt.ah $rd, $rs1, $rm",   (FSQRT_H FPR16:$rd, FPR16:$rs1, frmarg:$rm), 0>;
-def : InstAlias<"fsqrt.ah $rd, $rs1",   (FSQRT_H FPR16:$rd, FPR16:$rs1, 0b111), 0>;
-def : InstAlias<"fsgnj.ah $rd, $rs1, $rs2",   (FSGNJ_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"fsgnjn.ah $rd, $rs1, $rs2",   (FSGNJN_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"fsgnjx.ah $rd, $rs1, $rs2",   (FSGNJX_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"fmin.ah $rd, $rs1, $rs2",   (FMIN_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"fmax.ah $rd, $rs1, $rs2",   (FMAX_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"feq.ah $rd, $rs1, $rs2",   (FEQ_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"flt.ah $rd, $rs1, $rs2",   (FLT_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"fle.ah $rd, $rs1, $rs2",   (FLE_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"fcvt.w.ah $rd, $rs1, $rm",   (FCVT_W_H GPR:$rd, FPR16:$rs1, frmarg:$rm), 0>;
-def : InstAlias<"fcvt.w.ah $rd, $rs1",   (FCVT_W_H GPR:$rd, FPR16:$rs1, 0b111), 0>;
-def : InstAlias<"fcvt.wu.ah $rd, $rs1, $rm",   (FCVT_WU_H GPR:$rd, FPR16:$rs1, frmarg:$rm), 0>;
-def : InstAlias<"fcvt.wu.ah $rd, $rs1",   (FCVT_WU_H GPR:$rd, FPR16:$rs1, 0b111), 0>;
-def : InstAlias<"fcvt.ah.w $rd, $rs1, $rm",   (FCVT_H_W FPR16:$rd, GPR:$rs1, frmarg:$rm), 0>;
-def : InstAlias<"fcvt.ah.w $rd, $rs1",   (FCVT_H_W FPR16:$rd, GPR:$rs1, 0b111), 0>;
-def : InstAlias<"fcvt.ah.wu $rd, $rs1, $rm",   (FCVT_H_WU FPR16:$rd, GPR:$rs1, frmarg:$rm), 0>;
-def : InstAlias<"fcvt.ah.wu $rd, $rs1",   (FCVT_H_WU FPR16:$rd, GPR:$rs1, 0b111), 0>;
 def : InstAlias<"fmv.x.ah $rd, $rs1",   (FMV_X_H GPR:$rd, FPR16:$rs1), 0>;
 def : InstAlias<"fclass.ah $rd, $rs1",   (FCLASS_H GPR:$rd, FPR16:$rs1), 0>;
 def : InstAlias<"fmv.ah.x $rd, $rs1",   (FMV_H_X FPR16:$rd, GPR:$rs1), 0>;
@@ -573,82 +543,85 @@ def HasExtXfvechalf : Predicate<
 let Predicates = [HasExtXfvechalf] in {
 
 // Instructions
+// NOTE: operands use PulpV2F (GPRs) since GAP9-style cores keep floats in
+// the integer register file (Zfinx/Zhinx style).
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFADD_H : RVInstRVf<0b10, 0b00001, 0b0, VFMT_FP16, RISCVOpcode<"VFADD_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfadd.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfadd.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFADD_R_H : RVInstRVf<0b10, 0b00001, 0b1, VFMT_FP16, RISCVOpcode<"VFADD_R_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfadd.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfadd.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSUB_H : RVInstRVf<0b10, 0b00010, 0b0, VFMT_FP16, RISCVOpcode<"VFSUB_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsub.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsub.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSUB_R_H : RVInstRVf<0b10, 0b00010, 0b1, VFMT_FP16, RISCVOpcode<"VFSUB_R_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsub.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsub.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMUL_H : RVInstRVf<0b10, 0b00011, 0b0, VFMT_FP16, RISCVOpcode<"VFMUL_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmul.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmul.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMUL_R_H : RVInstRVf<0b10, 0b00011, 0b1, VFMT_FP16, RISCVOpcode<"VFMUL_R_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmul.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmul.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFDIV_H : RVInstRVf<0b10, 0b00100, 0b0, VFMT_FP16, RISCVOpcode<"VFDIV_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfdiv.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfdiv.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFDIV_R_H : RVInstRVf<0b10, 0b00100, 0b1, VFMT_FP16, RISCVOpcode<"VFDIV_R_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfdiv.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfdiv.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMIN_H : RVInstRVf<0b10, 0b00101, 0b0, VFMT_FP16, RISCVOpcode<"VFMIN_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmin.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmin.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMIN_R_H : RVInstRVf<0b10, 0b00101, 0b1, VFMT_FP16, RISCVOpcode<"VFMIN_R_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmin.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmin.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMAX_H : RVInstRVf<0b10, 0b00110, 0b0, VFMT_FP16, RISCVOpcode<"VFMAX_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmax.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmax.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMAX_R_H : RVInstRVf<0b10, 0b00110, 0b1, VFMT_FP16, RISCVOpcode<"VFMAX_R_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmax.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmax.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSQRT_H : RVInstRVf<0b10, 0b00111, 0b0, VFMT_FP16, RISCVOpcode<"VFSQRT_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1), "vfsqrt.h", "$rd, $rs1">, Sched<[]> {
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1), "vfsqrt.h", "$rd, $rs1">, Sched<[]> {
     let rs2 = 0b00000;
   }
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+// vfmac/vfmre accumulate into rd, so the destination is a tied operand.
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
 def VFMAC_H : RVInstRVf<0b10, 0b01000, 0b0, VFMT_FP16, RISCVOpcode<"VFMAC_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmac.h", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmac.h", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
 def VFMAC_R_H : RVInstRVf<0b10, 0b01000, 0b1, VFMT_FP16, RISCVOpcode<"VFMAC_R_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmac.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmac.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
 def VFMRE_H : RVInstRVf<0b10, 0b01001, 0b0, VFMT_FP16, RISCVOpcode<"VFMRE_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmre.h", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmre.h", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
 def VFMRE_R_H : RVInstRVf<0b10, 0b01001, 0b1, VFMT_FP16, RISCVOpcode<"VFMRE_R_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmre.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmre.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFCLASS_H : RVInstRVf<0b10, 0b01100, 0b0, VFMT_FP16, RISCVOpcode<"VFCLASS_H", 0b0110011>,
-             (outs GPR:$rd), (ins FPR16:$rs1), "vfclass.h", "$rd, $rs1">, Sched<[]> {
+             (outs GPR:$rd), (ins PulpV2F:$rs1), "vfclass.h", "$rd, $rs1">, Sched<[]> {
     let rs2 = 0b00001;
   }
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJ_H : RVInstRVf<0b10, 0b01101, 0b0, VFMT_FP16, RISCVOpcode<"VFSGNJ_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnj.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnj.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJ_R_H : RVInstRVf<0b10, 0b01101, 0b1, VFMT_FP16, RISCVOpcode<"VFSGNJ_R_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnj.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnj.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJN_H : RVInstRVf<0b10, 0b01110, 0b0, VFMT_FP16, RISCVOpcode<"VFSGNJN_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnjn.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjn.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJN_R_H : RVInstRVf<0b10, 0b01110, 0b1, VFMT_FP16, RISCVOpcode<"VFSGNJN_R_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnjn.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjn.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJX_H : RVInstRVf<0b10, 0b01111, 0b0, VFMT_FP16, RISCVOpcode<"VFSGNJX_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnjx.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjx.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJX_R_H : RVInstRVf<0b10, 0b01111, 0b1, VFMT_FP16, RISCVOpcode<"VFSGNJX_R_H", 0b0110011>,
-             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnjx.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjx.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFEQ_H : RVInstRVf<0b10, 0b10000, 0b0, VFMT_FP16, RISCVOpcode<"VFEQ_H", 0b0110011>,
              (outs GPR:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfeq.h", "$rd, $rs1, $rs2">, Sched<[]>;
@@ -777,62 +750,151 @@ def HasExtXfvecalthalf : Predicate<
 let Predicates = [HasExtXfvecalthalf] in {
 
 // Instructions
+// Encodings verified against GAP9 GCC: alt-half uses vfmt = 0b01.
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFADD_AH : RVInstRVf<0b10, 0b00001, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFADD_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfadd.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFADD_R_AH : RVInstRVf<0b10, 0b00001, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFADD_R_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfadd.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFSUB_AH : RVInstRVf<0b10, 0b00010, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFSUB_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsub.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFSUB_R_AH : RVInstRVf<0b10, 0b00010, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFSUB_R_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsub.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFMUL_AH : RVInstRVf<0b10, 0b00011, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFMUL_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmul.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFMUL_R_AH : RVInstRVf<0b10, 0b00011, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFMUL_R_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmul.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFDIV_AH : RVInstRVf<0b10, 0b00100, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFDIV_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfdiv.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFDIV_R_AH : RVInstRVf<0b10, 0b00100, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFDIV_R_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfdiv.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFMIN_AH : RVInstRVf<0b10, 0b00101, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFMIN_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmin.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFMIN_R_AH : RVInstRVf<0b10, 0b00101, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFMIN_R_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmin.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFMAX_AH : RVInstRVf<0b10, 0b00110, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFMAX_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmax.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFMAX_R_AH : RVInstRVf<0b10, 0b00110, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFMAX_R_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmax.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFSQRT_AH : RVInstRVf<0b10, 0b00111, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFSQRT_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1), "vfsqrt.ah", "$rd, $rs1">, Sched<[]> {
+    let rs2 = 0b00000;
+  }
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
+def VFMAC_AH : RVInstRVf<0b10, 0b01000, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFMAC_AH", 0b0110011>,
+             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmac.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
+def VFMAC_R_AH : RVInstRVf<0b10, 0b01000, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFMAC_R_AH", 0b0110011>,
+             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmac.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
+def VFMRE_AH : RVInstRVf<0b10, 0b01001, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFMRE_AH", 0b0110011>,
+             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmre.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
+def VFMRE_R_AH : RVInstRVf<0b10, 0b01001, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFMRE_R_AH", 0b0110011>,
+             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmre.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFSGNJ_AH : RVInstRVf<0b10, 0b01101, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFSGNJ_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnj.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFSGNJ_R_AH : RVInstRVf<0b10, 0b01101, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFSGNJ_R_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnj.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFSGNJN_AH : RVInstRVf<0b10, 0b01110, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFSGNJN_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjn.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFSGNJN_R_AH : RVInstRVf<0b10, 0b01110, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFSGNJN_R_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjn.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFSGNJX_AH : RVInstRVf<0b10, 0b01111, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFSGNJX_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjx.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFSGNJX_R_AH : RVInstRVf<0b10, 0b01111, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFSGNJX_R_AH", 0b0110011>,
+             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjx.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
 
-// Pseudo instructions
-def : InstAlias<"vfadd.ah $rd, $rs1, $rs2",   (VFADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfadd.r.ah $rd, $rs1, $rs2",   (VFADD_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfsub.ah $rd, $rs1, $rs2",   (VFSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfsub.r.ah $rd, $rs1, $rs2",   (VFSUB_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfmul.ah $rd, $rs1, $rs2",   (VFMUL_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfmul.r.ah $rd, $rs1, $rs2",   (VFMUL_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfdiv.ah $rd, $rs1, $rs2",   (VFDIV_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfdiv.r.ah $rd, $rs1, $rs2",   (VFDIV_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfmin.ah $rd, $rs1, $rs2",   (VFMIN_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfmin.r.ah $rd, $rs1, $rs2",   (VFMIN_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfmax.ah $rd, $rs1, $rs2",   (VFMAX_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfmax.r.ah $rd, $rs1, $rs2",   (VFMAX_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfsqrt.ah $rd, $rs1",   (VFSQRT_H FPR16:$rd, FPR16:$rs1), 0>;
-def : InstAlias<"vfmac.ah $rd, $rs1, $rs2",   (VFMAC_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfmac.r.ah $rd, $rs1, $rs2",   (VFMAC_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfmre.ah $rd, $rs1, $rs2",   (VFMRE_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfmre.r.ah $rd, $rs1, $rs2",   (VFMRE_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfclass.ah $rd, $rs1",   (VFCLASS_H GPR:$rd, FPR16:$rs1), 0>;
-def : InstAlias<"vfsgnj.ah $rd, $rs1, $rs2",   (VFSGNJ_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfsgnj.r.ah $rd, $rs1, $rs2",   (VFSGNJ_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfsgnjn.ah $rd, $rs1, $rs2",   (VFSGNJN_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfsgnjn.r.ah $rd, $rs1, $rs2",   (VFSGNJN_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfsgnjx.ah $rd, $rs1, $rs2",   (VFSGNJX_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfsgnjx.r.ah $rd, $rs1, $rs2",   (VFSGNJX_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfeq.ah $rd, $rs1, $rs2",   (VFEQ_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfeq.r.ah $rd, $rs1, $rs2",   (VFEQ_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfne.ah $rd, $rs1, $rs2",   (VFNE_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfne.r.ah $rd, $rs1, $rs2",   (VFNE_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vflt.ah $rd, $rs1, $rs2",   (VFLT_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vflt.r.ah $rd, $rs1, $rs2",   (VFLT_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfge.ah $rd, $rs1, $rs2",   (VFGE_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfge.r.ah $rd, $rs1, $rs2",   (VFGE_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfle.ah $rd, $rs1, $rs2",   (VFLE_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfle.r.ah $rd, $rs1, $rs2",   (VFLE_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfgt.ah $rd, $rs1, $rs2",   (VFGT_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfgt.r.ah $rd, $rs1, $rs2",   (VFGT_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
-def : InstAlias<"vfmv.x.ah $rd, $rs1",   (VFMV_X_H GPR:$rd, FPR16:$rs1), 0>;
-def : InstAlias<"vfmv.ah.x $rd, $rs1",   (VFMV_H_X FPR16:$rd, GPR:$rs1), 0>;
-def : InstAlias<"vfcvt.x.ah $rd, $rs1",   (VFCVT_X_H GPR:$rd, FPR16:$rs1), 0>;
-def : InstAlias<"vfcvt.xu.ah $rd, $rs1",   (VFCVT_XU_H GPR:$rd, FPR16:$rs1), 0>;
-def : InstAlias<"vfcvt.ah.x $rd, $rs1",   (VFCVT_H_X FPR16:$rd, GPR:$rs1), 0>;
-def : InstAlias<"vfcvt.ah.xu $rd, $rs1",   (VFCVT_H_XU FPR16:$rd, GPR:$rs1), 0>;
-def : InstAlias<"vfcpka.ah.s $rd, $rs1, $rs2",   (VFCPKA_H_S FPR16:$rd, FPR32:$rs1, FPR32:$rs2), 0>;
-def : InstAlias<"vfcpkb.ah.s $rd, $rs1, $rs2",   (VFCPKB_H_S FPR16:$rd, FPR32:$rs1, FPR32:$rs2), 0>;
-def : InstAlias<"vfcpkc.ah.s $rd, $rs1, $rs2",   (VFCPKC_H_S FPR16:$rd, FPR32:$rs1, FPR32:$rs2), 0>;
-def : InstAlias<"vfcpkd.ah.s $rd, $rs1, $rs2",   (VFCPKD_H_S FPR16:$rd, FPR32:$rs1, FPR32:$rs2), 0>;
-def : InstAlias<"vfcpka.ah.d $rd, $rs1, $rs2",   (VFCPKA_H_D FPR16:$rd, FPR64:$rs1, FPR64:$rs2), 0>;
-def : InstAlias<"vfcpkb.ah.d $rd, $rs1, $rs2",   (VFCPKB_H_D FPR16:$rd, FPR64:$rs1, FPR64:$rs2), 0>;
-def : InstAlias<"vfcpkc.ah.d $rd, $rs1, $rs2",   (VFCPKC_H_D FPR16:$rd, FPR64:$rs1, FPR64:$rs2), 0>;
-def : InstAlias<"vfcpkd.ah.d $rd, $rs1, $rs2",   (VFCPKD_H_D FPR16:$rd, FPR64:$rs1, FPR64:$rs2), 0>;
-def : InstAlias<"vfcvt.s.ah $rd, $rs1",   (VFCVT_S_H FPR32:$rd, FPR16:$rs1), 0>;
-def : InstAlias<"vfcvtu.s.ah $rd, $rs1",   (VFCVTU_S_H FPR32:$rd, FPR16:$rs1), 0>;
-def : InstAlias<"vfcvt.ah.s $rd, $rs1",   (VFCVT_H_S FPR16:$rd, FPR32:$rs1), 0>;
-def : InstAlias<"vfcvtu.ah.s $rd, $rs1",   (VFCVTU_H_S FPR16:$rd, FPR32:$rs1), 0>;
+// Compare, classify, integer-convert and pack instructions, encodings
+// validated against GAP GCC binutils (vfmt = 0b01 selects the alt format;
+// GAP9 does not implement vfmv.*.ah, vfcvt[u].{s.ah,ah.s} or the
+// vfcpk{b,c,d}.ah.* variants).
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFCLASS_AH : RVInstRVf<0b10, 0b01100, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFCLASS_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1), "vfclass.ah", "$rd, $rs1">, Sched<[]> {
+    let rs2 = 0b00001;
+  }
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFEQ_AH : RVInstRVf<0b10, 0b10000, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFEQ_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfeq.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFEQ_R_AH : RVInstRVf<0b10, 0b10000, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFEQ_R_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfeq.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFNE_AH : RVInstRVf<0b10, 0b10001, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFNE_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfne.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFNE_R_AH : RVInstRVf<0b10, 0b10001, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFNE_R_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfne.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFLT_AH : RVInstRVf<0b10, 0b10010, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFLT_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vflt.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFLT_R_AH : RVInstRVf<0b10, 0b10010, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFLT_R_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vflt.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFGE_AH : RVInstRVf<0b10, 0b10011, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFGE_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfge.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFGE_R_AH : RVInstRVf<0b10, 0b10011, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFGE_R_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfge.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFLE_AH : RVInstRVf<0b10, 0b10100, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFLE_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfle.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFLE_R_AH : RVInstRVf<0b10, 0b10100, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFLE_R_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfle.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFGT_AH : RVInstRVf<0b10, 0b10101, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFGT_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfgt.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFGT_R_AH : RVInstRVf<0b10, 0b10101, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFGT_R_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfgt.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFCVT_X_AH : RVInstRVf<0b10, 0b01100, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFCVT_X_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1), "vfcvt.x.ah", "$rd, $rs1">, Sched<[]> {
+    let rs2 = 0b00010;
+  }
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFCVT_XU_AH : RVInstRVf<0b10, 0b01100, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFCVT_XU_AH", 0b0110011>,
+             (outs GPR:$rd), (ins PulpV2F:$rs1), "vfcvt.xu.ah", "$rd, $rs1">, Sched<[]> {
+    let rs2 = 0b00010;
+  }
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFCVT_AH_X : RVInstRVf<0b10, 0b01100, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFCVT_AH_X", 0b0110011>,
+             (outs PulpV2F:$rd), (ins GPR:$rs1), "vfcvt.ah.x", "$rd, $rs1">, Sched<[]> {
+    let rs2 = 0b00011;
+  }
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFCVT_AH_XU : RVInstRVf<0b10, 0b01100, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFCVT_AH_XU", 0b0110011>,
+             (outs PulpV2F:$rd), (ins GPR:$rs1), "vfcvt.ah.xu", "$rd, $rs1">, Sched<[]> {
+    let rs2 = 0b00011;
+  }
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def VFCPKA_AH_S : RVInstRVf<0b10, 0b11000, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFCPKA_AH_S", 0b0110011>,
+             (outs PulpV2F:$rd), (ins FPR32INX:$rs1, FPR32INX:$rs2), "vfcpka.ah.s", "$rd, $rs1, $rs2">, Sched<[]>;
+
+// NOTE: the previous vfmv/vfcvt/vfcpk/compare .ah aliases mapped to the .h
+// encodings (vfmt=0b10), which is wrong; they were removed until their real
+// encodings are validated against hardware/GCC.
 } // let Predicates = [HasExtXfvecalthalf]
 
 

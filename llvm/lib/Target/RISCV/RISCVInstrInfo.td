@@ -2212,8 +2212,10 @@ include "RISCVInstrInfoXCV.td"
 include "RISCVInstrInfoXfrep.td"
 include "RISCVInstrInfoXdma.td"
 include "RISCVInstrInfoXssr.td"
-include "RISCVInstrInfoXsmallfloat.td"
+// Xpulp must come before Xsmallfloat: the small-float vector patterns reuse
+// the Xpulpv2 pack/shuffle instructions.
 include "RISCVInstrInfoXpulp.td"
+include "RISCVInstrInfoXsmallfloat.td"
 
 //===----------------------------------------------------------------------===//
 // Global ISel

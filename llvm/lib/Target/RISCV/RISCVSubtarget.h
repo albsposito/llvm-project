@@ -234,6 +234,10 @@ public:
            HasExtXfexpauxvecaltquarter;
   }
 
+  // True when scalar bf16 (fp16alt) arithmetic is available in GPRs
+  // (Zfinx/Zhinx-style cores such as GAP9).
+  bool hasAltHalfInx() const { return HasExtXfalthalf && HasStdExtZfinx; }
+
 protected:
   // GlobalISel related APIs.
   std::unique_ptr<CallLowering> CallLoweringInfo;

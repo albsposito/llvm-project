@@ -742,6 +742,27 @@ RISCVISAInfo::parseArchString(StringRef Arch, bool EnableExperimentalExtension,
                              "string must be lowercase");
   }
 
+  // PULP: accept "gap9" (or "xgap9") in a -march string as an umbrella alias
+  // that expands to the set of extensions the GAP9 core implements. It is a
+  // pure parse-time alias: the canonical extension list (and hence the ELF
+  // arch attribute) contains the individual extensions, so objects stay
+  // compatible with tools that do not know the alias. The alias cannot be a
+  // real registered extension because names ending in a digit are ambiguous
+  // with the trailing version number in (normalized) ISA strings.
+  std::string ArchAliased;
+  if (Arch.contains("gap9")) {
+    SmallVector<StringRef, 8> Tokens;
+    Arch.split(Tokens, '_');
+    SmallVector<std::string, 8> Mapped;
+    for (StringRef Tok : Tokens)
+      Mapped.push_back(
+          (Tok == "gap9" || Tok == "xgap9")
+              ? "zfinx_zhinx_xpulpv_xfalthalf_xfvechalf_xfvecalthalf"
+              : Tok.str());
+    ArchAliased = llvm::join(Mapped, "_");
+    Arch = ArchAliased;
+  }
+
   bool HasRV64 = Arch.starts_with("rv64");
   // ISA string must begin with rv32 or rv64.
   if (!(Arch.starts_with("rv32") || HasRV64) || (Arch.size() < 5)) {

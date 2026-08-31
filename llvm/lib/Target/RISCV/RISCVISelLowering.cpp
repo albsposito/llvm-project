@@ -131,6 +131,8 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
     addRegisterClass(MVT::f64, &RISCV::FPR64RegClass);
   if (Subtarget.hasStdExtZhinxmin())
     addRegisterClass(MVT::f16, &RISCV::GPRF16RegClass);
+  if (Subtarget.hasAltHalfInx())
+    addRegisterClass(MVT::bf16, &RISCV::GPRBF16RegClass);
   if (Subtarget.hasStdExtZfinx())
     addRegisterClass(MVT::f32, &RISCV::GPRF32RegClass);
   if (Subtarget.hasStdExtZdinx()) {
@@ -143,6 +145,11 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
   if (Subtarget.hasPULPExtV2()) {
     addRegisterClass(MVT::v2i16, &RISCV::PulpV2RegClass);
     addRegisterClass(MVT::v4i8, &RISCV::PulpV4RegClass);
+    // Packed small-float vectors live in GPRs (Zfinx/Zhinx style cores).
+    if (Subtarget.hasExtXfvechalf())
+      addRegisterClass(MVT::v2f16, &RISCV::PulpV2FRegClass);
+    if (Subtarget.hasExtXfvecalthalf())
+      addRegisterClass(MVT::v2bf16, &RISCV::PulpV2FRegClass);
   }
 
   static const MVT::SimpleValueType BoolVecVTs[] = {
@@ -473,6 +480,39 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
     setOperationAction(ISD::FCOPYSIGN, MVT::bf16, Expand);
   }
 
+  if (Subtarget.hasAltHalfInx()) {
+    // Native scalar fp16alt (bf16-in-GPR) arithmetic - PULP Xfalthalf.
+    setOperationAction({ISD::FADD, ISD::FSUB, ISD::FMUL, ISD::FDIV, ISD::FMA,
+                        ISD::FNEG, ISD::FABS, ISD::FCOPYSIGN, ISD::FMINNUM,
+                        ISD::FMAXNUM, ISD::STRICT_FADD, ISD::STRICT_FSUB,
+                        ISD::STRICT_FMUL, ISD::STRICT_FDIV, ISD::STRICT_FMA,
+                        ISD::SETCC},
+                       MVT::bf16, Legal);
+    setCondCodeAction(FPCCToExpand, MVT::bf16, Expand);
+    setOperationAction(ISD::SELECT, MVT::bf16, Custom);
+    setOperationAction(ISD::SELECT_CC, MVT::bf16, Expand);
+    setOperationAction(ISD::BR_CC, MVT::bf16, Expand);
+    // f32 <-> bf16 are single fcvt.{ah.s,s.ah} instructions.
+    setOperationAction(ISD::STRICT_FP_ROUND, MVT::bf16, Legal);
+    setOperationAction(ISD::STRICT_FP_EXTEND, MVT::f32, Legal);
+    // Bitcasts bf16 <-> i16 are register copies.
+    setOperationAction(ISD::BITCAST, MVT::i16, Custom);
+    setOperationAction(ISD::BITCAST, MVT::bf16, Custom);
+    // No fsqrt.ah and no rounding-mode-flexible fp16alt conversions: promote
+    // to f32 (matches GAP GCC).
+    setOperationAction({ISD::FSQRT, ISD::STRICT_FSQRT, ISD::FREM, ISD::FCEIL,
+                        ISD::FFLOOR, ISD::FTRUNC, ISD::FRINT, ISD::FROUND,
+                        ISD::FROUNDEVEN, ISD::FNEARBYINT, ISD::FPOW,
+                        ISD::FPOWI, ISD::FCOS, ISD::FSIN, ISD::FSINCOS,
+                        ISD::FEXP, ISD::FEXP2, ISD::FEXP10, ISD::FLOG,
+                        ISD::FLOG2, ISD::FLOG10, ISD::STRICT_FSETCC,
+                        ISD::STRICT_FSETCCS},
+                       MVT::bf16, Promote);
+    setOperationAction({ISD::FMAXIMUM, ISD::FMINIMUM}, MVT::bf16, Expand);
+    setOperationAction({ISD::LRINT, ISD::LLRINT, ISD::LROUND, ISD::LLROUND},
+                       MVT::bf16, Expand);
+  }
+
   if (Subtarget.hasStdExtZfhminOrZhinxmin()) {
     if (Subtarget.hasStdExtZfhOrZhinx()) {
       setOperationAction(FPLegalNodeTypes, MVT::f16, Legal);
@@ -679,6 +719,49 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
 
     setTruncStoreAction(MVT::v2i16, MVT::v2i8, Expand);
 
+    // Xfvec packed small-float vectors.
+    SmallVector<MVT, 2> PulpFPVecVTs;
+    if (Subtarget.hasExtXfvechalf())
+      PulpFPVecVTs.push_back(MVT::v2f16);
+    if (Subtarget.hasExtXfvecalthalf())
+      PulpFPVecVTs.push_back(MVT::v2bf16);
+    for (MVT VT : PulpFPVecVTs) {
+      setOperationAction({ISD::FADD, ISD::FSUB, ISD::FMUL, ISD::FNEG,
+                          ISD::FABS, ISD::FCOPYSIGN, ISD::FMINNUM,
+                          ISD::FMAXNUM, ISD::FMA},
+                         VT, Legal);
+      // Constant vectors are materialized as a single i32; non-constant
+      // build_vectors are matched to pv.pack.h by the ISel patterns.
+      // NOTE: SPLAT_VECTOR must NOT be Legal here: PreprocessISelDAG would
+      // rewrite it to the unselectable RVV VFMV_V_F_VL node.
+      setOperationAction(ISD::BUILD_VECTOR, VT, Custom);
+      // 32-bit loads/stores; also enables the p.lw/p.sw post-increment forms.
+      setOperationPromotedToType(ISD::LOAD, VT, MVT::i32);
+      setOperationPromotedToType(ISD::STORE, VT, MVT::i32);
+      // The HW has vfdiv/vfsqrt but GCC scalarizes them too; keep the
+      // scalar Zhinx path which handles rounding-mode flags correctly.
+      setOperationAction({ISD::FDIV, ISD::FSQRT, ISD::FREM, ISD::FSIN,
+                          ISD::FCOS, ISD::FSINCOS, ISD::FPOW, ISD::FPOWI,
+                          ISD::FEXP, ISD::FEXP2, ISD::FEXP10, ISD::FLOG,
+                          ISD::FLOG2, ISD::FLOG10, ISD::FCEIL, ISD::FFLOOR,
+                          ISD::FTRUNC, ISD::FRINT, ISD::FNEARBYINT,
+                          ISD::FROUND, ISD::FROUNDEVEN, ISD::FMINIMUM,
+                          ISD::FMAXIMUM, ISD::FLDEXP},
+                         VT, Expand);
+      setOperationAction({ISD::SETCC, ISD::VSELECT, ISD::SELECT,
+                          ISD::SELECT_CC, ISD::VECTOR_SHUFFLE,
+                          ISD::INSERT_VECTOR_ELT, ISD::CONCAT_VECTORS,
+                          ISD::SINT_TO_FP, ISD::UINT_TO_FP, ISD::FP_TO_SINT,
+                          ISD::FP_TO_UINT},
+                         VT, Expand);
+    }
+    if (Subtarget.hasExtXfvechalf()) {
+      setOperationAction(ISD::FP_EXTEND, MVT::v2f32, Expand);
+      setOperationAction(ISD::FP_ROUND, MVT::v2f16, Expand);
+    }
+    if (Subtarget.hasExtXfvecalthalf())
+      setOperationAction(ISD::FP_ROUND, MVT::v2bf16, Expand);
+
     setTargetDAGCombine(ISD::BR);
 
     setBooleanVectorContents(ZeroOrNegativeOneBooleanContent);
@@ -708,6 +791,20 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
     setIndexedStoreAction(ISD::POST_INC, MVT::i32, Legal);
     setIndexedStoreAction(ISD::POST_INC, MVT::v2i16, Legal);
     setIndexedStoreAction(ISD::POST_INC, MVT::v4i8, Legal);
+    // With Zfinx/Zhinx float data lives in GPRs, so the p.lw/p.lh/p.sw/p.sh
+    // post-increment forms apply to f32/f16 as well.
+    if (Subtarget.hasStdExtZfinx()) {
+      setIndexedLoadAction(ISD::POST_INC, MVT::f32, Legal);
+      setIndexedStoreAction(ISD::POST_INC, MVT::f32, Legal);
+    }
+    if (Subtarget.hasStdExtZhinxmin()) {
+      setIndexedLoadAction(ISD::POST_INC, MVT::f16, Legal);
+      setIndexedStoreAction(ISD::POST_INC, MVT::f16, Legal);
+    }
+    if (Subtarget.hasAltHalfInx()) {
+      setIndexedLoadAction(ISD::POST_INC, MVT::bf16, Legal);
+      setIndexedStoreAction(ISD::POST_INC, MVT::bf16, Legal);
+    }
   }
 
   setBooleanContents(ZeroOrOneBooleanContent);
@@ -2199,7 +2296,7 @@ bool RISCVTargetLowering::isFPImmLegal(const APFloat &Imm, EVT VT,
   else if (VT == MVT::f64)
     IsLegalVT = Subtarget.hasStdExtDOrZdinx();
   else if (VT == MVT::bf16)
-    IsLegalVT = Subtarget.hasStdExtZfbfmin();
+    IsLegalVT = Subtarget.hasStdExtZfbfmin() || Subtarget.hasAltHalfInx();
 
   if (!IsLegalVT)
     return false;
@@ -2796,7 +2893,13 @@ InstructionCost RISCVTargetLowering::getLMULCost(MVT VT) const {
     else
       Cost = (LMul * DLenFactor);
   } else {
-    Cost = divideCeil(VT.getSizeInBits(), Subtarget.getRealMinVLen() / DLenFactor);
+    unsigned DLen = Subtarget.getRealMinVLen() / DLenFactor;
+    // Without any V extension getRealMinVLen() is 0. Return a neutral cost
+    // instead of dividing by zero (fixed PULP SIMD vectors are legal without
+    // RVV).
+    if (DLen == 0)
+      return 1;
+    Cost = divideCeil(VT.getSizeInBits(), DLen);
   }
   return Cost;
 }
@@ -5995,7 +6098,7 @@ SDValue RISCVTargetLowering::LowerOperation(SDValue Op,
       return FPConv;
     }
     if (VT == MVT::bf16 && Op0VT == MVT::i16 &&
-        Subtarget.hasStdExtZfbfmin()) {
+        (Subtarget.hasStdExtZfbfmin() || Subtarget.hasAltHalfInx())) {
       SDValue NewOp0 = DAG.getNode(ISD::ANY_EXTEND, DL, XLenVT, Op0);
       SDValue FPConv = DAG.getNode(RISCVISD::FMV_H_X, DL, MVT::bf16, NewOp0);
       return FPConv;
@@ -6518,6 +6621,29 @@ SDValue RISCVTargetLowering::LowerOperation(SDValue Op,
   case ISD::VECTOR_SPLICE:
     return lowerVECTOR_SPLICE(Op, DAG);
   case ISD::BUILD_VECTOR:
+    if (Subtarget.hasPULPExtV2() && (Op.getSimpleValueType() == MVT::v2f16 ||
+                                     Op.getSimpleValueType() == MVT::v2bf16)) {
+      // Constant packed small-float vectors become a single i32 constant;
+      // everything else is left legal and matched to pv.pack.h patterns.
+      if (ISD::isBuildVectorOfConstantFPSDNodes(Op.getNode())) {
+        SDLoc DL(Op);
+        uint32_t Bits = 0;
+        for (unsigned i = 0; i < 2; ++i) {
+          SDValue Elt = Op.getOperand(i);
+          if (Elt.isUndef())
+            continue;
+          uint32_t EltBits = cast<ConstantFPSDNode>(Elt)
+                                 ->getValueAPF()
+                                 .bitcastToAPInt()
+                                 .getZExtValue() &
+                             0xffff;
+          Bits |= EltBits << (16 * i);
+        }
+        SDValue C = DAG.getConstant(Bits, DL, MVT::i32);
+        return DAG.getNode(ISD::BITCAST, DL, Op.getSimpleValueType(), C);
+      }
+      return Op;
+    }
     return lowerBUILD_VECTOR(Op, DAG, Subtarget);
   case ISD::SPLAT_VECTOR:
     if (Op.getValueType().getScalarType() == MVT::f16 &&
@@ -11946,7 +12072,7 @@ void RISCVTargetLowering::ReplaceNodeResults(SDNode *N,
       SDValue FPConv = DAG.getNode(RISCVISD::FMV_X_ANYEXTH, DL, XLenVT, Op0);
       Results.push_back(DAG.getNode(ISD::TRUNCATE, DL, MVT::i16, FPConv));
     } else if (VT == MVT::i16 && Op0VT == MVT::bf16 &&
-               Subtarget.hasStdExtZfbfmin()) {
+               (Subtarget.hasStdExtZfbfmin() || Subtarget.hasAltHalfInx())) {
       SDValue FPConv = DAG.getNode(RISCVISD::FMV_X_ANYEXTH, DL, XLenVT, Op0);
       Results.push_back(DAG.getNode(ISD::TRUNCATE, DL, MVT::i16, FPConv));
     } else if (VT == MVT::i32 && Op0VT == MVT::f32 && Subtarget.is64Bit() &&
@@ -16850,6 +16976,7 @@ static bool isSelectPseudo(MachineInstr &MI) {
   case RISCV::Select_GPR_Using_CC_GPR:
   case RISCV::Select_FPR16_Using_CC_GPR:
   case RISCV::Select_FPR16INX_Using_CC_GPR:
+  case RISCV::Select_FPRAH16INX_Using_CC_GPR:
   case RISCV::Select_FPR32_Using_CC_GPR:
   case RISCV::Select_FPR32INX_Using_CC_GPR:
   case RISCV::Select_FPR64_Using_CC_GPR:
@@ -17334,6 +17461,7 @@ RISCVTargetLowering::EmitInstrWithCustomInserter(MachineInstr &MI,
   case RISCV::Select_GPR_Using_CC_GPR:
   case RISCV::Select_FPR16_Using_CC_GPR:
   case RISCV::Select_FPR16INX_Using_CC_GPR:
+  case RISCV::Select_FPRAH16INX_Using_CC_GPR:
   case RISCV::Select_FPR32_Using_CC_GPR:
   case RISCV::Select_FPR32INX_Using_CC_GPR:
   case RISCV::Select_FPR64_Using_CC_GPR:
@@ -19796,8 +19924,12 @@ bool RISCVTargetLowering::getIndexedAddressPartsPulp(
   if (Op->getOpcode() != ISD::ADD)
     return false;
 
-  // Xpulp supports i8, i16, and i32 post-increments only
-  if (!(VT == MVT::i8 || VT == MVT::i16 || VT == MVT::i32))
+  // Xpulp post-increments cover i8, i16 and i32; with Zfinx/Zhinx the same
+  // GPR loads/stores carry f32/f16 data too.
+  if (!(VT == MVT::i8 || VT == MVT::i16 || VT == MVT::i32 ||
+        (VT == MVT::f32 && Subtarget.hasStdExtZfinx()) ||
+        (VT == MVT::f16 && Subtarget.hasStdExtZhinxmin()) ||
+        (VT == MVT::bf16 && Subtarget.hasAltHalfInx())))
     return false;
 
   Base = Op->getOperand(0);
@@ -19879,8 +20011,12 @@ bool RISCVTargetLowering::isFMAFasterThanFMulAndFAdd(const MachineFunction &MF,
 
   switch (SVT.getSimpleVT().SimpleTy) {
   case MVT::f16:
-    return VT.isVector() ? Subtarget.hasVInstructionsF16()
+    return VT.isVector() ? (Subtarget.hasExtXfvechalf() ||
+                            Subtarget.hasVInstructionsF16())
                          : Subtarget.hasStdExtZfhOrZhinx();
+  case MVT::bf16:
+    return VT.isVector() ? Subtarget.hasExtXfvecalthalf()
+                         : Subtarget.hasAltHalfInx();
   case MVT::f32:
     return Subtarget.hasStdExtFOrZfinx();
   case MVT::f64:

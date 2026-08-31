@@ -282,6 +282,16 @@ def PulpV4 : RegisterClass<"RISCV", [v4i8], 32, (add
     (sequence "X%u", 0, 4)
   )>;
 
+// Xfvec packed float vectors (GAP9-style cores keep floats in GPRs).
+def PulpV2F : RegisterClass<"RISCV", [v2f16, v2bf16], 32, (add
+    (sequence "X%u", 10, 17),
+    (sequence "X%u", 5, 7),
+    (sequence "X%u", 28, 31),
+    (sequence "X%u", 8, 9),
+    (sequence "X%u", 18, 27),
+    (sequence "X%u", 0, 4)
+  )>;
+
 // Vector type mapping to LLVM types.
 //
 // The V vector extension requires that VLEN >= 128 and <= 65536.
@@ -557,6 +567,9 @@ def VMV0 : RegisterClass<"RISCV", VMaskVTs, 64, (add V0)> {
 
 let RegInfos = XLenRI in {
 def GPRF16  : RegisterClass<"RISCV", [f16], 16, (add GPR)>;
+// bf16 in GPRs for the PULP Xfalthalf extension (Zhinx-style cores). Kept
+// separate from GPRF16 so the untyped Zhinx f16 patterns stay unambiguous.
+def GPRBF16 : RegisterClass<"RISCV", [bf16], 16, (add GPR)>;
 def GPRF32  : RegisterClass<"RISCV", [f32], 32, (add GPR)>;
 } // RegInfos = XLenRI
 

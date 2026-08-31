@@ -1637,6 +1637,26 @@ def : Pat<(post_truncsti16 (i32 GPR:$val), (i32 GPR:$base), (i32 GPR:$offset)),
 def : Pat<(post_store (i32 GPR:$val), (i32 GPR:$base), (i32 GPR:$offset)),
     (P_SW_rr_PostIncrement (i32 GPR:$val), (i32 GPR:$base), (i32 GPR:$offset))>;
 
+// With Zfinx/Zhinx, f32/f16 values live in GPRs, so the post-increment
+// integer stores apply to them too.
+let Predicates = [IsRV32, HasPULPExtV2, HasStdExtZfinx] in {
+def : Pat<(post_store (f32 FPR32INX:$val), (i32 GPR:$base), simm12:$offset),
+    (P_SW_ri_PostIncrement (COPY_TO_REGCLASS FPR32INX:$val, GPR),
+                           (i32 GPR:$base), simm12:$offset)>;
+def : Pat<(post_store (f32 FPR32INX:$val), (i32 GPR:$base), (i32 GPR:$offset)),
+    (P_SW_rr_PostIncrement (COPY_TO_REGCLASS FPR32INX:$val, GPR),
+                           (i32 GPR:$base), (i32 GPR:$offset))>;
+}
+
+let Predicates = [IsRV32, HasPULPExtV2, HasStdExtZhinxmin] in {
+def : Pat<(post_store (f16 FPR16INX:$val), (i32 GPR:$base), simm12:$offset),
+    (P_SH_ri_PostIncrement (COPY_TO_REGCLASS FPR16INX:$val, GPR),
+                           (i32 GPR:$base), simm12:$offset)>;
+def : Pat<(post_store (f16 FPR16INX:$val), (i32 GPR:$base), (i32 GPR:$offset)),
+    (P_SH_rr_PostIncrement (COPY_TO_REGCLASS FPR16INX:$val, GPR),
+                           (i32 GPR:$base), (i32 GPR:$offset))>;
+}
+
 def : Pat<(truncstorei8 (i32 GPR:$val), (add (i32 GPR:$base), (i32 GPR:$offset))),
     (P_SB_rr (i32 GPR:$val), (i32 GPR:$base), (i32 GPR:$offset))>;
 def : Pat<(truncstorei16 (i32 GPR:$val), (add (i32 GPR:$base), (i32 GPR:$offset))),

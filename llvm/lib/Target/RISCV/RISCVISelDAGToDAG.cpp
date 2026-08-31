@@ -862,11 +862,33 @@ bool RISCVDAGToDAGISel::tryPulpIndexedLoad(SDNode *Node) {
       if (simm12) Opcode = RISCV::P_LW_ri_PostIncrement;
       else        Opcode = RISCV::P_LW_rr_PostIncrement;
       break;
+    case MVT::f32:
+      if (!Subtarget->hasStdExtZfinx())
+        return false;
+      if (simm12) Opcode = RISCV::P_LW_ri_PostIncrement;
+      else        Opcode = RISCV::P_LW_rr_PostIncrement;
+      break;
+    case MVT::f16:
+      if (!Subtarget->hasStdExtZhinxmin())
+        return false;
+      // Zhinx only uses the low 16 bits, so the sign-extending p.lh matches
+      // the plain lh used for unindexed f16 loads.
+      if (simm12) Opcode = RISCV::P_LH_ri_PostIncrement;
+      else        Opcode = RISCV::P_LH_rr_PostIncrement;
+      break;
+    case MVT::bf16:
+      if (!Subtarget->hasAltHalfInx())
+        return false;
+      // Same as f16: fp16alt ops only read the low 16 bits of the GPR.
+      if (simm12) Opcode = RISCV::P_LH_ri_PostIncrement;
+      else        Opcode = RISCV::P_LH_rr_PostIncrement;
+      break;
   }
 
   if (!Opcode) return false;
 
-  ReplaceNode(Node, CurDAG->getMachineNode(Opcode, DL, MVT::i32, MVT::i32,
+  ReplaceNode(Node, CurDAG->getMachineNode(Opcode, DL, Load->getValueType(0),
+                                           Load->getValueType(1),
                                            Chain.getSimpleValueType(),
                                            Base, Offset, Chain));
   return true;
@@ -1014,8 +1036,8 @@ void RISCVDAGToDAGISel::Select(SDNode *Node) {
     default:
       llvm_unreachable("Unexpected size");
     case MVT::bf16:
-      assert(Subtarget->hasStdExtZfbfmin());
-      Opc = RISCV::FMV_H_X;
+      assert(Subtarget->hasStdExtZfbfmin() || Subtarget->hasAltHalfInx());
+      Opc = Subtarget->hasAltHalfInx() ? RISCV::COPY : RISCV::FMV_H_X;
       break;
     case MVT::f16:
       Opc = Subtarget->hasStdExtZhinxmin() ? RISCV::COPY : RISCV::FMV_H_X;

@@ -395,6 +395,19 @@ auto getInductionUpdateParts(const MachineInstr *Update)
     Result.IndDef = 2;
     Result.Bump = 3;
     break;
+  case RISCV::P_SW_ri_PostIncrement:
+  case RISCV::P_SW_rr_PostIncrement:
+  case RISCV::P_SB_ri_PostIncrement:
+  case RISCV::P_SB_rr_PostIncrement:
+  case RISCV::P_SH_ri_PostIncrement:
+  case RISCV::P_SH_rr_PostIncrement:
+    // %Rnext:gpr = P_SW_ri_PostIncrement %value:gpr, %R:gpr(tied-def 0), 4
+    //     ^                                              ^               ^
+    // 0: IndUpdate                                   2: IndDef        3: Bump
+    Result.IndUpdate = 0;
+    Result.IndDef = 2;
+    Result.Bump = 3;
+    break;
   }
 
   return Result;
@@ -774,25 +787,29 @@ PULPHardwareLoops::getLoopTripCount(MachineLoop *L,
 
   if (InitialValue->isReg()) {
     llvm::Register R = InitialValue->getReg();
-    MachineBasicBlock *DefBB = MRI->getVRegDef(R)->getParent();
-    if (!MDT->properlyDominates(DefBB, Header)) {
+    // Physical registers (e.g. X0 in a compare against zero) have no SSA
+    // definition, so getVRegDef would return null.
+    MachineInstr *DefMI = R.isVirtual() ? MRI->getVRegDef(R) : nullptr;
+    if (!DefMI || !MDT->properlyDominates(DefMI->getParent(), Header)) {
       int64_t V;
       if (!checkForImmediate(*InitialValue, V)) {
         return nullptr;
       }
     }
-    OldInsts.push_back(MRI->getVRegDef(R));
+    if (DefMI)
+      OldInsts.push_back(DefMI);
   }
   if (EndValue->isReg()) {
     llvm::Register R = EndValue->getReg();
-    MachineBasicBlock *DefBB = MRI->getVRegDef(R)->getParent();
-    if (!MDT->properlyDominates(DefBB, Header)) {
+    MachineInstr *DefMI = R.isVirtual() ? MRI->getVRegDef(R) : nullptr;
+    if (!DefMI || !MDT->properlyDominates(DefMI->getParent(), Header)) {
       int64_t V;
       if (!checkForImmediate(*EndValue, V)) {
         return nullptr;
       }
     }
-    OldInsts.push_back(MRI->getVRegDef(R));
+    if (DefMI)
+      OldInsts.push_back(DefMI);
   }
 
   return computeCount(L, InitialValue, EndValue, IVReg, IVBump, Cmp);
@@ -991,8 +1008,9 @@ CountValue *PULPHardwareLoops::computeCount(MachineLoop *Loop,
       // If the loop has been unrolled, we should use the original loop count
       // instead of recalculating the value. This will avoid additional
       // 'Add' instruction.
-      const MachineInstr *EndValInstr = MRI->getVRegDef(End->getReg());
-      if (EndValInstr->getOpcode() == RISCV::ADDI &&
+      const MachineInstr *EndValInstr =
+          End->getReg().isVirtual() ? MRI->getVRegDef(End->getReg()) : nullptr;
+      if (EndValInstr && EndValInstr->getOpcode() == RISCV::ADDI &&
           EndValInstr->getOperand(1).getSubReg() == 0 &&
           EndValInstr->getOperand(2).getImm() == StartV) {
         DistR = EndValInstr->getOperand(1).getReg();
@@ -1092,6 +1110,12 @@ bool PULPHardwareLoops::containsInvalidInstruction(MachineLoop *L) const {
 /// removed.
 bool PULPHardwareLoops::isDead(
     const MachineInstr *MI, SmallVectorImpl<MachineInstr *> &DeadPhis) const {
+  // Never remove instructions with memory side effects. A post-increment
+  // store can be the loop's induction update; after the conversion its
+  // bumped pointer may be dead, but the store itself must stay.
+  if (MI->mayStore() || MI->hasUnmodeledSideEffects())
+    return false;
+
   // Examine each operand.
   for (unsigned i = 0, e = MI->getNumOperands(); i != e; ++i) {
     const MachineOperand &MO = MI->getOperand(i);
@@ -1265,12 +1289,23 @@ bool PULPHardwareLoops::convertToHardwareLoop(MachineLoop *L, bool &RecL0used,
   if (TripCount->isReg()) {
     // There will be a use of the register inserted into the preheader,
     // so make sure that the register is actually defined at that point.
-    MachineInstr *TCDef = MRI->getVRegDef(TripCount->getReg());
-    MachineBasicBlock *BBDef = TCDef->getParent();
-    if (!MDT->dominates(BBDef, Preheader)) {
-      LLVM_DEBUG(dbgs() << "Cannot convert to hwloop: induction register not "
-                           "available in preheader\n");
-      return Changed;
+    // Physical registers have no SSA definition; only the constant zero
+    // register X0 is known to be available everywhere.
+    llvm::Register TCReg = TripCount->getReg();
+    if (!TCReg.isVirtual()) {
+      if (TCReg != RISCV::X0) {
+        LLVM_DEBUG(dbgs() << "Cannot convert to hwloop: trip count in "
+                             "physical register\n");
+        return Changed;
+      }
+    } else {
+      MachineInstr *TCDef = MRI->getVRegDef(TCReg);
+      MachineBasicBlock *BBDef = TCDef->getParent();
+      if (!MDT->dominates(BBDef, Preheader)) {
+        LLVM_DEBUG(dbgs() << "Cannot convert to hwloop: induction register not "
+                             "available in preheader\n");
+        return Changed;
+      }
     }
   }
 

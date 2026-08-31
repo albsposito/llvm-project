@@ -17,12 +17,8 @@ fsb ft5, (x4)
 flab ft3, (x4)
 # CHECK-DISASM: fsb     ft5, 0(tp)
 fsab ft5, (x4)
-# CHECK-DISASM: fsgnj.h ft3, ft6, ft6
-fmv.ah ft3, ft6
-# CHECK-DISASM: fsgnjx.h        ft3, ft6, ft6
-fabs.ah ft3, ft6
-# CHECK-DISASM: fsgnjn.h        ft3, ft6, ft6
-fneg.ah ft3, ft6
+# fmv.ah/fabs.ah/fneg.ah are Zfinx-style (GPR) instructions, tested in
+# rv32xsflt-xfalthalf-valid.s (GPR-as-FPR parsing is disabled when F is on).
 # CHECK-DISASM: fsgnj.b ft3, ft6, ft6
 fmv.b ft3, ft6
 # CHECK-DISASM: fsgnjx.b        ft3, ft6, ft6

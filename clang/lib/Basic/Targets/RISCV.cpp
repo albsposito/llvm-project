@@ -355,6 +355,11 @@ bool RISCVTargetInfo::handleTargetFeatures(std::vector<std::string> &Features,
   if (ISAInfo->hasExtension("zfh") || ISAInfo->hasExtension("zhinx"))
     HasLegalHalfType = true;
 
+  // The PULP Xfalthalf extension provides native scalar bf16 arithmetic, so
+  // __bf16 does not need to be evaluated with float excess precision.
+  if (ISAInfo->hasExtension("xfalthalf"))
+    HasFullBFloat16 = true;
+
   FastUnalignedAccess = llvm::is_contained(Features, "+fast-unaligned-access");
 
   if (llvm::is_contained(Features, "+experimental"))

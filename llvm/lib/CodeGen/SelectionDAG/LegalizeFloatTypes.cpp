@@ -3131,6 +3131,7 @@ bool DAGTypeLegalizer::SoftPromoteHalfOperand(SDNode *N, unsigned OpNo) {
                        "operand!");
 
   case ISD::BITCAST:    Res = SoftPromoteHalfOp_BITCAST(N); break;
+  case ISD::BUILD_VECTOR: Res = SoftPromoteHalfOp_BUILD_VECTOR(N); break;
   case ISD::FCOPYSIGN:  Res = SoftPromoteHalfOp_FCOPYSIGN(N, OpNo); break;
   case ISD::FP_TO_SINT:
   case ISD::FP_TO_UINT: Res = SoftPromoteHalfOp_FP_TO_XINT(N); break;
@@ -3166,6 +3167,18 @@ SDValue DAGTypeLegalizer::SoftPromoteHalfOp_BITCAST(SDNode *N) {
   SDValue Op0 = GetSoftPromotedHalf(N->getOperand(0));
 
   return DAG.getNode(ISD::BITCAST, SDLoc(N), N->getValueType(0), Op0);
+}
+
+SDValue DAGTypeLegalizer::SoftPromoteHalfOp_BUILD_VECTOR(SDNode *N) {
+  // Build the vector from the soft-promoted i16 elements and bitcast back.
+  EVT VT = N->getValueType(0);
+  SDLoc dl(N);
+  SmallVector<SDValue, 8> Ops;
+  for (const SDValue &Op : N->op_values())
+    Ops.push_back(GetSoftPromotedHalf(Op));
+  EVT IVT = VT.changeVectorElementType(MVT::i16);
+  SDValue Vec = DAG.getBuildVector(IVT, dl, Ops);
+  return DAG.getNode(ISD::BITCAST, dl, VT, Vec);
 }
 
 SDValue DAGTypeLegalizer::SoftPromoteHalfOp_FCOPYSIGN(SDNode *N,

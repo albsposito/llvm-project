@@ -1052,8 +1052,12 @@ InstructionCost RISCVTTIImpl::getMemoryOpCost(unsigned Opcode, Type *Src,
   // Assume memory ops cost scale with the number of vector registers
   // possible accessed by the instruction.  Note that BasicTTI already
   // handles the LT.first term for us.
+  // LMUL scaling only makes sense with RVV. With the PULP extensions small
+  // fixed vectors (v2s/v4s/v2h) are legal without any V extension; in that
+  // case getRealMinVLen() is 0 and getLMULCost would divide by zero.
   if (std::pair<InstructionCost, MVT> LT = getTypeLegalizationCost(Src);
-      LT.second.isVector() && CostKind != TTI::TCK_CodeSize)
+      LT.second.isVector() && CostKind != TTI::TCK_CodeSize &&
+      ST->hasVInstructions())
     BaseCost *= TLI->getLMULCost(LT.second);
   return Cost + BaseCost;
 
