@@ -32,6 +32,7 @@ namespace clang {
   class DeclGroupRef;
   class DiagnosticBuilder;
   struct LoopHint;
+  struct FrepHint;
   class Parser;
   class ParsingDeclRAIIObject;
   class ParsingDeclSpec;
@@ -214,6 +215,7 @@ class Parser : public CodeCompletionHandler {
   std::unique_ptr<PragmaHandler> MaxTokensHerePragmaHandler;
   std::unique_ptr<PragmaHandler> MaxTokensTotalPragmaHandler;
   std::unique_ptr<PragmaHandler> RISCVPragmaHandler;
+  std::unique_ptr<PragmaHandler> FrepHandler;
 
   std::unique_ptr<CommentHandler> CommentSemaHandler;
 
@@ -813,6 +815,10 @@ private:
   /// Handle the annotation token produced for
   /// #pragma clang loop and #pragma unroll.
   bool HandlePragmaLoopHint(LoopHint &Hint);
+
+  /// Handle the annotation token produced for
+  /// #pragma frep
+  bool HandlePragmaFrep(FrepHint &Hint);
 
   bool ParsePragmaAttributeSubjectMatchRuleSet(
       attr::ParsedSubjectMatchRuleSet &SubjectMatchRules,
@@ -2147,6 +2153,11 @@ private:
   StmtResult ParseAsmStatement(bool &msAsm);
   StmtResult ParseMicrosoftAsmStatement(SourceLocation AsmLoc);
   StmtResult ParsePragmaLoopHint(StmtVector &Stmts, ParsedStmtContext StmtCtx,
+                                 SourceLocation *TrailingElseLoc,
+                                 ParsedAttributes &Attrs);
+
+  StmtResult ParsePragmaFrep(StmtVector &Stmts,
+                                 ParsedStmtContext StmtCtx,
                                  SourceLocation *TrailingElseLoc,
                                  ParsedAttributes &Attrs);
 

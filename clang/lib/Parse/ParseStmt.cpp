@@ -17,6 +17,7 @@
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Parse/LoopHint.h"
+#include "clang/Parse/FrepHint.h"
 #include "clang/Parse/Parser.h"
 #include "clang/Parse/RAIIObjectsForParser.h"
 #include "clang/Sema/DeclSpec.h"
@@ -513,6 +514,12 @@ Retry:
   case tok::annot_pragma_attribute:
     HandlePragmaAttribute();
     return StmtEmpty();
+
+  case tok::annot_pragma_frep:
+    ProhibitAttributes(CXX11Attrs);
+    ProhibitAttributes(GNUAttrs);
+    return ParsePragmaFrep(Stmts, StmtCtx, TrailingElseLoc, CXX11Attrs);
+
   }
 
   // If we reached this code, the statement must end in a semicolon.
@@ -2493,6 +2500,37 @@ StmtResult Parser::ParsePragmaLoopHint(StmtVector &Stmts,
     Attrs.Range.setBegin(StartLoc);
 
   return S;
+}
+
+StmtResult Parser::ParsePragmaFrep(StmtVector &Stmts,
+                                       ParsedStmtContext StmtCtx,
+                                       SourceLocation *TrailingElseLoc,
+                                       ParsedAttributes &Attrs) {
+  // Create temporary attribute list.
+  ParsedAttributes TempAttrs(AttrFactory);
+  while (Tok.is(tok::annot_pragma_frep)) {
+    FrepHint Hint;
+    if (!HandlePragmaFrep(Hint))
+      continue;
+    if (Hint.OptionLoc->Ident->getName() == "infer") {
+      ArgsUnion ArgHints[] = {Hint.PragmaNameLoc, Hint.OptionLoc};
+      TempAttrs.addNew(Hint.PragmaNameLoc->Ident, Hint.Range, nullptr,
+                     Hint.PragmaNameLoc->Loc, ArgHints, 2,
+                     ParsedAttr::Form::Pragma());
+    } else {
+      printf("Error, no valid option in ParseStmt\n");
+    }
+  }
+  // Get the next statement.
+  MaybeParseCXX11Attributes(Attrs);
+  
+  ParsedAttributes EmptyDeclSpecAttrs(AttrFactory);
+  StmtResult S = ParseStatementOrDeclarationAfterAttributes(
+      Stmts, StmtCtx, TrailingElseLoc, Attrs, EmptyDeclSpecAttrs);
+  
+  Attrs.takeAllFrom(TempAttrs);
+  return S;
+
 }
 
 Decl *Parser::ParseFunctionStatementBody(Decl *Decl, ParseScope &BodyScope) {
