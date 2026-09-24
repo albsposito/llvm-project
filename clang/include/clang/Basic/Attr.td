@@ -4195,7 +4195,7 @@ def HLSLLoopHint: StmtAttr {
 
 def Frep : Attr {
   let Spellings = [Pragma<"", "frep">];
-  let Args = [EnumArgument<"Option", "OptionType",
+  let Args = [EnumArgument<"Option", "OptionType", /*is_string=*/false,
                           ["infer"],
                           ["Infer"]>];
   let AdditionalMembers = [{
