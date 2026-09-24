@@ -282,7 +282,7 @@ class PolicyAndIntegrateTest(unittest.TestCase):
 
 
 class LitDiffTest(unittest.TestCase):
-    def run_diff(self, cand, base=None):
+    def run_diff(self, cand, base=None, renames=None):
         with tempfile.TemporaryDirectory() as tmp:
             c = Path(tmp) / "c.json"
             c.write_text(json.dumps({"tests": [{"name": n, "code": k} for n, k in cand.items()]}))
@@ -293,6 +293,10 @@ class LitDiffTest(unittest.TestCase):
                 b = Path(tmp) / "b.json"
                 b.write_text(json.dumps({"tests": [{"name": n, "code": k} for n, k in base.items()]}))
                 args += ["--baseline", str(b)]
+            if renames is not None:
+                m = Path(tmp) / "renames.json"
+                m.write_text(json.dumps(renames))
+                args += ["--baseline-renames", str(m)]
             r = py("lit_diff.py", *args)
             return r.returncode, json.loads((Path(tmp) / "o.json").read_text())
 
@@ -310,6 +314,47 @@ class LitDiffTest(unittest.TestCase):
         self.assertEqual(problems["llvm/test/CodeGen/RISCV/xpulp-hwloop.ll"], "fork test is UNSUPPORTED, not PASS")
         self.assertEqual(problems["llvm/test/MC/RISCV/rv32xssr-valid.s"], "fork test did not run")
         self.assertEqual(problems["llvm/test/CodeGen/RISCV/add.ll"], "regressed from PASS to XFAIL")
+
+    def test_evidence_backed_rename_and_rejection_cases(self):
+        source = "llvm/test/CodeGen/RISCV/old.ll"
+        dest = "llvm/test/CodeGen/RISCV/new.ll"
+        base = {"LLVM :: CodeGen/RISCV/old.ll": "PASS"}
+        cand = {"LLVM :: CodeGen/RISCV/xpulp-hwloop.ll": "PASS",
+                "LLVM :: MC/RISCV/rv32xssr-valid.s": "PASS",
+                "LLVM :: CodeGen/RISCV/new.ll": "PASS"}
+        entry = {"source": source, "destination": dest, "upstream_commit": "a" * 40}
+        rc, report = self.run_diff(cand, base, [entry])
+        self.assertEqual(rc, 0, report)
+        self.assertEqual(report["baseline_renames"], [entry])
+        self.assertEqual(self.run_diff(cand, base)[0], 1)
+        for code in (None, "FAIL", "UNRESOLVED", "TIMEOUT", "XPASS", "XFAIL", "UNSUPPORTED"):
+            with self.subTest(destination=code):
+                changed = dict(cand)
+                if code is None:
+                    del changed["LLVM :: CodeGen/RISCV/new.ll"]
+                else:
+                    changed["LLVM :: CodeGen/RISCV/new.ll"] = code
+                rc, report = self.run_diff(changed, base, [entry])
+                self.assertEqual(rc, 1)
+                self.assertTrue(report["mapping_errors"])
+                if code == "FAIL":
+                    self.assertTrue(any(t["problem"] == "FAIL" for g in report["groups"] for t in g["tests"]))
+        for entries in ([entry, entry], [entry, {**entry, "source": source + "2"}],
+                        [{**entry, "upstream_commit": "missing"}],
+                        [{**entry, "source": dest}], ["invalid"]):
+            with self.subTest(entries=entries):
+                self.assertTrue(self.run_diff(cand, base, entries)[1]["mapping_errors"])
+        present = {**cand, "LLVM :: CodeGen/RISCV/old.ll": "FAIL"}
+        self.assertEqual(self.run_diff(present, base, [entry])[0], 1)
+        unrelated = {**cand, "LLVM :: CodeGen/RISCV/other.ll": "FAIL"}
+        self.assertEqual(self.run_diff(unrelated, base, [entry])[0], 1)
+        # Baseline identity mapping never waives the fork inventory requirement.
+        fork_entry = {**entry, "source": "llvm/test/CodeGen/RISCV/xpulp-hwloop.ll"}
+        missing_fork = dict(cand)
+        del missing_fork["LLVM :: CodeGen/RISCV/xpulp-hwloop.ll"]
+        rc, report = self.run_diff(missing_fork, {"LLVM :: CodeGen/RISCV/xpulp-hwloop.ll": "PASS"}, [fork_entry])
+        self.assertEqual(rc, 1)
+        self.assertTrue(any(t["problem"] == "fork test did not run" for g in report["groups"] for t in g["tests"]))
 
 
 DIS_REF = """

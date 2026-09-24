@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Run the green-defining test suite for a worktree and diff it against a baseline.
-#   scripts/lit.sh <worktree> <build-dir> <jobs> <out-dir> [baseline-lit.json]
+#   scripts/lit.sh <worktree> <build-dir> <jobs> <out-dir> [baseline-lit.json] [baseline-renames.json]
 # Writes <out-dir>/lit.json (lit results), <out-dir>/unit.json (RISCVISAInfo gtest) and
 # <out-dir>/lit_diff.json (lit_diff.py report). Exit status is lit_diff.py's (0 = green).
 set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 source "$here/../config.env"
-wt="$1"; bd="$2"; jobs="$3"; out="$4"; baseline="${5:-}"
+wt="$1"; bd="$2"; jobs="$3"; out="$4"; baseline="${5:-}"; renames="${6:-}"
 mkdir -p "$out"
 "$here/in-builder.sh" bash -c '
 set -uo pipefail
@@ -35,4 +35,5 @@ rc=$?
 args=(--candidate "$out/lit.json" --fork-tests "$here/../data/fork-tests.txt" --out "$out/lit_diff.json"
       --known-failures "$here/../data/known-failures.txt")
 [ -n "$baseline" ] && args+=(--baseline "$baseline")
+[ -n "$renames" ] && args+=(--baseline-renames "$renames")
 python3 "$here/lit_diff.py" "${args[@]}"
