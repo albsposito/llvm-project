@@ -90,6 +90,23 @@ void initializeRISCVLoadStoreOptPass(PassRegistry &);
 FunctionPass *createRISCVZacasABIFixPass();
 void initializeRISCVZacasABIFixPass(PassRegistry &);
 
+FunctionPass *createPULPExpandPseudoPass();
+void initializePULPExpandPseudoPass(PassRegistry &);
+
+FunctionPass *createPULPHardwareLoops();
+void initializePULPHardwareLoopsPass(PassRegistry &);
+
+FunctionPass *createPULPFixupHwLoops();
+
+FunctionPass *createRISCVExpandSSRPass();
+void initializeRISCVExpandSSRPass(PassRegistry &);
+
+FunctionPass *createRISCVExpandSDMAPass();
+void initializeRISCVExpandSDMAPass(PassRegistry &);
+
+FunctionPass *createSNITCHFrepLoopsPass();
+void initializeSNITCHFrepLoopsPass(PassRegistry &);
+
 InstructionSelector *
 createRISCVInstructionSelector(const RISCVTargetMachine &,
                                const RISCVSubtarget &,
