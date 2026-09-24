@@ -1644,7 +1644,7 @@ static bool ParseFrepValue(Preprocessor &PP, Token &Tok, Token PragmaName,
   EOFTok.setLocation(Tok.getLocation());
   ValueList.push_back(EOFTok); // Terminates expression for parsing.
 
-  Info.Toks = llvm::makeArrayRef(ValueList).copy(PP.getPreprocessorAllocator());
+  Info.Toks = llvm::ArrayRef(ValueList).copy(PP.getPreprocessorAllocator());
   Info.Option = Option;
   Info.PragmaName = PragmaName;
   return true;
