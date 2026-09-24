@@ -28,9 +28,10 @@ def uimm13_lsb0 : Operand<OtherVT>,
   }];
 }
 
-def uimm6_lsb0 : Operand<OtherVT>,
-                 ImmLeaf<XLenVT, [{return isShiftedUInt<5, 1>(Imm);}]>  {
-  let ParserMatchClass = UImmAsmOperand<6, "Lsb0">;
+// PULP-private operand. Upstream (Xwchc) has its own, different uimm6_lsb0.
+def uimm6_lsb0_pulp : Operand<OtherVT>,
+                      ImmLeaf<XLenVT, [{return isShiftedUInt<5, 1>(Imm);}]>  {
+  let ParserMatchClass = UImmAsmOperand<6, "Lsb0Pulp">;
   let EncoderMethod = "getImmOpValueAsr1";
   let DecoderMethod = "decodeUImmOperand<13>";
   let MCOperandPredicate = [{
