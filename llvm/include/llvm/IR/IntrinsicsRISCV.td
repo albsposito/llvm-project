@@ -1831,6 +1831,7 @@ def int_riscv_sm4ed      : ScalarCryptoByteSelect32;
 // Zksh
 def int_riscv_sm3p0      : ScalarCryptoGprIntrinsic32;
 def int_riscv_sm3p1      : ScalarCryptoGprIntrinsic32;
+
 } // TargetPrefix = "riscv"
 
 //===----------------------------------------------------------------------===//
@@ -1889,3 +1890,5 @@ let TargetPrefix = "riscv" in {
 include "llvm/IR/IntrinsicsRISCVXTHead.td"
 include "llvm/IR/IntrinsicsRISCVXsf.td"
 include "llvm/IR/IntrinsicsRISCVXCV.td"
+include "llvm/IR/IntrinsicsRISCVXpulp.td"
+include "llvm/IR/IntrinsicsRISCVXsnitch.td"
