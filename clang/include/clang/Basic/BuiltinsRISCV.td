@@ -151,3 +151,8 @@ def ntl_store : RISCVBuiltin<"void(...)">;
 // XCV extensions.
 //===----------------------------------------------------------------------===//
 include "clang/Basic/BuiltinsRISCVXCV.td"
+
+//===----------------------------------------------------------------------===//
+// PULP extensions (Xpulpv, Xssr, Xdma).
+//===----------------------------------------------------------------------===//
+include "clang/Basic/BuiltinsRISCVXpulp.td"
