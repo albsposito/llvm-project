@@ -1,0 +1,7 @@
+llvm-project/
+wt/
+build/
+ccache/
+logs/
+toolchains/
+__pycache__/
