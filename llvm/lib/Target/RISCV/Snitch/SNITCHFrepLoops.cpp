@@ -86,8 +86,8 @@ public:
   StringRef getPassName() const override { return SNITCH_FREP_LOOPS_NAME; }
 
   void getAnalysisUsage(AnalysisUsage &AU) const override {
-    AU.addRequired<MachineDominatorTree>();
-    AU.addRequired<MachineLoopInfo>();
+    AU.addRequired<MachineDominatorTreeWrapperPass>();
+    AU.addRequired<MachineLoopInfoWrapperPass>();
     MachineFunctionPass::getAnalysisUsage(AU);
   }
 
@@ -313,9 +313,9 @@ bool SNITCHFrepLoops::runOnMachineFunction(MachineFunction &MF) {
 
   bool Changed = false;
 
-  MLI = &getAnalysis<MachineLoopInfo>();
+  MLI = &getAnalysis<MachineLoopInfoWrapperPass>().getLI();
   MRI = &MF.getRegInfo();
-  MDT = &getAnalysis<MachineDominatorTree>();
+  MDT = &getAnalysis<MachineDominatorTreeWrapperPass>().getDomTree();
   const RISCVSubtarget &HST = MF.getSubtarget<RISCVSubtarget>();
   TII = HST.getInstrInfo();
   TRI = HST.getRegisterInfo();
@@ -1636,8 +1636,8 @@ bool SNITCHFrepLoops::isMarkedForInference(MachineLoop *L) {
 
 INITIALIZE_PASS_BEGIN(SNITCHFrepLoops, DEBUG_TYPE, SNITCH_FREP_LOOPS_NAME,
                       false, false)
-INITIALIZE_PASS_DEPENDENCY(MachineDominatorTree)
-INITIALIZE_PASS_DEPENDENCY(MachineLoopInfo)
+INITIALIZE_PASS_DEPENDENCY(MachineDominatorTreeWrapperPass)
+INITIALIZE_PASS_DEPENDENCY(MachineLoopInfoWrapperPass)
 INITIALIZE_PASS_END(SNITCHFrepLoops, DEBUG_TYPE, SNITCH_FREP_LOOPS_NAME, false,
                     false)
 
