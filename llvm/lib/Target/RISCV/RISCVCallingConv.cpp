@@ -531,11 +531,14 @@ bool llvm::CC_RISCV(unsigned ValNo, MVT ValVT, MVT LocVT,
   Align StackAlign = Align(XLen / 8);
 
   if (ValVT.isVector() || ValVT.isRISCVVectorTuple()) {
-    Reg = allocateRVVReg(ValVT, ValNo, State, TLI);
+    if (ValVT.isVector() && Subtarget.hasPULPExtV2())
+      Reg = State.AllocateReg(ArgGPRs);
+    else
+      Reg = allocateRVVReg(ValVT, ValNo, State, TLI);
     if (Reg) {
       // Fixed-length vectors are located in the corresponding scalable-vector
       // container types.
-      if (ValVT.isFixedLengthVector()) {
+      if (ValVT.isFixedLengthVector() && !Subtarget.hasPULPExtV2()) {
         LocVT = TLI.getContainerForFixedLengthVector(LocVT);
         State.addLoc(
             CCValAssign::getCustomReg(ValNo, ValVT, Reg, LocVT, LocInfo));
@@ -589,7 +592,8 @@ bool llvm::CC_RISCV(unsigned ValNo, MVT ValVT, MVT LocVT,
 
   assert(((ValVT.isFloatingPoint() && !ValVT.isVector()) || LocVT == XLenVT ||
           (TLI.getSubtarget().hasVInstructions() &&
-           (ValVT.isVector() || ValVT.isRISCVVectorTuple()))) &&
+           (ValVT.isVector() || ValVT.isRISCVVectorTuple())) ||
+          TLI.getSubtarget().hasPULPExtV2()) &&
          "Expected an XLenVT or vector types at this stage");
 
   if (Reg) {

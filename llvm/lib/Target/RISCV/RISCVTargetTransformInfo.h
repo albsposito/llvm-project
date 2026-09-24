@@ -438,6 +438,8 @@ public:
 
   TTI::MemCmpExpansionOptions enableMemCmpExpansion(bool OptSize,
                                                     bool IsZeroCmp) const;
+
+  bool isLoweredToCall(const Function *F);
 };
 
 } // end namespace llvm

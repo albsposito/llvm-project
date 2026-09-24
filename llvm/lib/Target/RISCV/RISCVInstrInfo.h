@@ -300,6 +300,10 @@ public:
   std::unique_ptr<TargetInstrInfo::PipelinerLoopInfo>
   analyzeLoopForPipelining(MachineBasicBlock *LoopBB) const override;
 
+  // Check if the instruction is a scheduling boundary.
+  bool isSchedulingBoundary(const MachineInstr &MI,
+                            const MachineBasicBlock *MBB,
+                            const MachineFunction &MF) const override;
 protected:
   const RISCVSubtarget &STI;
 
