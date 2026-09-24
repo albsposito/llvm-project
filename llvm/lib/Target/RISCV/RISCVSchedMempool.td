@@ -59,6 +59,12 @@ def : WriteRes<WriteIDiv, [MempoolUnitSnitch, MempoolUnitIMulDiv]> {
 let Latency = 16;
 let ReleaseAtCycles = [1, 14];
 }
+// Remainder uses the divider exactly like division (upstream split the
+// WriteIDiv class into WriteIDiv/WriteIRem in LLVM 19).
+def : WriteRes<WriteIRem, [MempoolUnitSnitch, MempoolUnitIMulDiv]> {
+let Latency = 16;
+let ReleaseAtCycles = [1, 14];
+}
 
 // Memory
 def : WriteRes<WriteSTB, [MempoolUnitSnitch]>;
@@ -86,6 +92,7 @@ def : WriteRes<WriteIALU32, []>;
 def : WriteRes<WriteShiftImm32, []>;
 def : WriteRes<WriteIMul32, []>;
 def : WriteRes<WriteIDiv32, []>;
+def : WriteRes<WriteIRem32, []>;
 def : WriteRes<WriteSFB, []>;
 def : WriteRes<WriteSTD, []>;
 def : WriteRes<WriteLDD, []>;
@@ -159,6 +166,8 @@ def : ReadAdvance<ReadSFBJmp, 0>;
 def : ReadAdvance<ReadSFBALU, 0>;
 def : ReadAdvance<ReadIDiv, 0>;
 def : ReadAdvance<ReadIDiv32, 0>;
+def : ReadAdvance<ReadIRem, 0>;
+def : ReadAdvance<ReadIRem32, 0>;
 def : ReadAdvance<ReadIMul, 0>;
 def : ReadAdvance<ReadIMul32, 0>;
 def : ReadAdvance<ReadAtomicWA, 0>;
@@ -216,9 +225,12 @@ def : ReadAdvance<ReadXPERM, 0>;
 //===----------------------------------------------------------------------===//
 // Unsupported extensions
 defm : UnsupportedSchedV;
+defm : UnsupportedSchedZabha;
 defm : UnsupportedSchedZba;
 defm : UnsupportedSchedZbb;
 defm : UnsupportedSchedZbc;
 defm : UnsupportedSchedZbs;
 defm : UnsupportedSchedZfh;
+defm : UnsupportedSchedXsfvcp;
+defm : UnsupportedSchedZvk;
 }
