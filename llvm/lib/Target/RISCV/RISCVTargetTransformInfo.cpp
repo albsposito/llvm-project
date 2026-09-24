@@ -1968,3 +1968,20 @@ bool RISCVTTIImpl::areInlineCompatible(const Function *Caller,
   // target-features.
   return (CallerBits & CalleeBits) == CalleeBits;
 }
+
+bool RISCVTTIImpl::isLoweredToCall(const Function *F) {
+  if (F->getName().starts_with("llvm.riscv.pulp"))
+    return false;
+
+  return BaseT::isLoweredToCall(F);
+}
+
+TTI::AddressingModeKind
+RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,
+                                         ScalarEvolution *SE) const {
+  if (ST->hasPULPExtV2()) {
+    return TTI::AMK_PostIndexed;
+  }
+
+  return TTI::AMK_None;
+}
