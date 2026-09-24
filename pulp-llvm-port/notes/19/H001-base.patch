@@ -1,0 +1,171 @@
+diff --git a/pulp-llvm-port/scripts/integrate.py b/pulp-llvm-port/scripts/integrate.py
+index b02c03736653..022e2d168d74 100755
+--- a/pulp-llvm-port/scripts/integrate.py
++++ b/pulp-llvm-port/scripts/integrate.py
+@@ -13,10 +13,16 @@ Order of checks (first failure wins, and the integration branch is restored to w
+   3. build: the set of error signatures must not grow, and must shrink
+      (a change that fixes nothing is rejected as noise)
+   4. optional lit: the number of lit problems must not grow
++With --allow-unmasked, step 3 accepts new error signatures whose every site lies on a line the
++change did not add or modify: a fixed TableGen error lets the build reach code it never reached
++before, and those errors were already there. They are listed as errors_unmasked for the conductor
++to check; an error on a line the change touched is still a rejection.
+ Only the harness-owned integration worktree is ever reset; worker branches are untouched.
+ """
+ import argparse
+ import json
++import os
++import re
+ import subprocess
+ import sys
+ from pathlib import Path
+@@ -38,6 +44,34 @@ def error_keys(log, wt):
+     return {c["key"] for c in json.loads(out.read_text())["clusters"]}
+ 
+ 
++def error_sites(log, wt):
++    out = Path(log).with_suffix(".clusters.json")
++    return {c["key"]: c["sites"] for c in json.loads(out.read_text())["clusters"]}
++
++
++def touched_lines(wt, base, head):
++    """{path: set(line numbers in head)} for every line the range adds or modifies."""
++    diff = git(wt, "diff", "-U0", "--no-color", base, head)
++    touched, path = {}, None
++    for line in diff.splitlines():
++        if line.startswith("+++ "):
++            path = None if line[4:] == "/dev/null" else line[6:]
++        elif line.startswith("@@") and path:
++            m = re.search(r"\+(\d+)(?:,(\d+))?", line)
++            start, n = int(m.group(1)), int(m.group(2) or 1)
++            touched.setdefault(path, set()).update(range(start, start + n))
++    return touched
++
++
++def site_touched(site, touched):
++    path, _, rest = site.partition(":")
++    path = os.path.normpath(path)
++    lineno = rest.split(":")[0]
++    if path not in touched:
++        return False
++    return not lineno.isdigit() or int(lineno) in touched[path]
++
++
+ def main():
+     ap = argparse.ArgumentParser()
+     ap.add_argument("--int-wt", required=True)
+@@ -48,6 +82,8 @@ def main():
+     ap.add_argument("--errors-before", required=True, help="cluster_errors JSON of the integration HEAD")
+     ap.add_argument("--lit-cmd")
+     ap.add_argument("--lit-before", help="lit_diff JSON of the integration HEAD")
++    ap.add_argument("--allow-unmasked", action="store_true",
++                    help="accept new error signatures that are not on lines the change touched")
+     ap.add_argument("--out", required=True)
+     args = ap.parse_args()
+     wt = args.int_wt
+@@ -90,6 +126,15 @@ def main():
+     new = sorted(after - before)
+     fixed = sorted(before - after)
+     result.update(build_rc=rc, errors_fixed=fixed, errors_new=new, build_log=str(build_log))
++    if new and args.allow_unmasked and fixed:
++        sites = error_sites(build_log, wt)
++        touched = touched_lines(wt, head0, "HEAD")
++        on_change = [k for k in new if any(site_touched(s, touched) for s in sites.get(k, []))]
++        if not on_change:
++            result.update(errors_unmasked=new, errors_new=[])
++            new = []
++        else:
++            result.update(errors_on_changed_lines=on_change)
+     if new:
+         return finish("REJECTED", reason="build introduced new error signatures")
+     if before and not fixed:
+diff --git a/pulp-llvm-port/scripts/lit.sh b/pulp-llvm-port/scripts/lit.sh
+index 134de6d71129..36ca25cfdf1c 100755
+--- a/pulp-llvm-port/scripts/lit.sh
++++ b/pulp-llvm-port/scripts/lit.sh
+@@ -14,18 +14,24 @@ wt="$1"; bd="$2"; jobs="$3"; out="$4"; shift 4
+ ninja -C "$bd" -j "$jobs" -k 0 llvm-test-depends clang-test-depends lld || exit 3
+ paths=(); for p in "$@"; do paths+=("$wt/$p"); done
+ "$bd/bin/llvm-lit" -q --no-progress-bar -j "$jobs" -o "$out/lit.json" "${paths[@]}"
+-# ISAInfo unit test lives in SupportTests (LLVM 18) or TargetParserTests (19+).
+-for t in TargetParserTests SupportTests; do
+-  if ninja -C "$bd" -j "$jobs" "$t" >/dev/null 2>&1; then
+-    bin=$(find "$bd/unittests" -type f -name "$t" | head -1)
+-    "$bin" --gtest_filter="RISCVISAInfo*" --gtest_output="json:$out/unit.json" >"$out/unit.log" 2>&1
+-    echo "unit ($t) exit $?"; break
+-  fi
+-done
++# ISAInfo unit test lives in SupportTests (LLVM 18) or TargetParserTests (19+). Pick by
++# where the test source is: both binaries exist at 18, and the wrong one runs 0 tests.
++if [ -f "$wt/llvm/unittests/TargetParser/RISCVISAInfoTest.cpp" ]; then t=TargetParserTests; src=TargetParser; else t=SupportTests; src=Support; fi
++ninja -C "$bd" -j "$jobs" "$t" >/dev/null 2>&1 || { echo "unit: building $t failed"; exit 4; }
++bin=$(find "$bd/unittests" -type f -name "$t" | head -1)
++# The suites in RISCVISAInfoTest.cpp are named after what they test (ParseArchString, ...),
++# not after the file, so build the filter from the file itself.
++filter=$(grep -oE "^TEST(_F)?\(\w+" "$wt/llvm/unittests/$src/RISCVISAInfoTest.cpp" | sed "s/.*(//; s/$/.*/" | sort -u | paste -sd:)
++"$bin" --gtest_filter="$filter" --gtest_output="json:$out/unit.json" >"$out/unit.log" 2>&1
++urc=$?
++n=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))[\"tests\"])" "$out/unit.json" 2>/dev/null || echo 0)
++echo "unit ($t) exit $urc, $n tests"
++[ "$urc" -eq 0 ] && [ "$n" -gt 0 ] || exit 5
+ exit 0
+ ' _ "$wt" "$bd" "$jobs" "$out" $LIT_PATHS
+ rc=$?
+-[ $rc -ne 0 ] && { echo "lit.sh: building test dependencies failed ($rc)"; exit $rc; }
++[ $rc -eq 3 ] && { echo "lit.sh: building test dependencies failed ($rc)"; exit $rc; }
++[ $rc -ne 0 ] && { echo "lit.sh: RISCVISAInfo unit tests failed or did not run ($rc), see $out/unit.log"; exit $rc; }
+ args=(--candidate "$out/lit.json" --fork-tests "$here/../data/fork-tests.txt" --out "$out/lit_diff.json"
+       --known-failures "$here/../data/known-failures.txt")
+ [ -n "$baseline" ] && args+=(--baseline "$baseline")
+diff --git a/pulp-llvm-port/tests/test_harness.py b/pulp-llvm-port/tests/test_harness.py
+index b519394e764a..e42152872f18 100755
+--- a/pulp-llvm-port/tests/test_harness.py
++++ b/pulp-llvm-port/tests/test_harness.py
+@@ -198,14 +198,14 @@ class PolicyAndIntegrateTest(unittest.TestCase):
+         self.assertEqual(rc, 1)
+         self.assertEqual(rules, {"test-edit", "test-weakened", "if0", "upstream-file-edit"})
+ 
+-    def integrate(self, build_script, **extra):
++    def integrate(self, build_script, *extra_args):
+         (Path(self.tmp.name) / "build.sh").write_text(build_script)
+         before = Path(self.tmp.name) / "before.json"
+         before.write_text(json.dumps({"clusters": [{"key": "use of undeclared identifier 'foo'"}]}))
+         out = Path(self.tmp.name) / "logs" / "r.json"
+         args = ["--int-wt", str(self.repo), "--branch", "work", "--stack-base", self.base,
+                 "--notes-root", str(self.notes), "--build-cmd", f"bash {self.tmp.name}/build.sh {self.repo}",
+-                "--errors-before", str(before), "--out", str(out)]
++                "--errors-before", str(before), "--out", str(out), *extra_args]
+         r = py("integrate.py", *args)
+         return r.returncode, json.loads(out.read_text())
+ 
+@@ -239,6 +239,30 @@ class PolicyAndIntegrateTest(unittest.TestCase):
+         self.assertEqual(rc, 1)
+         self.assertEqual(res["errors_new"], ["expected ';'"])
+ 
++    # The fix lets the build get further and reach an error that was already there (a masked error).
++    UNMASKING = ("grep -q v3 $1/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp || "
++                 "{ echo \"$1/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:1:1: error: use of undeclared identifier 'foo'\"; exit 1; }\n"
++                 "echo \"$1/llvm/lib/Target/RISCV/RISCVISelLowering.cpp:1:1: error: no member named 'bar'\"\n"
++                 "exit 1\n")
++
++    def test_unmasked_error_needs_opt_in_and_is_reported(self):
++        self.worker({"llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp": "hwloop pass v3\n"},
++                    f"fixup! {self.passes_subject}\n\nChange-Note: 19/E001.md\n")
++        rc, res = self.integrate(self.UNMASKING)
++        self.assertEqual(rc, 1)
++        self.assertEqual(res["errors_new"], ["no member named 'bar'"])
++        rc, res = self.integrate(self.UNMASKING, "--allow-unmasked")
++        self.assertEqual((rc, res["verdict"]), (0, "LANDED"), res)
++        self.assertEqual(res["errors_unmasked"], ["no member named 'bar'"])
++
++    def test_new_error_on_changed_line_is_rejected_even_with_opt_in(self):
++        self.worker({"llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp": "hwloop pass v3\n"},
++                    f"fixup! {self.passes_subject}\n\nChange-Note: 19/E001.md\n")
++        script = ("echo \"$1/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:1:1: error: expected ';'\"\nexit 1\n")
++        rc, res = self.integrate(script, "--allow-unmasked")
++        self.assertEqual(rc, 1)
++        self.assertEqual(res["errors_on_changed_lines"], ["expected ';'"])
++
+     def test_policy_failure_blocks_integration(self):
+         self.worker({"llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp": "hwloop pass v3\n"}, "no fixup subject")
+         rc, res = self.integrate(self.FAILING)

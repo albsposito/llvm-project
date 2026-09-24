@@ -13,10 +13,16 @@ Order of checks (first failure wins, and the integration branch is restored to w
   3. build: the set of error signatures must not grow, and must shrink
      (a change that fixes nothing is rejected as noise)
   4. optional lit: the number of lit problems must not grow
+With --allow-unmasked, step 3 accepts new error signatures whose every site lies on a line the
+change did not add or modify: a fixed TableGen error lets the build reach code it never reached
+before, and those errors were already there. They are listed as errors_unmasked for the conductor
+to check; an error on a line the change touched is still a rejection.
 Only the harness-owned integration worktree is ever reset; worker branches are untouched.
 """
 import argparse
 import json
+import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -38,6 +44,34 @@ def error_keys(log, wt):
     return {c["key"] for c in json.loads(out.read_text())["clusters"]}
 
 
+def error_sites(log, wt):
+    out = Path(log).with_suffix(".clusters.json")
+    return {c["key"]: c["sites"] for c in json.loads(out.read_text())["clusters"]}
+
+
+def touched_lines(wt, base, head):
+    """{path: set(line numbers in head)} for every line the range adds or modifies."""
+    diff = git(wt, "diff", "-U0", "--no-color", base, head)
+    touched, path = {}, None
+    for line in diff.splitlines():
+        if line.startswith("+++ "):
+            path = None if line[4:] == "/dev/null" else line[6:]
+        elif line.startswith("@@") and path:
+            m = re.search(r"\+(\d+)(?:,(\d+))?", line)
+            start, n = int(m.group(1)), int(m.group(2) or 1)
+            touched.setdefault(path, set()).update(range(start, start + n))
+    return touched
+
+
+def site_touched(site, touched):
+    path, _, rest = site.partition(":")
+    path = os.path.normpath(path)
+    lineno = rest.split(":")[0]
+    if path not in touched:
+        return False
+    return not lineno.isdigit() or int(lineno) in touched[path]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--int-wt", required=True)
@@ -48,6 +82,8 @@ def main():
     ap.add_argument("--errors-before", required=True, help="cluster_errors JSON of the integration HEAD")
     ap.add_argument("--lit-cmd")
     ap.add_argument("--lit-before", help="lit_diff JSON of the integration HEAD")
+    ap.add_argument("--allow-unmasked", action="store_true",
+                    help="accept new error signatures that are not on lines the change touched")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
     wt = args.int_wt
@@ -90,6 +126,15 @@ def main():
     new = sorted(after - before)
     fixed = sorted(before - after)
     result.update(build_rc=rc, errors_fixed=fixed, errors_new=new, build_log=str(build_log))
+    if new and args.allow_unmasked and fixed:
+        sites = error_sites(build_log, wt)
+        touched = touched_lines(wt, head0, "HEAD")
+        on_change = [k for k in new if any(site_touched(s, touched) for s in sites.get(k, []))]
+        if not on_change:
+            result.update(errors_unmasked=new, errors_new=[])
+            new = []
+        else:
+            result.update(errors_on_changed_lines=on_change)
     if new:
         return finish("REJECTED", reason="build introduced new error signatures")
     if before and not fixed:
