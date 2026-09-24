@@ -5016,6 +5016,8 @@ def mrvv_vector_bits_EQ : Joined<["-"], "mrvv-vector-bits=">, Group<m_Group>,
       !eq(GlobalDocumentation.Program, "Flang") : "",
       true: " The value will be reflected in __riscv_v_fixed_vlen preprocessor define"),
     " (RISC-V only)")>;
+def mno_fdiv : Flag<["-"], "mno-fdiv">, Group<m_riscv_Features_Group>,
+  HelpText<"Don't use hardware floating-point divide and square root instructions (RISC-V only)">;
 
 def munaligned_access : Flag<["-"], "munaligned-access">, Group<m_Group>,
   HelpText<"Allow memory accesses to be unaligned (AArch32/MIPSr6 only)">;
