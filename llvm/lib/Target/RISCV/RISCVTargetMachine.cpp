@@ -128,6 +128,12 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeRISCVTarget() {
   initializeRISCVDAGToDAGISelLegacyPass(*PR);
   initializeRISCVMoveMergePass(*PR);
   initializeRISCVPushPopOptPass(*PR);
+
+  initializeRISCVExpandSSRPass(*PR);
+  initializePULPExpandPseudoPass(*PR);
+  initializeSNITCHFrepLoopsPass(*PR);
+  initializeRISCVExpandSDMAPass(*PR);
+  initializePULPHardwareLoopsPass(*PR);
 }
 
 static StringRef computeDataLayout(const Triple &TT,
@@ -522,6 +528,8 @@ void RISCVPassConfig::addPreEmitPass2() {
   }
   addPass(createRISCVExpandPseudoPass());
 
+  addPass(createPULPFixupHwLoops());
+
   // Schedule the expansion of AMOs at the last possible moment, avoiding the
   // possibility for other passes to break the requirements for forward
   // progress in the LR/SC block.
@@ -553,6 +561,11 @@ void RISCVPassConfig::addPreRegAlloc() {
 
   addPass(createRISCVInsertReadWriteCSRPass());
   addPass(createRISCVInsertWriteVXRMPass());
+  addPass(createPULPExpandPseudoPass());
+  addPass(createRISCVExpandSDMAPass());
+  addPass(createRISCVExpandSSRPass());
+  addPass(createSNITCHFrepLoopsPass());
+  addPass(createPULPHardwareLoops());
 
   // Run RISCVInsertVSETVLI after PHI elimination. On O1 and above do it after
   // register coalescing so needVSETVLIPHI doesn't need to look through COPYs.
