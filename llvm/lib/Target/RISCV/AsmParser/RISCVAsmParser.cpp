@@ -778,7 +778,7 @@ public:
            VK == RISCVMCExpr::VK_RISCV_None;
   }
 
-  bool isUImm6Lsb0() const {
+  bool isUImm6Lsb0Pulp() const {
     int64_t Imm;
     RISCVMCExpr::VariantKind VK = RISCVMCExpr::VK_RISCV_None;
     if (!isImm())
