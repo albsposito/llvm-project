@@ -12,6 +12,7 @@
 
 #include "RISCVRegisterInfo.h"
 #include "RISCV.h"
+#include "RISCVMachineFunctionInfo.h"
 #include "RISCVSubtarget.h"
 #include "llvm/ADT/SmallSet.h"
 #include "llvm/BinaryFormat/Dwarf.h"
@@ -142,6 +143,15 @@ BitVector RISCVRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
   // Floating point environment registers.
   markSuperRegs(Reserved, RISCV::FRM);
   markSuperRegs(Reserved, RISCV::FFLAGS);
+  
+  // Mark SSR floating point registers as reserved.
+  if(Subtarget.hasExtXssr()) {
+    const auto *RVFI = MF.getInfo<RISCVMachineFunctionInfo>();
+    for (unsigned n = 0; n != 8; ++n) {
+      if(RVFI->getUsedSSR() & (1<<n))
+        markSuperRegs(Reserved, RISCV::F0_D + n);
+    }
+  }
 
   // SiFive VCIX state registers.
   markSuperRegs(Reserved, RISCV::SF_VCIX_STATE);
