@@ -198,14 +198,14 @@ class PolicyAndIntegrateTest(unittest.TestCase):
         self.assertEqual(rc, 1)
         self.assertEqual(rules, {"test-edit", "test-weakened", "if0", "upstream-file-edit"})
 
-    def integrate(self, build_script, **extra):
+    def integrate(self, build_script, *extra_args):
         (Path(self.tmp.name) / "build.sh").write_text(build_script)
         before = Path(self.tmp.name) / "before.json"
         before.write_text(json.dumps({"clusters": [{"key": "use of undeclared identifier 'foo'"}]}))
         out = Path(self.tmp.name) / "logs" / "r.json"
         args = ["--int-wt", str(self.repo), "--branch", "work", "--stack-base", self.base,
                 "--notes-root", str(self.notes), "--build-cmd", f"bash {self.tmp.name}/build.sh {self.repo}",
-                "--errors-before", str(before), "--out", str(out)]
+                "--errors-before", str(before), "--out", str(out), *extra_args]
         r = py("integrate.py", *args)
         return r.returncode, json.loads(out.read_text())
 
@@ -238,6 +238,30 @@ class PolicyAndIntegrateTest(unittest.TestCase):
         rc, res = self.integrate(script)
         self.assertEqual(rc, 1)
         self.assertEqual(res["errors_new"], ["expected ';'"])
+
+    # The fix lets the build get further and reach an error that was already there (a masked error).
+    UNMASKING = ("grep -q v3 $1/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp || "
+                 "{ echo \"$1/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:1:1: error: use of undeclared identifier 'foo'\"; exit 1; }\n"
+                 "echo \"$1/llvm/lib/Target/RISCV/RISCVISelLowering.cpp:1:1: error: no member named 'bar'\"\n"
+                 "exit 1\n")
+
+    def test_unmasked_error_needs_opt_in_and_is_reported(self):
+        self.worker({"llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp": "hwloop pass v3\n"},
+                    f"fixup! {self.passes_subject}\n\nChange-Note: 19/E001.md\n")
+        rc, res = self.integrate(self.UNMASKING)
+        self.assertEqual(rc, 1)
+        self.assertEqual(res["errors_new"], ["no member named 'bar'"])
+        rc, res = self.integrate(self.UNMASKING, "--allow-unmasked")
+        self.assertEqual((rc, res["verdict"]), (0, "LANDED"), res)
+        self.assertEqual(res["errors_unmasked"], ["no member named 'bar'"])
+
+    def test_new_error_on_changed_line_is_rejected_even_with_opt_in(self):
+        self.worker({"llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp": "hwloop pass v3\n"},
+                    f"fixup! {self.passes_subject}\n\nChange-Note: 19/E001.md\n")
+        script = ("echo \"$1/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:1:1: error: expected ';'\"\nexit 1\n")
+        rc, res = self.integrate(script, "--allow-unmasked")
+        self.assertEqual(rc, 1)
+        self.assertEqual(res["errors_on_changed_lines"], ["expected ';'"])
 
     def test_policy_failure_blocks_integration(self):
         self.worker({"llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp": "hwloop pass v3\n"}, "no fixup subject")

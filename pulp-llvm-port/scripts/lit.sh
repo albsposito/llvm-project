@@ -14,18 +14,24 @@ wt="$1"; bd="$2"; jobs="$3"; out="$4"; shift 4
 ninja -C "$bd" -j "$jobs" -k 0 llvm-test-depends clang-test-depends lld || exit 3
 paths=(); for p in "$@"; do paths+=("$wt/$p"); done
 "$bd/bin/llvm-lit" -q --no-progress-bar -j "$jobs" -o "$out/lit.json" "${paths[@]}"
-# ISAInfo unit test lives in SupportTests (LLVM 18) or TargetParserTests (19+).
-for t in TargetParserTests SupportTests; do
-  if ninja -C "$bd" -j "$jobs" "$t" >/dev/null 2>&1; then
-    bin=$(find "$bd/unittests" -type f -name "$t" | head -1)
-    "$bin" --gtest_filter="RISCVISAInfo*" --gtest_output="json:$out/unit.json" >"$out/unit.log" 2>&1
-    echo "unit ($t) exit $?"; break
-  fi
-done
+# ISAInfo unit test lives in SupportTests (LLVM 18) or TargetParserTests (19+). Pick by
+# where the test source is: both binaries exist at 18, and the wrong one runs 0 tests.
+if [ -f "$wt/llvm/unittests/TargetParser/RISCVISAInfoTest.cpp" ]; then t=TargetParserTests; src=TargetParser; else t=SupportTests; src=Support; fi
+ninja -C "$bd" -j "$jobs" "$t" >/dev/null 2>&1 || { echo "unit: building $t failed"; exit 4; }
+bin=$(find "$bd/unittests" -type f -name "$t" | head -1)
+# The suites in RISCVISAInfoTest.cpp are named after what they test (ParseArchString, ...),
+# not after the file, so build the filter from the file itself.
+filter=$(grep -oE "^TEST(_F)?\(\w+" "$wt/llvm/unittests/$src/RISCVISAInfoTest.cpp" | sed "s/.*(//; s/$/.*/" | sort -u | paste -sd:)
+"$bin" --gtest_filter="$filter" --gtest_output="json:$out/unit.json" >"$out/unit.log" 2>&1
+urc=$?
+n=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))[\"tests\"])" "$out/unit.json" 2>/dev/null || echo 0)
+echo "unit ($t) exit $urc, $n tests"
+[ "$urc" -eq 0 ] && [ "$n" -gt 0 ] || exit 5
 exit 0
 ' _ "$wt" "$bd" "$jobs" "$out" $LIT_PATHS
 rc=$?
-[ $rc -ne 0 ] && { echo "lit.sh: building test dependencies failed ($rc)"; exit $rc; }
+[ $rc -eq 3 ] && { echo "lit.sh: building test dependencies failed ($rc)"; exit $rc; }
+[ $rc -ne 0 ] && { echo "lit.sh: RISCVISAInfo unit tests failed or did not run ($rc), see $out/unit.log"; exit $rc; }
 args=(--candidate "$out/lit.json" --fork-tests "$here/../data/fork-tests.txt" --out "$out/lit_diff.json"
       --known-failures "$here/../data/known-failures.txt")
 [ -n "$baseline" ] && args+=(--baseline "$baseline")
