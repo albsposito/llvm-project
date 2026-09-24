@@ -29,6 +29,8 @@ tablegen(LLVM RISCVGenPostLegalizeGICombiner.inc -gen-global-isel-combiner
 add_public_tablegen_target(RISCVCommonTableGen)
 
 add_llvm_target(RISCVCodeGen
+  PULP/PULPHardwareLoops.cpp
+  PULP/PULPFixupHwLoops.cpp
   RISCVAsmPrinter.cpp
   RISCVCallingConv.cpp
   RISCVCodeGenPrepare.cpp
@@ -37,6 +39,8 @@ add_llvm_target(RISCVCodeGen
   RISCVMakeCompressible.cpp
   RISCVExpandAtomicPseudoInsts.cpp
   RISCVExpandPseudoInsts.cpp
+  RISCVExpandSSRInsts.cpp
+  RISCVExpandSDMAInsts.cpp
   RISCVFrameLowering.cpp
   RISCVGatherScatterLowering.cpp
   RISCVIndirectBranchTracking.cpp
@@ -71,6 +75,8 @@ add_llvm_target(RISCVCodeGen
   GISel/RISCVO0PreLegalizerCombiner.cpp
   GISel/RISCVPreLegalizerCombiner.cpp
   GISel/RISCVRegisterBankInfo.cpp
+  Snitch/SNITCHFrepLoops.cpp
+  PULPExpandPseudoInsts.cpp
 
   LINK_COMPONENTS
   Analysis
