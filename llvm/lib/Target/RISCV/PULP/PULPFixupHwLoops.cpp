@@ -97,7 +97,7 @@ MachineBasicBlock *splitMBBAt(MachineBasicBlock *OldMBB, MachineInstr &MI) {
 
     void getAnalysisUsage(AnalysisUsage &AU) const override {
       AU.setPreservesCFG();
-      AU.addRequired<MachineLoopInfo>();
+      AU.addRequired<MachineLoopInfoWrapperPass>();
       MachineFunctionPass::getAnalysisUsage(AU);
     }
 
@@ -340,7 +340,8 @@ bool PULPFixupHwLoops::fixupLoopLatch(MachineFunction &MF) {
       for (MachineInstr &MI : MBB) {
         if (isHardwareLoop(MI)) {
           // Get the ExitingBlock, and from there the ExitBlock
-          MachineLoopInfo *MLI = &getAnalysis<MachineLoopInfo>();
+          MachineLoopInfo *MLI =
+              &getAnalysis<MachineLoopInfoWrapperPass>().getLI();
           MachineBasicBlock *LastMBB = MI.getOperand(0).getMBB();
           MachineLoop *L = MLI->getLoopFor(LastMBB);
           assert(L->contains(LastMBB) && "Loop does not contain LastMBB");

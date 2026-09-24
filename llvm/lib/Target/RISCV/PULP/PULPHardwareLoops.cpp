@@ -95,8 +95,8 @@ public:
   StringRef getPassName() const override { return "PULP Hardware Loops"; }
 
   void getAnalysisUsage(AnalysisUsage &AU) const override {
-    AU.addRequired<MachineDominatorTree>();
-    AU.addRequired<MachineLoopInfo>();
+    AU.addRequired<MachineDominatorTreeWrapperPass>();
+    AU.addRequired<MachineLoopInfoWrapperPass>();
     MachineFunctionPass::getAnalysisUsage(AU);
   }
 
@@ -294,8 +294,8 @@ public:
 
 INITIALIZE_PASS_BEGIN(PULPHardwareLoops, "pulp-hwloops", "PULP Hardware Loops",
                       false, false)
-INITIALIZE_PASS_DEPENDENCY(MachineDominatorTree)
-INITIALIZE_PASS_DEPENDENCY(MachineLoopInfo)
+INITIALIZE_PASS_DEPENDENCY(MachineDominatorTreeWrapperPass)
+INITIALIZE_PASS_DEPENDENCY(MachineLoopInfoWrapperPass)
 INITIALIZE_PASS_END(PULPHardwareLoops, "pulp-hwloops", "PULP Hardware Loops",
                     false, false)
 
@@ -323,9 +323,9 @@ bool PULPHardwareLoops::runOnMachineFunction(MachineFunction &MF) {
   bool Changed = false;
   NumHWLoopsInternal = 0;
 
-  MLI = &getAnalysis<MachineLoopInfo>();
+  MLI = &getAnalysis<MachineLoopInfoWrapperPass>().getLI();
   MRI = &MF.getRegInfo();
-  MDT = &getAnalysis<MachineDominatorTree>();
+  MDT = &getAnalysis<MachineDominatorTreeWrapperPass>().getDomTree();
   const RISCVSubtarget &HST = MF.getSubtarget<RISCVSubtarget>();
   TII = HST.getInstrInfo();
   TRI = HST.getRegisterInfo();
