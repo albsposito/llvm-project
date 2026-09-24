@@ -9,14 +9,14 @@ target triple = "riscv32-unknown-unknown-elf"
 
 ; Case 1: Nested loop, inner loop with FREP, outer loop not unrolled
 
-; CHECK:        csrrsi  {{.*}}, 1984, 1
+; CHECK:        csrsi 1984, 1
 ; CHECK:        li [[rBound:[a-zA-Z0-9_]*]], 127
 ; CHECK-NEXT:   frep.o  [[rBound]], 2, 0, 0
 ; CHECK-NEXT:   fmul.d  {{.*}}
 ; CHECK-NEXT:   fadd.d  {{.*}}
 ; CHECK-NEXT:   fmv.x.w {{.*}}, {{.*}}
 ; CHECK-NEXT:   addi  [[rInd:[a-zA-Z0-9_]*]], [[rInd]], 1
-; CHECK-NEXT:   csrrci  {{.*}}, 1984, 1
+; CHECK-NEXT:   csrci 1984, 1
 ; CHECK-NEXT:   bne [[rInd]], a1, .LBB0_1
 
 ; Function Attrs: nounwind
@@ -55,14 +55,14 @@ for.body4:                                        ; preds = %for.body, %for.body
 
 ; Case 2: Nested loop, inner loop with FREP, outer loop unrolled 2
 
-; CHECK:        csrrsi  {{.*}}, 1984, 1
+; CHECK:        csrsi 1984, 1
 ; CHECK:        li [[rBound:[a-zA-Z0-9_]*]], 127
 ; CHECK-NEXT:   frep.o  [[rBound]], 2, 0, 0
 ; CHECK-NEXT:   fmul.d  {{.*}}
 ; CHECK-NEXT:   fadd.d  {{.*}}
 ; CHECK-NEXT:   fmv.x.w {{.*}}, {{.*}}
-; CHECK-NEXT:   csrrci  {{.*}}, 1984, 1
-; CHECK-NEXT:   csrrsi  {{.*}}, 1984, 1
+; CHECK-NEXT:   csrci 1984, 1
+; CHECK-NEXT:   csrsi 1984, 1
 ; CHECK:        li [[rBound:[a-zA-Z0-9_]*]], 127
 ; CHECK:        frep.o  [[rBound]], 2, 0, 0
 ; CHECK-NEXT:   fmul.d  {{.*}}
