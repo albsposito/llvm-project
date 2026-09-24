@@ -862,6 +862,10 @@ static RISCVCC::CondCode getCondFromBranchOpc(unsigned Opc) {
     return RISCVCC::COND_LTU;
   case RISCV::BGEU:
     return RISCVCC::COND_GEU;
+  case RISCV::P_BEQIMM:
+    return RISCVCC::COND_EQ;
+  case RISCV::P_BNEIMM:
+    return RISCVCC::COND_NE;
   }
 }
 
@@ -1279,6 +1283,8 @@ bool RISCVInstrInfo::isBranchOffsetInRange(unsigned BranchOp,
   case RISCV::BGEU:
   case RISCV::CV_BEQIMM:
   case RISCV::CV_BNEIMM:
+  case RISCV::P_BEQIMM:
+  case RISCV::P_BNEIMM:
     return isIntN(13, BrOffset);
   case RISCV::JAL:
   case RISCV::PseudoBR:
@@ -2432,6 +2438,9 @@ bool RISCVInstrInfo::verifyInstruction(const MachineInstr &MI,
         case RISCVOp::OPERAND_VTYPEI11:
           Ok = isUInt<11>(Imm);
           break;
+        case RISCVOp::OPERAND_UIMM12M1:
+          Ok = isUInt<12>(Imm) && (Imm != 0);
+          break;
         case RISCVOp::OPERAND_SIMM12:
           Ok = isInt<12>(Imm);
           break;
@@ -3018,6 +3027,26 @@ std::string RISCVInstrInfo::createMIROperandComment(
 
   OS.flush();
   return Comment;
+}
+
+bool RISCVInstrInfo::isSchedulingBoundary(const MachineInstr &MI,
+                                          const MachineBasicBlock *MBB,
+                                          const MachineFunction &MF) const {
+
+  if (TargetInstrInfo::isSchedulingBoundary(MI, MBB, MF)) {
+    return true;
+  }
+
+  switch (MI.getOpcode()) {
+    case RISCV::LOOP0setup:
+    case RISCV::LOOP1setup:
+    case RISCV::LOOP0setupi:
+    case RISCV::LOOP1setupi:
+      return true;
+    default:;
+  }
+
+  return false;
 }
 
 // clang-format off

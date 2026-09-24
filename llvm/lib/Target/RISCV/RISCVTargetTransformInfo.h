@@ -399,6 +399,12 @@ public:
   }
 
   std::optional<unsigned> getMinPageSize() const { return 4096; }
+
+  bool isLoweredToCall(const Function *F);
+
+  // Defined due to PULP subtarget preferring post-inc
+  TTI::AddressingModeKind
+    getPreferredAddressingMode(const Loop *L, ScalarEvolution *SE) const;
 };
 
 } // end namespace llvm
