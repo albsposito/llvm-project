@@ -8,6 +8,8 @@ here="$(cd "$(dirname "$0")" && pwd)"
 source "$here/../config.env"
 wt="$1"; bd="$2"; jobs="$3"; out="$4"; baseline="${5:-}"
 mkdir -p "$out"
+# Remove prior evidence before any command can fail.
+rm -f "$out/lit.json" "$out/unit.json" "$out/unit.exit" "$out/lit_diff.json"
 "$here/in-builder.sh" bash -c '
 set -uo pipefail
 wt="$1"; bd="$2"; jobs="$3"; out="$4"; shift 4
@@ -24,6 +26,7 @@ bin=$(find "$bd/unittests" -type f -name "$t" | head -1)
 filter=$(grep -oE "^TEST(_F)?\(\w+" "$wt/llvm/unittests/$src/RISCVISAInfoTest.cpp" | sed "s/.*(//; s/$/.*/" | sort -u | paste -sd:)
 "$bin" --gtest_filter="$filter" --gtest_output="json:$out/unit.json" >"$out/unit.log" 2>&1
 urc=$?
+printf "%s\n" "$urc" > "$out/unit.exit"
 n=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))[\"tests\"])" "$out/unit.json" 2>/dev/null || echo 0)
 echo "unit ($t) exit $urc, $n tests"
 [ "$urc" -eq 0 ] && [ "$n" -gt 0 ] || exit 5
@@ -31,8 +34,10 @@ exit 0
 ' _ "$wt" "$bd" "$jobs" "$out" $LIT_PATHS
 rc=$?
 [ $rc -eq 3 ] && { echo "lit.sh: building test dependencies failed ($rc)"; exit $rc; }
-[ $rc -ne 0 ] && { echo "lit.sh: RISCVISAInfo unit tests failed or did not run ($rc), see $out/unit.log"; exit $rc; }
+[ $rc -ne 0 ] && echo "lit.sh: RISCVISAInfo unit tests failed or did not run ($rc), see $out/unit.log"
+urc=$(cat "$out/unit.exit" 2>/dev/null || echo 99)
 args=(--candidate "$out/lit.json" --fork-tests "$here/../data/fork-tests.txt" --out "$out/lit_diff.json"
-      --known-failures "$here/../data/known-failures.txt")
+      --known-failures "$here/../data/known-failures.txt"
+      --unit "$out/unit.json" --unit-exit "$urc")
 [ -n "$baseline" ] && args+=(--baseline "$baseline")
 python3 "$here/lit_diff.py" "${args[@]}"
