@@ -6,6 +6,7 @@
 // RISCV32: error: unknown target CPU 'not-a-cpu'
 // RISCV32-NEXT: note: valid target CPU values are:
 // RISCV32-SAME: {{^}} generic-rv32
+// RISCV32-SAME: {{^}}, mempool-rv32
 // RISCV32-SAME: {{^}}, rocket-rv32
 // RISCV32-SAME: {{^}}, rp2350-hazard3
 // RISCV32-SAME: {{^}}, sifive-e20
@@ -14,6 +15,7 @@
 // RISCV32-SAME: {{^}}, sifive-e31
 // RISCV32-SAME: {{^}}, sifive-e34
 // RISCV32-SAME: {{^}}, sifive-e76
+// RISCV32-SAME: {{^}}, snitch
 // RISCV32-SAME: {{^}}, syntacore-scr1-base
 // RISCV32-SAME: {{^}}, syntacore-scr1-max
 // RISCV32-SAME: {{^}}, syntacore-scr3-rv32
@@ -52,6 +54,7 @@
 // TUNE-RISCV32: error: unknown target CPU 'not-a-cpu'
 // TUNE-RISCV32-NEXT: note: valid target CPU values are:
 // TUNE-RISCV32-SAME: {{^}} generic-rv32
+// TUNE-RISCV32-SAME: {{^}}, mempool-rv32
 // TUNE-RISCV32-SAME: {{^}}, rocket-rv32
 // TUNE-RISCV32-SAME: {{^}}, rp2350-hazard3
 // TUNE-RISCV32-SAME: {{^}}, sifive-e20
@@ -60,6 +63,7 @@
 // TUNE-RISCV32-SAME: {{^}}, sifive-e31
 // TUNE-RISCV32-SAME: {{^}}, sifive-e34
 // TUNE-RISCV32-SAME: {{^}}, sifive-e76
+// TUNE-RISCV32-SAME: {{^}}, snitch
 // TUNE-RISCV32-SAME: {{^}}, syntacore-scr1-base
 // TUNE-RISCV32-SAME: {{^}}, syntacore-scr1-max
 // TUNE-RISCV32-SAME: {{^}}, syntacore-scr3-rv32

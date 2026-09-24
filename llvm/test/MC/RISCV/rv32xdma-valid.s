@@ -1,0 +1,38 @@
+# RUN: llvm-mc %s -triple=riscv32 --mattr=xdma -riscv-no-aliases -show-encoding \
+# RUN:     | FileCheck -check-prefixes=CHECK-ASM,CHECK-ASM-AND-OBJ %s
+# RUN: llvm-mc %s -filetype=obj -triple=riscv32  --mattr=xdma \
+# RUN:     | llvm-objdump -M no-aliases -d -r --mattr=xdma --no-print-imm-hex - \
+# RUN:     | FileCheck -check-prefixes=CHECK-DISASM %s
+
+# CHECK-ASM-AND-OBJ: dmsrc t0, t1
+# CHECK-ASM: encoding: [0x2b,0x80,0x62,0x00]
+# CHECK-DISASM: 0062802b   dmsrc  t0, t1
+dmsrc t0, t1
+# CHECK-ASM-AND-OBJ: dmdst t2, t3
+# CHECK-ASM: encoding: [0x2b,0x80,0xc3,0x03]
+# CHECK-DISASM: 03c3802b   dmdst  t2, t3
+dmdst t2, t3
+# CHECK-ASM-AND-OBJ: dmstr t0, t1
+# CHECK-ASM: encoding: [0x2b,0x80,0x62,0x0c]
+# CHECK-DISASM: 0c62802b   dmstr  t0, t1
+dmstr t0, t1
+# CHECK-ASM-AND-OBJ: dmcpyi t0, t1, 11
+# CHECK-ASM: encoding: [0xab,0x02,0xb3,0x04]
+# CHECK-DISASM: 04b302ab   dmcpyi t0, t1, 11
+dmcpyi t0, t1, 0b1011
+# CHECK-ASM-AND-OBJ: dmcpy t0, t1, t2
+# CHECK-ASM: encoding: [0xab,0x02,0x73,0x06]
+# CHECK-DISASM: 067302ab   dmcpy t0, t1, t2
+dmcpy t0, t1, t2
+# CHECK-ASM-AND-OBJ: dmstati t0, 5
+# CHECK-ASM: encoding: [0xab,0x02,0x50,0x08]
+# CHECK-DISASM: 085002ab   dmstati t0, 5
+dmstati t0, 0b0101
+# CHECK-ASM-AND-OBJ: dmstat t0, t1
+# CHECK-ASM: encoding: [0xab,0x02,0x60,0x0a]
+# CHECK-DISASM: 0a6002ab   dmstat t0, t1
+dmstat t0, t1
+# CHECK-ASM-AND-OBJ: dmrep t0
+# CHECK-ASM: encoding: [0x2b,0x80,0x02,0x0e]
+# CHECK-DISASM: 0e02802b   dmrep t0
+dmrep t0
