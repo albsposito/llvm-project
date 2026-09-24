@@ -624,6 +624,24 @@ bool SemaRISCV::CheckBuiltinFunctionCall(const TargetInfo &TI,
     break;
   }
   }
+  auto ArgValue = [&](int ArgNum) -> int {
+    llvm::APSInt Result;
+    if (SemaRef.BuiltinConstantArg(TheCall, ArgNum, Result)) {
+      llvm_unreachable("pulp intrinsic call expects a constant argument");
+    }
+    // Arg value is going to be passed to BuiltinConstantArgRange
+    // that takes int args, let's narrow it here...
+    return static_cast<int>(Result.getSExtValue());
+  };
+  // Indicate, if present, the position of well-known immediate arguments.
+  std::optional<int> RoundArgNum;
+  std::optional<int> NormArgNum;
+  std::optional<int> NegPow2ArgNum;
+  std::optional<int> Pow2ComplArgNum;
+  std::optional<int> MaskArgNum;
+  std::optional<int> NegMaskArgNum;
+  // For intrinsics which take an immediate value as part of the instruction,
+  // range check them here.
 
   switch (BuiltinID) {
   case RISCVVector::BI__builtin_rvv_vsetvli:
@@ -1303,7 +1321,7 @@ bool SemaRISCV::CheckBuiltinFunctionCall(const TargetInfo &TI,
   case RISCVVector::BI__builtin_rvv_vfwnmsac_vf_rm_mu:
     return SemaRef.BuiltinConstantArgRange(TheCall, 4, 0, 4);
   case RISCV::BI__builtin_riscv_ntl_load:
-  case RISCV::BI__builtin_riscv_ntl_store:
+  case RISCV::BI__builtin_riscv_ntl_store: {
     DeclRefExpr *DRE =
         cast<DeclRefExpr>(TheCall->getCallee()->IgnoreParenCasts());
     assert((BuiltinID == RISCV::BI__builtin_riscv_ntl_store ||
@@ -1366,6 +1384,114 @@ bool SemaRISCV::CheckBuiltinFunctionCall(const TargetInfo &TI,
     TheCall->setArg(1, ValArg.get());
     TheCall->setType(Context.VoidTy);
     return false;
+  }
+  case RISCV::BI__builtin_pulp_addRN:
+  case RISCV::BI__builtin_pulp_adduRN:
+  case RISCV::BI__builtin_pulp_subRN:
+  case RISCV::BI__builtin_pulp_subuRN:
+  case RISCV::BI__builtin_pulp_mulhhsRN:
+  case RISCV::BI__builtin_pulp_mulhhuRN:
+  case RISCV::BI__builtin_pulp_mulsRN:
+  case RISCV::BI__builtin_pulp_muluRN: RoundArgNum = 3; LLVM_FALLTHROUGH;
+  case RISCV::BI__builtin_pulp_addN:
+  case RISCV::BI__builtin_pulp_adduN:
+  case RISCV::BI__builtin_pulp_subN:
+  case RISCV::BI__builtin_pulp_subuN:
+  case RISCV::BI__builtin_pulp_mulsN:
+  case RISCV::BI__builtin_pulp_muluN:
+  case RISCV::BI__builtin_pulp_mulhhsN:
+  case RISCV::BI__builtin_pulp_mulhhuN: NormArgNum = 2; break;
+  case RISCV::BI__builtin_pulp_machhsRN:
+  case RISCV::BI__builtin_pulp_machhuRN:
+  case RISCV::BI__builtin_pulp_macsRN:
+  case RISCV::BI__builtin_pulp_macuRN: RoundArgNum = 4; LLVM_FALLTHROUGH;
+  case RISCV::BI__builtin_pulp_machhsN:
+  case RISCV::BI__builtin_pulp_machhuN:
+  case RISCV::BI__builtin_pulp_macsN:
+  case RISCV::BI__builtin_pulp_macuN: NormArgNum = 3; break;
+  case RISCV::BI__builtin_pulp_bset: MaskArgNum = 1; break;
+  case RISCV::BI__builtin_pulp_bclr: NegMaskArgNum = 1; break;
+  case RISCV::BI__builtin_pulp_binsert: NegMaskArgNum = 1; MaskArgNum = 3;
+    if (SemaRef.BuiltinConstantArgRange(TheCall, 4, 0, 31))
+      return true;
+    break;
+  case RISCV::BI__builtin_pulp_clip: NegPow2ArgNum = 1; Pow2ComplArgNum = 2; break;
+  case RISCV::BI__builtin_pulp_clipu: Pow2ComplArgNum = 2;
+    if (SemaRef.BuiltinConstantArgRange(TheCall, 1, 0, 0))
+      return true;
+    break;
+  // Bit extract: size + offset <= 32
+  case RISCV::BI__builtin_pulp_bextract:
+  case RISCV::BI__builtin_pulp_bextractu:
+    if (SemaRef.BuiltinConstantArgRange(TheCall, 1, 0, 32) ||
+        SemaRef.BuiltinConstantArgRange(TheCall, 2, 0, 32))
+      return true;
+    if (ArgValue(1) + ArgValue(2) > 32)
+      return Diag(TheCall->getBeginLoc(),
+                  diag::err_riscv_pulp_builtin_bextract_range);
+    break;
+  // Special purpose registers: register id in range [0..4091]
+  case RISCV::BI__builtin_pulp_read_then_spr_bit_clr:
+  case RISCV::BI__builtin_pulp_read_then_spr_bit_set:
+  case RISCV::BI__builtin_pulp_spr_bit_clr:
+  case RISCV::BI__builtin_pulp_spr_bit_set:
+    if (SemaRef.BuiltinConstantArgRange(TheCall, 1, 0, 31))
+      return true;
+    LLVM_FALLTHROUGH;
+  case RISCV::BI__builtin_pulp_spr_read:
+  case RISCV::BI__builtin_pulp_spr_read_vol:
+  case RISCV::BI__builtin_pulp_spr_write:
+    return SemaRef.BuiltinConstantArgRange(TheCall, 0, 0, 4091);
+  }
+  // Arg checks
+  if (NormArgNum) {
+    // Check normalization factor: must be an immediate in range [0..31]
+    if (SemaRef.BuiltinConstantArgRange(TheCall, *NormArgNum, 0, 31))
+      return true;
+    if (RoundArgNum) {
+      auto norm = ArgValue(*RoundArgNum);
+      auto round = 1u << (norm >= 1 ? norm - 1 : 0);
+      // Check rounding factor: must be an immediate equal to 2^(n-1)
+      // where n is the normalization factor
+      if(SemaRef.BuiltinConstantArgRange(TheCall, *RoundArgNum, round, round))
+        return true;
+    }
+  }
+  if(NegPow2ArgNum) {
+    auto n = *NegPow2ArgNum;
+    llvm::APSInt Result;
+    if (SemaRef.BuiltinConstantArg(TheCall, n, Result))
+      return true;
+    if(!llvm::isPowerOf2_32(-ArgValue(n)))
+      return Diag(TheCall->getBeginLoc(), diag::err_riscv_pulp_builtin_negpow2)
+             << TheCall->getArg(n)->getSourceRange();
+  }
+  if(Pow2ComplArgNum) {
+    auto n = *Pow2ComplArgNum;
+    llvm::APSInt Result;
+    if (SemaRef.BuiltinConstantArg(TheCall, n, Result))
+      return true;
+    if(!llvm::isPowerOf2_32(ArgValue(n) + 1))
+      return Diag(TheCall->getBeginLoc(), diag::err_riscv_pulp_builtin_pow2complement)
+             << TheCall->getArg(n)->getSourceRange();
+  }
+  if(MaskArgNum) {
+    auto n = *MaskArgNum;
+    llvm::APSInt Result;
+    if (SemaRef.BuiltinConstantArg(TheCall, n, Result))
+      return true;
+    if(!llvm::isShiftedMask_32(ArgValue(n)))
+      return Diag(TheCall->getBeginLoc(), diag::err_riscv_pulp_builtin_shiftedmask)
+             << TheCall->getArg(n)->getSourceRange();
+  }
+  if(NegMaskArgNum) {
+    auto n = *NegMaskArgNum;
+    llvm::APSInt Result;
+    if (SemaRef.BuiltinConstantArg(TheCall, n, Result))
+      return true;
+    if(!llvm::isShiftedMask_32(~ArgValue(n)))
+      return Diag(TheCall->getBeginLoc(), diag::err_riscv_pulp_builtin_negshiftedmask)
+             << TheCall->getArg(n)->getSourceRange();
   }
 
   return false;

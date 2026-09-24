@@ -1,0 +1,225 @@
+//==- BuiltinsRISCVXpulp.td - PULP RISC-V builtin database -*- tablegen -*-==//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines the PULP-specific (Xpulpv, Xssr, Xdma) builtin function
+// database. It is included from BuiltinsRISCV.td, following the layout
+// upstream uses for the CORE-V builtins (BuiltinsRISCVXCV.td, LLVM 20).
+//
+// Converted from the fork's TARGET_BUILTIN entries in BuiltinsRISCV.def
+// (LLVM 18). The spelling of every builtin is "__builtin_" # NAME, so the
+// builtin IDs (RISCV::BI__builtin_pulp_*, ...) are unchanged.
+//
+//===----------------------------------------------------------------------===//
+
+class PULPBuiltin<string prototype, string features = ""> : TargetBuiltin {
+  let Spellings = ["__builtin_" # NAME];
+  let Prototype = prototype;
+  let Features = features;
+}
+
+//===----------------------------------------------------------------------===//
+// SSR extension.
+//===----------------------------------------------------------------------===//
+let Attributes = [NoThrow] in {
+def ssr_setup_1d_r : PULPBuiltin<"void(unsigned int, unsigned long int, unsigned long int, unsigned long int, void *)", "xssr">;
+def ssr_setup_1d_w : PULPBuiltin<"void(unsigned int, unsigned long int, unsigned long int, unsigned long int, void *)", "xssr">;
+def ssr_read : PULPBuiltin<"void(unsigned int, unsigned int, void *)", "xssr">;
+def ssr_write : PULPBuiltin<"void(unsigned int, unsigned int, void *)", "xssr">;
+def ssr_setup_bound_stride_1d : PULPBuiltin<"void(unsigned int, unsigned long int, unsigned long int)", "xssr">;
+def ssr_setup_bound_stride_2d : PULPBuiltin<"void(unsigned int, unsigned long int, unsigned long int)", "xssr">;
+def ssr_setup_bound_stride_3d : PULPBuiltin<"void(unsigned int, unsigned long int, unsigned long int)", "xssr">;
+def ssr_setup_bound_stride_4d : PULPBuiltin<"void(unsigned int, unsigned long int, unsigned long int)", "xssr">;
+def ssr_setup_repetition : PULPBuiltin<"void(unsigned int, unsigned long int)", "xssr">;
+def ssr_push : PULPBuiltin<"void(unsigned int, double)", "xssr">;
+def ssr_pop : PULPBuiltin<"double(unsigned int)", "xssr">;
+def ssr_enable : PULPBuiltin<"void()", "xssr">;
+def ssr_disable : PULPBuiltin<"void()", "xssr">;
+def ssr_barrier : PULPBuiltin<"void(unsigned int)", "xssr">;
+} // Attributes = [NoThrow]
+
+//===----------------------------------------------------------------------===//
+// SDMA extension.
+//===----------------------------------------------------------------------===//
+let Attributes = [NoThrow] in {
+def sdma_start_oned : PULPBuiltin<"unsigned int(unsigned long long int, unsigned long long int, unsigned int, unsigned int)", "xdma">;
+def sdma_start_twod : PULPBuiltin<"unsigned int(unsigned long long int, unsigned long long int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int)", "xdma">;
+def sdma_stat : PULPBuiltin<"unsigned int(unsigned int)", "xdma">;
+def sdma_wait_for_idle : PULPBuiltin<"void()", "xdma">;
+} // Attributes = [NoThrow]
+
+//===----------------------------------------------------------------------===//
+// PULP extension.
+//===----------------------------------------------------------------------===//
+let Attributes = [NoThrow, Const] in {
+def bitinsert : PULPBuiltin<"int(int, int, _Constant unsigned int, _Constant unsigned int)", "xpulpv">; // NOTE: normal builtin in GCC
+} // Attributes = [NoThrow, Const]
+let Attributes = [NoThrow] in {
+def pulp_CoreCount : PULPBuiltin<"int()", "xpulpv">;
+def pulp_CoreId : PULPBuiltin<"int()", "xpulpv">;
+def pulp_ClusterId : PULPBuiltin<"int()", "xpulpv">;
+def pulp_IsFc : PULPBuiltin<"int()", "xpulpv">;
+def pulp_HasFc : PULPBuiltin<"int()", "xpulpv">;
+} // Attributes = [NoThrow]
+let Attributes = [NoThrow, Const] in {
+def pulp_mac : PULPBuiltin<"int(int, int, int)", "xpulpv">;
+def pulp_machhs : PULPBuiltin<"int(int, int, int)", "xpulpv">;
+def pulp_machhu : PULPBuiltin<"unsigned int(unsigned int, unsigned int, int)", "xpulpv">;
+def pulp_macs : PULPBuiltin<"int(int, int, int)", "xpulpv">;
+def pulp_macu : PULPBuiltin<"unsigned int(unsigned int, unsigned int, int)", "xpulpv">;
+def pulp_msu : PULPBuiltin<"int(int, int, int)", "xpulpv">;
+def pulp_bset : PULPBuiltin<"int(int, unsigned _Constant int)", "xpulpv">;
+def pulp_bset_r : PULPBuiltin<"int(int, unsigned int)", "xpulpv">;
+def pulp_clb : PULPBuiltin<"int(int)", "xpulpv">;
+def pulp_cnt : PULPBuiltin<"int(int)", "xpulpv">;
+def pulp_ff1 : PULPBuiltin<"int(int)", "xpulpv">;
+def pulp_fl1 : PULPBuiltin<"int(int)", "xpulpv">;
+def pulp_parity : PULPBuiltin<"int(int)", "xpulpv">;
+def pulp_rotr : PULPBuiltin<"int(int, int)", "xpulpv">;
+} // Attributes = [NoThrow, Const]
+let Attributes = [NoThrow] in {
+def pulp_read_base_off : PULPBuiltin<"int(int *, int)", "xpulpv">;
+def pulp_write_base_off : PULPBuiltin<"void(int, int *, int)", "xpulpv">;
+def pulp_read_base_off_v : PULPBuiltin<"int(int *, int)", "xpulpv">;
+def pulp_write_base_off_v : PULPBuiltin<"void(int, int *, int)", "xpulpv">;
+def pulp_read_then_spr_bit_clr : PULPBuiltin<"int(_Constant int, _Constant int)", "xpulpv">;
+def pulp_read_then_spr_bit_set : PULPBuiltin<"int(_Constant int, _Constant int)", "xpulpv">;
+def pulp_read_then_spr_write : PULPBuiltin<"int(_Constant int, int)", "xpulpv">;
+def pulp_spr_bit_clr : PULPBuiltin<"void(_Constant int, _Constant int)", "xpulpv">;
+def pulp_spr_bit_set : PULPBuiltin<"void(_Constant int, _Constant int)", "xpulpv">;
+def pulp_spr_read : PULPBuiltin<"int(_Constant int)", "xpulpv">;
+def pulp_spr_read_vol : PULPBuiltin<"int(_Constant int)", "xpulpv">;
+def pulp_spr_write : PULPBuiltin<"void(_Constant int, int)", "xpulpv">;
+def pulp_event_unit_read : PULPBuiltin<"unsigned int(int *, unsigned int)", "xpulpv">;
+} // Attributes = [NoThrow]
+let Attributes = [NoThrow, Const] in {
+def pulp_abs : PULPBuiltin<"unsigned int(int)", "xpulpv">;
+def pulp_addN : PULPBuiltin<"int(int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_addN_r : PULPBuiltin<"int(int, int, unsigned int)", "xpulpv">;
+def pulp_addRN : PULPBuiltin<"int(int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_addRN_r : PULPBuiltin<"unsigned int(int, int, unsigned int)", "xpulpv">;
+def pulp_adduN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned _Constant int)", "xpulpv">;
+def pulp_adduN_r : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned int)", "xpulpv">;
+def pulp_adduRN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_adduRN_r : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned int)", "xpulpv">;
+def pulp_clip : PULPBuiltin<"int(int, _Constant int, _Constant int)", "xpulpv">;
+def pulp_clip_r : PULPBuiltin<"int(int, int)", "xpulpv">;
+def pulp_clipu : PULPBuiltin<"unsigned int(int, _Constant int, _Constant int)", "xpulpv">;
+def pulp_clipu_r : PULPBuiltin<"unsigned int(int, unsigned int)", "xpulpv">;
+def pulp_maxsi : PULPBuiltin<"int(int, int)", "xpulpv">;
+def pulp_machhsN : PULPBuiltin<"int(int, int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_machhsRN : PULPBuiltin<"int(int, int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_machhuN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_machhuRN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_macsN : PULPBuiltin<"int(int, int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_macsRN : PULPBuiltin<"int(int, int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_macuN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_macuRN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_maxusi : PULPBuiltin<"unsigned int(unsigned int, unsigned int)", "xpulpv">;
+def pulp_minsi : PULPBuiltin<"int(int, int)", "xpulpv">;
+def pulp_minusi : PULPBuiltin<"unsigned int(unsigned int, unsigned int)", "xpulpv">;
+def pulp_mulhhs : PULPBuiltin<"int(int, int)", "xpulpv">;
+def pulp_mulhhsN : PULPBuiltin<"int(int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_mulhhsRN : PULPBuiltin<"int(int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_mulhhu : PULPBuiltin<"unsigned int(unsigned int, unsigned int)", "xpulpv">;
+def pulp_mulhhuN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned _Constant int)", "xpulpv">;
+def pulp_mulhhuRN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_muls : PULPBuiltin<"int(int, int)", "xpulpv">;
+def pulp_mulsN : PULPBuiltin<"int(int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_mulsRN : PULPBuiltin<"int(int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_mulu : PULPBuiltin<"unsigned int(unsigned int, unsigned int)", "xpulpv">;
+def pulp_muluN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned _Constant int)", "xpulpv">;
+def pulp_muluRN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_subN : PULPBuiltin<"int(int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_subN_r : PULPBuiltin<"int(int, int, unsigned int)", "xpulpv">;
+def pulp_subRN : PULPBuiltin<"int(int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_subRN_r : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned int)", "xpulpv">;
+def pulp_subuN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned _Constant int)", "xpulpv">;
+def pulp_subuN_r : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned int)", "xpulpv">;
+def pulp_subuRN : PULPBuiltin<"unsigned int(unsigned int, unsigned int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_subuRN_r : PULPBuiltin<"unsigned int(int, int, unsigned int)", "xpulpv">;
+def pulp_bclr : PULPBuiltin<"int(int, unsigned _Constant int)", "xpulpv">;
+def pulp_bclr_r : PULPBuiltin<"int(int, unsigned int)", "xpulpv">;
+def pulp_bextract : PULPBuiltin<"int(int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_bextract_r : PULPBuiltin<"int(int, unsigned int)", "xpulpv">;
+def pulp_bextractu : PULPBuiltin<"int(int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_bextractu_r : PULPBuiltin<"int(int, unsigned int)", "xpulpv">;
+def pulp_binsert : PULPBuiltin<"int(int, unsigned _Constant int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_binsert_r : PULPBuiltin<"int(int, int, unsigned int)", "xpulpv">;
+def pulp_dotsp2 : PULPBuiltin<"int(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_dotsp4 : PULPBuiltin<"int(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_dotspsc2 : PULPBuiltin<"int(_Vector<2, short>, int)", "xpulpv">;
+def pulp_dotspsc4 : PULPBuiltin<"int(_Vector<4, char>, int)", "xpulpv">;
+def pulp_dotup2 : PULPBuiltin<"unsigned int(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_dotup4 : PULPBuiltin<"unsigned int(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_dotupsc2 : PULPBuiltin<"unsigned int(_Vector<2, short>, unsigned int)", "xpulpv">;
+def pulp_dotupsc4 : PULPBuiltin<"unsigned int(_Vector<4, char>, unsigned int)", "xpulpv">;
+def pulp_dotusp2 : PULPBuiltin<"int(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_dotusp4 : PULPBuiltin<"int(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_dotuspsc2 : PULPBuiltin<"int(_Vector<2, short>, int)", "xpulpv">;
+def pulp_dotuspsc4 : PULPBuiltin<"int(_Vector<4, char>, int)", "xpulpv">;
+def pulp_sdotsp2 : PULPBuiltin<"int(_Vector<2, short>, _Vector<2, short>, int)", "xpulpv">;
+def pulp_sdotsp4 : PULPBuiltin<"int(_Vector<4, char>, _Vector<4, char>, int)", "xpulpv">;
+def pulp_sdotspsc2 : PULPBuiltin<"int(_Vector<2, short>, int, int)", "xpulpv">;
+def pulp_sdotspsc4 : PULPBuiltin<"int(_Vector<4, char>, int, int)", "xpulpv">;
+def pulp_sdotup2 : PULPBuiltin<"unsigned int(_Vector<2, short>, _Vector<2, short>, unsigned int)", "xpulpv">;
+def pulp_sdotup4 : PULPBuiltin<"unsigned int(_Vector<4, char>, _Vector<4, char>, unsigned int)", "xpulpv">;
+def pulp_sdotupsc2 : PULPBuiltin<"unsigned int(_Vector<2, short>, unsigned int, unsigned int)", "xpulpv">;
+def pulp_sdotupsc4 : PULPBuiltin<"unsigned int(_Vector<4, char>, unsigned int, unsigned int)", "xpulpv">;
+def pulp_sdotusp2 : PULPBuiltin<"int(_Vector<2, short>, _Vector<2, short>, int)", "xpulpv">;
+def pulp_sdotusp4 : PULPBuiltin<"int(_Vector<4, char>, _Vector<4, char>, int)", "xpulpv">;
+def pulp_sdotuspsc2 : PULPBuiltin<"int(_Vector<2, short>, int, int)", "xpulpv">;
+def pulp_sdotuspsc4 : PULPBuiltin<"int(_Vector<4, char>, int, int)", "xpulpv">;
+def pulp_abs2 : PULPBuiltin<"unsigned _Vector<2, short>(_Vector<2, short>)", "xpulpv">;
+def pulp_abs4 : PULPBuiltin<"unsigned _Vector<4, char>(_Vector<4, char>)", "xpulpv">;
+def pulp_add2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_add4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_and2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_and4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_avg2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_avg4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_avgu2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_avgu4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_exor2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_exor4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_max2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_max4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_maxu2 : PULPBuiltin<"unsigned _Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_maxu4 : PULPBuiltin<"unsigned _Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_min2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_min4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_minu2 : PULPBuiltin<"unsigned _Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_minu4 : PULPBuiltin<"unsigned _Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_neg2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>)", "xpulpv">;
+def pulp_neg4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>)", "xpulpv">;
+def pulp_or2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_or4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_sll2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_sll4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_sra2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_sra4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_srl2 : PULPBuiltin<"unsigned _Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_srl4 : PULPBuiltin<"unsigned _Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_sub2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_sub4 : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_pack2 : PULPBuiltin<"_Vector<2, short>(int, int)", "xpulpv">;
+def pulp_pack4 : PULPBuiltin<"_Vector<4, char>(int, int, int, int)", "xpulpv">;
+def pulp_pack4_hi : PULPBuiltin<"_Vector<4, char>(int, int, _Vector<4, char>)", "xpulpv">;
+def pulp_pack4_lo : PULPBuiltin<"_Vector<4, char>(int, int, _Vector<4, char>)", "xpulpv">;
+def pulp_shuffle2h : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_shuffle4b : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+def pulp_shuffleh : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xpulpv">;
+def pulp_shuffleb : PULPBuiltin<"_Vector<4, char>(_Vector<4, char>, _Vector<4, char>)", "xpulpv">;
+} // Attributes = [NoThrow, Const]
+let Attributes = [NoThrow] in {
+def pulp_OffsetedRead : PULPBuiltin<"int(int *, int)", "xpulpv">;
+def pulp_OffsetedReadByte : PULPBuiltin<"int(char *, int)", "xpulpv">;
+def pulp_OffsetedReadHalf : PULPBuiltin<"int(short *, int)", "xpulpv">;
+def pulp_OffsetedWrite : PULPBuiltin<"void(int, int *, int)", "xpulpv">;
+def pulp_OffsetedWriteByte : PULPBuiltin<"void(int, char *, int)", "xpulpv">;
+def pulp_OffsetedWriteHalf : PULPBuiltin<"void(int, short *, int)", "xpulpv">;
+} // Attributes = [NoThrow]
