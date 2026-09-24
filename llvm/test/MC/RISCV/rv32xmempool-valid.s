@@ -6,5 +6,5 @@
 
 # CHECK-ASM-AND-OBJ: csrrs t0, trace, zero
 # CHECK-ASM: encoding: [0xf3,0x22,0x00,0x7d]
-# CHECK-DISASM: f3 22 00 7d   csrrs t0, trace, zero
+# CHECK-DISASM: 7d0022f3   csrrs t0, trace, zero
 csrr    t0, trace
