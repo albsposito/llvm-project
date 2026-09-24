@@ -321,6 +321,10 @@ RelExpr RISCV::getRelExpr(const RelType type, const Symbol &s,
   case R_RISCV_SET_ULEB128:
   case R_RISCV_SUB_ULEB128:
     return RE_RISCV_LEB128;
+  case R_PULPV2_LOOP_SETUP:
+    return R_NONE;
+  case R_PULPV2_LOOP_SETUPI:
+    return R_NONE;
   default:
     Err(ctx) << getErrorLoc(ctx, loc) << "unknown relocation (" << type.v
              << ") against symbol " << &s;
