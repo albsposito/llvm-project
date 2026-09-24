@@ -64,7 +64,7 @@ def tuimm12 : Operand<XLenVT>, TImmLeaf<XLenVT, [{return isUInt<12>(Imm);}]> {
   let OperandNamespace = "RISCVOp";
 }
 
-def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+def powerOf2Minus1_pulp : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
 def negativePowerOf2    : TImmLeaf<XLenVT, [{ return isPowerOf2_32(-Imm);    }]>;
 def powerOf2            : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm);     }]>;
 def mask                : TImmLeaf<XLenVT, [{ return isMask_32(Imm);         }]>;
@@ -76,7 +76,7 @@ def shiftedFlippedMask  : TImmLeaf<XLenVT, [{ return isShiftedMask_32(~Imm); }]>
 // Operand and SDNode transformation definitions.
 //===----------------------------------------------------------------------===//
 
-def trailing1sPlus1 : SDNodeXForm<imm, [{
+def trailing1sPlus1_pulp : SDNodeXForm<imm, [{
   return CurDAG->getTargetConstant(
                           countr_one<uint32_t>(N->getSExtValue()) + 1,
                           SDLoc(N), N->getValueType(0));
@@ -1245,12 +1245,12 @@ def : Pat<(sext_inreg (i32 GPR:$rs1), i8 ), (P_EXTBS (i32 GPR:$rs1))>;
 def : Pat<(and (i32 GPR:$rs1), 0xffff), (P_EXTHZ (i32 GPR:$rs1))>;
 def : Pat<(and (i32 GPR:$rs1), 0xff  ), (P_EXTBZ (i32 GPR:$rs1))>;
 
-def : Pat<(clip negativePowerOf2, powerOf2Minus1:$upperBound, (i32 GPR:$rs1)),
-          (P_CLIP (i32 GPR:$rs1), (trailing1sPlus1 imm:$upperBound))>;
+def : Pat<(clip negativePowerOf2, powerOf2Minus1_pulp:$upperBound, (i32 GPR:$rs1)),
+          (P_CLIP (i32 GPR:$rs1), (trailing1sPlus1_pulp imm:$upperBound))>;
 def : Pat<(between (not (i32 GPR:$rs2)), (i32 GPR:$rs2), (i32 GPR:$rs1)),
           (P_CLIPR (i32 GPR:$rs1), (i32 GPR:$rs2))>;
-def : Pat<(betweenu powerOf2Minus1:$upperBound, (i32 GPR:$rs1)),
-          (P_CLIPU (i32 GPR:$rs1), (trailing1sPlus1 imm:$upperBound))>;
+def : Pat<(betweenu powerOf2Minus1_pulp:$upperBound, (i32 GPR:$rs1)),
+          (P_CLIPU (i32 GPR:$rs1), (trailing1sPlus1_pulp imm:$upperBound))>;
 def : Pat<(betweenu (i32 GPR:$rs2), (i32 GPR:$rs1)),
           (P_CLIPUR (i32 GPR:$rs1), (i32 GPR:$rs2))>;
 
@@ -1832,12 +1832,12 @@ def : Pat<(int_riscv_pulp_binsert_r (i32 GPR:$rd), (i32 GPR:$rs1), (i32 GPR:$rs2
           (P_INSERTR (i32 GPR:$rd), (i32 GPR:$rs1), (i32 GPR:$rs2))>;
 
 def : Pat<(int_riscv_pulp_clip (i32 GPR:$rs1), negativePowerOf2:$lowerBound,
-                               powerOf2Minus1),
+                               powerOf2Minus1_pulp),
           (P_CLIP (i32 GPR:$rs1), (trailing0s imm:$lowerBound))>;
 def : PatGprGpr<int_riscv_pulp_clip_r, P_CLIPR>;
 
-def : Pat<(int_riscv_pulp_clipu (i32 GPR:$rs1), 0, powerOf2Minus1:$upperBound),
-          (P_CLIPU (i32 GPR:$rs1), (trailing1sPlus1 imm:$upperBound))>;
+def : Pat<(int_riscv_pulp_clipu (i32 GPR:$rs1), 0, powerOf2Minus1_pulp:$upperBound),
+          (P_CLIPU (i32 GPR:$rs1), (trailing1sPlus1_pulp imm:$upperBound))>;
 def : PatGprGpr<int_riscv_pulp_clipu_r, P_CLIPUR>;
 
 def : Pat<(int_riscv_pulp_OffsetedRead (i32 GPR:$rs1), (i32 GPR:$rs2)), (P_LW_rr (i32 GPR:$rs1), (i32 GPR:$rs2))>;
