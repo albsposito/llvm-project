@@ -703,6 +703,7 @@ public:
   bool isUImm6() const { return IsUImm<6>(); }
   bool isUImm7() const { return IsUImm<7>(); }
   bool isUImm8() const { return IsUImm<8>(); }
+  bool isUImm12() const { return IsUImm<12>(); }
   bool isUImm16() const { return IsUImm<16>(); }
   bool isUImm20() const { return IsUImm<20>(); }
   bool isUImm32() const { return IsUImm<32>(); }
@@ -777,6 +778,20 @@ public:
            VK == RISCVMCExpr::VK_RISCV_None;
   }
 
+  bool isUImm6Lsb0Pulp() const {
+    int64_t Imm;
+    RISCVMCExpr::VariantKind VK = RISCVMCExpr::VK_RISCV_None;
+    if (!isImm())
+      return false;
+    bool IsConstantImm = evaluateConstantImm(getImm(), Imm, VK);
+    bool IsValid;
+    if (!IsConstantImm)
+      IsValid = RISCVAsmParser::classifySymbolRef(getImm(), VK);
+    else
+      IsValid = isShiftedUInt<5, 1>(Imm);
+    return IsValid && VK == RISCVMCExpr::VK_RISCV_None;
+  }
+
   bool isSImm6NonZero() const {
     if (!isImm())
       return false;
@@ -785,6 +800,16 @@ public:
     bool IsConstantImm = evaluateConstantImm(getImm(), Imm, VK);
     return IsConstantImm && Imm != 0 &&
            isInt<6>(fixImmediateForRV32(Imm, isRV64Imm())) &&
+           VK == RISCVMCExpr::VK_RISCV_None;
+  }
+
+  bool isUImm12M1() const {
+    if (!isImm())
+      return false;
+    RISCVMCExpr::VariantKind VK = RISCVMCExpr::VK_RISCV_None;
+    int64_t Imm;
+    bool IsConstantImm = evaluateConstantImm(getImm(), Imm, VK);
+    return IsConstantImm && isUInt<12>(Imm) && (Imm != 0) &&
            VK == RISCVMCExpr::VK_RISCV_None;
   }
 
@@ -921,6 +946,16 @@ public:
   }
 
   bool isSImm13Lsb0() const { return isBareSimmNLsb0<13>(); }
+
+  bool isUImm13Lsb0() const {
+    if (!isImm())
+      return false;
+    int64_t Imm;
+    RISCVMCExpr::VariantKind VK = RISCVMCExpr::VK_RISCV_None;
+    bool IsConstantImm = evaluateConstantImm(getImm(), Imm, VK);
+    return IsConstantImm && isShiftedUInt<12, 1>(Imm) &&
+           VK == RISCVMCExpr::VK_RISCV_None;
+  }
 
   bool isSImm10Lsb0000NonZero() const {
     if (!isImm())
@@ -2450,6 +2485,14 @@ ParseStatus RISCVAsmParser::parseMemOpBaseReg(OperandVector &Operands) {
   if (!parseRegister(Operands).isSuccess())
     return Error(getLoc(), "expected register");
 
+  // Post-increment addressing mode (PULPV2 ISA extension)
+  if (getSTI().hasFeature(RISCV::FeaturePULPExtV2)) {
+    if (getLexer().is(AsmToken::Exclaim)) {
+      getParser().Lex(); // Eat '!'
+      Operands.push_back(RISCVOperand::createToken("!", getLoc()));
+    }
+  }
+
   if (parseToken(AsmToken::RParen, "expected ')'"))
     return ParseStatus::Failure;
   Operands.push_back(RISCVOperand::createToken(")", getLoc()));
@@ -2674,8 +2717,15 @@ bool RISCVAsmParser::parseOperand(OperandVector &Operands, StringRef Mnemonic) {
     return true;
 
   // Attempt to parse token as a register.
-  if (parseRegister(Operands, true).isSuccess())
+  if (parseRegister(Operands, true).isSuccess()) {
+    // This pattern is valid for the PULPV2 ISA extension
+    if (getSTI().hasFeature(RISCV::FeaturePULPExtV2)) {
+      // Parse memory base register if present
+      if (getLexer().is(AsmToken::LParen))
+        return !parseMemOpBaseReg(Operands).isSuccess();
+    }
     return false;
+  }
 
   // Attempt to parse token as an immediate
   if (parseImmediate(Operands).isSuccess()) {
