@@ -219,8 +219,8 @@ void riscv::getRISCVTargetFeatures(const Driver &D, const llvm::Triple &Triple,
     // down.
     Features.erase(std::remove_if(Features.begin(), Features.end(),
                                   [](StringRef feat) {
-                                    return feat.equals("+fdiv") ||
-                                           feat.equals("-fdiv");
+                                    return feat == "+fdiv" ||
+                                           feat == "-fdiv";
                                   }),
                    Features.end());
     Features.push_back("+nofdiv");
