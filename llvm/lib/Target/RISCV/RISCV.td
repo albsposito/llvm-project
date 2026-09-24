@@ -53,6 +53,8 @@ include "RISCVSchedSiFiveP600.td"
 include "RISCVSchedSyntacoreSCR1.td"
 include "RISCVSchedSyntacoreSCR3.td"
 include "RISCVSchedXiangShanNanHu.td"
+include "RISCVSchedMempool.td"
+include "RISCVSchedSnitch.td"
 
 //===----------------------------------------------------------------------===//
 // RISC-V processors supported.
