@@ -288,7 +288,7 @@ bool fixupBump(MachineBasicBlock *lastBlock, MachineInstr *setup,
     for (MachineInstr &MI : *MBB) {
       // If this is a read of the register, and we have not yet encountered a
       // write, then it is not safe to remove this register.
-      alwaysWrite &= !MI.readsRegister(bumpReg);
+      alwaysWrite &= !MI.readsRegister(bumpReg, /*TRI=*/nullptr);
       if (MI.modifiesRegister(bumpReg, nullptr)) {
         // We do not need to continue searching, the old value is killed here.
         found = true;
