@@ -75,6 +75,9 @@ static bool findRISCVMultilibs(const Driver &D,
     MultilibBuilder Imafc = MultilibBuilder("/rv32imafc/ilp32f")
                                 .flag("-march=rv32imafc")
                                 .flag("-mabi=ilp32f");
+    MultilibBuilder Imfcxpulpv2 = MultilibBuilder("/rv32imfcxpulpv2/ilp32f")
+                                .flag("-march=rv32imfcxpulpv2")
+                                .flag("-mabi=ilp32f");
 
     // Multilib reuse
     bool UseI = (Arch == "rv32i") || (Arch == "rv32ic");    // ic => i
@@ -91,7 +94,7 @@ static bool findRISCVMultilibs(const Driver &D,
     addMultilibFlag(Abi == "ilp32f", "-mabi=ilp32f", Flags);
 
     Result.Multilibs =
-        MultilibSetBuilder().Either(I, Im, Iac, Imac, Imafc).makeMultilibSet();
+        MultilibSetBuilder().Either({I, Im, Iac, Imac, Imafc, Imfcxpulpv2}).makeMultilibSet();
     return Result.Multilibs.select(Flags, Result.SelectedMultilibs);
   }
   return false;
