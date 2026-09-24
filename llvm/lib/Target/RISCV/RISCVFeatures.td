@@ -1471,3 +1471,63 @@ def FeatureTaggedGlobals : SubtargetFeature<"tagged-globals",
     "AllowTaggedGlobals",
     "true", "Use an instruction sequence for taking the address of a global "
     "that allows a memory tag in the upper address bits">;
+
+// PULP / Snitch / MemPool vendor extensions. Declared as RISCVExtension (like
+// the CORE-V XCV* extensions above) so that TableGen emits them into the
+// RISCVISAInfo extension table, which was hand-written in
+// llvm/lib/Support/RISCVISAInfo.cpp up to LLVM 18.
+// Keep existing feature record IDs and generated subtarget fields. Override
+// the ISA names because upstream now derives them from FeatureVendor IDs.
+def FeaturePULPExtV2
+    : RISCVExtension<2, 0, "'pulpv2' (PULP extensions version 2)"> {
+  let Name = "xpulpv";
+  let Desc = "'pulpv2' (PULP extensions version 2)";
+}
+def HasPULPExtV2 : Predicate<"Subtarget->hasPULPExtV2()">,
+                             AssemblerPredicate<(all_of FeaturePULPExtV2)>;
+
+def FeatureExtXfrep
+    : RISCVExtension<0, 1, "'Xfrep' (Floating-Point Repetition)"> {
+  let Name = "xfrep";
+  let Desc = "'Xfrep' (Floating-Point Repetition)";
+}
+def HasExtXfrep : Predicate<"Subtarget->hasExtXfrep()">,
+                           AssemblerPredicate<(all_of FeatureExtXfrep),
+                           "'Xfrep' (Floating-Point Repetition)">;
+
+def FeatureExtXdma
+    : RISCVExtension<0, 1, "'Xdma' (Asynchronous Data Movement)"> {
+  let Name = "xdma";
+  let Desc = "'Xdma' (Asynchronous Data Movement)";
+}
+def HasExtXdma : Predicate<"Subtarget->hasExtXdma()">,
+                           AssemblerPredicate<(all_of FeatureExtXdma),
+                           "'Xdma' (Asynchronous Data Movement)">;
+
+def FeatureExtXssr
+    : RISCVExtension<0, 1, "'Xssr' (Stream Semantic Registers)"> {
+  let Name = "xssr";
+  let Desc = "'Xssr' (Stream Semantic Registers)";
+}
+def HasExtXssr : Predicate<"Subtarget->hasExtXssr()">,
+                           AssemblerPredicate<(all_of FeatureExtXssr),
+                           "'Xssr' (Stream Semantic Registers)">;
+
+def FeatureExtXmempool
+    : RISCVExtension<0, 1, "'Xmempool' (MemPool System)"> {
+  let Name = "xmempool";
+  let Desc = "'Xmempool' (MemPool System)";
+}
+def HasExtXmempool : Predicate<"Subtarget->hasExtXmempool()">,
+                           AssemblerPredicate<(all_of FeatureExtXmempool),
+                           "'Xmempool' (MemPool System)">;
+
+// Not an ISA extension (it was never in the RISCVISAInfo table): stays a plain
+// SubtargetFeature.
+def FeatureHasNoFdiv
+    : SubtargetFeature<"nofdiv", "HasNoFdiv", "true",
+                       "Disable fdiv.* and fsqrt.* instructions, delegate to libcalls",
+                       [FeatureStdExtF]>;
+def HasNoFdiv : Predicate<"Subtarget->hasNoFdiv()">,
+                          AssemblerPredicate<(all_of FeatureHasNoFdiv),
+                          "Disable fdiv.* and fsqrt.* instructions, delegate to libcalls">;

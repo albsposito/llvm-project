@@ -288,6 +288,18 @@ public:
     return 1;
   }
 
+  bool hasExtXsmallfloat() const {
+    return HasExtXfalthalf || HasExtXfquarter || HasExtXfaltquarter ||
+           HasExtXfvecsingle || HasExtXfvechalf || HasExtXfvecalthalf ||
+           HasExtXfvecquarter || HasExtXfvecaltquarter || HasExtXfauxhalf ||
+           HasExtXfauxalthalf || HasExtXfauxquarter || HasExtXfauxaltquarter ||
+           HasExtXfauxvecsingle || HasExtXfauxvechalf ||
+           HasExtXfauxvecalthalf || HasExtXfauxvecquarter ||
+           HasExtXfauxvecaltquarter || HasExtXfexpauxvechalf ||
+           HasExtXfexpauxvecalthalf || HasExtXfexpauxvecquarter ||
+           HasExtXfexpauxvecaltquarter;
+  }
+
 protected:
   // SelectionDAGISel related APIs.
   std::unique_ptr<const SelectionDAGTargetInfo> TSInfo;
