@@ -146,3 +146,8 @@ let Features = "zihintntl", Attributes = [CustomTypeChecking] in {
 def ntl_load : RISCVBuiltin<"void(...)">;
 def ntl_store : RISCVBuiltin<"void(...)">;
 } // Features = "zihintntl", Attributes = [CustomTypeChecking]
+
+//===----------------------------------------------------------------------===//
+// PULP extensions (Xpulpv, Xssr, Xdma).
+//===----------------------------------------------------------------------===//
+include "clang/Basic/BuiltinsRISCVXpulp.td"
