@@ -12,7 +12,8 @@ Order of checks (first failure wins, and the integration branch is restored to w
   2. cherry-pick onto the integration HEAD (a conflict means the worker must rebase)
   3. build: the set of error signatures must not grow, and must shrink
      (a change that fixes nothing is rejected as noise)
-  4. optional lit: the number of lit problems must not grow
+  4. optional lit/unit: neither failure set may grow, unit coverage must remain,
+     and the combined failure set must shrink unless already green
 With --allow-unmasked, step 3 accepts new error signatures whose every site lies on a line the
 change did not add or modify: a fixed TableGen error lets the build reach code it never reached
 before, and those errors were already there. They are listed as errors_unmasked for the conductor
@@ -28,6 +29,7 @@ import sys
 from pathlib import Path
 
 from common import git
+from unit_report import combined_gate
 
 HERE = Path(__file__).resolve().parent
 
@@ -126,6 +128,8 @@ def main():
     new = sorted(after - before)
     fixed = sorted(before - after)
     result.update(build_rc=rc, errors_fixed=fixed, errors_new=new, build_log=str(build_log))
+    if rc != 0 and not after:
+        return finish("REJECTED", reason="build failed without recognized error signatures")
     if new and args.allow_unmasked and fixed:
         sites = error_sites(build_log, wt)
         touched = touched_lines(wt, head0, "HEAD")
@@ -143,16 +147,18 @@ def main():
     if args.lit_cmd:
         lit_log = logdir / f"{tag}.lit.log"
         lit_json = logdir / f"{tag}.lit_diff.json"
-        run(args.lit_cmd.format(diff_out=lit_json), lit_log)
-        if not lit_json.exists():
-            return finish("REJECTED", reason="lit command produced no lit_diff report", lit_log=str(lit_log))
-        a = json.loads(lit_json.read_text())["problems"]
-        b = json.loads(Path(args.lit_before).read_text())["problems"] if args.lit_before else None
-        result.update(lit_problems_before=b, lit_problems_after=a, lit_diff=str(lit_json))
-        if b is not None and a > b:
-            return finish("REJECTED", reason="lit problems increased")
-        if b and a == b:
-            return finish("REJECTED", reason="lit problems did not shrink; change fixes nothing it claims to")
+        # A command that fails before writing must never reuse a previous report.
+        lit_json.unlink(missing_ok=True)
+        lit_rc = run(args.lit_cmd.format(diff_out=lit_json), lit_log)
+        try:
+            after_report = json.loads(lit_json.read_text())
+            before_report = json.loads(Path(args.lit_before).read_text()) if args.lit_before else None
+        except (OSError, ValueError) as exc:
+            return finish("REJECTED", reason="missing or invalid test report", detail=str(exc), lit_log=str(lit_log))
+        result.update(lit_rc=lit_rc, lit_diff=str(lit_json))
+        reason = combined_gate(before_report, after_report, lit_rc)
+        if reason:
+            return finish("REJECTED", reason=reason)
     return finish("LANDED", commits=commits)
 
 

@@ -19,6 +19,8 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+from unit_report import unit_report
+
 BAD = {"FAIL", "UNRESOLVED", "TIMEOUT", "XPASS"}
 SUITE_PREFIX = {"LLVM": "llvm/test/", "Clang": "clang/test/", "lld": "lld/test/"}
 
@@ -77,6 +79,8 @@ def main():
     ap.add_argument("--known-failures", help="owner-approved list of repo-relative tests that fail at the 18 baseline")
     ap.add_argument("--baseline-renames", help="reviewed JSON upstream test identities with provenance SHA-1s")
     ap.add_argument("--out")
+    ap.add_argument("--unit", help="gtest JSON; required for integration gate")
+    ap.add_argument("--unit-exit", type=int)
     args = ap.parse_args()
     cand = load(args.candidate)
     base = load(args.baseline) if args.baseline else {}
@@ -127,6 +131,9 @@ def main():
     if args.baseline_renames:
         report["baseline_renames"] = renames
         report["mapping_errors"] = mapping_errors
+    if args.unit:
+        report["unit"] = unit_report(args.unit, args.unit_exit)
+        report["green"] = report["green"] and report["unit"]["valid"] and not report["unit"]["failures"]
     text = json.dumps(report, indent=2)
     if args.out:
         Path(args.out).write_text(text)
