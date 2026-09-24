@@ -1397,3 +1397,52 @@ def FeatureForcedSWShadowStack : SubtargetFeature<
     "forced-sw-shadow-stack", "HasForcedSWShadowStack", "true",
     "Implement shadow stack with software.">;
 def HasForcedSWShadowStack : Predicate<"Subtarget->hasForcedSWShadowStack()">;
+
+// PULP / Snitch / MemPool vendor extensions. Declared as RISCVExtension (like
+// the CORE-V XCV* extensions above) so that TableGen emits them into the
+// RISCVISAInfo extension table, which was hand-written in
+// llvm/lib/Support/RISCVISAInfo.cpp up to LLVM 18.
+// TODO We should remove the "V2" part, since this is handled specially now.
+def FeaturePULPExtV2
+    : RISCVExtension<"xpulpv", 2, 0,
+                     "'pulpv2' (PULP extensions version 2)">;
+def HasPULPExtV2 : Predicate<"Subtarget->hasPULPExtV2()">,
+                             AssemblerPredicate<(all_of FeaturePULPExtV2)>;
+
+def FeatureExtXfrep
+    : RISCVExtension<"xfrep", 0, 1,
+                     "'Xfrep' (Floating-Point Repetition)">;
+def HasExtXfrep : Predicate<"Subtarget->hasExtXfrep()">,
+                           AssemblerPredicate<(all_of FeatureExtXfrep),
+                           "'Xfrep' (Floating-Point Repetition)">;
+
+def FeatureExtXdma
+    : RISCVExtension<"xdma", 0, 1,
+                     "'Xdma' (Asynchronous Data Movement)">;
+def HasExtXdma : Predicate<"Subtarget->hasExtXdma()">,
+                           AssemblerPredicate<(all_of FeatureExtXdma),
+                           "'Xdma' (Asynchronous Data Movement)">;
+
+def FeatureExtXssr
+    : RISCVExtension<"xssr", 0, 1,
+                     "'Xssr' (Stream Semantic Registers)">;
+def HasExtXssr : Predicate<"Subtarget->hasExtXssr()">,
+                           AssemblerPredicate<(all_of FeatureExtXssr),
+                           "'Xssr' (Stream Semantic Registers)">;
+
+def FeatureExtXmempool
+    : RISCVExtension<"xmempool", 0, 1,
+                     "'Xmempool' (MemPool System)">;
+def HasExtXmempool : Predicate<"Subtarget->hasExtXmempool()">,
+                           AssemblerPredicate<(all_of FeatureExtXmempool),
+                           "'Xmempool' (MemPool System)">;
+
+// Not an ISA extension (it was never in the RISCVISAInfo table): stays a plain
+// SubtargetFeature.
+def FeatureHasNoFdiv
+    : SubtargetFeature<"nofdiv", "HasNoFdiv", "true",
+                       "Disable fdiv.* and fsqrt.* instructions, delegate to libcalls",
+                       [FeatureStdExtF]>;
+def HasNoFdiv : Predicate<"Subtarget->hasNoFdiv()">,
+                          AssemblerPredicate<(all_of FeatureHasNoFdiv),
+                          "Disable fdiv.* and fsqrt.* instructions, delegate to libcalls">;
