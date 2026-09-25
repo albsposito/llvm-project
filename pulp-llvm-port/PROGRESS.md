@@ -58,3 +58,7 @@ Previous host (harness authoring): Amazon Linux 2, gcc 7.3.1, builds in `pulp-ll
 | 20 | conflict-codegen-core (2) | PULP versus XCVmem selection priority differs between selector and lowering when both enabled. | notes/20/conflict-codegen-core.md | Open; no new priority policy chosen |
 | 20 | conflict-codegen-core (3) | RVVArgDispatcher removed upstream, but broad PULP vector-to-GPR rule and fastcc gap remain; validate packed ABI/mixed extensions. | notes/20/conflict-codegen-core.md; CC relocation093b8bfe6b64 | Open; preserve ABI, follow upstream RVV elsewhere |
 | 20 | conflict-passes | Validate optional machine pipeliner and Zicfilp with PULP/FREP; no upstream equivalent establishes combined compatibility. | notes/20/conflict-passes.md; 2c782ab27187/e80d8e1b421b | Open; preserved all upstream/fork passes and stage order |
+
+## Overnight publication
+
+Direct atomic port-ref push rejected: GitHub OAuth lacks workflow scope. Exact24 refs preserved in verified steps/overnight-port-refs.bundle, included with separately pushed harness checkpoint. See HANDOVER.md for restore commands. No source history rewritten.

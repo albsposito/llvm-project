@@ -38,3 +38,17 @@ Complete: benchmarks/19-vs-18/report.md, README.md, raw results.json, commands.j
 ## Preservation
 
 All harness notes/tasks/step reports and raw benchmark evidence are committed. Selected20 failure logs are gzip snapshots in steps/20/checkpoint-logs/. All current port and worker branches plus port-19-green are to be pushed to owner origin, https://github.com/albsposito/llvm-project.git. No builds/toolchains/ccache or nested worktrees are included. Upstream release refs can be fetched from upstream when reconstructing on another host.
+
+## Push outcome and portable Git backup
+
+The atomic direct push of25refs was rejected by GitHub: current OAuth credential lacks `workflow` scope for upstream workflow changes on LLVM19/20 branches. No refs were updated by that atomic attempt. The harness branch is pushed separately, including `steps/overnight-port-refs.bundle`: a verified incremental Git bundle of all24 port/worker/tag refs. This preserves their exact commits without modifying or enabling workflows. Direct branch publication remains pending a credential with workflow permission.
+
+To restore on another clone, first obtain the ordinary upstream and fork history, then:
+
+```sh
+git fetch https://github.com/llvm/llvm-project.git tag llvmorg-19.1.7 tag llvmorg-20.1.8
+git bundle verify pulp-llvm-port/steps/overnight-port-refs.bundle
+git fetch pulp-llvm-port/steps/overnight-port-refs.bundle 'refs/heads/*:refs/remotes/checkpoint/*' 'refs/tags/port-19-green:refs/tags/port-19-green'
+```
+
+Bundle prerequisites are e6c3289804a67ea0bb6a86fadbe454dd93b8d855 (fork merge base), cd708029e0b2869e80abe31ddb175f7c35361f90 (19base),87f0227cb60147a26a1eeb4fb06e3b505e9c7261 (20base), and05fb8af658ad55d79726e4815bedddde8fed2175 (harness ancestor). A normal full clone of the checkpoint branch plus the two upstream tags provides these. The original host already has all branches and requires no restore. Harness validation at checkpoint:22 tests PASS.
