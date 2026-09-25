@@ -40,7 +40,8 @@ def load_renames(path, base, candidate):
     """Explicit upstream identity changes, only for absent baseline PASS tests.
 
     JSON is a list of {source, destination, upstream_commit} objects using repo
-    paths and full upstream SHA-1s. Evidence is reviewed separately; the hash is
+    paths and full upstream SHA-1s. Optional additional_destinations lists all other
+    successors of an upstream split; every successor must PASS. Evidence is reviewed separately; the hash is
     retained in the report so a passing comparison remains auditable.
     """
     entries = json.loads(Path(path).read_text())
@@ -56,16 +57,30 @@ def load_renames(path, base, candidate):
             raise ValueError("rename requires source, destination and upstream_commit")
         if not re.fullmatch(r"[0-9a-f]{40}", sha):
             raise ValueError(f"rename {src}: upstream_commit must be a full SHA-1")
-        if src in sources or dst in destinations or src == dst:
-            raise ValueError(f"duplicate or self rename: {src} -> {dst}")
+        allowed = {"source", "destination", "upstream_commit", "additional_destinations"}
+        if set(entry) - allowed:
+            raise ValueError(f"rename {src}: unknown fields")
+        extra = entry.get("additional_destinations", [])
+        if not isinstance(extra, list) or not all(isinstance(d, str) and d for d in extra):
+            raise ValueError(f"rename {src}: additional_destinations must be a list of paths")
+        targets = [dst, *extra]
+        for path in [src, *targets]:
+            if (not any(path.startswith(prefix) for prefix in SUITE_PREFIX.values())
+                    or any(part in ("", ".", "..") for part in path.split("/"))
+                    or "\\" in path or any(c.isspace() for c in path)):
+                raise ValueError(f"rename path must be a canonical repo test path: {path}")
+        if (src in sources or src in targets or len(set(targets)) != len(targets)
+                or destinations.intersection(targets)):
+            raise ValueError(f"duplicate or self rename: {src} -> {targets}")
         sources.add(src)
-        destinations.add(dst)
+        destinations.update(targets)
         if baseline.get(src) != "PASS":
             raise ValueError(f"rename source is not a baseline PASS: {src}")
         if src in candidate:
             raise ValueError(f"rename source still exists in candidate: {src}")
-        if candidate.get(dst) != "PASS":
-            raise ValueError(f"rename destination must PASS: {dst} ({candidate.get(dst, 'MISSING')})")
+        for target in targets:
+            if candidate.get(target) != "PASS":
+                raise ValueError(f"rename destination must PASS: {target} ({candidate.get(target, 'MISSING')})")
     if sources & destinations:
         raise ValueError("chained baseline renames are ambiguous")
     return entries

@@ -356,6 +356,47 @@ class LitDiffTest(unittest.TestCase):
         self.assertEqual(rc, 1)
         self.assertTrue(any(t["problem"] == "fork test did not run" for g in report["groups"] for t in g["tests"]))
 
+    def test_split_requires_every_successor_and_preserves_other_checks(self):
+        src = "llvm/test/CodeGen/RISCV/old.ll"
+        dst = "llvm/test/CodeGen/RISCV/new.ll"
+        secondary = "llvm/test/CodeGen/RISCV/second.ll"
+        entry = {"source": src, "destination": dst, "additional_destinations": [secondary],
+                 "upstream_commit": "a" * 40}
+        base = {"LLVM :: CodeGen/RISCV/old.ll": "PASS"}
+        cand = {"LLVM :: CodeGen/RISCV/xpulp-hwloop.ll": "PASS",
+                "LLVM :: MC/RISCV/rv32xssr-valid.s": "PASS",
+                "LLVM :: CodeGen/RISCV/new.ll": "PASS",
+                "LLVM :: CodeGen/RISCV/second.ll": "PASS"}
+        rc, report = self.run_diff(cand, base, [entry])
+        self.assertEqual(rc, 0, report)
+        self.assertEqual(report["baseline_renames"], [entry])
+        for code in (None, "FAIL", "UNRESOLVED", "TIMEOUT", "XPASS", "XFAIL", "UNSUPPORTED"):
+            with self.subTest(secondary=code):
+                changed = dict(cand)
+                if code is None:
+                    del changed["LLVM :: CodeGen/RISCV/second.ll"]
+                else:
+                    changed["LLVM :: CodeGen/RISCV/second.ll"] = code
+                rc, report = self.run_diff(changed, base, [entry])
+                self.assertEqual(rc, 1)
+                self.assertTrue(report["mapping_errors"])
+                if code == "FAIL":
+                    self.assertTrue(any(t["problem"] == "FAIL" for g in report["groups"] for t in g["tests"]))
+        for extra in (None, secondary, [None], [""], [dst], [secondary, secondary], [src],
+                      ["/tmp/test"], ["llvm/test/../test/x.ll"]):
+            with self.subTest(extra=extra):
+                self.assertTrue(self.run_diff(cand, base, [{**entry, "additional_destinations": extra}])[1]["mapping_errors"])
+        self.assertTrue(self.run_diff(cand, base, [{**entry, "additional_destination": []}])[1]["mapping_errors"])
+        other = {"source": "llvm/test/CodeGen/RISCV/other.ll", "destination": secondary,
+                 "upstream_commit": "b" * 40}
+        self.assertTrue(self.run_diff(cand, {**base, "LLVM :: CodeGen/RISCV/other.ll": "PASS"},
+                                      [entry, other])[1]["mapping_errors"])
+        for name in ("LLVM :: CodeGen/RISCV/unrelated.ll", "LLVM :: CodeGen/RISCV/xpulp-hwloop.ll"):
+            self.assertEqual(self.run_diff({**cand, name: "FAIL"}, base, [entry])[0], 1)
+        missing = dict(cand)
+        del missing["LLVM :: CodeGen/RISCV/xpulp-hwloop.ll"]
+        self.assertEqual(self.run_diff(missing, base, [entry])[0], 1)
+
 
 DIS_REF = """
 00000000 <gemm>:
