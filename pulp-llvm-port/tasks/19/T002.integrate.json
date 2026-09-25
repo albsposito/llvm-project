@@ -1,0 +1,15 @@
+{
+  "branch": "work/19/T002",
+  "int_head_before": "89cd9beaf6c930fdba3807d13054c64726860838",
+  "build_rc": 0,
+  "errors_fixed": [],
+  "errors_new": [],
+  "build_log": "tasks/19/work_19_T002.build.log",
+  "lit_rc": 1,
+  "lit_diff": "tasks/19/work_19_T002.lit_diff.json",
+  "verdict": "LANDED",
+  "int_head_after": "d1401c114cbc1320d89b3e88ffe0e3e75146555f",
+  "commits": [
+    "56ed3df73c50cd8a5e8082adcfdc40fc23ca5fa9"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "status": "done",
+  "branch": "work/19/E008",
+  "commits": ["a60138ef8ef7adee786ee9e6fde13843721ee810"],
+  "note": "notes/19/E008.md",
+  "signature_gone": true,
+  "other_errors_seen": [],
+  "repro_log": "logs/19-E008.repro.log",
+  "fix_log": "logs/19-E008.fix.log"
+}

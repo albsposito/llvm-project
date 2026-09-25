@@ -1,0 +1,25 @@
+{
+  "families": [
+    {
+      "family": "hwloop",
+      "ref": 8,
+      "cand": 8,
+      "verdict": "OK"
+    },
+    {
+      "family": "post-increment",
+      "ref": 4,
+      "cand": 4,
+      "verdict": "OK"
+    },
+    {
+      "family": "bitmanip-pulp",
+      "ref": 2,
+      "cand": 0,
+      "verdict": "FAIL"
+    }
+  ],
+  "total_ref": 157,
+  "total_cand": 155,
+  "fail": true
+}

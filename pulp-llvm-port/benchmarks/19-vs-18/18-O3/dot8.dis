@@ -1,0 +1,9 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/18-O3/dot8.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <dot8>:
+       0: b8b51657     	pv.sdotsp.b	a2, a0, a1
+       4: 8532         	mv	a0, a2
+       6: 8082         	ret

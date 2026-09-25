@@ -1,0 +1,16 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [
+    "test-edit at 33a6de9b7e79: examined regen report and actual diff; exactly 25 ASCII padding insertions within owner-approved narrowed scope. Names, versions, assertion, test inputs and longest-name row preserved."
+  ],
+  "checks": {
+    "range": "88ed01bb9d3b1d79ec84d0d37ac4399c023d87e0..33a6de9b7e790c8cc2294ea2f194e7fd7f13d1f8",
+    "dependency": "fa4f10654ef5 patch byte-identical to approved original c29a8b4cc12210a181ad26af5b25e104799cc348. Inspected all 21 RISCVExtension conversions; equivalent field defaults, 0.1 versions and predicates preserved. Approval covers both dependency and T005 commit.",
+    "upstream": "207e45fb67ee, 80628ee0d555, a6c028299cbc inspected and each confirmed in prev_tag..llvmorg-19.1.7. Width 20->21 and generated extension table match change. CORE-V RISCVExtension reference inspected.",
+    "policy": "Independent policy_check: 0 failures, 1 reviewed warning.",
+    "oracle": "Token-for-token test equality after whitespace splitting; length grows exactly25; no removed checks, test inputs, assertions or production behavior. No unrelated changes.",
+    "unit": "Independently executed own-worktree TargetParserTests with exact scripts/lit.sh file-derived filter:83/83 passed, zero failures. Evidence logs/19-T005.review-unit.{log,json}. Exact CheckExtensions also1/1. Worker full-suite log/result consistent at531passed,4host skips,total535.",
+    "notes": "Change note and Test-Regen trailer/report present; observable failure specified. Narrowed25-space scope recorded in owner-test-exceptions.md."
+  }
+}

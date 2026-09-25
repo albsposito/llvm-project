@@ -1,0 +1,20 @@
+{
+  "status": "done",
+  "branch": "work/19/E010",
+  "commits": ["a1b666f899479d4034bd037512cb9faa35e2dd7e"],
+  "note": "/home/ubuntu/llvm-project/pulp-llvm-port/notes/19/E010.md",
+  "signature_gone": true,
+  "cause": "184ca39529a9 [llvm] Move CodeGenTypes library to its own directory (#79444)",
+  "logs": {
+    "repro": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E010.repro.log",
+    "fix": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E010.fix.log",
+    "full_LLVMRISCVCodeGen": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E010.full.log"
+  },
+  "other_errors_seen": [
+    "no member named 'ID' in 'llvm::MachineDominatorTree' (PassAnalysisSupport.h, from PULPHardwareLoops.cpp / SNITCHFrepLoops.cpp; NPM MachineDominatorTreeWrapperPass migration)",
+    "no member named 'ID' in 'llvm::MachineLoopInfo' (same files; MachineLoopInfoWrapperPass migration)",
+    "use of undeclared identifier 'initializeMachineDominatorTreePass' (PULPHardwareLoops.cpp:297, SNITCHFrepLoops.cpp:1639)",
+    "use of undeclared identifier 'initializeMachineLoopInfoPass' (PULPHardwareLoops.cpp:298, SNITCHFrepLoops.cpp:1640)",
+    "too few arguments to function call, expected 2, have 1 (PULPFixupHwLoops.cpp:291)"
+  ]
+}

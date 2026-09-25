@@ -1,0 +1,15 @@
+{
+  "branch": "work/19/E002",
+  "int_head_before": "fa3f689792626176cc16c3053a7f2474ddfc3c69",
+  "build_rc": 1,
+  "errors_fixed": [
+    "Unknown Type: _Vector<N, short>"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/19/work_19_E002.build.log",
+  "verdict": "LANDED",
+  "int_head_after": "63e03f20647ca8cc7aa9ec89eebef5850e84e7fb",
+  "commits": [
+    "690092469a8e42d74cac36da26fd12e71832ef52"
+  ]
+}

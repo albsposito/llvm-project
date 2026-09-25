@@ -1,0 +1,17 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [],
+  "checks": {
+    "policy_check": "scripts/policy_check.py --repo wt/19-E010 --range 6c994ad0972c..work/19/E010 --notes-root notes --stack-base llvmorg-19.1.7: 1 commit, fail=0, warn=0",
+    "diff": "a1b666f89947 changes exactly two lines: llvm/lib/Target/RISCV/RISCVExpandSDMAInsts.cpp:23 and llvm/lib/Target/RISCV/RISCVExpandSSRInsts.cpp:57, each '#include \"llvm/CodeGen/LowLevelType.h\"' -> '#include \"llvm/CodeGenTypes/LowLevelType.h\"'. No other files touched. Branch is exactly one commit on top of integration_head 6c994ad0972c.",
+    "upstream_commit": "184ca39529a9 '[llvm] Move CodeGenTypes library to its own directory (#79444)' exists, renames llvm/include/llvm/{CodeGen => CodeGenTypes}/LowLevelType.h ('No behavior change'); it is an ancestor of llvmorg-19.1.7 and not of prev_tag e6c328980 -> in range. llvm/CodeGen/LowLevelType.h does not exist at llvmorg-19.1.7 (no forwarding header).",
+    "upstream_pattern": "Verified llvmorg-19.1.7:llvm/lib/Target/ARM/ARMCallLowering.cpp:36 reads '#include \"llvm/CodeGenTypes/LowLevelType.h\"' - fix identical to upstream's own pattern.",
+    "oracle_cheating": "None: include path spelling only; no removed/bypassed logic, early returns, stubs, forced conditions, pipeline changes, pattern deletions or test edits.",
+    "scope": "Single root cause (E001 header relocation, both sites). Commit subject matches owner cluster fixup subject '[pulp] passes: hardware loops, FREP, SSR/SDMA expansion, pseudo expansion' (the cluster commit touching both files). Change-Note: 19/E010.md trailer present; note has all four sections; 'What breaks' names an observable symptom (build failure) and cites SSR/SDMA lit tests that exist in the worktree. No other stale CodeGen/LowLevelType.h or CodeGen/MachineValueType.h includes remain under llvm/lib/Target/RISCV.",
+    "build": "logs/19-E010.fix.log shows RISCVExpandSDMAInsts.cpp.o and RISCVExpandSSRInsts.cpp.o built with no error."
+  },
+  "observations": [
+    "Other errors listed in result other_errors_seen (MachineDominatorTree/MachineLoopInfo wrapper-pass migration in PULPHardwareLoops.cpp/SNITCHFrepLoops.cpp, PULPFixupHwLoops.cpp:291 arity) are correctly left out of scope for separate tasks."
+  ]
+}

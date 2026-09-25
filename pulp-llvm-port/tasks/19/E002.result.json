@@ -1,0 +1,16 @@
+{
+  "status": "done",
+  "branch": "work/19/E002",
+  "commits": ["690092469a8e"],
+  "note": "/home/ubuntu/llvm-project/pulp-llvm-port/notes/19/E002.md",
+  "signature_gone": true,
+  "other_errors_seen": [
+    "E001 clang-frep-pragma: Attr.td:4199:28: error: Encountered a list when expecting a bit (blocks the Attr*.inc tablegen targets, so obj.clangBasic could not be built past them)"
+  ],
+  "evidence": {
+    "repro_log": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E002.repro.log",
+    "fix_log": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E002.fix.log",
+    "prototype_check": "Generated BuiltinsRISCV.inc vs fork BuiltinsRISCV.def at 6547028f925c: 174/174 fork builtins present, attributes and features identical, 150 type strings byte-identical, 24 differ only by the documented dropped U before a vector parameter; return-type U kept.",
+    "policy_check": "0 FAIL, 1 WARN (upstream-file-edit, covered by Upstream-File-Edit trailer)"
+  }
+}

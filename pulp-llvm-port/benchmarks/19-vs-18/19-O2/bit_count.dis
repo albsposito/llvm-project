@@ -1,0 +1,8 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/19-O2/bit_count.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <bit_count>:
+       0: 10053533     	p.cnt	a0, a0
+       4: 8082         	ret

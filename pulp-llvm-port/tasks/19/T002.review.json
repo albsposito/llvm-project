@@ -1,0 +1,18 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [
+    "test-edit: llvm/test/MC/RISCV/rv32xdma-valid.s: inspected diff and regen row(s); exactly 8 byte-display reversals preserve full encodings, operands, inputs, RUN lines and all other bytes. Explicit owner exception permits mechanical regeneration.",
+    "test-edit: llvm/test/MC/RISCV/rv32xfrep-valid.s: inspected diff and regen row(s); exactly 3 byte-display reversals preserve full encodings, operands, inputs, RUN lines and all other bytes. Explicit owner exception permits mechanical regeneration.",
+    "test-edit: llvm/test/MC/RISCV/rv32xmempool-valid.s: inspected diff and regen row(s); exactly 1 byte-display reversals preserve full encodings, operands, inputs, RUN lines and all other bytes. Explicit owner exception permits mechanical regeneration.",
+    "test-edit: llvm/test/MC/RISCV/rv32xssr-valid.s: inspected diff and regen row(s); exactly 6 byte-display reversals preserve full encodings, operands, inputs, RUN lines and all other bytes. Explicit owner exception permits mechanical regeneration."
+  ],
+  "evidence": [
+    "Reviewed actual commit 56ed3df73c50cd8a5e8082adcfdc40fc23ca5fa9",
+    "Independently ran policy_check.py: 0 FAIL, 4 WARN",
+    "Verified cited b27f86b40b20942c0e809128214b43d6edde365a is in prev_tag..llvmorg-19.1.7 and implements hexadecimal instruction-word printing",
+    "Programmatically compared parent/current files: exactly 18 approved encoding display conversions; no other file contents changed",
+    "Inspected actual lit JSON: all four worker-path tests PASS with integration tools; production sources unchanged",
+    "Reviewed notes/19/T002.md, T002.regen.md and owner-test-exceptions.md; observable failure and cosmetic classifications are accurate"
+  ]
+}

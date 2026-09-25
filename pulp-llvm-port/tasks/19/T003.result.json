@@ -1,0 +1,25 @@
+{
+  "status": "escalated",
+  "branch": "work/19/T003",
+  "commits": [],
+  "note": "notes/19/T003.md",
+  "signature_gone": false,
+  "other_errors_seen": [],
+  "question": "Apply evidence-backed upstream test identity mappings without deleting baseline coverage?",
+  "evidence": [
+    "b13f79961693 [RISCV] Fix spelling error in test names. NFC: both costrained->constrained 100% renames.",
+    "0afc884e8740 [RISCV] Use vnclip for scalable vector saturating truncation. (#88648): renames trunc-sat-clip.ll to fixed-vectors-trunc-sat-clip.ll (39 lines changed) and adds trunc-sat-clip-sdnode.ll (370 lines).",
+    "Missing source paths and passing replacement paths reproduced directly from steps/19/lit-r1/lit.json; isolated worktree created, no source edits or new build necessary for path-identity evidence."
+  ],
+  "upstream_test_mappings": {
+    "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-fround-costrained-sdnode.ll": "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-fround-constrained-sdnode.ll",
+    "llvm/test/CodeGen/RISCV/rvv/fround-costrained-sdnode.ll": "llvm/test/CodeGen/RISCV/rvv/fround-constrained-sdnode.ll",
+    "llvm/test/CodeGen/RISCV/rvv/trunc-sat-clip.ll": "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-trunc-sat-clip.ll"
+  },
+  "candidate_results": {
+    "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-fround-constrained-sdnode.ll": "PASS (steps/19/lit-r1/lit.json)",
+    "llvm/test/CodeGen/RISCV/rvv/fround-constrained-sdnode.ll": "PASS (steps/19/lit-r1/lit.json)",
+    "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-trunc-sat-clip.ll": "PASS (steps/19/lit-r1/lit.json)",
+    "llvm/test/CodeGen/RISCV/rvv/trunc-sat-clip-sdnode.ll": "PASS (steps/19/lit-r1/lit.json)"
+  }
+}

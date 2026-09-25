@@ -1,0 +1,12 @@
+{
+  "status": "done",
+  "branch": "work/19/E006",
+  "commits": ["dc6ed69f0c981c8672641a8b847445d19ec40d72"],
+  "note": "notes/19/E006.md",
+  "signature_gone": true,
+  "verification": "Real build of RISCVCommonTableGen still stops earlier on the unrelated 'def already exists: uimm6_lsb0' (E003/E005, not landed): logs/19-E006.repro.log and logs/19-E006.fix.log, same single signature, no new one. Defect verified on a scratch copy of llvm/lib/Target/RISCV with only the uimm6_lsb0/powerOf2Minus1/trailing1sPlus1 collisions renamed (logs/19-E006.scratch-tblgen.log): llvm-tblgen -gen-subtarget fails before (WriteVAESMVV_M1, then iteratively WriteVC_FPR16VV_M1, WriteAtomicB, WriteIRem) and exits 0 after; -gen-instr-info also clean. In the generated MempoolModelSchedClasses, WriteIDiv and WriteIRem entries are identical, so REM/REMU keep the LLVM 18 cost.",
+  "decision_for_reviewer": "WriteIRem is not a new extension class but a split of WriteIDiv (a0c7714525b6, NFC). Marking it unsupported (as the task text suggested for new classes) would have changed REM scheduling on Mempool, so it was given WriteIDiv's exact resources/latency, as upstream's split commit did for every existing model (reference RISCVSchedSyntacoreSCR1.td:59-62 at llvmorg-19.1.7). WriteIRem32 marked unsupported alongside the already-unsupported WriteIDiv32. Zabha/Xsfvcp/Zvk marked unsupported via upstream multiclasses as in RISCVSchedRocket.td:254,264,265. RISCVSchedSnitch.td defines no WriteRes, so it produces no errors and is unchanged.",
+  "other_errors_seen": [
+    "def already exists: uimm6_lsb0 / powerOf2Minus1 / trailing1sPlus1 (RISCVInstrInfoXpulp.td, insn-tablegen; tasks E003/E005)"
+  ]
+}

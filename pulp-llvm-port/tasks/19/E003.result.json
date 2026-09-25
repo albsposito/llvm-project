@@ -1,0 +1,17 @@
+{
+  "status": "done",
+  "branch": "work/19/E003",
+  "commits": ["1630ccfbfa2f09021e3aebad060a572fa51b0c62", "77edb7ce5a4adfaaf0ba2a16646c7b80e4eb3e94"],
+  "note": "/home/ubuntu/llvm-project/pulp-llvm-port/notes/19/E003.md",
+  "signature_gone": true,
+  "other_errors_seen": [
+    "def already exists: powerOf2Minus1 (RISCVInstrInfoXpulp.td:67, insn-tablegen; upstream 56f0ecd6db92 XCValu; now the first llvm-tblgen error, blocks RISCVCommonTableGen)",
+    "def already exists: trailing1sPlus1 (RISCVInstrInfoXpulp.td:~79, expected next, same upstream commit; found by masking in a scratch tblgen run)"
+  ],
+  "logs": {
+    "repro": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E003.repro.log",
+    "after_fix": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E003.fix-tg.log"
+  },
+  "verification_limits": "RISCVCommonTableGen still fails, now on powerOf2Minus1 (another collision), so LLVMRISCVAsmParser could not be built. Checked instead with llvm-tblgen -gen-asm-matcher on a scratch copy of the .td files with the powerOf2Minus1/trailing1sPlus1 collisions masked: it emits separate MCK_UImm6Lsb0 (upstream isUImm6Lsb0, used by qk.c.lhu/qk.c.sh) and MCK_UImm6Lsb0Pulp (fork isUImm6Lsb0Pulp) with no error. The C++ now has one isUImm6Lsb0 (upstream's) and one isUImm6Lsb0Pulp (the fork's).",
+  "remark": "No fork instruction uses the fork's uimm6_lsb0, either at 18 (6547028f925c) or at 19. It is dead code, so renaming it cannot change behaviour. Deleting it would be the other option, but AGENT_RULES rule 9 forbids that without escalating; the conductor may want to raise it with the owner."
+}

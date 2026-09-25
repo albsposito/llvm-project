@@ -1,0 +1,90 @@
+{
+  "green": false,
+  "totals": {
+    "PASS": 4525,
+    "FAIL": 6
+  },
+  "problems": 14,
+  "groups": [
+    {
+      "dir": "llvm/test/CodeGen/RISCV",
+      "count": 6,
+      "tests": [
+        {
+          "test": "llvm/test/CodeGen/RISCV/freploop-nested.ll",
+          "problem": "FAIL"
+        },
+        {
+          "test": "llvm/test/CodeGen/RISCV/vp-splice-mask-vectors.ll",
+          "problem": "regressed from PASS to MISSING"
+        },
+        {
+          "test": "llvm/test/CodeGen/RISCV/vp-splice.ll",
+          "problem": "regressed from PASS to MISSING"
+        },
+        {
+          "test": "llvm/test/CodeGen/RISCV/vp-splice-fixed-vectors.ll",
+          "problem": "regressed from PASS to MISSING"
+        },
+        {
+          "test": "llvm/test/CodeGen/RISCV/vp-splice-mask-fixed-vectors.ll",
+          "problem": "regressed from PASS to MISSING"
+        },
+        {
+          "test": "llvm/test/CodeGen/RISCV/inline-asm-S-constraint.ll",
+          "problem": "regressed from PASS to MISSING"
+        }
+      ]
+    },
+    {
+      "dir": "llvm/test/MC/RISCV",
+      "count": 4,
+      "tests": [
+        {
+          "test": "llvm/test/MC/RISCV/rv32xdma-valid.s",
+          "problem": "FAIL"
+        },
+        {
+          "test": "llvm/test/MC/RISCV/rv32xfrep-valid.s",
+          "problem": "FAIL"
+        },
+        {
+          "test": "llvm/test/MC/RISCV/rv32xmempool-valid.s",
+          "problem": "FAIL"
+        },
+        {
+          "test": "llvm/test/MC/RISCV/rv32xssr-valid.s",
+          "problem": "FAIL"
+        }
+      ]
+    },
+    {
+      "dir": "llvm/test/CodeGen/RISCV/rvv",
+      "count": 3,
+      "tests": [
+        {
+          "test": "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-fround-costrained-sdnode.ll",
+          "problem": "regressed from PASS to MISSING"
+        },
+        {
+          "test": "llvm/test/CodeGen/RISCV/rvv/fround-costrained-sdnode.ll",
+          "problem": "regressed from PASS to MISSING"
+        },
+        {
+          "test": "llvm/test/CodeGen/RISCV/rvv/trunc-sat-clip.ll",
+          "problem": "regressed from PASS to MISSING"
+        }
+      ]
+    },
+    {
+      "dir": "clang/test/CodeGen/RISCV",
+      "count": 1,
+      "tests": [
+        {
+          "test": "clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics-diag.c",
+          "problem": "FAIL"
+        }
+      ]
+    }
+  ]
+}

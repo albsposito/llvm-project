@@ -1,0 +1,13 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [],
+  "checks": {
+    "policy_check": "scripts/policy_check.py --range d225ed2e8fa7..work/19/E007 --stack-base llvmorg-19.1.7: 1 commit, 0 FAIL, 0 WARN",
+    "diff": "f9e95fb57fb9 touches only clang/lib/Driver/ToolChains/Arch/RISCV.cpp:222-223 (fork -mno-fdiv lambda), replacing feat.equals(\"+fdiv\"/\"-fdiv\") with feat == \"...\"; no logic removed, no early return, no test touched; no remaining .equals( calls in the file",
+    "upstream": "3fa409f2318e [ADT] Remove StringRef::equals (#98735), de483ad51389 (deprecation) and 135d92f90316 [Driver] Use StringRef::operator== ... (#91698) all verified reachable from llvmorg-19.1.7 and not from prev_tag e6c3289804a6 (llvmorg-18.1.4); 135d92f90316 shows the identical ObjectMode.equals(\"64\") -> ObjectMode == \"64\" pattern; operator== at StringRef.h:866 at llvmorg-19.1.7",
+    "note": "all four sections present; 'What breaks' names observable symptoms (stray -fdiv feature / missing +nofdiv, fdiv.s/fsqrt.s emitted) and the lit tests riscv-arch.c (RV32-NOFDIV) and riscv-nofdiv.c, both present",
+    "commit_format": "subject 'fixup! [pulp] clang-driver: target macros and driver flags' matches owner cluster; Change-Note: 19/E007.md trailer present",
+    "build": "logs/19-E007.fix.log: RISCV.cpp.o builds with 0 errors"
+  }
+}

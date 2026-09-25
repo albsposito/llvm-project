@@ -12,6 +12,7 @@ if [ -d "$LLVM_SRC/.git" ]; then echo "clone already exists at $LLVM_SRC"; else
   git clone --no-checkout --single-branch --branch "$PULP_18_BRANCH" --origin pulp "$PULP" "$LLVM_SRC"
 fi
 cd "$LLVM_SRC"
+git remote get-url pulp >/dev/null 2>&1 || git remote add pulp "$PULP"
 git remote get-url upstream >/dev/null 2>&1 || git remote add upstream "$UPSTREAM"
 [ "$fork" != none ] && { git remote get-url origin >/dev/null 2>&1 || git remote add origin "$fork"; }
 git fetch pulp "$PULP_18_BRANCH" "$PULP_22_BRANCH"

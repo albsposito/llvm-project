@@ -29,6 +29,10 @@ In a Kiro session with this directory as the project:
 - Phase 0: "Run /local/home/albsposi/pulp-llvm-port/agent-sops/phase0-setup.sop.md with fork_url=<your fork URL>"
 - Each step, after approving the previous one: "Run /local/home/albsposi/pulp-llvm-port/agent-sops/port-step.sop.md with step=19"
 
+## Running under Claude Code
+
+The SOPs name Kiro tools. Under Claude Code: `spawn_run` is the Agent tool (one subagent per task, told only which SOP and task file to follow); `session_ledger_record` / `session_ledger_read` are the `Current phase` line and step table of `PROGRESS.md`; `resource_status` is `nproc`, `free -g` and `df -h /`. Paths written as `/local/home/albsposi/pulp-llvm-port` mean `$PORT_ROOT` from `config.env`.
+
 ## Layout
 
 - `scripts/`: harness scripts (Python 3 stdlib only, plus bash); `tests/test_harness.py` covers them (`python3 -m unittest discover -s tests`)

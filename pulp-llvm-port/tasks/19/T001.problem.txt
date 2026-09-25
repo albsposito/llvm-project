@@ -1,0 +1,31 @@
+{
+  "dir": "llvm/test/CodeGen/RISCV",
+  "count": 6,
+  "tests": [
+    {
+      "test": "llvm/test/CodeGen/RISCV/freploop-nested.ll",
+      "problem": "FAIL"
+    },
+    {
+      "test": "llvm/test/CodeGen/RISCV/vp-splice-mask-vectors.ll",
+      "problem": "regressed from PASS to MISSING"
+    },
+    {
+      "test": "llvm/test/CodeGen/RISCV/vp-splice.ll",
+      "problem": "regressed from PASS to MISSING"
+    },
+    {
+      "test": "llvm/test/CodeGen/RISCV/vp-splice-fixed-vectors.ll",
+      "problem": "regressed from PASS to MISSING"
+    },
+    {
+      "test": "llvm/test/CodeGen/RISCV/vp-splice-mask-fixed-vectors.ll",
+      "problem": "regressed from PASS to MISSING"
+    },
+    {
+      "test": "llvm/test/CodeGen/RISCV/inline-asm-S-constraint.ll",
+      "problem": "regressed from PASS to MISSING"
+    }
+  ]
+}
+Read full saved output in steps/19/lit-r1/lit.json. Missing baseline paths require upstream rename/removal evidence; do not drop coverage or edit tests as worker. Split independent root causes into reported follow-up requests.

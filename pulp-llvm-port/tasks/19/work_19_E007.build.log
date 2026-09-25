@@ -1,0 +1,217 @@
+ninja: Entering directory `build/int-19'
+[1/46] Generating VCSRevision.h
+[2/46] Generating VCSVersion.inc
+[3/46] Building CXX object tools/clang/lib/Basic/CMakeFiles/obj.clangBasic.dir/Version.cpp.o
+[4/46] Building CXX object lib/Object/CMakeFiles/LLVMObject.dir/IRSymtab.cpp.o
+[5/46] Linking CXX static library lib/libLLVMObject.a
+[6/46] Generating VCSVersion.inc
+[7/46] Building CXX object tools/clang/lib/Driver/CMakeFiles/obj.clangDriver.dir/ToolChains/Arch/RISCV.cpp.o
+[8/46] Linking CXX static library lib/libclangBasic.a
+[9/46] Linking CXX executable bin/llvm-objdump
+[10/46] Linking CXX static library lib/libclangDriver.a
+[11/46] Building CXX object tools/lld/Common/CMakeFiles/lldCommon.dir/Version.cpp.o
+[12/46] Linking CXX static library lib/liblldCommon.a
+[13/46] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVExpandSDMAInsts.cpp
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVExpandSDMAInsts.cpp:23:10: fatal error: 'llvm/CodeGen/LowLevelType.h' file not found
+   23 | #include "llvm/CodeGen/LowLevelType.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+[14/46] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVExpandSSRInsts.cpp
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVExpandSSRInsts.cpp:57:10: fatal error: 'llvm/CodeGen/LowLevelType.h' file not found
+   57 | #include "llvm/CodeGen/LowLevelType.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+[15/46] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:291:47: error: too few arguments to function call, expected 2, have 1
+  291 |       alwaysWrite &= !MI.readsRegister(bumpReg);
+      |                       ~~~~~~~~~~~~~~~~        ^
+../../wt/int-19/llvm/include/llvm/CodeGen/MachineInstr.h:1480:8: note: 'readsRegister' declared here
+ 1480 |   bool readsRegister(Register Reg, const TargetRegisterInfo *TRI) const {
+      |        ^             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:10:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVTargetMachine.h:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVSubtarget.h:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVFrameLowering.h:16:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetFrameLowering.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineOptimizationRemarkEmitter.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+   76 |     return addRequiredID(PassClass::ID);
+      |                                     ^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:100:10: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineLoopInfo>' requested here
+  100 |       AU.addRequired<MachineLoopInfo>();
+      |          ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:10:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVTargetMachine.h:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVSubtarget.h:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVFrameLowering.h:16:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetFrameLowering.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineOptimizationRemarkEmitter.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);
+      |                                       ~~~~~~~~~~~~~~^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:343:35: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineLoopInfo>' requested here
+  343 |           MachineLoopInfo *MLI = &getAnalysis<MachineLoopInfo>();
+      |                                   ^
+3 errors generated.
+[16/46] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:1639:1: error: use of undeclared identifier 'initializeMachineDominatorTreePass'
+ 1639 | INITIALIZE_PASS_DEPENDENCY(MachineDominatorTree)
+      | ^
+../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'
+   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);
+      |                                             ^
+<scratch space>:23:1: note: expanded from here
+   23 | initializeMachineDominatorTreePass
+      | ^
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:1640:1: error: use of undeclared identifier 'initializeMachineLoopInfoPass'
+ 1640 | INITIALIZE_PASS_DEPENDENCY(MachineLoopInfo)
+      | ^
+../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'
+   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);
+      |                                             ^
+<scratch space>:25:1: note: expanded from here
+   25 | initializeMachineLoopInfoPass
+      | ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineDominatorTree'
+   76 |     return addRequiredID(PassClass::ID);
+      |                                     ^
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:89:8: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineDominatorTree>' requested here
+   89 |     AU.addRequired<MachineDominatorTree>();
+      |        ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+   76 |     return addRequiredID(PassClass::ID);
+      |                                     ^
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:90:8: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineLoopInfo>' requested here
+   90 |     AU.addRequired<MachineLoopInfo>();
+      |        ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);
+      |                                       ~~~~~~~~~~~~~~^
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:316:10: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineLoopInfo>' requested here
+  316 |   MLI = &getAnalysis<MachineLoopInfo>();
+      |          ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineDominatorTree'
+  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);
+      |                                       ~~~~~~~~~~~~~~^
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:318:10: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineDominatorTree>' requested here
+  318 |   MDT = &getAnalysis<MachineDominatorTree>();
+      |          ^
+6 errors generated.
+[17/46] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:297:1: error: use of undeclared identifier 'initializeMachineDominatorTreePass'
+  297 | INITIALIZE_PASS_DEPENDENCY(MachineDominatorTree)
+      | ^
+../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'
+   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);
+      |                                             ^
+<scratch space>:104:1: note: expanded from here
+  104 | initializeMachineDominatorTreePass
+      | ^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:298:1: error: use of undeclared identifier 'initializeMachineLoopInfoPass'
+  298 | INITIALIZE_PASS_DEPENDENCY(MachineLoopInfo)
+      | ^
+../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'
+   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);
+      |                                             ^
+<scratch space>:2:1: note: expanded from here
+    2 | initializeMachineLoopInfoPass
+      | ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineDominatorTree'
+   76 |     return addRequiredID(PassClass::ID);
+      |                                     ^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:98:8: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineDominatorTree>' requested here
+   98 |     AU.addRequired<MachineDominatorTree>();
+      |        ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+   76 |     return addRequiredID(PassClass::ID);
+      |                                     ^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:99:8: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineLoopInfo>' requested here
+   99 |     AU.addRequired<MachineLoopInfo>();
+      |        ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);
+      |                                       ~~~~~~~~~~~~~~^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:326:10: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineLoopInfo>' requested here
+  326 |   MLI = &getAnalysis<MachineLoopInfo>();
+      |          ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineDominatorTree'
+  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);
+      |                                       ~~~~~~~~~~~~~~^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:328:10: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineDominatorTree>' requested here
+  328 |   MDT = &getAnalysis<MachineDominatorTree>();
+      |          ^
+6 errors generated.
+[18/46] Building CXX object tools/clang/lib/Parse/CMakeFiles/obj.clangParse.dir/ParsePragma.cpp.o
+FAILED: tools/clang/lib/Parse/CMakeFiles/obj.clangParse.dir/ParsePragma.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/lib/Parse -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/lib/Parse -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -fno-common -Woverloaded-virtual -Wno-nested-anon-types -O3 -DNDEBUG -std=c++17  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT tools/clang/lib/Parse/CMakeFiles/obj.clangParse.dir/ParsePragma.cpp.o -MF tools/clang/lib/Parse/CMakeFiles/obj.clangParse.dir/ParsePragma.cpp.o.d -o tools/clang/lib/Parse/CMakeFiles/obj.clangParse.dir/ParsePragma.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/lib/Parse/ParsePragma.cpp
+../../wt/int-19/clang/lib/Parse/ParsePragma.cpp:1647:21: error: no member named 'makeArrayRef' in namespace 'llvm'
+ 1647 |   Info.Toks = llvm::makeArrayRef(ValueList).copy(PP.getPreprocessorAllocator());
+      |               ~~~~~~^
+1 error generated.
+[19/46] Building CXX object lib/LTO/CMakeFiles/LLVMLTO.dir/LTO.cpp.o
+[20/46] Linking CXX static library lib/libLLVMLTO.a
+[21/46] Building CXX object lib/CodeGen/AsmPrinter/CMakeFiles/LLVMAsmPrinter.dir/AsmPrinter.cpp.o
+[22/46] Linking CXX static library lib/libLLVMAsmPrinter.a
+ninja: build stopped: cannot make progress due to previous errors.

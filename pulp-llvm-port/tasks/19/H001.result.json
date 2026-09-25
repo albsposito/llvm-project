@@ -1,0 +1,19 @@
+{
+  "status": "ready_for_review",
+  "branch": "work/19/H001",
+  "worktree": "/home/ubuntu/llvm-project/pulp-llvm-port/wt/19-H001",
+  "base": "05fb8af658ad55d79726e4815bedddde8fed2175",
+  "snapshot": "79aeb169e7af",
+  "commits": [
+    "e36850adcc1094dd7dbe50fb545d06ad4d466526"
+  ],
+  "note": "notes/19/H001.md",
+  "patch": "tasks/19/H001.patch",
+  "mapping": "steps/19/baseline-renames.json",
+  "tests": [
+    "18 unittest tests PASS",
+    "bash -n scripts/lit.sh PASS",
+    "Real lit-r1 comparison: exactly eight missing baseline identities resolved; six candidate FAILs remain"
+  ],
+  "apply_instructions": "Apply only patch or implementation commit delta, never prerequisite snapshot; reconcile lit.sh/lit_diff.py with H002"
+}

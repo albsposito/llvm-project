@@ -1,0 +1,457 @@
+[
+  {
+    "line": 8,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_CoreId' needs target feature xpulpv"
+  },
+  {
+    "line": 9,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_CoreCount' needs target feature xpulpv"
+  },
+  {
+    "line": 10,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_ClusterId' needs target feature xpulpv"
+  },
+  {
+    "line": 11,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_IsFc' needs target feature xpulpv"
+  },
+  {
+    "line": 12,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_HasFc' needs target feature xpulpv"
+  },
+  {
+    "line": 13,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_mac' needs target feature xpulpv"
+  },
+  {
+    "line": 14,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_machhs' needs target feature xpulpv"
+  },
+  {
+    "line": 15,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_machhu' needs target feature xpulpv"
+  },
+  {
+    "line": 16,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_macs' needs target feature xpulpv"
+  },
+  {
+    "line": 17,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_macu' needs target feature xpulpv"
+  },
+  {
+    "line": 18,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_msu' needs target feature xpulpv"
+  },
+  {
+    "line": 19,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_bset' needs target feature xpulpv"
+  },
+  {
+    "line": 20,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_bset_r' needs target feature xpulpv"
+  },
+  {
+    "line": 21,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_clb' needs target feature xpulpv"
+  },
+  {
+    "line": 22,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_cnt' needs target feature xpulpv"
+  },
+  {
+    "line": 23,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_ff1' needs target feature xpulpv"
+  },
+  {
+    "line": 24,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_fl1' needs target feature xpulpv"
+  },
+  {
+    "line": 25,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_parity' needs target feature xpulpv"
+  },
+  {
+    "line": 26,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_rotr' needs target feature xpulpv"
+  },
+  {
+    "line": 27,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_abs' needs target feature xpulpv"
+  },
+  {
+    "line": 28,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_addN' needs target feature xpulpv"
+  },
+  {
+    "line": 29,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_addN_r' needs target feature xpulpv"
+  },
+  {
+    "line": 30,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_addRN' needs target feature xpulpv"
+  },
+  {
+    "line": 31,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_addRN_r' needs target feature xpulpv"
+  },
+  {
+    "line": 32,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_adduN' needs target feature xpulpv"
+  },
+  {
+    "line": 33,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_adduN_r' needs target feature xpulpv"
+  },
+  {
+    "line": 34,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_adduRN' needs target feature xpulpv"
+  },
+  {
+    "line": 35,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_adduRN_r' needs target feature xpulpv"
+  },
+  {
+    "line": 36,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_clip' needs target feature xpulpv"
+  },
+  {
+    "line": 37,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_clip_r' needs target feature xpulpv"
+  },
+  {
+    "line": 38,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_clipu' needs target feature xpulpv"
+  },
+  {
+    "line": 39,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_clipu_r' needs target feature xpulpv"
+  },
+  {
+    "line": 40,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_maxsi' needs target feature xpulpv"
+  },
+  {
+    "line": 41,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_machhsN' needs target feature xpulpv"
+  },
+  {
+    "line": 42,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_machhsRN' needs target feature xpulpv"
+  },
+  {
+    "line": 43,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_machhuN' needs target feature xpulpv"
+  },
+  {
+    "line": 44,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_machhuRN' needs target feature xpulpv"
+  },
+  {
+    "line": 45,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_macsN' needs target feature xpulpv"
+  },
+  {
+    "line": 46,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_macsRN' needs target feature xpulpv"
+  },
+  {
+    "line": 47,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_macuN' needs target feature xpulpv"
+  },
+  {
+    "line": 48,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_macuRN' needs target feature xpulpv"
+  },
+  {
+    "line": 49,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_maxusi' needs target feature xpulpv"
+  },
+  {
+    "line": 50,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_minsi' needs target feature xpulpv"
+  },
+  {
+    "line": 51,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_minusi' needs target feature xpulpv"
+  },
+  {
+    "line": 52,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_mulhhs' needs target feature xpulpv"
+  },
+  {
+    "line": 53,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_mulhhsN' needs target feature xpulpv"
+  },
+  {
+    "line": 54,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_mulhhsRN' needs target feature xpulpv"
+  },
+  {
+    "line": 55,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_mulhhu' needs target feature xpulpv"
+  },
+  {
+    "line": 56,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_mulhhuN' needs target feature xpulpv"
+  },
+  {
+    "line": 57,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_mulhhuRN' needs target feature xpulpv"
+  },
+  {
+    "line": 58,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_muls' needs target feature xpulpv"
+  },
+  {
+    "line": 59,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_mulsN' needs target feature xpulpv"
+  },
+  {
+    "line": 60,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_mulsRN' needs target feature xpulpv"
+  },
+  {
+    "line": 61,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_mulu' needs target feature xpulpv"
+  },
+  {
+    "line": 62,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_muluN' needs target feature xpulpv"
+  },
+  {
+    "line": 63,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_muluRN' needs target feature xpulpv"
+  },
+  {
+    "line": 64,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_subN' needs target feature xpulpv"
+  },
+  {
+    "line": 65,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_subN_r' needs target feature xpulpv"
+  },
+  {
+    "line": 66,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_subRN' needs target feature xpulpv"
+  },
+  {
+    "line": 67,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_subRN_r' needs target feature xpulpv"
+  },
+  {
+    "line": 68,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_subuN' needs target feature xpulpv"
+  },
+  {
+    "line": 69,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_subuN_r' needs target feature xpulpv"
+  },
+  {
+    "line": 70,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_subuRN' needs target feature xpulpv"
+  },
+  {
+    "line": 71,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_subuRN_r' needs target feature xpulpv"
+  },
+  {
+    "line": 72,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_bclr' needs target feature xpulpv"
+  },
+  {
+    "line": 73,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_bclr_r' needs target feature xpulpv"
+  },
+  {
+    "line": 74,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_bextract' needs target feature xpulpv"
+  },
+  {
+    "line": 75,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_bextract_r' needs target feature xpulpv"
+  },
+  {
+    "line": 76,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_bextractu' needs target feature xpulpv"
+  },
+  {
+    "line": 77,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_bextractu_r' needs target feature xpulpv"
+  },
+  {
+    "line": 78,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_binsert' needs target feature xpulpv"
+  },
+  {
+    "line": 79,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_binsert_r' needs target feature xpulpv"
+  },
+  {
+    "line": 80,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_OffsetedRead' needs target feature xpulpv"
+  },
+  {
+    "line": 81,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_OffsetedReadHalf' needs target feature xpulpv"
+  },
+  {
+    "line": 82,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_OffsetedReadByte' needs target feature xpulpv"
+  },
+  {
+    "line": 83,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_OffsetedWrite' needs target feature xpulpv"
+  },
+  {
+    "line": 84,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_OffsetedWriteHalf' needs target feature xpulpv"
+  },
+  {
+    "line": 85,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_OffsetedWriteByte' needs target feature xpulpv"
+  },
+  {
+    "line": 86,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_read_base_off' needs target feature xpulpv"
+  },
+  {
+    "line": 87,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_write_base_off' needs target feature xpulpv"
+  },
+  {
+    "line": 88,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_read_base_off_v' needs target feature xpulpv"
+  },
+  {
+    "line": 89,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_write_base_off_v' needs target feature xpulpv"
+  },
+  {
+    "line": 90,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_read_then_spr_bit_clr' needs target feature xpulpv"
+  },
+  {
+    "line": 91,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_read_then_spr_bit_set' needs target feature xpulpv"
+  },
+  {
+    "line": 92,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_read_then_spr_write' needs target feature xpulpv"
+  },
+  {
+    "line": 93,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_spr_bit_clr' needs target feature xpulpv"
+  },
+  {
+    "line": 94,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_spr_bit_set' needs target feature xpulpv"
+  },
+  {
+    "line": 95,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_spr_read' needs target feature xpulpv"
+  },
+  {
+    "line": 96,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_spr_read_vol' needs target feature xpulpv"
+  },
+  {
+    "line": 97,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_spr_write' needs target feature xpulpv"
+  },
+  {
+    "line": 98,
+    "old": "builtin requires at least one of the following extensions: 'Xpulpv'",
+    "new": "'__builtin_pulp_event_unit_read' needs target feature xpulpv"
+  }
+]

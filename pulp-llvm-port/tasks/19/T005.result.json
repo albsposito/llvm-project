@@ -1,0 +1,36 @@
+{
+  "status": "done",
+  "branch": "work/19/T005",
+  "commits": [
+    "fa4f10654ef5f688f2e2aac123b956710698512c",
+    "33a6de9b7e790c8cc2294ea2f194e7fd7f13d1f8"
+  ],
+  "dependencies": [
+    {
+      "task": "19/E004",
+      "original_commit": "c29a8b4cc12210a181ad26af5b25e104799cc348",
+      "commit": "fa4f10654ef5f688f2e2aac123b956710698512c"
+    }
+  ],
+  "note": "notes/19/T005.md",
+  "signature_gone": true,
+  "other_errors_seen": [],
+  "evidence": [
+    "logs/19-T005.repro.log",
+    "logs/19-T005.verify.log",
+    "logs/19-T005.unit.log",
+    "logs/19-T005.approved.output.diff",
+    "logs/19-T005.policy.log"
+  ],
+  "verification": {
+    "build_rc": 0,
+    "filter_rc": 0,
+    "unit_passed": 531,
+    "unit_total": 535,
+    "policy_fail": 0,
+    "policy_warn": 1,
+    "unit_rc": 0,
+    "unit_skipped": 4
+  },
+  "scope": "25 padding spaces; conductor authorized omitting incorrect insertion for longest name, which stays unchanged"
+}

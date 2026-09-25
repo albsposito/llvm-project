@@ -1,0 +1,17 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "checks": {
+    "diff_read": "git show 1630ccfbfa2f (RISCVInstrInfoXpulp.td:31-34: def uimm6_lsb0 -> uimm6_lsb0_pulp, UImmAsmOperand<6,\"Lsb0\"> -> <6,\"Lsb0Pulp\">, one comment line added; predicate/encoder/decoder/MCOperandPredicate unchanged) and git show 77edb7ce5a4a (RISCVAsmParser.cpp:781: isUImm6Lsb0 -> isUImm6Lsb0Pulp, body unchanged). Nothing else changed.",
+    "fixup_subjects": "Both subjects exactly match cluster commits in llvmorg-19.1.7..integration_head ('[pulp] insn-tablegen: ...' and '[pulp] mc: ...'); one commit per owning cluster as the task asked.",
+    "upstream_citation": "3c5f929ad093 '[RISCV] Add QingKe \"XW\" compressed opcode extension (#97925)' exists, is in e6c3289804a6..llvmorg-19.1.7 (in rev-list; first in llvmorg-19.1.0-rc1), and adds def uimm6_lsb0 at RISCVInstrInfoXwch.td:62 (constant-only, getImmOpValue, decodeUImmOperand<6>), as the note says.",
+    "upstream_untouched": "git diff llvmorg-19.1.7 HEAD -- RISCVInstrInfoXwch.td is empty; upstream isUImm6Lsb0 (RISCVAsmParser.cpp:847) and case Match_InvalidUImm6Lsb0 (line 1564) are upstream's own and unchanged.",
+    "completeness": "grep over llvm/clang/lld lib sources at HEAD: no remaining fork reference to uimm6_lsb0/isUImm6Lsb0; at 18 (6547028f925c) the fork had only the def and isUImm6Lsb0, no instruction uses and no Match_InvalidUImm6Lsb0 case, so the renamed Match_InvalidUImm6Lsb0Pulp loses no fork diagnostic.",
+    "oracle_cheating": "None: no deleted fork logic, no early returns, stubs, forced conditions, pipeline changes, deleted patterns, or test edits. Fork operand kept (not deleted, per rule 9); worker correctly flagged it as dead and left deletion to the conductor.",
+    "note": "All four sections present; 'What breaks if this is wrong' names observable symptoms (TableGen/AsmParser build failure; xwchc-*.s MC tests for qk.c.lhu/qk.c.sh). Reference XCV.td:509,515 (CVrrAsmOperand/CVrr) verified at llvmorg-19.1.7; it is a weak analogy for vendor-marked naming but acceptable since upstream has no direct pattern for a name collision.",
+    "verification_limits": "RISCVCommonTableGen still fails on the separate powerOf2Minus1 collision (logs/19-E003.fix-tg.log tail confirms, XCV.td:719), so LLVMRISCVAsmParser was not built; uimm6_lsb0 error is gone. Accepted as out of scope (rule 5), reported in other_errors_seen."
+  },
+  "warnings_checked": [
+    "scripts/policy_check.py --repo wt/19-E003 --range 7c27289bc3a1..work/19/E003 --notes-root notes --stack-base llvmorg-19.1.7: 0 FAIL, 0 WARN; nothing to examine."
+  ]
+}

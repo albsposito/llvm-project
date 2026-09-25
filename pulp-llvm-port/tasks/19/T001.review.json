@@ -1,0 +1,7 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [
+    "test-edit freploop-nested.ll: actual single-commit diff modifies exactly five existing CSR checks, preserving CHECK/CHECK-NEXT strength, all other file bytes, RUN lines and inputs. Both regen blocks explicitly semantic and authorized by owner-test-exceptions.md including five-check/six-emission extraction refinement. Extraction script sources aliases mechanically from LLVM updater. CSRRSI/CSRRCI x0 aliases preserve CSR 1984 and mask 1 and only discard already-dead results. Upstream 52187b9f2e7ef0997269bcf64b3d2512a52467ed exists in prev_tag..llvmorg-19.1.7 and moves dead-definition pass after pre-regalloc SSR expansion; checked actual upstream diff, dead-register implementation and alias definitions. No production or unrelated edits. Independently ran all four original llc/FileCheck variants successfully; note states observable CSR-state failure. Policy: 0 FAIL, 1 WARN."
+  ]
+}

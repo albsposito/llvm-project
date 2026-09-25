@@ -1,0 +1,19 @@
+{
+  "branch": "work/19/E003",
+  "int_head_before": "7c27289bc3a1a39d0727f00d21dec5aacab0784a",
+  "build_rc": 1,
+  "errors_fixed": [
+    "def already exists: uimm6_lsb0"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/19/work_19_E003.build.log",
+  "errors_unmasked": [
+    "def already exists: powerOf2Minus1"
+  ],
+  "verdict": "LANDED",
+  "int_head_after": "fa3f689792626176cc16c3053a7f2474ddfc3c69",
+  "commits": [
+    "1630ccfbfa2f09021e3aebad060a572fa51b0c62",
+    "77edb7ce5a4adfaaf0ba2a16646c7b80e4eb3e94"
+  ]
+}

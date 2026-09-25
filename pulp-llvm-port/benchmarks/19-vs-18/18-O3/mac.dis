@@ -1,0 +1,9 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/18-O3/mac.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <mac>:
+       0: 42a58633     	p.mac	a2, a1, a0
+       4: 8532         	mv	a0, a2
+       6: 8082         	ret

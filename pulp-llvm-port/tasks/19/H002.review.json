@@ -1,0 +1,16 @@
+{
+  "verdict": "REJECT",
+  "range": "1cfbbeab584d..f798e86e4dfb",
+  "reasons": [
+    "pulp-llvm-port/notes/19/H002.md:1: Required change-note section \"## Upstream reference\" is missing (policy_check change-note FAIL). Add this section explicitly stating this is a harness defect with the relevant harness reference, and that no LLVM upstream change applies. Implementation review otherwise found no blocking defect."
+  ],
+  "warnings_checked": [
+    "Independent policy_check: 8 FAIL, 0 WARN. Fixup-subject and six upstream-file-edit findings concern authorized harness-only paths and are inapplicable to LLVM cluster ownership; missing required note section is actionable.",
+    "Conductor confirms dispatch is the task specification because main tasks/19/H002.md does not exist.",
+    "Reviewed only f798e86e4dfb against prerequisite snapshot 1cfbbeab584d, not snapshot changes. No LLVM source, tests, RUN lines, or expected results changed.",
+    "21 harness tests PASS independently; bash -n scripts/lit.sh and git diff --check PASS.",
+    "Unit report preserves assertion diagnostics, validates positive unique completed inventory and unit exit status; gate rejects lost unit cases, new lit/unit failure identities, unchanged combined failures, missing or stale reports, and nonzero builds without recognized errors.",
+    "H001 also edits lit.sh argument construction and lit_diff.py imports/options. Apply implementation deltas only and independently validate the combined resolved harness.",
+    "No upstream LLVM commit citation is applicable to a harness-only defect; required note section can state this explicitly."
+  ]
+}

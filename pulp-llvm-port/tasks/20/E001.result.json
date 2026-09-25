@@ -1,0 +1,24 @@
+{
+  "status": "done",
+  "branch": "work/20/E001",
+  "commits": [
+    "963f162ed2856968a7b864771385228ef70ab88c"
+  ],
+  "note": "notes/20/E001.md",
+  "signature_gone": true,
+  "other_errors_seen": [
+    "Processor does not define resources for WriteFCvtF32ToF16 (RISCVSchedMempool.td:3; untouched file)"
+  ],
+  "validation": {
+    "repro_log": "logs/20-E001.repro.log",
+    "build_log": "logs/20-E001.build.log",
+    "build_rc": 1,
+    "policy": "tasks/20/E001.policy.json",
+    "equivalence": "tasks/20/E001.registration-equivalence.json"
+  },
+  "coalesced_clusters": [
+    "E001",
+    "E002",
+    "E003"
+  ]
+}

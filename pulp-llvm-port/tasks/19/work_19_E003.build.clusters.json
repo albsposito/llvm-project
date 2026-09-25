@@ -1,0 +1,58 @@
+{
+  "log": "tasks/19/work_19_E003.build.log",
+  "failed_targets": 37,
+  "clusters": [
+    {
+      "key": "Encountered a list when expecting a bit",
+      "kind": "compile",
+      "sites": [
+        "clang/include/clang/AST/../Basic/Attr.td:4199",
+        "clang/include/clang/Basic/Attr.td:4199",
+        "clang/include/clang/Parse/../Basic/Attr.td:4199",
+        "clang/include/clang/Sema/../Basic/Attr.td:4199",
+        "clang/include/clang/Serialization/../Basic/Attr.td:4199"
+      ],
+      "samples": [
+        "/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit\n                          [\"infer\"],\n                           ^",
+        "/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit\n                          [\"infer\"],\n                           ^",
+        "/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Parse/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit\n                          [\"infer\"],\n                           ^"
+      ],
+      "owners": [
+        "clang-frep-pragma",
+        "upstream"
+      ],
+      "count": 5,
+      "id": "E001"
+    },
+    {
+      "key": "Unknown Type: _Vector<N, short>",
+      "kind": "compile",
+      "sites": [
+        "clang/include/clang/Basic/BuiltinsRISCVXpulp.td:21"
+      ],
+      "samples": [
+        "/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/BuiltinsRISCVXpulp.td:21:7: error: Unknown Type: _Vector<2, short>\n  let Prototype = prototype;\n      ^"
+      ],
+      "owners": [
+        "clang-builtins"
+      ],
+      "count": 1,
+      "id": "E002"
+    },
+    {
+      "key": "def already exists: powerOf2Minus1",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67"
+      ],
+      "samples": [
+        "/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1"
+      ],
+      "owners": [
+        "insn-tablegen"
+      ],
+      "count": 1,
+      "id": "E003"
+    }
+  ]
+}

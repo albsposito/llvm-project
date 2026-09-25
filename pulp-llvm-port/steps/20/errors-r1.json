@@ -1,0 +1,51 @@
+{
+  "log": "logs/build-int-20-r1.log",
+  "failed_targets": 19,
+  "clusters": [
+    {
+      "key": "Value specified for template argument 'RISCVExtension:desc' is of type int; expected type string: N",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVInstrInfoXsmallfloatGen.td:9"
+      ],
+      "samples": [
+        "/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV/RISCVInstrInfoXsmallfloatGen.td:9:19: error: Value specified for template argument 'RISCVExtension:desc' is of type int; expected type string: 1\n  \"xfalthalf\", 0, 1, \"'Xfalthalf' (alternate half-precision floats)\">;\n                  ^"
+      ],
+      "owners": [
+        "insn-tablegen"
+      ],
+      "count": 1,
+      "id": "E001"
+    },
+    {
+      "key": "Value specified for template argument 'RISCVExtension:implies' is of type string; expected type list<SubtargetFeature>: \"'Xfalthalf' (alternate half-precision floats)\"",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVInstrInfoXsmallfloatGen.td:9"
+      ],
+      "samples": [
+        "/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV/RISCVInstrInfoXsmallfloatGen.td:9:22: error: Value specified for template argument 'RISCVExtension:implies' is of type string; expected type list<SubtargetFeature>: \"'Xfalthalf' (alternate half-precision floats)\"\n  \"xfalthalf\", 0, 1, \"'Xfalthalf' (alternate half-precision floats)\">;\n                     ^"
+      ],
+      "owners": [
+        "insn-tablegen"
+      ],
+      "count": 1,
+      "id": "E002"
+    },
+    {
+      "key": "Value specified for template argument 'RISCVExtension:major' is of type string; expected type int: \"xfalthalf\"",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVInstrInfoXsmallfloatGen.td:9"
+      ],
+      "samples": [
+        "/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV/RISCVInstrInfoXsmallfloatGen.td:9:3: error: Value specified for template argument 'RISCVExtension:major' is of type string; expected type int: \"xfalthalf\"\n  \"xfalthalf\", 0, 1, \"'Xfalthalf' (alternate half-precision floats)\">;\n  ^"
+      ],
+      "owners": [
+        "insn-tablegen"
+      ],
+      "count": 1,
+      "id": "E003"
+    }
+  ]
+}

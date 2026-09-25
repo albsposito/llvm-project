@@ -1,0 +1,12 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [
+    "test-edit (40fe3a6eb2a9): independently read actual commit diff and regen report; precisely 91 expected-error bodies updated under explicit owner exception notes/19/owner-test-exceptions.md. Programmatically verified all non-annotation bytes identical, every exact builtin matches its source call, and every expected diagnostic retains xpulpv. No inputs, RUN lines, feature conditions or assertions changed. Cosmetic diagnostic wording classification is accurate."
+  ],
+  "evidence": [
+    "Independent policy run tasks/19/T004.review-policy.json: 0 FAIL, 1 WARN.",
+    "Upstream 13b653ab112736b92cd7f8ef249ced2b148ee7f4 exists and is ancestor of llvmorg-19.1.7 but not prev_tag e6c3289804a67ea0bb6a86fadbe454dd93b8d855. Reviewed removed Sema global feature check and equivalent exact target-feature diagnostic migration in clang/test/CodeGen/RISCV/rvb-intrinsics/riscv64-zbkb-error.c.",
+    "Worker verification log records actual test PASS using integration clang and worker source. No production code changed; note states observable missing-feature diagnostic failure."
+  ]
+}

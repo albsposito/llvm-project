@@ -1,0 +1,15 @@
+{
+  "branch": "work/19/E007",
+  "int_head_before": "6c994ad0972cd1f0700f7ae993ba74ef458c1834",
+  "build_rc": 1,
+  "errors_fixed": [
+    "no member named 'equals' in 'llvm::StringRef'"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/19/work_19_E007.build.log",
+  "verdict": "LANDED",
+  "int_head_after": "67ff43c86b720b3cdd1de94e8055b9cc20a254c0",
+  "commits": [
+    "f9e95fb57fb95008b0cd549499d9d1f8d31fbb6f"
+  ]
+}

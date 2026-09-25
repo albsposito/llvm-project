@@ -1,0 +1,52 @@
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace, preprocessed source, and associated run script.
+Stack dump:
+0.	Program arguments: /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang --target=riscv32-unknown-elf -march=rv32imc_xpulpv2 -mabi=ilp32 -ffreestanding -fno-builtin -O2 -c /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/sources/copy_loop.c -o /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/19-O2/copy_loop.o
+1.	<eof> parser at end of file
+2.	Code generation
+3.	Running pass 'Function Pass Manager' on module '/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/sources/copy_loop.c'.
+4.	Running pass 'PULP Hardware Loops' on function '@copy_loop'
+ #0 0x000062d6b4aa72c8 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x40662c8)
+ #1 0x000062d6b4aa4e9e llvm::sys::RunSignalHandlers() (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x4063e9e)
+ #2 0x000062d6b4a187f6 CrashRecoverySignalHandler(int) CrashRecoveryContext.cpp:0:0
+ #3 0x00007e8e6be45330 (/lib/x86_64-linux-gnu/libc.so.6+0x45330)
+ #4 0x000062d6b3b6689c (anonymous namespace)::PULPHardwareLoops::convertToHardwareLoop(llvm::MachineLoop*, bool&, bool&) PULPHardwareLoops.cpp:0:0
+ #5 0x000062d6b3b651be (anonymous namespace)::PULPHardwareLoops::runOnMachineFunction(llvm::MachineFunction&) PULPHardwareLoops.cpp:0:0
+ #6 0x000062d6b3fb18c6 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x35708c6)
+ #7 0x000062d6b45ad509 llvm::FPPassManager::runOnFunction(llvm::Function&) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x3b6c509)
+ #8 0x000062d6b45b5a52 llvm::FPPassManager::runOnModule(llvm::Module&) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x3b74a52)
+ #9 0x000062d6b45ae05c llvm::legacy::PassManagerImpl::run(llvm::Module&) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x3b6d05c)
+#10 0x000062d6b52b412d clang::EmitBackendOutput(clang::DiagnosticsEngine&, clang::HeaderSearchOptions const&, clang::CodeGenOptions const&, clang::TargetOptions const&, clang::LangOptions const&, llvm::StringRef, llvm::Module*, clang::BackendAction, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>, std::unique_ptr<llvm::raw_pwrite_stream, std::default_delete<llvm::raw_pwrite_stream>>, clang::BackendConsumer*) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x487312d)
+#11 0x000062d6b52de660 clang::BackendConsumer::HandleTranslationUnit(clang::ASTContext&) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x489d660)
+#12 0x000062d6b72369c9 clang::ParseAST(clang::Sema&, bool, bool) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x67f59c9)
+#13 0x000062d6b579b3cf clang::FrontendAction::Execute() (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x4d5a3cf)
+#14 0x000062d6b5704e1d clang::CompilerInstance::ExecuteAction(clang::FrontendAction&) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x4cc3e1d)
+#15 0x000062d6b588481e clang::ExecuteCompilerInvocation(clang::CompilerInstance*) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x4e4381e)
+#16 0x000062d6b3a497eb cc1_main(llvm::ArrayRef<char const*>, char const*, void*) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x30087eb)
+#17 0x000062d6b3a45fdd ExecuteCC1Tool(llvm::SmallVectorImpl<char const*>&, llvm::ToolContext const&) driver.cpp:0:0
+#18 0x000062d6b553d2e9 void llvm::function_ref<void ()>::callback_fn<clang::driver::CC1Command::Execute(llvm::ArrayRef<std::optional<llvm::StringRef>>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>*, bool*) const::$_0>(long) Job.cpp:0:0
+#19 0x000062d6b4a18536 llvm::CrashRecoveryContext::RunSafely(llvm::function_ref<void ()>) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x3fd7536)
+#20 0x000062d6b553c842 clang::driver::CC1Command::Execute(llvm::ArrayRef<std::optional<llvm::StringRef>>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>*, bool*) const (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x4afb842)
+#21 0x000062d6b54f3ba7 clang::driver::Compilation::ExecuteCommand(clang::driver::Command const&, clang::driver::Command const*&, bool) const (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x4ab2ba7)
+#22 0x000062d6b54f40e7 clang::driver::Compilation::ExecuteJobs(clang::driver::JobList const&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&, bool) const (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x4ab30e7)
+#23 0x000062d6b5515469 clang::driver::Driver::ExecuteCompilation(clang::driver::Compilation&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x4ad4469)
+#24 0x000062d6b3a4554d clang_main(int, char**, llvm::ToolContext const&) (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x300454d)
+#25 0x000062d6b3a56577 main (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x3015577)
+#26 0x00007e8e6be2a1ca (/lib/x86_64-linux-gnu/libc.so.6+0x2a1ca)
+#27 0x00007e8e6be2a28b __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28b)
+#28 0x000062d6b3a439a5 _start (/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang+0x30029a5)
+clang: error: clang frontend command failed with exit code 139 (use -v to see invocation)
+clang version 19.1.7 (https://github.com/albsposito/llvm-project.git 9b2edaf923ad46816535d7361e9daef79be0529c)
+Target: riscv32-unknown-unknown-elf
+Thread model: posix
+InstalledDir: /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin
+Build config: +assertions
+clang: note: diagnostic msg: 
+********************
+
+PLEASE ATTACH THE FOLLOWING FILES TO THE BUG REPORT:
+Preprocessed source(s) and associated run script(s) are located at:
+clang: note: diagnostic msg: /tmp/copy_loop-d51a63.c
+clang: note: diagnostic msg: /tmp/copy_loop-d51a63.sh
+clang: note: diagnostic msg: 
+
+********************

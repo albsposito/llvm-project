@@ -1,0 +1,101 @@
+Note: Google Test filter = OrderedExtensionMap.*:ParseArchString.*:ParseNormalizedArchString.*:RiscvExtensionsHelp.*:ToFeatures.*:getTargetFeatureForExtension.*:isSupportedExtensionWithVersion.*
+[==========] Running 37 tests from 7 test suites.
+[----------] Global test environment set-up.
+[----------] 6 tests from ParseNormalizedArchString
+[ RUN      ] ParseNormalizedArchString.RejectsUpperCase
+[       OK ] ParseNormalizedArchString.RejectsUpperCase (0 ms)
+[ RUN      ] ParseNormalizedArchString.RejectsInvalidBaseISA
+[       OK ] ParseNormalizedArchString.RejectsInvalidBaseISA (0 ms)
+[ RUN      ] ParseNormalizedArchString.RejectsMalformedInputs
+[       OK ] ParseNormalizedArchString.RejectsMalformedInputs (0 ms)
+[ RUN      ] ParseNormalizedArchString.AcceptsValidBaseISAsAndSetsXLen
+[       OK ] ParseNormalizedArchString.AcceptsValidBaseISAsAndSetsXLen (0 ms)
+[ RUN      ] ParseNormalizedArchString.AcceptsArbitraryExtensionsAndVersions
+[       OK ] ParseNormalizedArchString.AcceptsArbitraryExtensionsAndVersions (0 ms)
+[ RUN      ] ParseNormalizedArchString.UpdatesFLenMinVLenMaxELen
+[       OK ] ParseNormalizedArchString.UpdatesFLenMinVLenMaxELen (0 ms)
+[----------] 6 tests from ParseNormalizedArchString (0 ms total)
+
+[----------] 23 tests from ParseArchString
+[ RUN      ] ParseArchString.RejectsUpperCase
+[       OK ] ParseArchString.RejectsUpperCase (0 ms)
+[ RUN      ] ParseArchString.RejectsInvalidBaseISA
+[       OK ] ParseArchString.RejectsInvalidBaseISA (0 ms)
+[ RUN      ] ParseArchString.RejectsUnsupportedBaseISA
+[       OK ] ParseArchString.RejectsUnsupportedBaseISA (0 ms)
+[ RUN      ] ParseArchString.AcceptsSupportedBaseISAsAndSetsXLenAndFLen
+[       OK ] ParseArchString.AcceptsSupportedBaseISAsAndSetsXLenAndFLen (0 ms)
+[ RUN      ] ParseArchString.RequiresCanonicalOrderForSingleLetterExtensions
+[       OK ] ParseArchString.RequiresCanonicalOrderForSingleLetterExtensions (0 ms)
+[ RUN      ] ParseArchString.RejectsUnrecognizedExtensionNamesByDefault
+[       OK ] ParseArchString.RejectsUnrecognizedExtensionNamesByDefault (0 ms)
+[ RUN      ] ParseArchString.IgnoresUnrecognizedExtensionNamesWithIgnoreUnknown
+[       OK ] ParseArchString.IgnoresUnrecognizedExtensionNamesWithIgnoreUnknown (0 ms)
+[ RUN      ] ParseArchString.AcceptsVersionInLongOrShortForm
+[       OK ] ParseArchString.AcceptsVersionInLongOrShortForm (0 ms)
+[ RUN      ] ParseArchString.RejectsUnrecognizedExtensionVersionsByDefault
+[       OK ] ParseArchString.RejectsUnrecognizedExtensionVersionsByDefault (0 ms)
+[ RUN      ] ParseArchString.UsesDefaultVersionForUnrecognisedBaseISAVersionWithIgnoreUnknown
+[       OK ] ParseArchString.UsesDefaultVersionForUnrecognisedBaseISAVersionWithIgnoreUnknown (0 ms)
+[ RUN      ] ParseArchString.IgnoresExtensionsWithUnrecognizedVersionsWithIgnoreUnknown
+[       OK ] ParseArchString.IgnoresExtensionsWithUnrecognizedVersionsWithIgnoreUnknown (0 ms)
+[ RUN      ] ParseArchString.AcceptsUnderscoreSplittingExtensions
+[       OK ] ParseArchString.AcceptsUnderscoreSplittingExtensions (0 ms)
+[ RUN      ] ParseArchString.RejectsDoubleOrTrailingUnderscore
+[       OK ] ParseArchString.RejectsDoubleOrTrailingUnderscore (0 ms)
+[ RUN      ] ParseArchString.RejectsDuplicateExtensionNames
+[       OK ] ParseArchString.RejectsDuplicateExtensionNames (0 ms)
+[ RUN      ] ParseArchString.RejectsExperimentalExtensionsIfNotEnableExperimentalExtension
+[       OK ] ParseArchString.RejectsExperimentalExtensionsIfNotEnableExperimentalExtension (0 ms)
+[ RUN      ] ParseArchString.AcceptsExperimentalExtensionsIfEnableExperimentalExtension
+[       OK ] ParseArchString.AcceptsExperimentalExtensionsIfEnableExperimentalExtension (0 ms)
+[ RUN      ] ParseArchString.RequiresExplicitVersionNumberForExperimentalExtensionByDefault
+[       OK ] ParseArchString.RequiresExplicitVersionNumberForExperimentalExtensionByDefault (0 ms)
+[ RUN      ] ParseArchString.AcceptsUnrecognizedVersionIfNotExperimentalExtensionVersionCheck
+[       OK ] ParseArchString.AcceptsUnrecognizedVersionIfNotExperimentalExtensionVersionCheck (0 ms)
+[ RUN      ] ParseArchString.RejectsUnrecognizedVersionForExperimentalExtension
+[       OK ] ParseArchString.RejectsUnrecognizedVersionForExperimentalExtension (0 ms)
+[ RUN      ] ParseArchString.RejectsExtensionVersionForG
+[       OK ] ParseArchString.RejectsExtensionVersionForG (0 ms)
+[ RUN      ] ParseArchString.AddsImpliedExtensions
+[       OK ] ParseArchString.AddsImpliedExtensions (0 ms)
+[ RUN      ] ParseArchString.RejectsConflictingExtensions
+[       OK ] ParseArchString.RejectsConflictingExtensions (0 ms)
+[ RUN      ] ParseArchString.ZceImplication
+[       OK ] ParseArchString.ZceImplication (0 ms)
+[----------] 23 tests from ParseArchString (0 ms total)
+
+[----------] 4 tests from ToFeatures
+[ RUN      ] ToFeatures.IIsDroppedAndExperimentalExtensionsArePrefixed
+[       OK ] ToFeatures.IIsDroppedAndExperimentalExtensionsArePrefixed (0 ms)
+[ RUN      ] ToFeatures.UnsupportedExtensionsAreDropped
+[       OK ] ToFeatures.UnsupportedExtensionsAreDropped (0 ms)
+[ RUN      ] ToFeatures.UnsupportedExtensionsAreKeptIfIgnoreUnknownIsFalse
+[       OK ] ToFeatures.UnsupportedExtensionsAreKeptIfIgnoreUnknownIsFalse (0 ms)
+[ RUN      ] ToFeatures.AddAllExtensionsAddsNegativeExtensions
+[       OK ] ToFeatures.AddAllExtensionsAddsNegativeExtensions (0 ms)
+[----------] 4 tests from ToFeatures (0 ms total)
+
+[----------] 1 test from OrderedExtensionMap
+[ RUN      ] OrderedExtensionMap.ExtensionsAreCorrectlyOrdered
+[       OK ] OrderedExtensionMap.ExtensionsAreCorrectlyOrdered (0 ms)
+[----------] 1 test from OrderedExtensionMap (0 ms total)
+
+[----------] 1 test from isSupportedExtensionWithVersion
+[ RUN      ] isSupportedExtensionWithVersion.AcceptsSingleExtensionWithVersion
+[       OK ] isSupportedExtensionWithVersion.AcceptsSingleExtensionWithVersion (0 ms)
+[----------] 1 test from isSupportedExtensionWithVersion (0 ms total)
+
+[----------] 1 test from getTargetFeatureForExtension
+[ RUN      ] getTargetFeatureForExtension.RetrieveTargetFeatureFromOneExt
+[       OK ] getTargetFeatureForExtension.RetrieveTargetFeatureFromOneExt (0 ms)
+[----------] 1 test from getTargetFeatureForExtension (0 ms total)
+
+[----------] 1 test from RiscvExtensionsHelp
+[ RUN      ] RiscvExtensionsHelp.CheckExtensions
+[       OK ] RiscvExtensionsHelp.CheckExtensions (0 ms)
+[----------] 1 test from RiscvExtensionsHelp (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 37 tests from 7 test suites ran. (0 ms total)
+[  PASSED  ] 37 tests.

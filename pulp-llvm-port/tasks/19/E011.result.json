@@ -1,0 +1,15 @@
+{
+  "status": "done",
+  "branch": "work/19/E011",
+  "commits": ["a118c57847e3"],
+  "note": "/home/ubuntu/llvm-project/pulp-llvm-port/notes/19/E011.md",
+  "signature_gone": true,
+  "other_errors_seen": [
+    "no member named 'ID' in 'llvm::MachineLoopInfo' (PassAnalysisSupport.h:76 and :232, instantiated from PULPFixupHwLoops.cpp:100 addRequired<MachineLoopInfo> and :343 getAnalysis<MachineLoopInfo>; NPM migration, upstream 79d0de2ac37b, present in the repro log too)"
+  ],
+  "logs": {
+    "repro": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E011.repro.log",
+    "after_fix": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E011.fix.log"
+  },
+  "upstream_commit": "f6d431f208c0 [CodeGen] Make the parameter TRI required in some functions. (#85968)"
+}

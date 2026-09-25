@@ -1,0 +1,4 @@
+O2 18 bytes 74 instructions 25 sum_of_per_kernel_median_seconds 0.11114082500171207
+O2 19 bytes 74 instructions 25 sum_of_per_kernel_median_seconds 0.1156772690010257
+O3 18 bytes 74 instructions 25 sum_of_per_kernel_median_seconds 0.11028449299919885
+O3 19 bytes 74 instructions 25 sum_of_per_kernel_median_seconds 0.11568917599652195

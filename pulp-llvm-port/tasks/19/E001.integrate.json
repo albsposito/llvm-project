@@ -1,0 +1,19 @@
+{
+  "branch": "work/19/E001",
+  "int_head_before": "63e03f20647ca8cc7aa9ec89eebef5850e84e7fb",
+  "build_rc": 1,
+  "errors_fixed": [
+    "Encountered a list when expecting a bit"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/19/work_19_E001.build.log",
+  "errors_unmasked": [
+    "no member named 'equals' in 'llvm::StringRef'",
+    "no member named 'makeArrayRef' in namespace 'llvm'"
+  ],
+  "verdict": "LANDED",
+  "int_head_after": "d225ed2e8fa7c8bb89b138ea0ce5c69371e5ef50",
+  "commits": [
+    "7065cb2fdcaa7e5bfd57e93d25bce89f717f4690"
+  ]
+}

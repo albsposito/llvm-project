@@ -1,0 +1,13 @@
+{
+  "status": "done",
+  "branch": "work/19/E009",
+  "commits": ["86a1446a5d4dd7706c72d8a0937899a2ebc712cd"],
+  "note": "notes/19/E009.md",
+  "signature_gone": true,
+  "other_errors_seen": [
+    "llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:291: too few arguments to function call, expected 2, have 1 (readsRegister; E011)",
+    "llvm/lib/Target/RISCV/RISCVExpandSDMAInsts.cpp:23 and RISCVExpandSSRInsts.cpp:57: 'llvm/CodeGen/LowLevelType.h' file not found"
+  ],
+  "repro_log": "logs/19-E009.repro.log",
+  "fix_log": "logs/19-E009.fix.log"
+}

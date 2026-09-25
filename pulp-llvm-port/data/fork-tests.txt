@@ -4,7 +4,7 @@ clang/test/CodeGen/RISCV/riscv-ssr-intrinsics.c
 clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics-diag.c
 clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics.c
 clang/test/Driver/riscv-arch.c
-clang/test/Misc/target-invalid-cpu-note.c
+clang/test/Misc/target-invalid-cpu-note/riscv.c
 clang/test/Preprocessor/riscv-nofdiv.c
 llvm/test/CodeGen/RISCV/O0-pipeline.ll
 llvm/test/CodeGen/RISCV/O3-pipeline.ll
@@ -55,4 +55,4 @@ llvm/test/MC/RISCV/xsmallfloat/rv32xsflt-xfvecquarter-invalid.s
 llvm/test/MC/RISCV/xsmallfloat/rv32xsflt-xfvecquarter-valid.s
 llvm/test/MC/RISCV/xsmallfloat/rv32xsflt-xfvecsingle-invalid.s
 llvm/test/MC/RISCV/xsmallfloat/rv32xsflt-xfvecsingle-valid.s
-llvm/unittests/Support/RISCVISAInfoTest.cpp
+llvm/unittests/TargetParser/RISCVISAInfoTest.cpp

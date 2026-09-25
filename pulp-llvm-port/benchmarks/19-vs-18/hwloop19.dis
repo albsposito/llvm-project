@@ -1,0 +1,173 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/hwloop19.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <for_1x>:
+       0: 02b05163     	blez	a1, 0x22 <for_1x+0x22>
+       4: 058a         	slli	a1, a1, 0x2
+       6: 00b50633     	add	a2, a0, a1
+       a: 40a605b3     	sub	a1, a2, a0
+       e: 0025d693     	srli	a3, a1, 0x2
+      12: 4581         	li	a1, 0x0
+      14: 0046c07b     	lp.setup	x0, a3, 0x4
+      18: 0045268b     	p.lw	a3, 0x4(a0!)
+      1c: 95b6         	add	a1, a1, a3
+      1e: 852e         	mv	a0, a1
+      20: 8082         	ret
+      22: 4581         	li	a1, 0x0
+      24: 852e         	mv	a0, a1
+      26: 8082         	ret
+
+00000028 <for_1x_reverse>:
+      28: 02b05263     	blez	a1, 0x4c <for_1x_reverse+0x24>
+      2c: 862a         	mv	a2, a0
+      2e: 4501         	li	a0, 0x0
+      30: 00158693     	addi	a3, a1, 0x1
+      34: 058a         	slli	a1, a1, 0x2
+      36: 962e         	add	a2, a2, a1
+      38: 4585         	li	a1, 0x1
+      3a: 40b68733     	sub	a4, a3, a1
+      3e: 1671         	addi	a2, a2, -0x4
+      40: 0047407b     	lp.setup	x0, a4, 0x4
+      44: 4218         	lw	a4, 0x0(a2)
+      46: 953a         	add	a0, a0, a4
+      48: 1671         	addi	a2, a2, -0x4
+      4a: 8082         	ret
+      4c: 4501         	li	a0, 0x0
+      4e: 8082         	ret
+
+00000050 <for_2x>:
+      50: 4701         	li	a4, 0x0
+      52: 02c05c63     	blez	a2, 0x8a <for_2x+0x3a>
+      56: 02d05a63     	blez	a3, 0x8a <for_2x+0x3a>
+      5a: 4801         	li	a6, 0x0
+      5c: 4701         	li	a4, 0x0
+      5e: 068a         	slli	a3, a3, 0x2
+      60: 00d588b3     	add	a7, a1, a3
+      64: 012640fb     	lp.setup	x1, a2, 0x12
+      68: 00281693     	slli	a3, a6, 0x2
+      6c: 96aa         	add	a3, a3, a0
+      6e: 0006a303     	lw	t1, 0x0(a3)
+      72: 40b886b3     	sub	a3, a7, a1
+      76: 0026d293     	srli	t0, a3, 0x2
+      7a: 86ae         	mv	a3, a1
+      7c: 0052c07b     	lp.setup	x0, t0, 0x5
+      80: 0046a78b     	p.lw	a5, 0x4(a3!)
+      84: 971a         	add	a4, a4, t1
+      86: 8f1d         	sub	a4, a4, a5
+      88: 0805         	addi	a6, a6, 0x1
+      8a: 853a         	mv	a0, a4
+      8c: 8082         	ret
+
+0000008e <for_2x_reverse>:
+      8e: 4701         	li	a4, 0x0
+      90: 04c05063     	blez	a2, 0xd0 <for_2x_reverse+0x42>
+      94: 02d05e63     	blez	a3, 0xd0 <for_2x_reverse+0x42>
+      98: 4701         	li	a4, 0x0
+      9a: 00168893     	addi	a7, a3, 0x1
+      9e: 068a         	slli	a3, a3, 0x2
+      a0: 95b6         	add	a1, a1, a3
+      a2: ffc58813     	addi	a6, a1, -0x4
+      a6: 4305         	li	t1, 0x1
+      a8: 82b2         	mv	t0, a2
+      aa: 167d         	addi	a2, a2, -0x1
+      ac: 00261593     	slli	a1, a2, 0x2
+      b0: 95aa         	add	a1, a1, a0
+      b2: 0005ae03     	lw	t3, 0x0(a1)
+      b6: 406883b3     	sub	t2, a7, t1
+      ba: 85c2         	mv	a1, a6
+      bc: 86c6         	mv	a3, a7
+      be: 0001         	nop
+      c0: 0053c07b     	lp.setup	x0, t2, 0x5
+      c4: 419c         	lw	a5, 0x0(a1)
+      c6: 9772         	add	a4, a4, t3
+      c8: 8f1d         	sub	a4, a4, a5
+      ca: 15f1         	addi	a1, a1, -0x4
+      cc: fc534ee3     	blt	t1, t0, 0xa8 <for_2x_reverse+0x1a>
+      d0: 853a         	mv	a0, a4
+      d2: 8082         	ret
+
+000000d4 <for_3x>:
+      d4: 4801         	li	a6, 0x0
+      d6: 04d05963     	blez	a3, 0x128 <for_3x+0x54>
+      da: 04e05763     	blez	a4, 0x128 <for_3x+0x54>
+      de: 04f05563     	blez	a5, 0x128 <for_3x+0x54>
+      e2: 4881         	li	a7, 0x0
+      e4: 4801         	li	a6, 0x0
+      e6: 078a         	slli	a5, a5, 0x2
+      e8: 00f602b3     	add	t0, a2, a5
+      ec: 00289793     	slli	a5, a7, 0x2
+      f0: 97aa         	add	a5, a5, a0
+      f2: 0007a383     	lw	t2, 0x0(a5)
+      f6: 4301         	li	t1, 0x0
+      f8: 014740fb     	lp.setup	x1, a4, 0x14
+      fc: 00231793     	slli	a5, t1, 0x2
+     100: 97ae         	add	a5, a5, a1
+     102: 0007ae03     	lw	t3, 0x0(a5)
+     106: 40c287b3     	sub	a5, t0, a2
+     10a: 0027de93     	srli	t4, a5, 0x2
+     10e: 87b2         	mv	a5, a2
+     110: 006ec07b     	lp.setup	x0, t4, 0x6
+     114: 0047ae8b     	p.lw	t4, 0x4(a5!)
+     118: 981e         	add	a6, a6, t2
+     11a: 9ef2         	add	t4, t4, t3
+     11c: 41d80833     	sub	a6, a6, t4
+     120: 0305         	addi	t1, t1, 0x1
+     122: 0885         	addi	a7, a7, 0x1
+     124: fcd894e3     	bne	a7, a3, 0xec <for_3x+0x18>
+     128: 8542         	mv	a0, a6
+     12a: 8082         	ret
+
+0000012c <for_3x_reverse>:
+     12c: 4801         	li	a6, 0x0
+     12e: 06d05163     	blez	a3, 0x190 <for_3x_reverse+0x64>
+     132: 04e05f63     	blez	a4, 0x190 <for_3x_reverse+0x64>
+     136: 04f05d63     	blez	a5, 0x190 <for_3x_reverse+0x64>
+     13a: 1141         	addi	sp, sp, -0x10
+     13c: c622         	sw	s0, 0xc(sp)
+     13e: 4801         	li	a6, 0x0
+     140: 00178893     	addi	a7, a5, 0x1
+     144: 078a         	slli	a5, a5, 0x2
+     146: 963e         	add	a2, a2, a5
+     148: ffc60313     	addi	t1, a2, -0x4
+     14c: 4e85         	li	t4, 0x1
+     14e: 82b6         	mv	t0, a3
+     150: 16fd         	addi	a3, a3, -0x1
+     152: 00269613     	slli	a2, a3, 0x2
+     156: 962a         	add	a2, a2, a0
+     158: 00062f03     	lw	t5, 0x0(a2)
+     15c: 83ba         	mv	t2, a4
+     15e: 8e1e         	mv	t3, t2
+     160: 13fd         	addi	t2, t2, -0x1
+     162: 00239613     	slli	a2, t2, 0x2
+     166: 962e         	add	a2, a2, a1
+     168: 00062f83     	lw	t6, 0x0(a2)
+     16c: 41d88433     	sub	s0, a7, t4
+     170: 861a         	mv	a2, t1
+     172: 87c6         	mv	a5, a7
+     174: 0074407b     	lp.setup	x0, s0, 0x7
+     178: 4200         	lw	s0, 0x0(a2)
+     17a: 987a         	add	a6, a6, t5
+     17c: 947e         	add	s0, s0, t6
+     17e: 40880833     	sub	a6, a6, s0
+     182: 1671         	addi	a2, a2, -0x4
+     184: fdcecde3     	blt	t4, t3, 0x15e <for_3x_reverse+0x32>
+     188: fc5ec3e3     	blt	t4, t0, 0x14e <for_3x_reverse+0x22>
+     18c: 4432         	lw	s0, 0xc(sp)
+     18e: 0141         	addi	sp, sp, 0x10
+     190: 8542         	mv	a0, a6
+     192: 8082         	ret
+
+00000194 <strcmp>:
+     194: 00054603     	lbu	a2, 0x0(a0)
+     198: ca11         	beqz	a2, 0x1ac <strcmp+0x18>
+     19a: 0505         	addi	a0, a0, 0x1
+     19c: 0005c683     	lbu	a3, 0x0(a1)
+     1a0: 00d61663     	bne	a2, a3, 0x1ac <strcmp+0x18>
+     1a4: 0015460b     	p.lbu	a2, 0x1(a0!)
+     1a8: 0585         	addi	a1, a1, 0x1
+     1aa: fa6d         	bnez	a2, 0x19c <strcmp+0x8>
+     1ac: 0005c503     	lbu	a0, 0x0(a1)
+     1b0: 40a60533     	sub	a0, a2, a0
+     1b4: 8082         	ret

@@ -1,0 +1,186 @@
+{
+  "green": false,
+  "totals": {
+    "FAIL": 6,
+    "PASS": 4525
+  },
+  "problems": 6,
+  "groups": [
+    {
+      "dir": "llvm/test/MC/RISCV",
+      "count": 4,
+      "tests": [
+        {
+          "test": "llvm/test/MC/RISCV/rv32xfrep-valid.s",
+          "problem": "FAIL"
+        },
+        {
+          "test": "llvm/test/MC/RISCV/rv32xmempool-valid.s",
+          "problem": "FAIL"
+        },
+        {
+          "test": "llvm/test/MC/RISCV/rv32xssr-valid.s",
+          "problem": "FAIL"
+        },
+        {
+          "test": "llvm/test/MC/RISCV/rv32xdma-valid.s",
+          "problem": "FAIL"
+        }
+      ]
+    },
+    {
+      "dir": "llvm/test/CodeGen/RISCV",
+      "count": 1,
+      "tests": [
+        {
+          "test": "llvm/test/CodeGen/RISCV/freploop-nested.ll",
+          "problem": "FAIL"
+        }
+      ]
+    },
+    {
+      "dir": "clang/test/CodeGen/RISCV",
+      "count": 1,
+      "tests": [
+        {
+          "test": "clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics-diag.c",
+          "problem": "FAIL"
+        }
+      ]
+    }
+  ],
+  "baseline_renames": [
+    {
+      "source": "llvm/test/CodeGen/RISCV/vp-splice.ll",
+      "destination": "llvm/test/CodeGen/RISCV/rvv/vp-splice.ll",
+      "upstream_commit": "7855703194232a94d321dceea27b45cee0c91f73"
+    },
+    {
+      "source": "llvm/test/CodeGen/RISCV/vp-splice-fixed-vectors.ll",
+      "destination": "llvm/test/CodeGen/RISCV/rvv/vp-splice-fixed-vectors.ll",
+      "upstream_commit": "7855703194232a94d321dceea27b45cee0c91f73"
+    },
+    {
+      "source": "llvm/test/CodeGen/RISCV/vp-splice-mask-vectors.ll",
+      "destination": "llvm/test/CodeGen/RISCV/rvv/vp-splice-mask-vectors.ll",
+      "upstream_commit": "7855703194232a94d321dceea27b45cee0c91f73"
+    },
+    {
+      "source": "llvm/test/CodeGen/RISCV/vp-splice-mask-fixed-vectors.ll",
+      "destination": "llvm/test/CodeGen/RISCV/rvv/vp-splice-mask-fixed-vectors.ll",
+      "upstream_commit": "7855703194232a94d321dceea27b45cee0c91f73"
+    },
+    {
+      "source": "llvm/test/CodeGen/RISCV/inline-asm-S-constraint.ll",
+      "destination": "llvm/test/CodeGen/RISCV/inline-asm-s-constraint.ll",
+      "upstream_commit": "10a55caccf4e2d397f94c1455b93d774591be45f"
+    },
+    {
+      "source": "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-fround-costrained-sdnode.ll",
+      "destination": "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-fround-constrained-sdnode.ll",
+      "upstream_commit": "b13f799616939933373610c7458687ae88fa414d"
+    },
+    {
+      "source": "llvm/test/CodeGen/RISCV/rvv/fround-costrained-sdnode.ll",
+      "destination": "llvm/test/CodeGen/RISCV/rvv/fround-constrained-sdnode.ll",
+      "upstream_commit": "b13f799616939933373610c7458687ae88fa414d"
+    },
+    {
+      "source": "llvm/test/CodeGen/RISCV/rvv/trunc-sat-clip.ll",
+      "destination": "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-trunc-sat-clip.ll",
+      "upstream_commit": "0afc884e874043bf5207d561ab82b107e8860d41"
+    }
+  ],
+  "mapping_errors": [],
+  "unit": {
+    "valid": true,
+    "exit_code": 0,
+    "tests": [
+      "OrderedExtensionMap.ExtensionsAreCorrectlyOrdered",
+      "ParseArchSTring.AcceptsProfileNamesWithSeparatedAdditionalExtensions",
+      "ParseArchString.AcceptsAmbiguousFromRelaxExtensions",
+      "ParseArchString.AcceptsBareProfileNames",
+      "ParseArchString.AcceptsExperimentalExtensionsIfEnableExperimentalExtension",
+      "ParseArchString.AcceptsRelaxMixedLetterExtensions",
+      "ParseArchString.AcceptsRelaxSingleLetterExtensions",
+      "ParseArchString.AcceptsSupportedBaseISAsAndSetsXLenAndFLen",
+      "ParseArchString.AcceptsUnderscoreSplittingExtensions",
+      "ParseArchString.AcceptsUnrecognizedVersionIfNotExperimentalExtensionVersionCheck",
+      "ParseArchString.AcceptsVersionInLongOrShortForm",
+      "ParseArchString.AddsImpliedExtensions",
+      "ParseArchString.RejectsConflictingExtensions",
+      "ParseArchString.RejectsDoubleOrTrailingUnderscore",
+      "ParseArchString.RejectsDuplicateExtensionNames",
+      "ParseArchString.RejectsExperimentalExtensionsIfNotEnableExperimentalExtension",
+      "ParseArchString.RejectsExperimentalProfilesIfEnableExperimentalExtensionsNotSet",
+      "ParseArchString.RejectsExtensionVersionForG",
+      "ParseArchString.RejectsInvalidBaseISA",
+      "ParseArchString.RejectsInvalidChars",
+      "ParseArchString.RejectsMultiLetterExtensionFollowBySingleLetterExtensions",
+      "ParseArchString.RejectsProfilesWithAdditionalExtensionsGivenAlreadyInProfile",
+      "ParseArchString.RejectsProfilesWithUnseparatedExtraExtensions",
+      "ParseArchString.RejectsRelaxExtensionsNotStartWithEorIorG",
+      "ParseArchString.RejectsUnrecognizedExtensionNamesByDefault",
+      "ParseArchString.RejectsUnrecognizedExtensionVersionsByDefault",
+      "ParseArchString.RejectsUnrecognizedProfileNames",
+      "ParseArchString.RejectsUnrecognizedVersionForExperimentalExtension",
+      "ParseArchString.RejectsUnsupportedBaseISA",
+      "ParseArchString.RequiresExplicitVersionNumberForExperimentalExtensionByDefault",
+      "ParseArchString.ZceImplication",
+      "ParseNormalizedArchString.AcceptsArbitraryExtensionsAndVersions",
+      "ParseNormalizedArchString.AcceptsUnknownMultiletter",
+      "ParseNormalizedArchString.AcceptsValidBaseISAsAndSetsXLen",
+      "ParseNormalizedArchString.DuplicateExtension",
+      "ParseNormalizedArchString.RejectsBadS",
+      "ParseNormalizedArchString.RejectsBadX",
+      "ParseNormalizedArchString.RejectsBadZ",
+      "ParseNormalizedArchString.RejectsInvalidBaseISA",
+      "ParseNormalizedArchString.RejectsInvalidChars",
+      "ParseNormalizedArchString.RejectsMalformedInputs",
+      "ParseNormalizedArchString.RejectsOnlyVersion",
+      "ParseNormalizedArchString.UpdatesFLenMinVLenMaxELen",
+      "RiscvExtensionsHelp.CheckExtensions",
+      "TargetParserTest.AArch64ArchExtFeature",
+      "TargetParserTest.AArch64ArchFeatures",
+      "TargetParserTest.AArch64ArchPartialOrder",
+      "TargetParserTest.AArch64ExtensionFeatures",
+      "TargetParserTest.AArch64PrintSupportedExtensions",
+      "TargetParserTest.ARMArchExtDependencies",
+      "TargetParserTest.ARMArchExtFeature",
+      "TargetParserTest.ARMExtensionFeatures",
+      "TargetParserTest.ARMFPUFeatures",
+      "TargetParserTest.ARMFPUNeonSupportLevel",
+      "TargetParserTest.ARMFPURestriction",
+      "TargetParserTest.ARMFPUVersion",
+      "TargetParserTest.ARMPrintSupportedExtensions",
+      "TargetParserTest.ARMparseArchEndianAndISA",
+      "TargetParserTest.ARMparseArchProfile",
+      "TargetParserTest.ARMparseArchVersion",
+      "TargetParserTest.ARMparseHWDiv",
+      "TargetParserTest.CSKYArchExtFeature",
+      "TargetParserTest.CSKYExtensionFeatures",
+      "TargetParserTest.CSKYFPUFeatures",
+      "TargetParserTest.CSKYFPUVersion",
+      "TargetParserTest.RISCVPrintEnabledExtensions",
+      "TargetParserTest.getARMCPUForArch",
+      "TargetParserTest.testAArch64Arch",
+      "TargetParserTest.testAArch64CPUArchList",
+      "TargetParserTest.testAArch64Extension",
+      "TargetParserTest.testARMArch",
+      "TargetParserTest.testARMCPUArchList",
+      "TargetParserTest.testARMExtension",
+      "TargetParserTest.testCSKYArch",
+      "TargetParserTest.testCSKYCPUArchList",
+      "TargetParserTest.testInvalidARMArch",
+      "TargetParserTest.testInvalidCSKYArch",
+      "ToFeatures.AddAllExtensionsAddsNegativeExtensions",
+      "ToFeatures.IIsDroppedAndExperimentalExtensionsArePrefixed",
+      "ToFeatures.UnsupportedExtensionsAreDropped",
+      "ToFeatures.UnsupportedExtensionsAreKeptIfIgnoreUnknownIsFalse",
+      "getTargetFeatureForExtension.RetrieveTargetFeatureFromOneExt",
+      "isSupportedExtensionWithVersion.AcceptsSingleExtensionWithVersion"
+    ],
+    "failures": [],
+    "errors": []
+  }
+}

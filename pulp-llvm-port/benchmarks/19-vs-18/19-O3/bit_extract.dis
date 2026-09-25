@@ -1,0 +1,8 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/19-O3/bit_extract.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <bit_extract>:
+       0: d0851533     	p.extractu	a0, a0, 0x8, 0x8
+       4: 8082         	ret

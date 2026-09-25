@@ -1,0 +1,1021 @@
+{
+  "flags": [
+    "--target=riscv32-unknown-elf",
+    "-march=rv32imc_xpulpv2",
+    "-mabi=ilp32",
+    "-ffreestanding",
+    "-fno-builtin"
+  ],
+  "versions": {
+    "18": "clang version 18.1.4 (https://github.com/albsposito/llvm-project.git 1c33bd3dba2bd1f3942842135daba498af1b3eb5)\nTarget: riscv32-unknown-unknown-elf\nThread model: posix\nInstalledDir: /home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin\n",
+    "19": "clang version 19.1.7 (https://github.com/albsposito/llvm-project.git 9b2edaf923ad46816535d7361e9daef79be0529c)\nTarget: riscv32-unknown-unknown-elf\nThread model: posix\nInstalledDir: /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin\nBuild config: +assertions\n"
+  },
+  "load_average": [
+    0.32568359375,
+    5.1787109375,
+    6.4794921875
+  ],
+  "source_sha256": "2b7d3269f1e1b0cf3f413001eb03f02d3205c871cfbb9ba4d7616f63c12f37f2",
+  "rows": [
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "bit_count",
+      "returncode": 0,
+      "times": [
+        0.013920624000093085,
+        0.013536724000005051,
+        0.01065813899913337,
+        0.013492752001184272,
+        0.011291270999208791,
+        0.013514632999431342,
+        0.010615561001031892
+      ],
+      "size": 6,
+      "instructions": {
+        "p.cnt": 1,
+        "ret": 1
+      },
+      "object_sha256": "482863416dc9590811df8c38a23d2dd00b46ae599b1d29ee22492995e608ef24"
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "bit_count",
+      "returncode": 0,
+      "times": [
+        0.01395876799870166,
+        0.010840264998478233,
+        0.013760821999312611,
+        0.010803377999764052,
+        0.014351387999340659,
+        0.011012920998837217,
+        0.014014296999448561
+      ],
+      "size": 6,
+      "instructions": {
+        "p.cnt": 1,
+        "ret": 1
+      },
+      "object_sha256": "5d10f4dfb5e8d62a7a89b062276642664a6853000b85e812328333c7eaf931ac"
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "bit_extract",
+      "returncode": 0,
+      "times": [
+        0.011706388999300543,
+        0.011372199000106775,
+        0.010377393000453594,
+        0.011425323000366916,
+        0.01077237299978151,
+        0.011769267999625299,
+        0.010568351999609149
+      ],
+      "size": 6,
+      "instructions": {
+        "p.extractu": 1,
+        "ret": 1
+      },
+      "object_sha256": "1df5504cd30aa5fb9cbaff8ab6f8934f4db7b5e2a53bcf95c5de9c2d7b2d7b2a"
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "bit_extract",
+      "returncode": 0,
+      "times": [
+        0.011827344000266748,
+        0.01098874200033606,
+        0.012516733999291318,
+        0.010915380000369623,
+        0.012591761000294355,
+        0.011585213000216754,
+        0.012381480999465566
+      ],
+      "size": 6,
+      "instructions": {
+        "p.extractu": 1,
+        "ret": 1
+      },
+      "object_sha256": "a847514383b84468c9f1a48cf5d67c0a590386677221a1b752238aa4ce7c73b9"
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "copy_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "copy_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "dot16",
+      "returncode": 0,
+      "times": [
+        0.011303930999929435,
+        0.011688335998769617,
+        0.010315458999684779,
+        0.010978238000461715,
+        0.010729560999607202,
+        0.011695478000547155,
+        0.011377260998415295
+      ],
+      "size": 8,
+      "instructions": {
+        "pv.sdotsp.h": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "e63e24054f3eea6d4b580ca7925ab28e654629e34642f67ecd9f077e4b28a3b3"
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "dot16",
+      "returncode": 0,
+      "times": [
+        0.011845244000141975,
+        0.010948934001135058,
+        0.011828770000647637,
+        0.010729937999713002,
+        0.01184824799929629,
+        0.010933317000308307,
+        0.011706392000633059
+      ],
+      "size": 8,
+      "instructions": {
+        "pv.sdotsp.h": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "92a5bb41585d6f456b106b0ff417baacbc43f66ce8a86b7273a668b6a10817bf"
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "dot16_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "dot16_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "dot8",
+      "returncode": 0,
+      "times": [
+        0.011248691000218969,
+        0.011428256999352016,
+        0.011025701000107802,
+        0.011112324998975964,
+        0.011106472000392387,
+        0.011286057999313925,
+        0.0107322080002632
+      ],
+      "size": 8,
+      "instructions": {
+        "pv.sdotsp.b": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "de5b638d226eb3055321a126da84cf10e33c0860773395069e8a6a9059eff801"
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "dot8",
+      "returncode": 0,
+      "times": [
+        0.011432089999289019,
+        0.010703944000852061,
+        0.012137235000409419,
+        0.011290607999399072,
+        0.012619863000509213,
+        0.01087919300152862,
+        0.011685882998790476
+      ],
+      "size": 8,
+      "instructions": {
+        "pv.sdotsp.b": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "994e6bcb1e8988b370794dfd0f6ccb8f495bc6496a860bc2f129f79142a895e4"
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "dot8_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "dot8_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "mac",
+      "returncode": 0,
+      "times": [
+        0.011388015000193263,
+        0.011281824999969103,
+        0.010412620998977218,
+        0.010778688998470898,
+        0.010782637000374962,
+        0.011086025000622612,
+        0.01051299599930644
+      ],
+      "size": 8,
+      "instructions": {
+        "p.mac": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "48705d5538e01466b378a13fedf56a07dbd8816193d195c310b744d0ca361938"
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "mac",
+      "returncode": 0,
+      "times": [
+        0.01132860599864216,
+        0.010931808999885106,
+        0.01142567299939401,
+        0.011141978999148705,
+        0.011437785999078187,
+        0.011044381999454345,
+        0.011590193000301952
+      ],
+      "size": 8,
+      "instructions": {
+        "p.mac": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "4c8e3cef8b341c85ebecaaf5b3396c1c39db28cd9da227aa096cbdfc62d49345"
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "packed_add16",
+      "returncode": 0,
+      "times": [
+        0.010710484999435721,
+        0.01094615300098667,
+        0.010416315999464132,
+        0.010652237999238423,
+        0.01140358699922217,
+        0.011029303999748663,
+        0.010609872999339132
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.add.h": 1,
+        "ret": 1
+      },
+      "object_sha256": "b049ba106371922f8634b7880d7fc6cfd4a9734c102d5909848d4f47e21e94ee"
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "packed_add16",
+      "returncode": 0,
+      "times": [
+        0.01134881700090773,
+        0.010603753000395955,
+        0.011525595000421163,
+        0.010893528999076807,
+        0.011817605000032927,
+        0.011182340000232216,
+        0.01142690400047286
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.add.h": 1,
+        "ret": 1
+      },
+      "object_sha256": "cfff3ff86b32abaa71fcf0fdfc50a5e2839da03a1ce49255dfe7e68d366f3527"
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "packed_add8",
+      "returncode": 0,
+      "times": [
+        0.010723209001298528,
+        0.010911829000178841,
+        0.01021865899929253,
+        0.010480515999006457,
+        0.010612383999614394,
+        0.010960930998408003,
+        0.010454450999532128
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.add.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "c0a0426c1bc5a148288f74602f5cad3005d62d039eda32cfedc3f4ce63ab4cf9"
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "packed_add8",
+      "returncode": 0,
+      "times": [
+        0.011435222999352845,
+        0.010752240999863716,
+        0.01103124000110256,
+        0.010748858001534245,
+        0.011183361000803416,
+        0.010866091999560012,
+        0.011037158999897656
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.add.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "9768b89f2bbe27242948c4c5b4012a0a497979147a7e7c75389ecbe660aec990"
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "packed_add8_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "packed_add8_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "packed_max8",
+      "returncode": 0,
+      "times": [
+        0.010857310000574216,
+        0.010645483998814598,
+        0.010577414999715984,
+        0.01042724099897896,
+        0.011115126000731834,
+        0.010693645001083496,
+        0.010713169000155176
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.max.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "54210138cb24796f7b19e91b0f3fa5a6d81af88bc6118ea313f0017e436bf77d"
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "packed_max8",
+      "returncode": 0,
+      "times": [
+        0.011404811000829795,
+        0.012177847000202746,
+        0.01114831800077809,
+        0.011060858001656015,
+        0.011150133999763057,
+        0.011011206999683054,
+        0.011048861000745092
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.max.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "f07f93b9b6f69fcb2d4e4d615b47f0891d508773a10c6b8d7c855367d7bc6419"
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "packed_shift16",
+      "returncode": 0,
+      "times": [
+        0.010676339001292945,
+        0.010693190999518265,
+        0.010004751999076689,
+        0.010596677000648924,
+        0.010366370001065661,
+        0.01056127700030629,
+        0.01015852699856623
+      ],
+      "size": 10,
+      "instructions": {
+        "pv.add.sci.h": 1,
+        "pv.srl.h": 1,
+        "ret": 1
+      },
+      "object_sha256": "52a51622fbe2ad8ab6959b71562a451d9699525452c376b9517e0d12a6076a10"
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "packed_shift16",
+      "returncode": 0,
+      "times": [
+        0.011213926998607349,
+        0.011746325999411056,
+        0.010797633000038331,
+        0.010661857000741293,
+        0.010921166998741683,
+        0.010667902999557555,
+        0.010875189000216778
+      ],
+      "size": 10,
+      "instructions": {
+        "pv.add.sci.h": 1,
+        "pv.srl.h": 1,
+        "ret": 1
+      },
+      "object_sha256": "133cb1618ad8c8f1c881d405126f256e2a27289d898bdee1e4c1250111ebfa1a"
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "packed_shift8",
+      "returncode": 0,
+      "times": [
+        0.010329233000447857,
+        0.010339603000829811,
+        0.010853931000383454,
+        0.011119577000499703,
+        0.010499190000700764,
+        0.010629925000102958,
+        0.010287585999321891
+      ],
+      "size": 10,
+      "instructions": {
+        "pv.add.sci.b": 1,
+        "pv.srl.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "c0fb8046002ad970dc10fabfa8d0d54ab108ecf5a9ec0c4e81b4b4f9be8d9ac2"
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "packed_shift8",
+      "returncode": 0,
+      "times": [
+        0.010866030999750365,
+        0.01121845099987695,
+        0.011224421999941114,
+        0.010774240001410362,
+        0.011924978000024566,
+        0.011344384000040009,
+        0.010955642001135857
+      ],
+      "size": 10,
+      "instructions": {
+        "pv.add.sci.b": 1,
+        "pv.srl.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "263d5e525325166fd0ae872fcfbdafd06743114c7a00651f611cfa74eb657b77"
+    },
+    {
+      "version": "18",
+      "opt": "O2",
+      "kernel": "sum_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "19",
+      "opt": "O2",
+      "kernel": "sum_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "bit_count",
+      "returncode": 0,
+      "times": [
+        0.013280310999107314,
+        0.013928837001003558,
+        0.010463857999639004,
+        0.01336460799939232,
+        0.010223583998595132,
+        0.013384575000600307,
+        0.010171738000281039
+      ],
+      "size": 6,
+      "instructions": {
+        "p.cnt": 1,
+        "ret": 1
+      },
+      "object_sha256": "482863416dc9590811df8c38a23d2dd00b46ae599b1d29ee22492995e608ef24"
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "bit_count",
+      "returncode": 0,
+      "times": [
+        0.013838507999025751,
+        0.010753328999271616,
+        0.014070290999370627,
+        0.0109730780004611,
+        0.013805597998725716,
+        0.011066432000006898,
+        0.014154328000586247
+      ],
+      "size": 6,
+      "instructions": {
+        "p.cnt": 1,
+        "ret": 1
+      },
+      "object_sha256": "5d10f4dfb5e8d62a7a89b062276642664a6853000b85e812328333c7eaf931ac"
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "bit_extract",
+      "returncode": 0,
+      "times": [
+        0.01120457599972724,
+        0.011146250000820146,
+        0.010602823000226635,
+        0.011631879999185912,
+        0.010209083999143331,
+        0.011330740000630612,
+        0.010535948000324424
+      ],
+      "size": 6,
+      "instructions": {
+        "p.extractu": 1,
+        "ret": 1
+      },
+      "object_sha256": "1df5504cd30aa5fb9cbaff8ab6f8934f4db7b5e2a53bcf95c5de9c2d7b2d7b2a"
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "bit_extract",
+      "returncode": 0,
+      "times": [
+        0.01208871600101702,
+        0.010647121000147308,
+        0.01232559700110869,
+        0.011118260999865015,
+        0.01174418600021454,
+        0.010734911000326974,
+        0.013257583001177409
+      ],
+      "size": 6,
+      "instructions": {
+        "p.extractu": 1,
+        "ret": 1
+      },
+      "object_sha256": "a847514383b84468c9f1a48cf5d67c0a590386677221a1b752238aa4ce7c73b9"
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "copy_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "copy_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "dot16",
+      "returncode": 0,
+      "times": [
+        0.011329098000715021,
+        0.011600362000535824,
+        0.010584902000118745,
+        0.01124185000116995,
+        0.010374547999163042,
+        0.011141814000438899,
+        0.010542557000007946
+      ],
+      "size": 8,
+      "instructions": {
+        "pv.sdotsp.h": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "e63e24054f3eea6d4b580ca7925ab28e654629e34642f67ecd9f077e4b28a3b3"
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "dot16",
+      "returncode": 0,
+      "times": [
+        0.011770619999879273,
+        0.010848459000044386,
+        0.011599985000430024,
+        0.010878883998884703,
+        0.011514736999743036,
+        0.01112688500143122,
+        0.011728203000529902
+      ],
+      "size": 8,
+      "instructions": {
+        "pv.sdotsp.h": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "92a5bb41585d6f456b106b0ff417baacbc43f66ce8a86b7273a668b6a10817bf"
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "dot16_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "dot16_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "dot8",
+      "returncode": 0,
+      "times": [
+        0.010867846998735331,
+        0.011032561000320129,
+        0.011320183000862016,
+        0.011044282999137067,
+        0.010217024000667152,
+        0.010943213001155527,
+        0.011632244999418617
+      ],
+      "size": 8,
+      "instructions": {
+        "pv.sdotsp.b": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "de5b638d226eb3055321a126da84cf10e33c0860773395069e8a6a9059eff801"
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "dot8",
+      "returncode": 0,
+      "times": [
+        0.011575330998311983,
+        0.010561943001448526,
+        0.012252159000126994,
+        0.010786896000354318,
+        0.01230662600028154,
+        0.011674436000248534,
+        0.012636741999813239
+      ],
+      "size": 8,
+      "instructions": {
+        "pv.sdotsp.b": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "994e6bcb1e8988b370794dfd0f6ccb8f495bc6496a860bc2f129f79142a895e4"
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "dot8_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "dot8_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "mac",
+      "returncode": 0,
+      "times": [
+        0.010647502000210807,
+        0.010984286998791504,
+        0.01035531000161427,
+        0.010613956999804941,
+        0.010222764998616185,
+        0.010729874000389827,
+        0.010578157000054489
+      ],
+      "size": 8,
+      "instructions": {
+        "p.mac": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "48705d5538e01466b378a13fedf56a07dbd8816193d195c310b744d0ca361938"
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "mac",
+      "returncode": 0,
+      "times": [
+        0.01150835499902314,
+        0.01089639299971168,
+        0.011495245000332943,
+        0.010745412999312975,
+        0.011387701999410638,
+        0.010925811000561225,
+        0.011385831998268259
+      ],
+      "size": 8,
+      "instructions": {
+        "p.mac": 1,
+        "mv": 1,
+        "ret": 1
+      },
+      "object_sha256": "4c8e3cef8b341c85ebecaaf5b3396c1c39db28cd9da227aa096cbdfc62d49345"
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "packed_add16",
+      "returncode": 0,
+      "times": [
+        0.010800188001667266,
+        0.01037762500163808,
+        0.010610476001602365,
+        0.010463041000548401,
+        0.010099536999405245,
+        0.010771754999950645,
+        0.011253361000854056
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.add.h": 1,
+        "ret": 1
+      },
+      "object_sha256": "b049ba106371922f8634b7880d7fc6cfd4a9734c102d5909848d4f47e21e94ee"
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "packed_add16",
+      "returncode": 0,
+      "times": [
+        0.01133516200025042,
+        0.01058097300119698,
+        0.01162134399964998,
+        0.011284932001217385,
+        0.011584534000576241,
+        0.011294068999632145,
+        0.011470209999970393
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.add.h": 1,
+        "ret": 1
+      },
+      "object_sha256": "cfff3ff86b32abaa71fcf0fdfc50a5e2839da03a1ce49255dfe7e68d366f3527"
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "packed_add8",
+      "returncode": 0,
+      "times": [
+        0.011682573000143748,
+        0.010580419999314472,
+        0.010171025000090594,
+        0.010703923000619397,
+        0.010133428999324678,
+        0.010545286999331438,
+        0.010561630999291083
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.add.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "c0a0426c1bc5a148288f74602f5cad3005d62d039eda32cfedc3f4ce63ab4cf9"
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "packed_add8",
+      "returncode": 0,
+      "times": [
+        0.010851680999621749,
+        0.011257525999099016,
+        0.011556823999853805,
+        0.011169213001267053,
+        0.011467324000477674,
+        0.010894496001128573,
+        0.011256312998739304
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.add.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "9768b89f2bbe27242948c4c5b4012a0a497979147a7e7c75389ecbe660aec990"
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "packed_add8_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "packed_add8_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "packed_max8",
+      "returncode": 0,
+      "times": [
+        0.01069016799920064,
+        0.01076586999988649,
+        0.010912998999629053,
+        0.010373728000558913,
+        0.010146159998839721,
+        0.01048486899890122,
+        0.011230269999941811
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.max.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "54210138cb24796f7b19e91b0f3fa5a6d81af88bc6118ea313f0017e436bf77d"
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "packed_max8",
+      "returncode": 0,
+      "times": [
+        0.010968317999868304,
+        0.010622145000525052,
+        0.011517291000927798,
+        0.01079843400111713,
+        0.011366583001290564,
+        0.010913504998825374,
+        0.012117312000555103
+      ],
+      "size": 6,
+      "instructions": {
+        "pv.max.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "f07f93b9b6f69fcb2d4e4d615b47f0891d508773a10c6b8d7c855367d7bc6419"
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "packed_shift16",
+      "returncode": 0,
+      "times": [
+        0.010574948999419576,
+        0.010439621999466908,
+        0.010209500000200933,
+        0.010738445000242791,
+        0.010457460000907304,
+        0.010388728000179981,
+        0.01027351499942597
+      ],
+      "size": 10,
+      "instructions": {
+        "pv.add.sci.h": 1,
+        "pv.srl.h": 1,
+        "ret": 1
+      },
+      "object_sha256": "52a51622fbe2ad8ab6959b71562a451d9699525452c376b9517e0d12a6076a10"
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "packed_shift16",
+      "returncode": 0,
+      "times": [
+        0.010958595999909448,
+        0.010487188999832142,
+        0.011038923999876715,
+        0.01076121300138766,
+        0.011010371001248132,
+        0.011074998001276981,
+        0.01145008300045447
+      ],
+      "size": 10,
+      "instructions": {
+        "pv.add.sci.h": 1,
+        "pv.srl.h": 1,
+        "ret": 1
+      },
+      "object_sha256": "133cb1618ad8c8f1c881d405126f256e2a27289d898bdee1e4c1250111ebfa1a"
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "packed_shift8",
+      "returncode": 0,
+      "times": [
+        0.01090049699996598,
+        0.01170391599953291,
+        0.010962205999021535,
+        0.010225056999843218,
+        0.00997469400135742,
+        0.010650603000613046,
+        0.010767702999146422
+      ],
+      "size": 10,
+      "instructions": {
+        "pv.add.sci.b": 1,
+        "pv.srl.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "c0fb8046002ad970dc10fabfa8d0d54ab108ecf5a9ec0c4e81b4b4f9be8d9ac2"
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "packed_shift8",
+      "returncode": 0,
+      "times": [
+        0.010994222999215708,
+        0.011669960000290303,
+        0.010810957999638049,
+        0.01083872699928179,
+        0.01080555299995467,
+        0.011024224999346188,
+        0.011436175000199
+      ],
+      "size": 10,
+      "instructions": {
+        "pv.add.sci.b": 1,
+        "pv.srl.b": 1,
+        "ret": 1
+      },
+      "object_sha256": "263d5e525325166fd0ae872fcfbdafd06743114c7a00651f611cfa74eb657b77"
+    },
+    {
+      "version": "18",
+      "opt": "O3",
+      "kernel": "sum_loop",
+      "returncode": 1,
+      "times": []
+    },
+    {
+      "version": "19",
+      "opt": "O3",
+      "kernel": "sum_loop",
+      "returncode": 1,
+      "times": []
+    }
+  ]
+}

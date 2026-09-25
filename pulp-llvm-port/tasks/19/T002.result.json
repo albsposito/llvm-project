@@ -1,0 +1,19 @@
+{
+  "status": "done",
+  "branch": "work/19/T002",
+  "commits": [
+    "56ed3df73c50cd8a5e8082adcfdc40fc23ca5fa9"
+  ],
+  "note": "notes/19/T002.md",
+  "signature_gone": true,
+  "other_errors_seen": [],
+  "verification": {
+    "lit": "logs/19-T002.verify.json",
+    "tests_passed": 4,
+    "policy": "logs/19-T002.policy.log",
+    "policy_fail": 0,
+    "regen": "notes/19/T002.regen.md",
+    "repro": "logs/19-T002.retry-repro.log",
+    "command": "python3 logs/19-T002-lit.py -v -o logs/19-T002.verify.json wt/19-T002/llvm/test/MC/RISCV/rv32{xdma,xfrep,xmempool,xssr}-valid.s"
+  }
+}

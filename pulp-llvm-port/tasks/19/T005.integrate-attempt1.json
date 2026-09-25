@@ -1,0 +1,7 @@
+{
+  "verdict": "HARNESS_ERROR_ROLLED_BACK",
+  "reason": "handoff errors-before JSON absent; integrate raised after build before report",
+  "int_head_before": "88ed01bb9d3b1d79ec84d0d37ac4399c023d87e0",
+  "temporary_head": "e3105e8dca0b",
+  "recovery": "clean integration restored to original checkpoint; baseline regenerated from E009 build log: 0 clusters"
+}

@@ -1,0 +1,56 @@
+{
+  "range": "7c27289bc3a1..port/19",
+  "commits": 16,
+  "fail": 0,
+  "warn": 8,
+  "findings": [
+    {
+      "commit": "63e03f20647c",
+      "level": "WARN",
+      "rule": "upstream-file-edit",
+      "msg": "edits upstream file the fork does not own: clang/utils/TableGen/ClangBuiltinsEmitter.cpp"
+    },
+    {
+      "commit": "720a9a638e03",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/unittests/TargetParser/RISCVISAInfoTest.cpp"
+    },
+    {
+      "commit": "89cd9beaf6c9",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/CodeGen/RISCV/freploop-nested.ll"
+    },
+    {
+      "commit": "d1401c114cbc",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xdma-valid.s"
+    },
+    {
+      "commit": "d1401c114cbc",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xfrep-valid.s"
+    },
+    {
+      "commit": "d1401c114cbc",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xmempool-valid.s"
+    },
+    {
+      "commit": "d1401c114cbc",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xssr-valid.s"
+    },
+    {
+      "commit": "d09da7bcbcbf",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics-diag.c"
+    }
+  ]
+}

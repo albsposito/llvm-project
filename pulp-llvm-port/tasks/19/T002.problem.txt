@@ -1,0 +1,23 @@
+{
+  "dir": "llvm/test/MC/RISCV",
+  "count": 4,
+  "tests": [
+    {
+      "test": "llvm/test/MC/RISCV/rv32xdma-valid.s",
+      "problem": "FAIL"
+    },
+    {
+      "test": "llvm/test/MC/RISCV/rv32xfrep-valid.s",
+      "problem": "FAIL"
+    },
+    {
+      "test": "llvm/test/MC/RISCV/rv32xmempool-valid.s",
+      "problem": "FAIL"
+    },
+    {
+      "test": "llvm/test/MC/RISCV/rv32xssr-valid.s",
+      "problem": "FAIL"
+    }
+  ]
+}
+Read full saved output in steps/19/lit-r1/lit.json. Missing baseline paths require upstream rename/removal evidence; do not drop coverage or edit tests as worker. Split independent root causes into reported follow-up requests.

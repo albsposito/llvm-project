@@ -1,0 +1,17 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [],
+  "checks": {
+    "diff": "Single commit c29a8b4cc122 touches only llvm/lib/Target/RISCV/RISCVInstrInfoXsmallfloatGen.td (42+/42-): 21 `SubtargetFeature<name, HasX, \"true\", desc>` -> `RISCVExtension<name, 0, 1, desc>`. No other lines changed; no Predicate/AssemblerPredicate/instruction edits.",
+    "policy_check": "scripts/policy_check.py --range 7c27289bc3a1..work/19/E004 --stack-base llvmorg-19.1.7: fail 0, warn 0.",
+    "versions_vs_llvm18": "All 21 names are in port/18 RISCVISAInfo.cpp SupportedExtensions (lines 77-98, non-experimental) at {0, 1}; the commit uses 0, 1 for every one; none were in SupportedExperimentalExtensions.",
+    "implied_features": "Old definitions had no implies argument; port/18 ISAInfo ImpliedExts table has no xf* entries; new records pass no implies. Unchanged.",
+    "has_names": "Scripted check over the diff: for all 21 records, feature string and description identical and old explicit field name == !subst(\"Feature\",\"Has\",NAME), which is RISCVExtension's default fieldname (RISCVFeatures.td:25-37 in the worktree). No record name contains a second 'Feature'.",
+    "upstream": "80628ee0d555 and a6c028299cbc exist, subjects match the note, both ancestors of llvmorg-19.1.7 and not of prev_tag e6c3289804a6. Pattern matches CORE-V FeatureVendorXCV* RISCVExtension declarations.",
+    "independent_repro": "On a scratch copy of the worktree's RISCV .td files with only the Xpulp uimm6_lsb0/powerOf2Minus1/trailing1sPlus1 collisions renamed, build/19-E004/bin/llvm-min-tblgen -gen-riscv-target-def emits all 21 smallfloat names at {0, 1} (plus xfrep) and the snitch PROC march includes all 21 xf*0p1.",
+    "oracle_cheating": "None: no removed fork logic, early returns, stubs, forced conditions, deleted patterns or test edits.",
+    "fixup_and_trailers": "Subject matches the cluster commit '[pulp] insn-tablegen: Xpulp/Xsmallfloat/Xssr/Xdma/Xfrep instructions and sched models'; Change-Note: 19/E004.md present and note has all four sections with observable symptoms (-march rejection, snitch default ISA losing smallfloat, RISCVISAInfoTest expectations).",
+    "open_items_not_blocking": "llc -mattr=+xfalthalf not verifiable until llc builds (uimm6_lsb0 duplicate and RISCVSchedMempool WriteVAESMVV_M1 are other tasks, reported in result file)."
+  }
+}

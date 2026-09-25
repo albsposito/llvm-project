@@ -1,0 +1,19 @@
+{
+  "dir": "llvm/test/CodeGen/RISCV/rvv",
+  "count": 3,
+  "tests": [
+    {
+      "test": "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-fround-costrained-sdnode.ll",
+      "problem": "regressed from PASS to MISSING"
+    },
+    {
+      "test": "llvm/test/CodeGen/RISCV/rvv/fround-costrained-sdnode.ll",
+      "problem": "regressed from PASS to MISSING"
+    },
+    {
+      "test": "llvm/test/CodeGen/RISCV/rvv/trunc-sat-clip.ll",
+      "problem": "regressed from PASS to MISSING"
+    }
+  ]
+}
+Read full saved output in steps/19/lit-r1/lit.json. Missing baseline paths require upstream rename/removal evidence; do not drop coverage or edit tests as worker. Split independent root causes into reported follow-up requests.

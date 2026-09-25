@@ -1,0 +1,23 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [
+    {
+      "commit": "690092469a8e",
+      "rule": "upstream-file-edit",
+      "file": "clang/utils/TableGen/ClangBuiltinsEmitter.cpp",
+      "why_acceptable": "Rule 11 exception granted. The fork has no earlier commits on this file (none in llvmorg-19.1.7..7c27289bc3a1 or prev_tag..6547028f925c), so the Upstream-File-Edit trailer is required and present. The diff is byte-identical to the ClangBuiltinsEmitter.cpp hunk of upstream 508263824f4e (all three edits: the _Vector< comma-split guard at line 67, the consume_front(\"_Vector\") keyword at 127-128, and the (IsExt ? \"E\" : \"V\") lane code at 140). The only textual difference is the context line `llvm::consumeUnsignedInteger`, which is already in 19.1.7 and not touched. The commit's other hunks (BuiltinsBase.td RequiredVectorWidth, X86 .td/.def/CMake/Targets) are X86-only and correctly left out. Behaviour is preserved: _ExtVector still emits E<N> and scalar parsing is untouched; no upstream .td at 19 uses _Vector< (only BuiltinsRISCVXpulp.td does), so no upstream builtin can change. The alternative (switching the fork to _ExtVector) would change the builtins from GCC vectors to ext_vector types (rule-9/escalation territory), so there is no cheaper correct fix. The edit disappears at step 20, where upstream already has it, so the fork surface does not grow for later ports."
+    }
+  ],
+  "checks": {
+    "policy_check": "Rerun by reviewer over 7c27289bc3a1..work/19/E002 with --stack-base llvmorg-19.1.7: 0 FAIL, 1 WARN (above).",
+    "fixup_subject": "Matches the cluster commit subject '[pulp] clang-builtins: RISC-V builtins and their Sema checks' in llvmorg-19.1.7..7c27289bc3a1.",
+    "trailers": "Change-Note: 19/E002.md (exists, four sections), Upstream-File-Edit present.",
+    "upstream_citations": "Cause commits a8d4a024e6be and 9b672de99760 are in e6c3289804a6..llvmorg-19.1.7. The backported commit 508263824f4e is (as expected for a backport) not in 19.1.7; it is LLVM 20, as the note says.",
+    "generated_output_spot_check": "build/19-E002 BuiltinsRISCV.inc: __builtin_pulp_add4 'V4cV4cV4c' and __builtin_pulp_dotsp2 'iV2sV2s' match the fork .def at 6547028f925c exactly; __builtin_pulp_maxu2 'UV2sV2sV2s' vs fork 'UV2sUV2sUV2s' differs only by U on vector parameters, which comes from the earlier .def-to-.td conflict resolution and is not caused by this commit. 64 V<N> codes, 0 E<N> codes in the generated file.",
+    "oracle_cheating": "None. No tests touched, no fork logic removed, no early returns, stubs or forced conditions. Every changed line is part of the backported hunk."
+  },
+  "observations": [
+    "The dropped U before vector parameters is described in the task and the change note as documented, but I found no mention of it in notes/19/conflict-clang-builtins.md or PROGRESS.md. It predates this task and does not block this review. The conductor should make sure it is recorded in the clang-builtins conflict note."
+  ]
+}

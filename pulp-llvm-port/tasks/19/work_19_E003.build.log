@@ -1,0 +1,360 @@
+ninja: Entering directory `build/int-19'
+[1/2286] Building Attrs.inc...
+FAILED: tools/clang/include/clang/AST/Attrs.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/AST/Attrs.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-classes -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/AST/Attrs.inc -d tools/clang/include/clang/AST/Attrs.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[2/2286] Building AttrImpl.inc...
+FAILED: tools/clang/include/clang/AST/AttrImpl.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/AST/AttrImpl.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-impl -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/AST/AttrImpl.inc -d tools/clang/include/clang/AST/AttrImpl.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[3/2286] Building AttrTextNodeDump.inc...
+FAILED: tools/clang/include/clang/AST/AttrTextNodeDump.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/AST/AttrTextNodeDump.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-text-node-dump -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/AST/AttrTextNodeDump.inc -d tools/clang/include/clang/AST/AttrTextNodeDump.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[4/2286] Building AttrNodeTraverse.inc...
+FAILED: tools/clang/include/clang/AST/AttrNodeTraverse.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/AST/AttrNodeTraverse.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-node-traverse -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/AST/AttrNodeTraverse.inc -d tools/clang/include/clang/AST/AttrNodeTraverse.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[5/2286] Building AttrVisitor.inc...
+FAILED: tools/clang/include/clang/AST/AttrVisitor.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/AST/AttrVisitor.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-ast-visitor -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/AST/AttrVisitor.inc -d tools/clang/include/clang/AST/AttrVisitor.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/AST/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[6/2286] Building BuiltinsRISCV.inc...
+FAILED: tools/clang/include/clang/Basic/BuiltinsRISCV.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Basic/BuiltinsRISCV.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-builtins -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/BuiltinsRISCV.td --write-if-changed -o tools/clang/include/clang/Basic/BuiltinsRISCV.inc -d tools/clang/include/clang/Basic/BuiltinsRISCV.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/BuiltinsRISCV.td:153:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/BuiltinsRISCVXpulp.td:21:7: error: Unknown Type: _Vector<2, short>
+  let Prototype = prototype;
+      ^
+[7/2286] Generating VCSRevision.h
+[8/2286] Building AttrList.inc...
+FAILED: tools/clang/include/clang/Basic/AttrList.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Basic/AttrList.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-list -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Basic/AttrList.inc -d tools/clang/include/clang/Basic/AttrList.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[9/2286] Building AttrSubMatchRulesList.inc...
+FAILED: tools/clang/include/clang/Basic/AttrSubMatchRulesList.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Basic/AttrSubMatchRulesList.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-subject-match-rule-list -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Basic/AttrSubMatchRulesList.inc -d tools/clang/include/clang/Basic/AttrSubMatchRulesList.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[10/2286] Building RegularKeywordAttrInfo.inc...
+FAILED: tools/clang/include/clang/Basic/RegularKeywordAttrInfo.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Basic/RegularKeywordAttrInfo.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-regular-keyword-attr-info -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Basic/RegularKeywordAttrInfo.inc -d tools/clang/include/clang/Basic/RegularKeywordAttrInfo.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[11/2286] Building AttrHasAttributeImpl.inc...
+FAILED: tools/clang/include/clang/Basic/AttrHasAttributeImpl.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Basic/AttrHasAttributeImpl.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-has-attribute-impl -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Basic/AttrHasAttributeImpl.inc -d tools/clang/include/clang/Basic/AttrHasAttributeImpl.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[12/2286] Building AttrParserStringSwitches.inc...
+FAILED: tools/clang/include/clang/Parse/AttrParserStringSwitches.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Parse/AttrParserStringSwitches.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-parser-string-switches -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Parse/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Parse -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Parse/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Parse/AttrParserStringSwitches.inc -d tools/clang/include/clang/Parse/AttrParserStringSwitches.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Parse/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[13/2286] Building AttrSubMatchRulesParserStringSwitches.inc...
+FAILED: tools/clang/include/clang/Parse/AttrSubMatchRulesParserStringSwitches.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Parse/AttrSubMatchRulesParserStringSwitches.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-subject-match-rules-parser-string-switches -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Parse/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Parse -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Parse/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Parse/AttrSubMatchRulesParserStringSwitches.inc -d tools/clang/include/clang/Parse/AttrSubMatchRulesParserStringSwitches.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Parse/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[14/2286] Building AttrParsedAttrList.inc...
+FAILED: tools/clang/include/clang/Sema/AttrParsedAttrList.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Sema/AttrParsedAttrList.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-parsed-attr-list -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Sema/AttrParsedAttrList.inc -d tools/clang/include/clang/Sema/AttrParsedAttrList.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[15/2286] Building AttrParsedAttrKinds.inc...
+FAILED: tools/clang/include/clang/Sema/AttrParsedAttrKinds.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Sema/AttrParsedAttrKinds.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-parsed-attr-kinds -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Sema/AttrParsedAttrKinds.inc -d tools/clang/include/clang/Sema/AttrParsedAttrKinds.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[16/2286] Building AttrTemplateInstantiate.inc...
+FAILED: tools/clang/include/clang/Sema/AttrTemplateInstantiate.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Sema/AttrTemplateInstantiate.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-template-instantiate -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Sema/AttrTemplateInstantiate.inc -d tools/clang/include/clang/Sema/AttrTemplateInstantiate.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[17/2286] Building AttrSpellingListIndex.inc...
+FAILED: tools/clang/include/clang/Sema/AttrSpellingListIndex.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Sema/AttrSpellingListIndex.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-spelling-index -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Sema/AttrSpellingListIndex.inc -d tools/clang/include/clang/Sema/AttrSpellingListIndex.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[18/2286] Building AttrParsedAttrImpl.inc...
+FAILED: tools/clang/include/clang/Sema/AttrParsedAttrImpl.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Sema/AttrParsedAttrImpl.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-parsed-attr-impl -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Sema/AttrParsedAttrImpl.inc -d tools/clang/include/clang/Sema/AttrParsedAttrImpl.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Sema/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[19/2286] Building AttrPCHRead.inc...
+FAILED: tools/clang/include/clang/Serialization/AttrPCHRead.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Serialization/AttrPCHRead.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-pch-read -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Serialization/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Serialization -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Serialization/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Serialization/AttrPCHRead.inc -d tools/clang/include/clang/Serialization/AttrPCHRead.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Serialization/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[20/2286] Building AttrPCHWrite.inc...
+FAILED: tools/clang/include/clang/Serialization/AttrPCHWrite.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include/clang/Serialization/AttrPCHWrite.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/clang-tblgen -gen-clang-attr-pch-write -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Serialization/../../ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Serialization -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Serialization/../Basic/Attr.td --write-if-changed -o tools/clang/include/clang/Serialization/AttrPCHWrite.inc -d tools/clang/include/clang/Serialization/AttrPCHWrite.inc.d
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include/clang/Serialization/../Basic/Attr.td:4199:28: error: Encountered a list when expecting a bit
+                          ["infer"],
+                           ^
+[21/2286] Building RISCVGenPostLegalizeGICombiner.inc...
+FAILED: lib/Target/RISCV/RISCVGenPostLegalizeGICombiner.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenPostLegalizeGICombiner.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-global-isel-combiner -combiners="RISCVPostLegalizerCombiner" -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td --write-if-changed -o lib/Target/RISCV/RISCVGenPostLegalizeGICombiner.inc -d lib/Target/RISCV/RISCVGenPostLegalizeGICombiner.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td:16:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td:16:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[22/2286] Building RISCVGenDAGISel.inc...
+FAILED: lib/Target/RISCV/RISCVGenDAGISel.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenDAGISel.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-dag-isel -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target -omit-comments /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenDAGISel.inc -d lib/Target/RISCV/RISCVGenDAGISel.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[23/2286] Building RISCVGenMacroFusion.inc...
+FAILED: lib/Target/RISCV/RISCVGenMacroFusion.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenMacroFusion.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-macro-fusion-pred -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenMacroFusion.inc -d lib/Target/RISCV/RISCVGenMacroFusion.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[24/2286] Building RISCVGenAsmWriter.inc...
+FAILED: lib/Target/RISCV/RISCVGenAsmWriter.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenAsmWriter.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-asm-writer -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenAsmWriter.inc -d lib/Target/RISCV/RISCVGenAsmWriter.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[25/2286] Building RISCVGenAsmMatcher.inc...
+FAILED: lib/Target/RISCV/RISCVGenAsmMatcher.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenAsmMatcher.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-asm-matcher -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenAsmMatcher.inc -d lib/Target/RISCV/RISCVGenAsmMatcher.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[26/2286] Building RISCVGenInstrInfo.inc...
+FAILED: lib/Target/RISCV/RISCVGenInstrInfo.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenInstrInfo.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-instr-info -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenInstrInfo.inc -d lib/Target/RISCV/RISCVGenInstrInfo.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[27/2286] Building RISCVGenPreLegalizeGICombiner.inc...
+FAILED: lib/Target/RISCV/RISCVGenPreLegalizeGICombiner.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenPreLegalizeGICombiner.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-global-isel-combiner -combiners="RISCVPreLegalizerCombiner" -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td --write-if-changed -o lib/Target/RISCV/RISCVGenPreLegalizeGICombiner.inc -d lib/Target/RISCV/RISCVGenPreLegalizeGICombiner.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td:16:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td:16:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[28/2286] Building RISCVGenRegisterInfo.inc...
+FAILED: lib/Target/RISCV/RISCVGenRegisterInfo.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenRegisterInfo.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-register-info -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenRegisterInfo.inc -d lib/Target/RISCV/RISCVGenRegisterInfo.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[29/2286] Building RISCVGenRegisterBank.inc...
+FAILED: lib/Target/RISCV/RISCVGenRegisterBank.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenRegisterBank.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-register-bank -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenRegisterBank.inc -d lib/Target/RISCV/RISCVGenRegisterBank.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[30/2286] Building RISCVGenMCPseudoLowering.inc...
+FAILED: lib/Target/RISCV/RISCVGenMCPseudoLowering.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenMCPseudoLowering.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-pseudo-lowering -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenMCPseudoLowering.inc -d lib/Target/RISCV/RISCVGenMCPseudoLowering.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[31/2286] Building RISCVTargetParserDef.inc...
+FAILED: include/llvm/TargetParser/RISCVTargetParserDef.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include/llvm/TargetParser/RISCVTargetParserDef.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-min-tblgen -gen-riscv-target-def -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/ -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include/llvm/TargetParser -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o include/llvm/TargetParser/RISCVTargetParserDef.inc -d include/llvm/TargetParser/RISCVTargetParserDef.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[32/2286] Building RISCVGenGlobalISel.inc...
+FAILED: lib/Target/RISCV/RISCVGenGlobalISel.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenGlobalISel.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-global-isel -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td --write-if-changed -o lib/Target/RISCV/RISCVGenGlobalISel.inc -d lib/Target/RISCV/RISCVGenGlobalISel.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td:16:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td:16:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[33/2286] Building RISCVGenDisassemblerTables.inc...
+FAILED: lib/Target/RISCV/RISCVGenDisassemblerTables.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenDisassemblerTables.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-disassembler -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenDisassemblerTables.inc -d lib/Target/RISCV/RISCVGenDisassemblerTables.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[34/2286] Building RISCVGenSearchableTables.inc...
+FAILED: lib/Target/RISCV/RISCVGenSearchableTables.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenSearchableTables.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-searchable-tables -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenSearchableTables.inc -d lib/Target/RISCV/RISCVGenSearchableTables.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[35/2286] Building RISCVGenSubtargetInfo.inc...
+FAILED: lib/Target/RISCV/RISCVGenSubtargetInfo.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenSubtargetInfo.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-subtarget -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenSubtargetInfo.inc -d lib/Target/RISCV/RISCVGenSubtargetInfo.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[36/2286] Building RISCVGenMCCodeEmitter.inc...
+FAILED: lib/Target/RISCV/RISCVGenMCCodeEmitter.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenMCCodeEmitter.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-emitter -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenMCCodeEmitter.inc -d lib/Target/RISCV/RISCVGenMCCodeEmitter.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[37/2286] Building RISCVGenO0PreLegalizeGICombiner.inc...
+FAILED: lib/Target/RISCV/RISCVGenO0PreLegalizeGICombiner.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenO0PreLegalizeGICombiner.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-global-isel-combiner -combiners="RISCVO0PreLegalizerCombiner" -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td --write-if-changed -o lib/Target/RISCV/RISCVGenO0PreLegalizeGICombiner.inc -d lib/Target/RISCV/RISCVGenO0PreLegalizeGICombiner.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td:16:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVGISel.td:16:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+[38/2286] Building RISCVGenCompressInstEmitter.inc...
+FAILED: lib/Target/RISCV/RISCVGenCompressInstEmitter.inc /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV/RISCVGenCompressInstEmitter.inc 
+cd /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19 && /home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-tblgen -gen-compress-inst-emitter -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -I /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td --write-if-changed -o lib/Target/RISCV/RISCVGenCompressInstEmitter.inc -d lib/Target/RISCV/RISCVGenCompressInstEmitter.inc.d
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2118:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1
+def powerOf2Minus1      : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
+    ^
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCV.td:36:
+Included from /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfo.td:2112:
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td:719:5: note: location of previous definition
+def powerOf2Minus1 : ImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1); }]>;
+    ^
+ninja: build stopped: cannot make progress due to previous errors.

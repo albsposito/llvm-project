@@ -1,0 +1,29 @@
+# Step 19 conflict: passes
+
+Pick: `ffb912b4d002` "[pulp] passes: hardware loops, FREP, SSR/SDMA expansion, pseudo expansion"
+Worktree: `wt/int-19` (branch `port/19`), prev base `e6c3289804a6` (fork's LLVM 18 merge base), new base `llvmorg-19.1.7`.
+Added cleanly (new files, carried verbatim): `PULP/PULPHardwareLoops.cpp`, `PULP/PULPFixupHwLoops.cpp`, `PULPExpandPseudoInsts.cpp`, `RISCVExpandSSRInsts.cpp`, `RISCVExpandSDMAInsts.cpp`, `Snitch/SNITCHFrepLoops.cpp`.
+Auto-merged parts: the `PULP/*`, `Snitch/SNITCHFrepLoops.cpp` and `PULPExpandPseudoInsts.cpp` source lines in `CMakeLists.txt`; the five `initialize*Pass` calls in `LLVMInitializeRISCVTarget()`; `addPass(createPULPFixupHwLoops())` in `addPreEmitPass2()` (still right after `createRISCVExpandPseudoPass()` and before `createRISCVExpandAtomicPseudoPass()`, same as at 18).
+
+## Paths
+
+| Path | Conflict type | Upstream change | Resolution |
+|---|---|---|---|
+| `llvm/lib/Target/RISCV/CMakeLists.txt` | both modified (fork lines came right after `RISCVFoldMasks.cpp`) | `c74ba57e0bd9` "[RISCV] Convert AVLs with vlenb to VLMAX where possible (#97800)" removed `RISCVFoldMasks.cpp` (its code now lives in `RISCVVectorPeephole.cpp`, already listed upstream) | Kept upstream's side (no `RISCVFoldMasks.cpp`), inserted the fork's `RISCVExpandSSRInsts.cpp` and `RISCVExpandSDMAInsts.cpp` at the same position (after `RISCVExpandPseudoInsts.cpp`). |
+| `llvm/lib/Target/RISCV/RISCV.h` | both modified (fork block sat just above the GlobalISel selector declaration, which upstream rewrote) | `createRISCVInstructionSelector` now takes `const RISCVSubtarget &` / `const RISCVRegisterBankInfo &`, and `initializeRISCVDAGToDAGISelPass` became `initializeRISCVDAGToDAGISelLegacyPass` (`7652a5940701` "Reland \"[NewPM][CodeGen] Port selection dag isel to new pass manager\" (#94149)") | Kept upstream's new declarations verbatim; re-inserted the fork's 17 lines (create/initialize for PULPExpandPseudo, PULPHardwareLoops, PULPFixupHwLoops, RISCVExpandSSR, RISCVExpandSDMA, SNITCHFrepLoops) unchanged just before them. |
+| `llvm/lib/Target/RISCV/RISCVTargetMachine.cpp` | both modified (`addPreRegAlloc()` body) | Upstream moved `RISCVInsertVSETVLI` and `RISCVDeadRegisterDefinitions` out of `addPreRegAlloc()`: `52187b9f2e7e` "[RISCV] Move RISCVDeadRegisterDefinitions to post vector regalloc (#90636)", `0ebe48f068c0` "[RISCV] Move RISCVInsertVSETVLI after CSR/VXRM passes (#91701)", `1a58e88690c1` "[RISCV] Move RISCVInsertVSETVLI to after phi elimination (#91440)", `675e7bd1b94f` "[RISCV] Support postRA vsetvl insertion pass (#70549)" (default `-riscv-vsetvl-after-rvv-regalloc=true`: vsetvli insertion and dead-register-defs now run in `addRegAssignAndRewrite{Fast,Optimized}()` after RVV register allocation). Also `28233408a2c8` made RISCVInitUndef target-independent (`InitUndefID`). | Kept all upstream code. Placed the fork's five pre-RA passes (in the fork's order: PULPExpandPseudo, RISCVExpandSDMA, RISCVExpandSSR, SNITCHFrepLoops, PULPHardwareLoops) right after `createRISCVInsertWriteVXRMPass()`, i.e. still the last `addPass` calls of `addPreRegAlloc()` and still immediately after InsertReadWriteCSR/InsertWriteVXRM, before upstream's `insertPass(... RISCVInsertVSETVLIID)` block (which only registers an insertion point and adds nothing here). Also removed trailing whitespace from two fork blank lines (after `initializeRISCVPushPopOptPass` and after `createPULPFixupHwLoops()`); whitespace only. |
+
+## Pass-order changes versus the LLVM 18 fork
+
+At 18, `addPreRegAlloc()` ran: PreRAExpandPseudo, MergeBaseOffset, **InsertVSETVLI**, **DeadRegisterDefinitions**, InsertReadWriteCSR, InsertWriteVXRM, then the five fork passes.
+At 19 (as resolved): PreRAExpandPseudo, MergeBaseOffset, InsertReadWriteCSR, InsertWriteVXRM, the five fork passes; InsertVSETVLI and DeadRegisterDefinitions now run later (after RVV regalloc by default, or after PHI elimination / register coalescing with `-riscv-vsetvl-after-rvv-regalloc=false`).
+
+- ESCALATE: the five fork pre-RA passes (PULPExpandPseudo, RISCVExpandSDMA, RISCVExpandSSR, SNITCHFrepLoops, PULPHardwareLoops) used to run AFTER `RISCVInsertVSETVLI` and `RISCVDeadRegisterDefinitions`; with upstream's 19 pipeline they now run BEFORE both. Their order relative to each other and to InsertReadWriteCSR/InsertWriteVXRM is unchanged. There is no equivalent upstream point that keeps "after InsertVSETVLI" without also moving the fork passes past PHI elimination / register allocation (which would break passes that expect virtual registers / SSA, e.g. hardware-loop and FREP formation). Upstream's own precedent (`0ebe48f068c0`) moved InsertVSETVLI after the CSR/VXRM passes, i.e. treats pre-RA target passes as independent of vsetvli insertion. The fork passes are for Xpulp/Snitch (no RVV), so the risk is low, but it must be confirmed with the tests (hardware-loop / FREP / SSR lit tests, and `O0/O3-pipeline.ll` expectations, which will change and need a `test-regen`). Also note that DeadRegisterDefinitions (which rewrites dead defs to X0) no longer runs before PULPHardwareLoops / SNITCHFrepLoops.
+- Not a change: `createPULPFixupHwLoops()` in `addPreEmitPass2()` keeps its 18 position (after RISCVExpandPseudo, before RISCVExpandAtomicPseudo).
+
+## Known follow-ups (not fixed here, by design)
+
+- The new fork files contain trailing whitespace (`git diff --cached --check` reports it in `PULPFixupHwLoops.cpp`, `PULPExpandPseudoInsts.cpp`, `RISCVExpandSDMAInsts.cpp`, `RISCVExpandSSRInsts.cpp`); it is carried verbatim from the fork and was not touched. No conflict markers remain.
+- Build-phase leads (not checked here): the new pass files may use APIs changed at 19 (NewPM codegen port, debug records), to be handled in the build-fix phase.
+
+Markers check: `grep` for `<<<<<<<`/`=======`/`>>>>>>>`/`|||||||` in the three resolved paths finds nothing; `git diff --cached --check` reports only the pre-existing trailing whitespace above.

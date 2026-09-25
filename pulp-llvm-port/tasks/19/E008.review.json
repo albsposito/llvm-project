@@ -1,0 +1,17 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [],
+  "checks": {
+    "policy_check": "scripts/policy_check.py --repo wt/19-E008 --range d225ed2e8fa7..work/19/E008 --notes-root notes --stack-base llvmorg-19.1.7: 1 commit, fail=0, warn=0",
+    "diff": "a60138ef8ef7 changes exactly one line, clang/lib/Parse/ParsePragma.cpp:1647: llvm::makeArrayRef(ValueList) -> llvm::ArrayRef(ValueList); .copy(PP.getPreprocessorAllocator()) unchanged. No other files touched.",
+    "upstream_commit": "c70d3874e95b '[ADT] Remove makeArrayRef and makeMutableArrayRef (#79719)' exists, only touches llvm/include/llvm/ADT/ArrayRef.h (130 deletions), is an ancestor of llvmorg-19.1.7 and not of prev_tag e6c328980 -> in range.",
+    "upstream_pattern": "Verified llvmorg-19.1.7:clang/lib/Parse/ParsePragma.cpp:3547 (ParseLoopHintValue) reads 'Info.Toks = llvm::ArrayRef(ValueList).copy(PP.getPreprocessorAllocator());' - fix is identical to upstream's own pattern.",
+    "oracle_cheating": "None: no removed/bypassed logic, no early returns, no stubs, no forced conditions, no test edits. Pure API spelling change with identical semantics (makeArrayRef was a wrapper returning ArrayRef<T>(Vec)).",
+    "scope": "Single root cause, single line; commit subject matches owner cluster fixup subject; Change-Note trailer present and note has all four sections.",
+    "build": "logs/19-E008.fix.log shows obj.clangParse ParsePragma.cpp.o built with no makeArrayRef error."
+  },
+  "observations": [
+    "Non-blocking note inaccuracy: notes/19/E008.md 'What breaks if this is wrong' says fork clang tests for the frep pragma under clang/test/CodeGen/RISCV would catch a regression, but grep -rli frep clang/test in wt/19-E008 finds no frep pragma tests at all. Observable symptoms are still named (clang diagnostic/crash on #pragma frep, frep instructions missing in downstream Snitch programs), so the SOP bar is met, but the conductor should know #pragma frep has no in-tree test coverage."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "branch": "work/19/E004",
+  "int_head_before": "fa3f689792626176cc16c3053a7f2474ddfc3c69",
+  "build_rc": 1,
+  "errors_fixed": [],
+  "errors_new": [],
+  "build_log": "tasks/19/work_19_E004.build.log",
+  "verdict": "REJECTED",
+  "int_head_after": "fa3f689792626176cc16c3053a7f2474ddfc3c69",
+  "reason": "build error set did not shrink; change fixes nothing it claims to"
+}

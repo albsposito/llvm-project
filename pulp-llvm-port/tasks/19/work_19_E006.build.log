@@ -1,0 +1,421 @@
+ninja: Entering directory `build/int-19'
+[1/245] Generating VCSRevision.h
+[2/245] Generating VCSVersion.inc
+[3/245] Building CXX object tools/clang/lib/Basic/CMakeFiles/obj.clangBasic.dir/Version.cpp.o
+[4/245] Building RISCVGenMacroFusion.inc...
+[5/245] Building RISCVGenCompressInstEmitter.inc...
+[6/245] Building RISCVGenO0PreLegalizeGICombiner.inc...
+[7/245] Building RISCVTargetParserDef.inc...
+[8/242] Building RISCVGenMCCodeEmitter.inc...
+[9/242] Building RISCVGenPreLegalizeGICombiner.inc...
+[10/242] Building RISCVGenDisassemblerTables.inc...
+[11/242] Building RISCVGenRegisterInfo.inc...
+[12/242] Building RISCVGenPostLegalizeGICombiner.inc...
+[13/242] Building RISCVGenAsmWriter.inc...
+[14/242] Building RISCVGenRegisterBank.inc...
+[15/242] Building RISCVGenMCPseudoLowering.inc...
+[16/242] Building CXX object tools/clang/lib/Driver/CMakeFiles/obj.clangDriver.dir/ToolChains/Arch/RISCV.cpp.o
+FAILED: tools/clang/lib/Driver/CMakeFiles/obj.clangDriver.dir/ToolChains/Arch/RISCV.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/lib/Driver -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/lib/Driver -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -fno-common -Woverloaded-virtual -Wno-nested-anon-types -O3 -DNDEBUG -std=c++17  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT tools/clang/lib/Driver/CMakeFiles/obj.clangDriver.dir/ToolChains/Arch/RISCV.cpp.o -MF tools/clang/lib/Driver/CMakeFiles/obj.clangDriver.dir/ToolChains/Arch/RISCV.cpp.o.d -o tools/clang/lib/Driver/CMakeFiles/obj.clangDriver.dir/ToolChains/Arch/RISCV.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/lib/Driver/ToolChains/Arch/RISCV.cpp
+../../wt/int-19/clang/lib/Driver/ToolChains/Arch/RISCV.cpp:222:49: error: no member named 'equals' in 'llvm::StringRef'
+  222 |                                     return feat.equals("+fdiv") ||
+      |                                            ~~~~ ^
+../../wt/int-19/clang/lib/Driver/ToolChains/Arch/RISCV.cpp:223:49: error: no member named 'equals' in 'llvm::StringRef'
+  223 |                                            feat.equals("-fdiv");
+      |                                            ~~~~ ^
+2 errors generated.
+[17/242] Building RISCVGenAsmMatcher.inc...
+[18/242] Building RISCVGenSearchableTables.inc...
+[19/242] Building CXX object lib/Object/CMakeFiles/LLVMObject.dir/IRSymtab.cpp.o
+[20/242] Linking CXX static library lib/libLLVMObject.a
+[21/242] Generating VCSVersion.inc
+[22/242] Linking CXX static library lib/libclangBasic.a
+[23/242] Building CXX object tools/lld/Common/CMakeFiles/lldCommon.dir/Version.cpp.o
+[24/242] Linking CXX static library lib/liblldCommon.a
+[25/242] Building CXX object tools/clang/lib/Parse/CMakeFiles/obj.clangParse.dir/ParsePragma.cpp.o
+FAILED: tools/clang/lib/Parse/CMakeFiles/obj.clangParse.dir/ParsePragma.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/lib/Parse -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/lib/Parse -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/tools/clang/include -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -fno-common -Woverloaded-virtual -Wno-nested-anon-types -O3 -DNDEBUG -std=c++17  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT tools/clang/lib/Parse/CMakeFiles/obj.clangParse.dir/ParsePragma.cpp.o -MF tools/clang/lib/Parse/CMakeFiles/obj.clangParse.dir/ParsePragma.cpp.o.d -o tools/clang/lib/Parse/CMakeFiles/obj.clangParse.dir/ParsePragma.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/clang/lib/Parse/ParsePragma.cpp
+../../wt/int-19/clang/lib/Parse/ParsePragma.cpp:1647:21: error: no member named 'makeArrayRef' in namespace 'llvm'
+ 1647 |   Info.Toks = llvm::makeArrayRef(ValueList).copy(PP.getPreprocessorAllocator());
+      |               ~~~~~~^
+1 error generated.
+[26/242] Building CXX object lib/LTO/CMakeFiles/LLVMLTO.dir/LTO.cpp.o
+[27/242] Linking CXX static library lib/libLLVMLTO.a
+[28/242] Building CXX object lib/CodeGen/AsmPrinter/CMakeFiles/LLVMAsmPrinter.dir/AsmPrinter.cpp.o
+[29/242] Linking CXX static library lib/libLLVMAsmPrinter.a
+[30/242] Building RISCVGenSubtargetInfo.inc...
+[31/242] Building RISCVGenInstrInfo.inc...
+[32/242] Building RISCVGenGlobalISel.inc...
+[33/242] Building RISCVGenDAGISel.inc...
+[34/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVExpandSSRInsts.cpp
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVExpandSSRInsts.cpp:57:10: fatal error: 'llvm/CodeGen/LowLevelType.h' file not found
+   57 | #include "llvm/CodeGen/LowLevelType.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+[35/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVExpandSDMAInsts.cpp
+/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVExpandSDMAInsts.cpp:23:10: fatal error: 'llvm/CodeGen/LowLevelType.h' file not found
+   23 | #include "llvm/CodeGen/LowLevelType.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+[36/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:291:47: error: too few arguments to function call, expected 2, have 1
+  291 |       alwaysWrite &= !MI.readsRegister(bumpReg);
+      |                       ~~~~~~~~~~~~~~~~        ^
+../../wt/int-19/llvm/include/llvm/CodeGen/MachineInstr.h:1480:8: note: 'readsRegister' declared here
+ 1480 |   bool readsRegister(Register Reg, const TargetRegisterInfo *TRI) const {
+      |        ^             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:10:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVTargetMachine.h:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVSubtarget.h:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVFrameLowering.h:16:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetFrameLowering.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineOptimizationRemarkEmitter.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+   76 |     return addRequiredID(PassClass::ID);
+      |                                     ^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:100:10: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineLoopInfo>' requested here
+  100 |       AU.addRequired<MachineLoopInfo>();
+      |          ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:10:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVTargetMachine.h:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVSubtarget.h:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVFrameLowering.h:16:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetFrameLowering.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineOptimizationRemarkEmitter.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);
+      |                                       ~~~~~~~~~~~~~~^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:343:35: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineLoopInfo>' requested here
+  343 |           MachineLoopInfo *MLI = &getAnalysis<MachineLoopInfo>();
+      |                                   ^
+3 errors generated.
+[37/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVPostRAExpandPseudoInsts.cpp.o
+[38/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMachineFunctionInfo.cpp.o
+[39/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVRedundantCopyElimination.cpp.o
+[40/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMergeBaseOffset.cpp.o
+[41/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVFrameLowering.cpp.o
+[42/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInsertVSETVLI.cpp.o
+[43/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVAsmPrinter.cpp.o
+[44/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInsertReadWriteCSR.cpp.o
+[45/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMakeCompressible.cpp.o
+[46/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:297:1: error: use of undeclared identifier 'initializeMachineDominatorTreePass'
+  297 | INITIALIZE_PASS_DEPENDENCY(MachineDominatorTree)
+      | ^
+../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'
+   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);
+      |                                             ^
+<scratch space>:104:1: note: expanded from here
+  104 | initializeMachineDominatorTreePass
+      | ^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:298:1: error: use of undeclared identifier 'initializeMachineLoopInfoPass'
+  298 | INITIALIZE_PASS_DEPENDENCY(MachineLoopInfo)
+      | ^
+../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'
+   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);
+      |                                             ^
+<scratch space>:2:1: note: expanded from here
+    2 | initializeMachineLoopInfoPass
+      | ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineDominatorTree'
+   76 |     return addRequiredID(PassClass::ID);
+      |                                     ^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:98:8: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineDominatorTree>' requested here
+   98 |     AU.addRequired<MachineDominatorTree>();
+      |        ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+   76 |     return addRequiredID(PassClass::ID);
+      |                                     ^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:99:8: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineLoopInfo>' requested here
+   99 |     AU.addRequired<MachineLoopInfo>();
+      |        ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);
+      |                                       ~~~~~~~~~~~~~~^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:326:10: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineLoopInfo>' requested here
+  326 |   MLI = &getAnalysis<MachineLoopInfo>();
+      |          ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:18:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/PULP/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineDominatorTree'
+  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);
+      |                                       ~~~~~~~~~~~~~~^
+../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:328:10: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineDominatorTree>' requested here
+  328 |   MDT = &getAnalysis<MachineDominatorTree>();
+      |          ^
+6 errors generated.
+[47/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandAtomicPseudoInsts.cpp.o
+[48/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVDeadRegisterDefinitions.cpp.o
+[49/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInsertWriteVXRM.cpp.o
+[50/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMoveMerger.cpp.o
+[51/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVOptWInstrs.cpp.o
+[52/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandPseudoInsts.cpp.o
+[53/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVPushPopOptimizer.cpp.o
+[54/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVCodeGenPrepare.cpp.o
+[55/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVSubtarget.cpp.o
+[56/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetObjectFile.cpp.o
+[57/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVGatherScatterLowering.cpp.o
+[58/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVRegisterInfo.cpp.o
+[59/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInstrInfo.cpp.o
+[60/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVInstPrinter.cpp.o
+[61/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCAsmInfo.cpp.o
+[62/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVELFObjectWriter.cpp.o
+[63/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVAsmBackend.cpp.o
+[64/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCExpr.cpp.o
+[65/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMatInt.cpp.o
+[66/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCObjectFileInfo.cpp.o
+[67/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCCodeEmitter.cpp.o
+[68/242] Building CXX object lib/Target/RISCV/Disassembler/CMakeFiles/LLVMRISCVDisassembler.dir/RISCVDisassembler.cpp.o
+[69/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVBaseInfo.cpp.o
+[70/242] Building CXX object tools/lld/tools/lld/CMakeFiles/lld.dir/lld-driver.cpp.o
+[71/242] Building CXX object lib/Target/RISCV/TargetInfo/CMakeFiles/LLVMRISCVInfo.dir/RISCVTargetInfo.cpp.o
+[72/242] Linking CXX static library lib/libLLVMRISCVInfo.a
+[73/242] Building CXX object tools/lld/tools/lld/CMakeFiles/lld.dir/lld.cpp.o
+[74/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVCallLowering.cpp.o
+[75/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:1639:1: error: use of undeclared identifier 'initializeMachineDominatorTreePass'
+ 1639 | INITIALIZE_PASS_DEPENDENCY(MachineDominatorTree)
+      | ^
+../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'
+   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);
+      |                                             ^
+<scratch space>:23:1: note: expanded from here
+   23 | initializeMachineDominatorTreePass
+      | ^
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:1640:1: error: use of undeclared identifier 'initializeMachineLoopInfoPass'
+ 1640 | INITIALIZE_PASS_DEPENDENCY(MachineLoopInfo)
+      | ^
+../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'
+   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);
+      |                                             ^
+<scratch space>:25:1: note: expanded from here
+   25 | initializeMachineLoopInfoPass
+      | ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineDominatorTree'
+   76 |     return addRequiredID(PassClass::ID);
+      |                                     ^
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:89:8: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineDominatorTree>' requested here
+   89 |     AU.addRequired<MachineDominatorTree>();
+      |        ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+   76 |     return addRequiredID(PassClass::ID);
+      |                                     ^
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:90:8: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineLoopInfo>' requested here
+   90 |     AU.addRequired<MachineLoopInfo>();
+      |        ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineLoopInfo'
+  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);
+      |                                       ~~~~~~~~~~~~~~^
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:316:10: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineLoopInfo>' requested here
+  316 |   MLI = &getAnalysis<MachineLoopInfo>();
+      |          ^
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:17:
+In file included from ../../wt/int-19/llvm/lib/Target/RISCV/Snitch/../RISCVInstrInfo.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/TargetInstrInfo.h:23:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineCycleAnalysis.h:18:
+In file included from ../../wt/int-19/llvm/include/llvm/CodeGen/MachineFunctionPass.h:22:
+In file included from ../../wt/int-19/llvm/include/llvm/Pass.h:350:
+../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineDominatorTree'
+  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);
+      |                                       ~~~~~~~~~~~~~~^
+../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:318:10: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineDominatorTree>' requested here
+  318 |   MDT = &getAnalysis<MachineDominatorTree>();
+      |          ^
+6 errors generated.
+[76/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVRegisterBankInfo.cpp.o
+[77/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULPExpandPseudoInsts.cpp.o
+[78/242] Building CXX object lib/Target/RISCV/AsmParser/CMakeFiles/LLVMRISCVAsmParser.dir/RISCVAsmParser.cpp.o
+[79/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVPostLegalizerCombiner.cpp.o
+[80/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o
+[81/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVTargetStreamer.cpp.o
+[82/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVELFStreamer.cpp.o
+[83/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/CallGraphSort.cpp.o
+[84/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVLegalizerInfo.cpp.o
+[85/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/COFFLinkerContext.cpp.o
+[86/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVO0PreLegalizerCombiner.cpp.o
+[87/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVInstructionSelector.cpp.o
+[88/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetMachine.cpp.o
+[89/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/DebugTypes.cpp.o
+[90/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVPreLegalizerCombiner.cpp.o
+[91/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/Chunks.cpp.o
+[92/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/MapFile.cpp.o
+[93/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/MarkLive.cpp.o
+[94/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/LLDMapFile.cpp.o
+[95/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/ICF.cpp.o
+[96/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/DLL.cpp.o
+[97/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/MinGW.cpp.o
+[98/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/AVR.cpp.o
+[99/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/Symbols.cpp.o
+[100/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/DriverUtils.cpp.o
+[101/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/MSP430.cpp.o
+[102/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/AMDGPU.cpp.o
+[103/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/AArch64.cpp.o
+[104/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/Hexagon.cpp.o
+[105/242] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCTargetDesc.cpp.o
+[106/242] Linking CXX static library lib/libLLVMRISCVDesc.a
+[107/242] Linking CXX static library lib/libLLVMRISCVAsmParser.a
+[108/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/LoongArch.cpp.o
+[109/242] Linking CXX static library lib/libLLVMRISCVDisassembler.a
+[110/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/MipsArchTree.cpp.o
+[111/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/PDB.cpp.o
+[112/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/LTO.cpp.o
+[113/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/AArch64ErrataFix.cpp.o
+[114/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/PPC.cpp.o
+[115/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/X86.cpp.o
+[116/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/CallGraphSort.cpp.o
+[117/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/EhFrame.cpp.o
+[118/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/ARMErrataFix.cpp.o
+[119/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/DWARF.cpp.o
+[120/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/Mips.cpp.o
+[121/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/SPARCV9.cpp.o
+[122/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/DriverUtils.cpp.o
+[123/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/SystemZ.cpp.o
+[124/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/ARM.cpp.o
+[125/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/PPC64.cpp.o
+[126/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/X86_64.cpp.o
+[127/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/Driver.cpp.o
+[128/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/ScriptLexer.cpp.o
+[129/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/ICF.cpp.o
+[130/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelLowering.cpp.o
+[131/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/RISCV.cpp.o
+[132/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/InputFiles.cpp.o
+[133/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/Writer.cpp.o
+[134/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/MapFile.cpp.o
+[135/242] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/SymbolTable.cpp.o
+[136/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Symbols.cpp.o
+[137/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/SymbolTable.cpp.o
+[138/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/MarkLive.cpp.o
+[139/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Arch/ARM64_32.cpp.o
+[140/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Target.cpp.o
+[141/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Arch/ARM64.cpp.o
+[142/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Arch/ARM64Common.cpp.o
+[143/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Dwarf.cpp.o
+[144/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Arch/X86_64.cpp.o
+[145/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Thunks.cpp.o
+[146/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/LinkerScript.cpp.o
+[147/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/InputSection.cpp.o
+[148/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/EhFrame.cpp.o
+[149/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/ExportTrie.cpp.o
+[150/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/ScriptParser.cpp.o
+[151/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/ConcatOutputSection.cpp.o
+[152/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/OutputSections.cpp.o
+[153/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/LTO.cpp.o
+[154/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/ICF.cpp.o
+[155/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/MapFile.cpp.o
+[156/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Relocations.cpp.o
+[157/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Target.cpp.o
+[158/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/OutputSection.cpp.o
+[159/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/InputSection.cpp.o
+[160/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/MarkLive.cpp.o
+[161/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/OutputSegment.cpp.o
+[162/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/SymbolTable.cpp.o
+[163/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Symbols.cpp.o
+[164/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/SectionPriorities.cpp.o
+[165/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVVectorPeephole.cpp.o
+[166/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/InputFiles.cpp.o
+[167/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/UnwindInfoSection.cpp.o
+[168/242] Building CXX object tools/lld/MinGW/CMakeFiles/lldMinGW.dir/Driver.cpp.o
+[169/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/ObjC.cpp.o
+[170/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/DriverUtils.cpp.o
+[171/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Writer.cpp.o
+[172/242] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o
+[173/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/WriterUtils.cpp.o
+[174/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Writer.cpp.o
+[175/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Relocations.cpp.o
+[176/242] Building CXX object tools/clang/tools/driver/CMakeFiles/clang.dir/clang-driver.cpp.o
+[177/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/MarkLive.cpp.o
+[178/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/Relocations.cpp.o
+[179/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/SyntheticSections.cpp.o
+[180/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/LTO.cpp.o
+[181/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/Symbols.cpp.o
+[182/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/OutputSegment.cpp.o
+[183/242] Building CXX object tools/clang/tools/driver/CMakeFiles/clang.dir/cc1gen_reproducer_main.cpp.o
+[184/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/OutputSections.cpp.o
+[185/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Driver.cpp.o
+[186/242] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/InputFiles.cpp.o
+[187/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/Driver.cpp.o
+[188/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/InputChunks.cpp.o
+[189/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/LTO.cpp.o
+[190/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/MapFile.cpp.o
+[191/242] Building CXX object tools/clang/tools/driver/CMakeFiles/clang.dir/cc1as_main.cpp.o
+[192/242] Building CXX object tools/llvm-mc/CMakeFiles/llvm-mc.dir/Disassembler.cpp.o
+[193/242] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/llvm-objdump-driver.cpp.o
+[194/242] Building CXX object tools/llvm-mc/CMakeFiles/llvm-mc.dir/llvm-mc.cpp.o
+[195/242] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/COFFDump.cpp.o
+[196/242] Linking CXX executable bin/llvm-mc
+[197/242] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/SourcePrinter.cpp.o
+[198/242] Building CXX object tools/opt/CMakeFiles/opt.dir/opt.cpp.o
+[199/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/InputFiles.cpp.o
+[200/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/SymbolTable.cpp.o
+[201/242] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/WasmDump.cpp.o
+[202/242] Building CXX object tools/llc/CMakeFiles/llc.dir/llc.cpp.o
+[203/242] Building CXX object tools/clang/tools/driver/CMakeFiles/clang.dir/driver.cpp.o
+[204/242] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/XCOFFDump.cpp.o
+[205/242] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/OffloadDump.cpp.o
+[206/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Driver.cpp.o
+[207/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/SyntheticSections.cpp.o
+[208/242] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/Writer.cpp.o
+[209/242] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/ELFDump.cpp.o
+[210/242] Building CXX object tools/clang/tools/driver/CMakeFiles/clang.dir/cc1_main.cpp.o
+[211/242] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/SyntheticSections.cpp.o
+[212/242] Building CXX object tools/llc/CMakeFiles/llc.dir/NewPMDriver.cpp.o
+[213/242] Building CXX object tools/opt/CMakeFiles/LLVMOptDriver.dir/optdriver.cpp.o
+[214/242] Building CXX object tools/opt/CMakeFiles/LLVMOptDriver.dir/NewPMDriver.cpp.o
+[215/242] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/MachODump.cpp.o
+[216/242] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/llvm-objdump.cpp.o
+[217/242] Linking CXX executable bin/llvm-objdump
+ninja: build stopped: cannot make progress due to previous errors.

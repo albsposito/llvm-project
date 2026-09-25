@@ -1,0 +1,11 @@
+{
+  "platform": "Linux-6.17.0-1017-aws-x86_64-with-glibc2.39",
+  "runner_path_lookup": {
+    "gvsoc": null,
+    "spike": null,
+    "qemu-riscv32": null,
+    "pulp-run": null,
+    "banshee": null
+  },
+  "compiler_build_settings": "build/int-19/CMakeCache.txt:CMAKE_BUILD_TYPE:STRING=Release\nbuild/int-19/CMakeCache.txt:LLVM_ENABLE_ASSERTIONS:BOOL=ON\nbuild/int-18/CMakeCache.txt:CMAKE_BUILD_TYPE:STRING=Release\nbuild/int-18/CMakeCache.txt:LLVM_ENABLE_ASSERTIONS:BOOL=ON\n"
+}

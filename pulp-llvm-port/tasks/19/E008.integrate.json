@@ -1,0 +1,15 @@
+{
+  "branch": "work/19/E008",
+  "int_head_before": "67ff43c86b720b3cdd1de94e8055b9cc20a254c0",
+  "build_rc": 1,
+  "errors_fixed": [
+    "no member named 'makeArrayRef' in namespace 'llvm'"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/19/work_19_E008.build.log",
+  "verdict": "LANDED",
+  "int_head_after": "be7c2fd19920e56a92816703d2fe1c8128771b38",
+  "commits": [
+    "a60138ef8ef7adee786ee9e6fde13843721ee810"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [
+    "policy_check.py --range 7c27289bc3a1..dc6ed69f0c98 --stack-base e6c3289804a6: 1 commit, 0 FAIL, 0 WARN. Nothing to excuse."
+  ],
+  "review_notes": [
+    "Diff read with git show dc6ed69f0c98: 12 lines added to llvm/lib/Target/RISCV/RISCVSchedMempool.td and nothing removed or modified. No existing WriteRes/ReadAdvance changed latency or resources. Commit subject is the insn-tablegen fixup! subject; Change-Note: 19/E006.md is present.",
+    "Upstream citations: 56b8bd77445f (Zvk sched classes), 6da1966bc503 (VCIX), 89f87c387627 (Zabha), a0c7714525b6 (div/rem split) all exist, are reachable from llvmorg-19.1.7 and not from prev_tag e6c3289804a6 (a release/18 commit), so they are in prev_tag..step_base_tag. Subjects match the note.",
+    "Unsupported lines: RISCVSchedMempool.td:228,234,235 add UnsupportedSchedZabha/Xsfvcp/Zvk, the same lines as llvmorg-19.1.7 RISCVSchedRocket.td and RISCVSchedSyntacoreSCR1.td in their Unsupported extensions blocks. This is the pattern the task asked for.",
+    "WriteIRem decision (differs from the task's 'mark unsupported' wording, and is correct): a0c7714525b6 is tagged [nfc]. It moved REM/REMU from WriteIDiv to WriteIRem (RISCVInstrInfoM.td:44,46 at 19) and, for every existing model, added WriteIRem with the same resources as WriteIDiv (SCR1: WriteIRem in the same let-block as WriteIDiv; Rocket: identical latency 33 and ReleaseAtCycles 33) and ReadAdvance<ReadIRem/ReadIRem32, 0>. Marking WriteIRem unsupported would have left REM/REMU without Mempool timing, which changes behaviour and breaks the task's own rule that existing costs must not change. The worker did what upstream did: RISCVSchedMempool.td:64-67 copies WriteIDiv exactly (resources [MempoolUnitSnitch, MempoolUnitIMulDiv], Latency 16, ReleaseAtCycles [1,14]). WriteIRem32 goes into the existing 'let Unsupported = 1' block next to WriteIDiv32 (line 95), and ReadIRem/ReadIRem32 are added next to ReadIDiv/ReadIDiv32 (lines 169-170). The deviation from the task text is explained in the note and in decision_for_reviewer.",
+    "Independent reproduction: copied the worktree's RISCV target dir to a reviewer scratch dir, renamed only the uimm6_lsb0/powerOf2Minus1/trailing1sPlus1 collisions (E003/E005), and ran build/19-E006/bin/llvm-tblgen -gen-subtarget. With the worker's Mempool file it exits 0. With HEAD^'s Mempool file it fails with 'RISCVSchedMempool.td:15:5: error: Processor does not define resources for WriteVAESMVV_M1'. In the generated MempoolModelSchedClasses[], WriteIDiv_ReadIDiv_ReadIDiv and WriteIRem_ReadIRem_ReadIRem are identical ({7, 2, 34, 1, 1, 2}), so REM keeps the LLVM 18 cost.",
+    "RISCVSchedSnitch.td has no WriteRes/ReadAdvance (0 matches), so it cannot hit the missing-resource check. Leaving it unchanged is correct.",
+    "Oracle-cheating hunt: no fork logic removed, no test touched, no feature dropped, no pattern deleted. Every added line is needed for the missing-class errors in this task's single root cause.",
+    "Note: all four sections are present. 'What breaks if this is wrong' names observable symptoms (rem/remu ordering in -mcpu=mempool-rv32 llc output, Mempool cycle counts, tblgen failure) and says honestly that no test covers it."
+  ]
+}

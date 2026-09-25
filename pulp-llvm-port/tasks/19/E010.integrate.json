@@ -1,0 +1,15 @@
+{
+  "branch": "work/19/E010",
+  "int_head_before": "8d371bf2b2072851e160d98701bb3d389d0fc3a4",
+  "build_rc": 1,
+  "errors_fixed": [
+    "'llvm<path>' file not found"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/19/work_19_E010.build.log",
+  "verdict": "LANDED",
+  "int_head_after": "23ee219de3d4770132a2b45128de21d1518839bf",
+  "commits": [
+    "a1b666f899479d4034bd037512cb9faa35e2dd7e"
+  ]
+}

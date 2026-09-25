@@ -13,7 +13,7 @@
     {"name": "codegen-core", "subject": "[pulp] codegen-core: lowering, ISel, instr/register info, TTI",
      "patterns": ["^llvm/lib/Target/RISCV/RISCVISel(Lowering|DAGToDAG)\\.(cpp|h)$", "^llvm/lib/Target/RISCV/RISCVInstrInfo\\.(cpp|h)$",
                   "^llvm/lib/Target/RISCV/RISCVRegisterInfo\\.(cpp|td|h)$", "^llvm/lib/Target/RISCV/RISCVMachineFunctionInfo\\.h$",
-                  "^llvm/lib/Target/RISCV/RISCVTargetTransformInfo\\.(cpp|h)$"]},
+                  "^llvm/lib/Target/RISCV/RISCVTargetTransformInfo\\.(cpp|h)$", "^llvm/lib/Target/RISCV/RISCVCallingConv\\.cpp$"]},
     {"name": "passes", "subject": "[pulp] passes: hardware loops, FREP, SSR/SDMA expansion, pseudo expansion",
      "patterns": ["^llvm/lib/Target/RISCV/(PULP|Snitch)/", "^llvm/lib/Target/RISCV/PULPExpandPseudoInsts\\.cpp$",
                   "^llvm/lib/Target/RISCV/RISCVExpand(SSR|SDMA)Insts\\.cpp$", "^llvm/lib/Target/RISCV/RISCV\\.h$",

@@ -1,0 +1,12 @@
+{
+  "status": "complete_pending_independent_review",
+  "report": "benchmarks/19-vs-18/report.md",
+  "runtime_measured": false,
+  "microkernel_configurations": 60,
+  "compile_successes": 40,
+  "shared_compile_crashes": 20,
+  "successful_cross_version_text_pairs": 20,
+  "byte_identical_pairs": 20,
+  "supplemental_mix_gate": "FAIL: two p.extbz instructions disappear from strcmp; hwloop and postincrement counts retained",
+  "source_or_integration_changes": false
+}

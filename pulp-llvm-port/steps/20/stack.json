@@ -1,0 +1,18 @@
+{
+  "base": "llvmorg-20.1.8",
+  "prev_base": "llvmorg-19.1.7",
+  "stack_tip": "94bbab7f1554874b4f17e51bbdadef698136489f",
+  "subjects": [
+    "[pulp] registration: extensions, features, processors, CSRs",
+    "[pulp] insn-tablegen: Xpulp/Xsmallfloat/Xssr/Xdma/Xfrep instructions and sched models",
+    "[pulp] intrinsics: IR intrinsics and SelectionDAG nodes",
+    "[pulp] codegen-core: lowering, ISel, instr/register info, TTI",
+    "[pulp] passes: hardware loops, FREP, SSR/SDMA expansion, pseudo expansion",
+    "[pulp] mc: asm parser, disassembler, encoder, fixups, relocations, lld",
+    "[pulp] clang-builtins: RISC-V builtins and their Sema checks",
+    "[pulp] clang-frep-pragma: #pragma frep parsing, attribute, codegen",
+    "[pulp] clang-driver: target macros and driver flags",
+    "[pulp] tests: fork-authored lit tests and pipeline expectations",
+    "[pulp] docs: fork README"
+  ]
+}

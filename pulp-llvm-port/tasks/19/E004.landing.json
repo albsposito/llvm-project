@@ -1,0 +1,7 @@
+{
+  "verdict": "LANDED_AS_DEPENDENCY",
+  "via": "tasks/19/T005.integrate.json",
+  "original_review": "tasks/19/E004.review.json",
+  "final_chain_review": "tasks/19/T005.review.json",
+  "verification": "83/83 required unit tests pass in steps/19/lit-land-T005/lit_diff.json"
+}

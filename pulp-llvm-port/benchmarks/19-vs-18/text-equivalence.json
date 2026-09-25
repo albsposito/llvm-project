@@ -1,0 +1,102 @@
+[
+  {
+    "opt": "O2",
+    "kernel": "bit_count",
+    "text_identical": true
+  },
+  {
+    "opt": "O2",
+    "kernel": "bit_extract",
+    "text_identical": true
+  },
+  {
+    "opt": "O2",
+    "kernel": "dot16",
+    "text_identical": true
+  },
+  {
+    "opt": "O2",
+    "kernel": "dot8",
+    "text_identical": true
+  },
+  {
+    "opt": "O2",
+    "kernel": "mac",
+    "text_identical": true
+  },
+  {
+    "opt": "O2",
+    "kernel": "packed_add16",
+    "text_identical": true
+  },
+  {
+    "opt": "O2",
+    "kernel": "packed_add8",
+    "text_identical": true
+  },
+  {
+    "opt": "O2",
+    "kernel": "packed_max8",
+    "text_identical": true
+  },
+  {
+    "opt": "O2",
+    "kernel": "packed_shift16",
+    "text_identical": true
+  },
+  {
+    "opt": "O2",
+    "kernel": "packed_shift8",
+    "text_identical": true
+  },
+  {
+    "opt": "O3",
+    "kernel": "bit_count",
+    "text_identical": true
+  },
+  {
+    "opt": "O3",
+    "kernel": "bit_extract",
+    "text_identical": true
+  },
+  {
+    "opt": "O3",
+    "kernel": "dot16",
+    "text_identical": true
+  },
+  {
+    "opt": "O3",
+    "kernel": "dot8",
+    "text_identical": true
+  },
+  {
+    "opt": "O3",
+    "kernel": "mac",
+    "text_identical": true
+  },
+  {
+    "opt": "O3",
+    "kernel": "packed_add16",
+    "text_identical": true
+  },
+  {
+    "opt": "O3",
+    "kernel": "packed_add8",
+    "text_identical": true
+  },
+  {
+    "opt": "O3",
+    "kernel": "packed_max8",
+    "text_identical": true
+  },
+  {
+    "opt": "O3",
+    "kernel": "packed_shift16",
+    "text_identical": true
+  },
+  {
+    "opt": "O3",
+    "kernel": "packed_shift8",
+    "text_identical": true
+  }
+]

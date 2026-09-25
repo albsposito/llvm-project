@@ -1,0 +1,11 @@
+{
+  "dir": "clang/test/CodeGen/RISCV",
+  "count": 1,
+  "tests": [
+    {
+      "test": "clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics-diag.c",
+      "problem": "FAIL"
+    }
+  ]
+}
+Read full saved output in steps/19/lit-r1/lit.json. Missing baseline paths require upstream rename/removal evidence; do not drop coverage or edit tests as worker. Split independent root causes into reported follow-up requests.

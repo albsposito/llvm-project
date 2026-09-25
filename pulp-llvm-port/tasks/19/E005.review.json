@@ -1,0 +1,15 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [],
+  "checks": {
+    "policy_check": "scripts/policy_check.py --range 7c27289bc3a1..9aeb147ff906 --stack-base llvmorg-19.1.7: 1 commit, 0 FAIL, 0 WARN",
+    "diff": "Single commit 9aeb147ff906 touches only llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td (9+/9-): pure rename of 2 defs (lines 66, 78) and 7 uses (1247-1248, 1251-1252, 1834, 1838-1839). Definition bodies unchanged; no deleted patterns, no logic change, no test edits.",
+    "all_uses_updated": "git grep on HEAD across the whole tree (not only the RISCV target dir) for \\b(powerOf2Minus1|trailing1sPlus1)\\b finds hits only in upstream RISCVInstrInfoXCV.td (719, 720, 767, 769). At integration head 7c27289bc3a1 the names occur only in RISCVInstrInfoXCV.td and RISCVInstrInfoXpulp.td, so no other fork file (td, C++, tests) referenced them.",
+    "upstream_untouched": "git diff llvmorg-19.1.7 HEAD -- llvm/lib/Target/RISCV/RISCVInstrInfoXCV.td is empty.",
+    "upstream_citation": "56f0ecd6db92 '[RISCV] Implement Intrinsics Support for XCValu Extension in CV32E40P (#85603)' exists, is an ancestor of llvmorg-19.1.7 and not of prev_tag e6c3289804a6; it adds the two records in RISCVInstrInfoXCV.td as the note says.",
+    "equivalence_claim": "Confirmed: upstream powerOf2Minus1 is ImmLeaf (fork TImmLeaf); upstream trailing1sPlus1 uses countr_one(N->getZExtValue()) (fork countr_one<uint32_t>(N->getSExtValue())). Fork-private rename is the correct, behaviour-preserving fix and follows upstream's vendor-prefixed naming (cv_* helpers in RISCVInstrInfoXCV.td).",
+    "independent_repro": "Scratch copy of HEAD + E003 rename (1630ccfbfa2f) applied only in scratch: llvm-tblgen -gen-dag-isel, -gen-instr-info, -gen-asm-matcher all succeed with no 'def already exists'. Generated DAG-ISel has 28 refs to Predicate_powerOf2Minus1_pulp and 5 to upstream Predicate_powerOf2Minus1, i.e. both sets of patterns kept.",
+    "note": "All four sections present; 'What breaks' names observable symptoms and tests (xpulpv.ll, riscv-xpulpv2-intrinsics.c, xcvalu.ll)."
+  }
+}

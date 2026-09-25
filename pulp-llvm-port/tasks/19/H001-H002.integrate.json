@@ -1,0 +1,10 @@
+{
+  "verdict": "APPLIED",
+  "review": "tasks/19/H001-H002.review.json",
+  "range": "79aeb169e7af..a1a15e546210",
+  "scope": "Harness working files only; prior dirty files preserved; LLVM port branch unchanged",
+  "Change-Note": [
+    "19/H001.md",
+    "19/H002.md"
+  ]
+}

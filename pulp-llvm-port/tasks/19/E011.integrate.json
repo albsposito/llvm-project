@@ -1,0 +1,15 @@
+{
+  "branch": "work/19/E011",
+  "int_head_before": "be7c2fd19920e56a92816703d2fe1c8128771b38",
+  "build_rc": 1,
+  "errors_fixed": [
+    "too few arguments to function call, expected N, have N"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/19/work_19_E011.build.log",
+  "verdict": "LANDED",
+  "int_head_after": "8d371bf2b2072851e160d98701bb3d389d0fc3a4",
+  "commits": [
+    "a118c57847e3a9da0cb6bd48399e61ede4c5030a"
+  ]
+}

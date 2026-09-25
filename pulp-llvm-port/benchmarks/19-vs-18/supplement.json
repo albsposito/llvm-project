@@ -1,0 +1,83 @@
+{
+  "source_sha256": "35265dc2be7fa940bb6ce9eee185af9a5bddd3a7ca4721e8cf5e9057d3295c3b",
+  "commands": [
+    [
+      "/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/llc",
+      "-O=2",
+      "-march=riscv32",
+      "-mattr=+xpulpv",
+      "-filetype=obj",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/xpulp-hwloop.ll",
+      "-o",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/hwloop18.o"
+    ],
+    [
+      "/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-objdump",
+      "-d",
+      "--mattr=+xpulpv,+c",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/hwloop18.o"
+    ],
+    [
+      "/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/llvm-nm",
+      "-S",
+      "--defined-only",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/hwloop18.o"
+    ],
+    [
+      "/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llc",
+      "-O=2",
+      "-march=riscv32",
+      "-mattr=+xpulpv",
+      "-filetype=obj",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/xpulp-hwloop.ll",
+      "-o",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/hwloop19.o"
+    ],
+    [
+      "/home/ubuntu/llvm-project/pulp-llvm-port/build/int-19/bin/llvm-objdump",
+      "-d",
+      "--mattr=+xpulpv,+c",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/hwloop19.o"
+    ],
+    [
+      "/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/llvm-nm",
+      "-S",
+      "--defined-only",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/hwloop19.o"
+    ],
+    [
+      "python3",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/scripts/mix_diff.py",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/hwloop18.dis",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/hwloop19.dis",
+      "--out",
+      "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/hwloop-mix.json"
+    ]
+  ],
+  "rows": [
+    {
+      "version": "18",
+      "sizes": {
+        "for_1x": 40,
+        "for_1x_reverse": 40,
+        "for_2x": 62,
+        "for_2x_reverse": 70,
+        "for_3x": 88,
+        "for_3x_reverse": 104,
+        "strcmp": 42
+      }
+    },
+    {
+      "version": "19",
+      "sizes": {
+        "for_1x": 40,
+        "for_1x_reverse": 40,
+        "for_2x": 62,
+        "for_2x_reverse": 70,
+        "for_3x": 88,
+        "for_3x_reverse": 104,
+        "strcmp": 34
+      }
+    }
+  ]
+}

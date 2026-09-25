@@ -1,0 +1,23 @@
+{
+  "branch": "work/19/E006",
+  "int_head_before": "6047a8fdc6ded7f686d1d418cd9f0518a73e91c5",
+  "build_rc": 1,
+  "errors_fixed": [
+    "Processor does not define resources for WriteVAESMVV_M1"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/19/work_19_E006.build.log",
+  "errors_unmasked": [
+    "'llvm<path>' file not found",
+    "no member named 'ID' in 'llvm::MachineDominatorTree'",
+    "no member named 'ID' in 'llvm::MachineLoopInfo'",
+    "too few arguments to function call, expected N, have N",
+    "use of undeclared identifier 'initializeMachineDominatorTreePass'",
+    "use of undeclared identifier 'initializeMachineLoopInfoPass'"
+  ],
+  "verdict": "LANDED",
+  "int_head_after": "6c994ad0972cd1f0700f7ae993ba74ef458c1834",
+  "commits": [
+    "dc6ed69f0c981c8672641a8b847445d19ec40d72"
+  ]
+}

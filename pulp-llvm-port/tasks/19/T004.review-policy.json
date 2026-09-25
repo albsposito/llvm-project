@@ -1,0 +1,14 @@
+{
+  "range": "88ed01bb9d3b1d79ec84d0d37ac4399c023d87e0..40fe3a6eb2a96de2522a26bea9f41e1faf08c3e3",
+  "commits": 1,
+  "fail": 0,
+  "warn": 1,
+  "findings": [
+    {
+      "commit": "40fe3a6eb2a9",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics-diag.c"
+    }
+  ]
+}

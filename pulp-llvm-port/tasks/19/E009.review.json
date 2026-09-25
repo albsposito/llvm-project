@@ -1,0 +1,15 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [],
+  "notes": [
+    "policy_check.py over 6c994ad0972c..work/19/E009 (stack-base llvmorg-19.1.7): 0 FAIL, 0 WARN.",
+    "Single commit 86a1446a5d4d, subject 'fixup! [pulp] passes: hardware loops, FREP, SSR/SDMA expansion, pseudo expansion', Change-Note 19/E009.md present with all four sections.",
+    "Cited commits 837dc542b151 (MachineDominatorTree split) and 79d0de2ac37b (machine-loops NewPM port) exist, are ancestors of llvmorg-19.1.7 and not of prev_tag e6c3289804a6; both apply the identical edit to HexagonHardwareLoops.cpp (verified at llvmorg-19.1.7 lines 121-122, 371-372, 387-389), matching the fork change hunk for hunk.",
+    "Consistency sweep: every fork-modified .cpp/.h (git diff --name-only llvmorg-19.1.7 HEAD) grepped for addRequired/addPreserved/getAnalysis*/INITIALIZE_PASS_DEPENDENCY/initialize* on MachineLoopInfo/MachineDominatorTree/MachinePostDominatorTree: all remaining uses are the WrapperPass form. PULPHardwareLoops.cpp (98-99, 297-298, 326, 328), SNITCHFrepLoops.cpp (89-90, 316, 318, 1639-1640), PULPFixupHwLoops.cpp (100, 344). Remaining bare MachineLoopInfo*/MachineDominatorTree* are member pointer types, which is correct (the wrapper returns those objects). RISCVPre/PostLegalizerCombiner.cpp hits are upstream, not fork-touched.",
+    "No analysis dropped: the diff removes no addRequired/addPreserved/setPreservesCFG/INITIALIZE_PASS_DEPENDENCY line without its 1:1 WrapperPass replacement. PULPFixupHwLoops uses plain INITIALIZE_PASS with no dependency list both before and after (pre-existing, unchanged); no addPreserved existed in any of the three passes before the change.",
+    "Hexagon's same commit also changed addBasicBlockToLoop(..., MLI->getBase()) to *MLI; no such getBase()/addBasicBlockToLoop use exists in the fork passes, so nothing missed there.",
+    "No oracle-cheating: no removed logic, early returns, stubs, tests or pipeline edits; every changed line is part of the rename.",
+    "Fix log: PULPHardwareLoops.cpp.o and SNITCHFrepLoops.cpp.o build; PULPFixupHwLoops.cpp.o fails only on readsRegister (line 291, tracked as E011) and RISCVExpandSDMA/SSR fail on LowLevelType.h, both unrelated and correctly listed in other_errors_seen. No MachineLoopInfo/MachineDominatorTree errors remain."
+  ]
+}

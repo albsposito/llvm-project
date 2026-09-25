@@ -1,0 +1,18 @@
+{
+  "status": "done",
+  "branch": "work/19/E005",
+  "commits": ["9aeb147ff9065778fb90443da3f7a4ac46509504"],
+  "note": "/home/ubuntu/llvm-project/pulp-llvm-port/notes/19/E005.md",
+  "signature_gone": true,
+  "other_errors_seen": [
+    "RISCVSchedMempool.td:15: Processor does not define resources for WriteVAESMVV_M1 (insn-tablegen, -gen-subtarget; Mempool sched model is missing resources for scheduling classes added upstream; now the only RISCVCommonTableGen error once E003+E005 are applied; RISCVSchedSnitch.td may have the same problem behind it)"
+  ],
+  "duplicates_fixed": ["powerOf2Minus1 (RISCVInstrInfoXpulp.td:66 -> powerOf2Minus1_pulp)", "trailing1sPlus1 (RISCVInstrInfoXpulp.td:78 -> trailing1sPlus1_pulp)"],
+  "equivalence": "Not equivalent to upstream: fork powerOf2Minus1 is TImmLeaf (upstream ImmLeaf); fork trailing1sPlus1 uses countr_one<uint32_t>(SExt) (upstream countr_one(ZExt)). Fork-private rename is required, not optional.",
+  "logs": {
+    "repro": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E005.repro.log",
+    "repro_without_e003": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E005.repro.build.log",
+    "after_fix": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/19-E005.fix-tg.log"
+  },
+  "verification_limits": "Repro and after-fix builds of RISCVCommonTableGen were run with E003's uimm6_lsb0 rename (1630ccfbfa2f) applied to the worktree as an uncommitted change for testing only; it was removed before committing, and the commit holds only E005's change. After the fix no 'def already exists' error is left (all RISCVCommonTableGen backends checked on a scratch copy). LLVMRISCVCodeGen could not be built because -gen-subtarget still fails on the Mempool sched model error above. The generated DAG-ISel shows separate Predicate_powerOf2Minus1_pulp/trailing1sPlus1_pulp (timm, hasPULPExtV2, P_CLIP/P_CLIPU) and upstream Predicate_powerOf2Minus1/trailing1sPlus1 (imm, hasVendorXCValu, CV_CLIP/CV_CLIPU)."
+}

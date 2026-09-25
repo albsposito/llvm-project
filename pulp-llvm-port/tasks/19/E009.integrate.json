@@ -1,0 +1,18 @@
+{
+  "branch": "work/19/E009",
+  "int_head_before": "23ee219de3d4770132a2b45128de21d1518839bf",
+  "build_rc": 0,
+  "errors_fixed": [
+    "no member named 'ID' in 'llvm::MachineDominatorTree'",
+    "no member named 'ID' in 'llvm::MachineLoopInfo'",
+    "use of undeclared identifier 'initializeMachineDominatorTreePass'",
+    "use of undeclared identifier 'initializeMachineLoopInfoPass'"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/19/work_19_E009.build.log",
+  "verdict": "LANDED",
+  "int_head_after": "88ed01bb9d3b1d79ec84d0d37ac4399c023d87e0",
+  "commits": [
+    "86a1446a5d4dd7706c72d8a0937899a2ebc712cd"
+  ]
+}

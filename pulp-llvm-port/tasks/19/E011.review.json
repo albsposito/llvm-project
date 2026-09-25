@@ -1,0 +1,15 @@
+{
+  "task": "19/E011",
+  "commit": "a118c57847e3",
+  "verdict": "APPROVE",
+  "reasons": [],
+  "checks": {
+    "diff": "One line changed at llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp:291: MI.readsRegister(bumpReg) became MI.readsRegister(bumpReg, /*TRI=*/nullptr). At prev_tag e6c3289804a6, MachineInstr.h:1445-1446 declared readsRegister(Register Reg, const TargetRegisterInfo *TRI = nullptr), so the argument value is identical and behavior is unchanged.",
+    "upstream": "f6d431f208c0 '[CodeGen] Make the parameter TRI required in some functions. (#85968)' exists. It is an ancestor of llvmorg-19.1.7 and not of prev_tag, so it is in range. It made TRI required and changed upstream callers the same way, e.g. RISCVISelLowering.cpp MI.readsRegister(RISCV::FRM) -> MI.readsRegister(RISCV::FRM, /*TRI=*/nullptr). The fix follows upstream's pattern.",
+    "oracle_cheating": "None. No logic removed, no early return, no stub, no forced condition, no test touched. The file's other call, modifiesRegister(bumpReg, nullptr) at line 292, already passed nullptr. The fix is consistent with it.",
+    "scope": "Every changed line is needed for E008. The NPM MachineLoopInfo::ID error was reported in other_errors_seen, not fixed here, which is correct.",
+    "commit_format": "Subject is 'fixup! [pulp] passes: hardware loops, FREP, SSR/SDMA expansion, pseudo expansion' (the owner cluster). Change-Note: 19/E011.md trailer is present and the note exists with all four sections.",
+    "note": "The 'What breaks if this is wrong' section names an observable symptom: counter-update addi deleted or kept around lp.setup in llvm/test/CodeGen/RISCV/xpulp-hwloop.ll (the test exists), and wrong values when a loop counter is used after a hardware loop."
+  },
+  "warnings_checked": []
+}

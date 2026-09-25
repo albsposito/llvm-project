@@ -1,0 +1,53 @@
+{
+  "log": "tasks/19/work_19_E001.build.log",
+  "failed_targets": 20,
+  "clusters": [
+    {
+      "key": "no member named 'equals' in 'llvm::StringRef'",
+      "kind": "compile",
+      "sites": [
+        "clang/lib/Driver/ToolChains/Arch/RISCV.cpp:222",
+        "clang/lib/Driver/ToolChains/Arch/RISCV.cpp:223"
+      ],
+      "samples": [
+        "../../wt/int-19/clang/lib/Driver/ToolChains/Arch/RISCV.cpp:222:49: error: no member named 'equals' in 'llvm::StringRef'\n  222 |                                     return feat.equals(\"+fdiv\") ||\n      |                                            ~~~~ ^",
+        "../../wt/int-19/clang/lib/Driver/ToolChains/Arch/RISCV.cpp:223:49: error: no member named 'equals' in 'llvm::StringRef'\n  223 |                                            feat.equals(\"-fdiv\");\n      |                                            ~~~~ ^"
+      ],
+      "owners": [
+        "clang-driver"
+      ],
+      "count": 2,
+      "id": "E001"
+    },
+    {
+      "key": "def already exists: powerOf2Minus1",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67"
+      ],
+      "samples": [
+        "/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:67:5: error: def already exists: powerOf2Minus1"
+      ],
+      "owners": [
+        "insn-tablegen"
+      ],
+      "count": 1,
+      "id": "E002"
+    },
+    {
+      "key": "no member named 'makeArrayRef' in namespace 'llvm'",
+      "kind": "compile",
+      "sites": [
+        "clang/lib/Parse/ParsePragma.cpp:1647"
+      ],
+      "samples": [
+        "../../wt/int-19/clang/lib/Parse/ParsePragma.cpp:1647:21: error: no member named 'makeArrayRef' in namespace 'llvm'\n 1647 |   Info.Toks = llvm::makeArrayRef(ValueList).copy(PP.getPreprocessorAllocator());\n      |               ~~~~~~^"
+      ],
+      "owners": [
+        "clang-frep-pragma"
+      ],
+      "count": 1,
+      "id": "E003"
+    }
+  ]
+}

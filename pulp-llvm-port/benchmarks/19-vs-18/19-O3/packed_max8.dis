@@ -1,0 +1,8 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/19-O3/packed_max8.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <packed_max8>:
+       0: 30b51557     	pv.max.b	a0, a0, a1
+       4: 8082         	ret

@@ -37,5 +37,5 @@ The lane runner emits one JSON row per program (`lane, program, compile, run, ou
 
 ## Facts to record here when discovered
 
-- Accepted `-march` spelling for the fork's extensions (Phase 0 step 5).
+- Accepted `-march` spelling for the fork's extensions (Phase 0 step 5): `-march=rv32imc_xpulpv2` (verified 2026-09-24 with `toolchains/ref-18`; `a*b+c` at `-O2` compiles to `p.mac`).
 - Deeploy image digest used, and the Deeploy / pulp-nn / snitch_cluster commits.

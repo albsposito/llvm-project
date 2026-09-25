@@ -1,0 +1,12 @@
+{
+  "status": "done",
+  "branch": "work/19/E004",
+  "commits": ["c29a8b4cc12210a181ad26af5b25e104799cc348"],
+  "note": "notes/19/E004.md",
+  "signature_gone": true,
+  "verification": "Real build of RISCVTargetParserTableGen/RISCVCommonTableGen still stops on the unrelated 'def already exists: uimm6_lsb0' (same single signature before and after, logs/19-E004.repro.log and logs/19-E004.fix.log; no new signature). Defect verified on a scratch copy of llvm/lib/Target/RISCV with only the uimm6_lsb0/powerOf2Minus1/trailing1sPlus1 collisions renamed: llvm-min-tblgen -gen-riscv-target-def emits 1 xf* row (xfrep) before and all 21 smallfloat names at {0, 1} plus xfrep after; the snitch CPU default march now includes all 21 xf*0p1 (before: rv32m2p0_a2p1_f2p2_d2p2_zfh1p0_xdma0p1_xfrep0p1_xssr0p1). llc -mattr=+xfalthalf not tried: llc does not build yet because of other clusters' errors.",
+  "other_errors_seen": [
+    "def already exists: uimm6_lsb0 (RISCVInstrInfoXpulp.td:31 vs upstream RISCVInstrInfoXwch.td:62; also powerOf2Minus1/trailing1sPlus1 per leads) - insn-tablegen, stops all RISCV tablegen",
+    "RISCVSchedMempool.td:15: error: Processor does not define resources for WriteVAESMVV_M1 (llvm-tblgen -gen-subtarget, seen after renaming the collisions in the scratch copy) - insn-tablegen sched model missing new upstream sched writes"
+  ]
+}

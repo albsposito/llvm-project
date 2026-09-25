@@ -1,0 +1,51 @@
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace, preprocessed source, and associated run script.
+Stack dump:
+0.	Program arguments: /home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang --target=riscv32-unknown-elf -march=rv32imc_xpulpv2 -mabi=ilp32 -ffreestanding -fno-builtin -O3 -c /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/sources/packed_add8_loop.c -o /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/18-O3/packed_add8_loop.o
+1.	<eof> parser at end of file
+2.	Code generation
+3.	Running pass 'Function Pass Manager' on module '/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/19-vs-18/sources/packed_add8_loop.c'.
+4.	Running pass 'PULP Hardware Loops' on function '@packed_add8_loop'
+ #0 0x000061da37df6318 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x3d63318)
+ #1 0x000061da37df3ede llvm::sys::RunSignalHandlers() (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x3d60ede)
+ #2 0x000061da37d636e6 CrashRecoverySignalHandler(int) CrashRecoveryContext.cpp:0:0
+ #3 0x00007178a1045330 (/lib/x86_64-linux-gnu/libc.so.6+0x45330)
+ #4 0x000061da36f08326 (anonymous namespace)::PULPHardwareLoops::convertToHardwareLoop(llvm::MachineLoop*, bool&, bool&) PULPHardwareLoops.cpp:0:0
+ #5 0x000061da36f06bf4 (anonymous namespace)::PULPHardwareLoops::runOnMachineFunction(llvm::MachineFunction&) PULPHardwareLoops.cpp:0:0
+ #6 0x000061da37319659 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x3286659)
+ #7 0x000061da37918da7 llvm::FPPassManager::runOnFunction(llvm::Function&) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x3885da7)
+ #8 0x000061da379213f2 llvm::FPPassManager::runOnModule(llvm::Module&) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x388e3f2)
+ #9 0x000061da37919917 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x3886917)
+#10 0x000061da385b1435 clang::EmitBackendOutput(clang::DiagnosticsEngine&, clang::HeaderSearchOptions const&, clang::CodeGenOptions const&, clang::TargetOptions const&, clang::LangOptions const&, llvm::StringRef, llvm::Module*, clang::BackendAction, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>, std::unique_ptr<llvm::raw_pwrite_stream, std::default_delete<llvm::raw_pwrite_stream>>, clang::BackendConsumer*) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x451e435)
+#11 0x000061da385d67e1 clang::BackendConsumer::HandleTranslationUnit(clang::ASTContext&) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x45437e1)
+#12 0x000061da3a412da6 clang::ParseAST(clang::Sema&, bool, bool) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x637fda6)
+#13 0x000061da38a121df clang::FrontendAction::Execute() (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x497f1df)
+#14 0x000061da3898015d clang::CompilerInstance::ExecuteAction(clang::FrontendAction&) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x48ed15d)
+#15 0x000061da38af52ee clang::ExecuteCompilerInvocation(clang::CompilerInstance*) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x4a622ee)
+#16 0x000061da36dff1a2 cc1_main(llvm::ArrayRef<char const*>, char const*, void*) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x2d6c1a2)
+#17 0x000061da36dfb56d ExecuteCC1Tool(llvm::SmallVectorImpl<char const*>&, llvm::ToolContext const&) driver.cpp:0:0
+#18 0x000061da387d16d9 void llvm::function_ref<void ()>::callback_fn<clang::driver::CC1Command::Execute(llvm::ArrayRef<std::optional<llvm::StringRef>>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>*, bool*) const::$_0>(long) Job.cpp:0:0
+#19 0x000061da37d63426 llvm::CrashRecoveryContext::RunSafely(llvm::function_ref<void ()>) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x3cd0426)
+#20 0x000061da387d0dd2 clang::driver::CC1Command::Execute(llvm::ArrayRef<std::optional<llvm::StringRef>>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>*, bool*) const (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x473ddd2)
+#21 0x000061da3878a337 clang::driver::Compilation::ExecuteCommand(clang::driver::Command const&, clang::driver::Command const*&, bool) const (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x46f7337)
+#22 0x000061da3878a877 clang::driver::Compilation::ExecuteJobs(clang::driver::JobList const&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&, bool) const (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x46f7877)
+#23 0x000061da387ab819 clang::driver::Driver::ExecuteCompilation(clang::driver::Compilation&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x4718819)
+#24 0x000061da36dfaa36 clang_main(int, char**, llvm::ToolContext const&) (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x2d67a36)
+#25 0x000061da36e0ba07 main (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x2d78a07)
+#26 0x00007178a102a1ca (/lib/x86_64-linux-gnu/libc.so.6+0x2a1ca)
+#27 0x00007178a102a28b __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28b)
+#28 0x000061da36df7b25 _start (/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang+0x2d64b25)
+clang: error: clang frontend command failed with exit code 139 (use -v to see invocation)
+clang version 18.1.4 (https://github.com/albsposito/llvm-project.git 1c33bd3dba2bd1f3942842135daba498af1b3eb5)
+Target: riscv32-unknown-unknown-elf
+Thread model: posix
+InstalledDir: /home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin
+clang: note: diagnostic msg: 
+********************
+
+PLEASE ATTACH THE FOLLOWING FILES TO THE BUG REPORT:
+Preprocessed source(s) and associated run script(s) are located at:
+clang: note: diagnostic msg: /tmp/packed_add8_loop-134792.c
+clang: note: diagnostic msg: /tmp/packed_add8_loop-134792.sh
+clang: note: diagnostic msg: 
+
+********************

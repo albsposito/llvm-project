@@ -1,0 +1,1 @@
+RiscvExtensionsHelp.CheckExtensions fails at RISCVISAInfoTest.cpp:1096. Read steps/19/lit-r1/unit.log. Investigate expected-output drift and parked E004 relation. Tests sacred: no manual test edits; if no authorized LLVM updater supports this, escalate with exact evidence. Do not alter production formatting just to satisfy stale expectations.

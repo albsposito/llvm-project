@@ -1,0 +1,13 @@
+{
+  "status": "done",
+  "branch": "work/19/E001",
+  "commits": [
+    "7065cb2fdcaa7e5bfd57e93d25bce89f717f4690"
+  ],
+  "note": "/home/ubuntu/llvm-project/pulp-llvm-port/notes/19/E001.md",
+  "signature_gone": true,
+  "other_errors_seen": [
+    "clang-builtins: BuiltinsRISCVXpulp.td:21:7: error: Unknown Type: _Vector<2, short> (blocks BuiltinsRISCV.inc, hence clang-tablegen-targets and obj.clangAST as whole targets; all 18 Attr*.inc targets build and obj.clangAST AttrImpl.cpp.o / StmtPrinter.cpp.o compile when invoked directly)"
+  ],
+  "evidence": "repro: logs/19-E001.repro.log (18 hits of signature); verify: logs/19-E001.verify.log, logs/19-E001.verify-attr.log (0 hits); causing commit 2d0137dd6401; retry 2: change note 'What breaks if this is wrong' corrected (no lit test covers #pragma frep; manual check via -emit-llvm for @llvm.riscv.frep.infer and -ast-dump for FrepAttr); code unchanged"
+}

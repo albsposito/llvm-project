@@ -1,0 +1,32 @@
+{
+  "range": "88ed01bb9d3b1d79ec84d0d37ac4399c023d87e0..work/19/T002",
+  "commits": 1,
+  "fail": 0,
+  "warn": 4,
+  "findings": [
+    {
+      "commit": "56ed3df73c50",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xdma-valid.s"
+    },
+    {
+      "commit": "56ed3df73c50",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xfrep-valid.s"
+    },
+    {
+      "commit": "56ed3df73c50",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xmempool-valid.s"
+    },
+    {
+      "commit": "56ed3df73c50",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xssr-valid.s"
+    }
+  ]
+}

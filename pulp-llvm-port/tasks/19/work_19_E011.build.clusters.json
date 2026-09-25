@@ -1,0 +1,91 @@
+{
+  "log": "tasks/19/work_19_E011.build.log",
+  "failed_targets": 5,
+  "clusters": [
+    {
+      "key": "'llvm<path>' file not found",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVExpandSDMAInsts.cpp:23",
+        "llvm/lib/Target/RISCV/RISCVExpandSSRInsts.cpp:57"
+      ],
+      "samples": [
+        "/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVExpandSDMAInsts.cpp:23:10: fatal error: 'llvm/CodeGen/LowLevelType.h' file not found\n   23 | #include \"llvm/CodeGen/LowLevelType.h\"\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+        "/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-19/llvm/lib/Target/RISCV/RISCVExpandSSRInsts.cpp:57:10: fatal error: 'llvm/CodeGen/LowLevelType.h' file not found\n   57 | #include \"llvm/CodeGen/LowLevelType.h\"\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+      ],
+      "owners": [
+        "passes"
+      ],
+      "count": 2,
+      "id": "E001"
+    },
+    {
+      "key": "no member named 'ID' in 'llvm::MachineDominatorTree'",
+      "kind": "compile",
+      "sites": [
+        "llvm/include/llvm/PassAnalysisSupport.h:76",
+        "llvm/include/llvm/PassAnalysisSupport.h:232"
+      ],
+      "samples": [
+        "../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineDominatorTree'\n   76 |     return addRequiredID(PassClass::ID);\n      |                                     ^\n../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:98:8: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineDominatorTree>' requested here\n   98 |     AU.addRequired<MachineDominatorTree>();\n      |        ^",
+        "../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineDominatorTree'\n  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);\n      |                                       ~~~~~~~~~~~~~~^\n../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:328:10: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineDominatorTree>' requested here\n  328 |   MDT = &getAnalysis<MachineDominatorTree>();\n      |          ^"
+      ],
+      "owners": [
+        "upstream"
+      ],
+      "count": 2,
+      "id": "E002"
+    },
+    {
+      "key": "no member named 'ID' in 'llvm::MachineLoopInfo'",
+      "kind": "compile",
+      "sites": [
+        "llvm/include/llvm/PassAnalysisSupport.h:76",
+        "llvm/include/llvm/PassAnalysisSupport.h:232"
+      ],
+      "samples": [
+        "../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:76:37: error: no member named 'ID' in 'llvm::MachineLoopInfo'\n   76 |     return addRequiredID(PassClass::ID);\n      |                                     ^\n../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:99:8: note: in instantiation of function template specialization 'llvm::AnalysisUsage::addRequired<llvm::MachineLoopInfo>' requested here\n   99 |     AU.addRequired<MachineLoopInfo>();\n      |        ^",
+        "../../wt/int-19/llvm/include/llvm/PassAnalysisSupport.h:232:53: error: no member named 'ID' in 'llvm::MachineLoopInfo'\n  232 |   return getAnalysisID<AnalysisType>(&AnalysisType::ID);\n      |                                       ~~~~~~~~~~~~~~^\n../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:326:10: note: in instantiation of function template specialization 'llvm::Pass::getAnalysis<llvm::MachineLoopInfo>' requested here\n  326 |   MLI = &getAnalysis<MachineLoopInfo>();\n      |          ^"
+      ],
+      "owners": [
+        "upstream"
+      ],
+      "count": 2,
+      "id": "E003"
+    },
+    {
+      "key": "use of undeclared identifier 'initializeMachineDominatorTreePass'",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:297",
+        "llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:1639"
+      ],
+      "samples": [
+        "../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:297:1: error: use of undeclared identifier 'initializeMachineDominatorTreePass'\n  297 | INITIALIZE_PASS_DEPENDENCY(MachineDominatorTree)\n      | ^\n../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'\n   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);\n      |                                             ^\n<scratch space>:104:1: note: expanded from here\n  104 | initializeMachineDominatorTreePass",
+        "../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:1639:1: error: use of undeclared identifier 'initializeMachineDominatorTreePass'\n 1639 | INITIALIZE_PASS_DEPENDENCY(MachineDominatorTree)\n      | ^\n../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'\n   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);\n      |                                             ^\n<scratch space>:23:1: note: expanded from here\n   23 | initializeMachineDominatorTreePass"
+      ],
+      "owners": [
+        "passes"
+      ],
+      "count": 2,
+      "id": "E004"
+    },
+    {
+      "key": "use of undeclared identifier 'initializeMachineLoopInfoPass'",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:298",
+        "llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:1640"
+      ],
+      "samples": [
+        "../../wt/int-19/llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp:298:1: error: use of undeclared identifier 'initializeMachineLoopInfoPass'\n  298 | INITIALIZE_PASS_DEPENDENCY(MachineLoopInfo)\n      | ^\n../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'\n   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);\n      |                                             ^\n<scratch space>:2:1: note: expanded from here\n    2 | initializeMachineLoopInfoPass",
+        "../../wt/int-19/llvm/lib/Target/RISCV/Snitch/SNITCHFrepLoops.cpp:1640:1: error: use of undeclared identifier 'initializeMachineLoopInfoPass'\n 1640 | INITIALIZE_PASS_DEPENDENCY(MachineLoopInfo)\n      | ^\n../../wt/int-19/llvm/include/llvm/PassSupport.h:55:45: note: expanded from macro 'INITIALIZE_PASS_DEPENDENCY'\n   55 | #define INITIALIZE_PASS_DEPENDENCY(depName) initialize##depName##Pass(Registry);\n      |                                             ^\n<scratch space>:25:1: note: expanded from here\n   25 | initializeMachineLoopInfoPass"
+      ],
+      "owners": [
+        "passes"
+      ],
+      "count": 2,
+      "id": "E005"
+    }
+  ]
+}
