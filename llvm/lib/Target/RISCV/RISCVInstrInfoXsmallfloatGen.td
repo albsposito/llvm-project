@@ -6,7 +6,10 @@
 
 // Subtarget definitions
 def FeatureExtXfalthalf : RISCVExtension<
-  "xfalthalf", 0, 1, "'Xfalthalf' (alternate half-precision floats)">;
+  0, 1, "alternate half-precision floats"> {
+  let Name = "xfalthalf";
+  let Desc = "'Xfalthalf' (alternate half-precision floats)";
+}
 def HasExtXfalthalf : Predicate<
   "Subtarget->hasExtXfalthalf()">, AssemblerPredicate<(all_of FeatureExtXfalthalf), "'Xfalthalf' (alternate half-precision floats)">;
 let Predicates = [HasExtXfalthalf] in {
@@ -99,7 +102,10 @@ def : InstAlias<"fcvt.h.ah $rd, $rs1",   (FCVT_H_H FPR16:$rd, FPR16:$rs1, 0b111)
 
 // Subtarget definitions
 def FeatureExtXfquarter : RISCVExtension<
-  "xfquarter", 0, 1, "'Xfquarter' (quarter-precision floats)">;
+  0, 1, "quarter-precision floats"> {
+  let Name = "xfquarter";
+  let Desc = "'Xfquarter' (quarter-precision floats)";
+}
 def HasExtXfquarter : Predicate<
   "Subtarget->hasExtXfquarter()">, AssemblerPredicate<(all_of FeatureExtXfquarter), "'Xfquarter' (quarter-precision floats)">;
 let Predicates = [HasExtXfquarter] in {
@@ -284,7 +290,10 @@ def : InstAlias<"fcvt.b.ah $rd, $rs1",   (FCVT_B_H FPR16:$rd, FPR16:$rs1, 0b111)
 
 // Subtarget definitions
 def FeatureExtXfaltquarter : RISCVExtension<
-  "xfaltquarter", 0, 1, "'Xfaltquarter' (alternate quarter-precision floats)">;
+  0, 1, "alternate quarter-precision floats"> {
+  let Name = "xfaltquarter";
+  let Desc = "'Xfaltquarter' (alternate quarter-precision floats)";
+}
 def HasExtXfaltquarter : Predicate<
   "Subtarget->hasExtXfaltquarter()">, AssemblerPredicate<(all_of FeatureExtXfaltquarter), "'Xfaltquarter' (alternate quarter-precision floats)">;
 let Predicates = [HasExtXfaltquarter] in {
@@ -369,7 +378,10 @@ def : InstAlias<"fcvt.ab.ab $rd, $rs1",   (FCVT_B_B FPR16:$rd, FPR16:$rs1), 0>;
 
 // Subtarget definitions
 def FeatureExtXfvecsingle : RISCVExtension<
-  "xfvecsingle", 0, 1, "'Xfvecsingle' (vectorial single-precision floats - requires FLEN >= 64)">;
+  0, 1, "vectorial single-precision floats - requires FLEN >= 64"> {
+  let Name = "xfvecsingle";
+  let Desc = "'Xfvecsingle' (vectorial single-precision floats - requires FLEN >= 64)";
+}
 def HasExtXfvecsingle : Predicate<
   "Subtarget->hasExtXfvecsingle()">, AssemblerPredicate<(all_of FeatureExtXfvecsingle), "'Xfvecsingle' (vectorial single-precision floats - requires FLEN >= 64)">;
 let Predicates = [HasExtXfvecsingle] in {
@@ -567,7 +579,10 @@ def : InstAlias<"vfcvtu.ah.h $rd, $rs1",   (VFCVTU_H_H FPR16:$rd, FPR16:$rs1), 0
 
 // Subtarget definitions
 def FeatureExtXfvechalf : RISCVExtension<
-  "xfvechalf", 0, 1, "'Xfvechalf' (vectorial half-precision floats - requires FLEN >= 32)">;
+  0, 1, "vectorial half-precision floats - requires FLEN >= 32"> {
+  let Name = "xfvechalf";
+  let Desc = "'Xfvechalf' (vectorial half-precision floats - requires FLEN >= 32)";
+}
 def HasExtXfvechalf : Predicate<
   "Subtarget->hasExtXfvechalf()">, AssemblerPredicate<(all_of FeatureExtXfvechalf), "'Xfvechalf' (vectorial half-precision floats - requires FLEN >= 32)">;
 let Predicates = [HasExtXfvechalf] in {
@@ -771,7 +786,10 @@ def VFCVTU_H_S : RVInstRVf<0b10, 0b01100, 0b1, VFMT_FP16, RISCVOpcode<"VFCVTU_H_
 
 // Subtarget definitions
 def FeatureExtXfvecalthalf : RISCVExtension<
-  "xfvecalthalf", 0, 1, "'Xfvecalthalf' (vectorial alternate half-precision floats - requires FLEN >= 32)">;
+  0, 1, "vectorial alternate half-precision floats - requires FLEN >= 32"> {
+  let Name = "xfvecalthalf";
+  let Desc = "'Xfvecalthalf' (vectorial alternate half-precision floats - requires FLEN >= 32)";
+}
 def HasExtXfvecalthalf : Predicate<
   "Subtarget->hasExtXfvecalthalf()">, AssemblerPredicate<(all_of FeatureExtXfvecalthalf), "'Xfvecalthalf' (vectorial alternate half-precision floats - requires FLEN >= 32)">;
 let Predicates = [HasExtXfvecalthalf] in {
@@ -843,7 +861,10 @@ def : InstAlias<"vfcvtu.ah.s $rd, $rs1",   (VFCVTU_H_S FPR16:$rd, FPR32:$rs1), 0
 
 // Subtarget definitions
 def FeatureExtXfvecquarter : RISCVExtension<
-  "xfvecquarter", 0, 1, "'Xfvecquarter' (vectorial quarter-precision floats - requires FLEN >= 16)">;
+  0, 1, "vectorial quarter-precision floats - requires FLEN >= 16"> {
+  let Name = "xfvecquarter";
+  let Desc = "'Xfvecquarter' (vectorial quarter-precision floats - requires FLEN >= 16)";
+}
 def HasExtXfvecquarter : Predicate<
   "Subtarget->hasExtXfvecquarter()">, AssemblerPredicate<(all_of FeatureExtXfvecquarter), "'Xfvecquarter' (vectorial quarter-precision floats - requires FLEN >= 16)">;
 let Predicates = [HasExtXfvecquarter] in {
@@ -1085,7 +1106,10 @@ def : InstAlias<"vfcvtu.b.ab $rd, $rs1",   (VFCVTU_B_B FPR16:$rd, FPR16:$rs1), 0
 
 // Subtarget definitions
 def FeatureExtXfvecaltquarter : RISCVExtension<
-  "xfvecaltquarter", 0, 1, "'Xfvecaltquarter' (vectorial alternative quarter-precision floats - requires FLEN >= 16)">;
+  0, 1, "vectorial alternative quarter-precision floats - requires FLEN >= 16"> {
+  let Name = "xfvecaltquarter";
+  let Desc = "'Xfvecaltquarter' (vectorial alternative quarter-precision floats - requires FLEN >= 16)";
+}
 def HasExtXfvecaltquarter : Predicate<
   "Subtarget->hasExtXfvecaltquarter()">, AssemblerPredicate<(all_of FeatureExtXfvecaltquarter), "'Xfvecaltquarter' (vectorial alternative quarter-precision floats - requires FLEN >= 16)">;
 let Predicates = [HasExtXfvecaltquarter] in {
@@ -1165,7 +1189,10 @@ def : InstAlias<"vfcvtu.ab.ah $rd, $rs1",   (VFCVTU_B_H FPR16:$rd, FPR16:$rs1), 
 
 // Subtarget definitions
 def FeatureExtXfauxhalf : RISCVExtension<
-  "xfauxhalf", 0, 1, "'Xfauxhalf' (half-precision auxiliary operations - requires Xfhalf extension)">;
+  0, 1, "half-precision auxiliary operations - requires Xfhalf extension"> {
+  let Name = "xfauxhalf";
+  let Desc = "'Xfauxhalf' (half-precision auxiliary operations - requires Xfhalf extension)";
+}
 def HasExtXfauxhalf : Predicate<
   "Subtarget->hasExtXfauxhalf()">, AssemblerPredicate<(all_of FeatureExtXfauxhalf), "'Xfauxhalf' (half-precision auxiliary operations - requires Xfhalf extension)">;
 let Predicates = [HasExtXfauxhalf] in {
@@ -1191,7 +1218,10 @@ def      : InstAlias<"fmacex.s.h $rd, $rs1, $rs2", (FMACEX_S_H FPR32:$rd, FPR32:
 
 // Subtarget definitions
 def FeatureExtXfauxalthalf : RISCVExtension<
-  "xfauxalthalf", 0, 1, "'Xfauxalthalf' (alternate half-precision auxiliary operations - requires Xfalthalf extension)">;
+  0, 1, "alternate half-precision auxiliary operations - requires Xfalthalf extension"> {
+  let Name = "xfauxalthalf";
+  let Desc = "'Xfauxalthalf' (alternate half-precision auxiliary operations - requires Xfalthalf extension)";
+}
 def HasExtXfauxalthalf : Predicate<
   "Subtarget->hasExtXfauxalthalf()">, AssemblerPredicate<(all_of FeatureExtXfauxalthalf), "'Xfauxalthalf' (alternate half-precision auxiliary operations - requires Xfalthalf extension)">;
 let Predicates = [HasExtXfauxalthalf] in {
@@ -1213,7 +1243,10 @@ def : InstAlias<"fmacex.s.ah $rd, $rs1, $rs2",   (FMACEX_S_H FPR32:$rd, FPR32:$r
 
 // Subtarget definitions
 def FeatureExtXfauxquarter : RISCVExtension<
-  "xfauxquarter", 0, 1, "'Xfauxquarter' (quarter-precision auxiliary operations - requires Xfquarter extension)">;
+  0, 1, "quarter-precision auxiliary operations - requires Xfquarter extension"> {
+  let Name = "xfauxquarter";
+  let Desc = "'Xfauxquarter' (quarter-precision auxiliary operations - requires Xfquarter extension)";
+}
 def HasExtXfauxquarter : Predicate<
   "Subtarget->hasExtXfauxquarter()">, AssemblerPredicate<(all_of FeatureExtXfauxquarter), "'Xfauxquarter' (quarter-precision auxiliary operations - requires Xfquarter extension)">;
 let Predicates = [HasExtXfauxquarter] in {
@@ -1239,7 +1272,10 @@ def      : InstAlias<"fmacex.s.b $rd, $rs1, $rs2", (FMACEX_S_B FPR32:$rd, FPR32:
 
 // Subtarget definitions
 def FeatureExtXfauxaltquarter : RISCVExtension<
-  "xfauxaltquarter", 0, 1, "'Xfauxaltquarter' (alternate quarter-precision auxiliary operations - requires Xfaltquarter extension)">;
+  0, 1, "alternate quarter-precision auxiliary operations - requires Xfaltquarter extension"> {
+  let Name = "xfauxaltquarter";
+  let Desc = "'Xfauxaltquarter' (alternate quarter-precision auxiliary operations - requires Xfaltquarter extension)";
+}
 def HasExtXfauxaltquarter : Predicate<
   "Subtarget->hasExtXfauxaltquarter()">, AssemblerPredicate<(all_of FeatureExtXfauxaltquarter), "'Xfauxaltquarter' (alternate quarter-precision auxiliary operations - requires Xfaltquarter extension)">;
 let Predicates = [HasExtXfauxaltquarter] in {
@@ -1261,7 +1297,10 @@ def : InstAlias<"fmacex.s.ab $rd, $rs1, $rs2",   (FMACEX_S_B FPR32:$rd, FPR32:$r
 
 // Subtarget definitions
 def FeatureExtXfauxvecsingle : RISCVExtension<
-  "xfauxvecsingle", 0, 1, "'Xfauxvecsingle' (vectorial single-precision auxiliary operations - requires Xfvecsingle extension)">;
+  0, 1, "vectorial single-precision auxiliary operations - requires Xfvecsingle extension"> {
+  let Name = "xfauxvecsingle";
+  let Desc = "'Xfauxvecsingle' (vectorial single-precision auxiliary operations - requires Xfvecsingle extension)";
+}
 def HasExtXfauxvecsingle : Predicate<
   "Subtarget->hasExtXfauxvecsingle()">, AssemblerPredicate<(all_of FeatureExtXfauxvecsingle), "'Xfauxvecsingle' (vectorial single-precision auxiliary operations - requires Xfvecsingle extension)">;
 let Predicates = [HasExtXfauxvecsingle] in {
@@ -1289,7 +1328,10 @@ def VFNSUM_S : RVInstRVf<0b10, 0b10111, 0b0, VFMT_FP32, RISCVOpcode<"VFNSUM_S", 
 
 // Subtarget definitions
 def FeatureExtXfauxvechalf : RISCVExtension<
-  "xfauxvechalf", 0, 1, "'Xfauxvechalf' (vectorial half-precision auxiliary operations - requires Xfvechalf extension)">;
+  0, 1, "vectorial half-precision auxiliary operations - requires Xfvechalf extension"> {
+  let Name = "xfauxvechalf";
+  let Desc = "'Xfauxvechalf' (vectorial half-precision auxiliary operations - requires Xfvechalf extension)";
+}
 def HasExtXfauxvechalf : Predicate<
   "Subtarget->hasExtXfauxvechalf()">, AssemblerPredicate<(all_of FeatureExtXfauxvechalf), "'Xfauxvechalf' (vectorial half-precision auxiliary operations - requires Xfvechalf extension)">;
 let Predicates = [HasExtXfauxvechalf] in {
@@ -1317,7 +1359,10 @@ def VFNSUM_H : RVInstRVf<0b10, 0b10111, 0b0, VFMT_FP16, RISCVOpcode<"VFNSUM_H", 
 
 // Subtarget definitions
 def FeatureExtXfauxvecalthalf : RISCVExtension<
-  "xfauxvecalthalf", 0, 1, "'Xfauxvecalthalf' (- vectorial alternate half-precision auxiliary operations - requires Xfvecalthalf extension)">;
+  0, 1, "- vectorial alternate half-precision auxiliary operations - requires Xfvecalthalf extension"> {
+  let Name = "xfauxvecalthalf";
+  let Desc = "'Xfauxvecalthalf' (- vectorial alternate half-precision auxiliary operations - requires Xfvecalthalf extension)";
+}
 def HasExtXfauxvecalthalf : Predicate<
   "Subtarget->hasExtXfauxvecalthalf()">, AssemblerPredicate<(all_of FeatureExtXfauxvecalthalf), "'Xfauxvecalthalf' (- vectorial alternate half-precision auxiliary operations - requires Xfvecalthalf extension)">;
 let Predicates = [HasExtXfauxvecalthalf] in {
@@ -1337,7 +1382,10 @@ def : InstAlias<"vfnsum.ah $rd, $rs1",   (VFNSUM_H FPR16:$rd, FPR16:$rs1), 0>;
 
 // Subtarget definitions
 def FeatureExtXfauxvecquarter : RISCVExtension<
-  "xfauxvecquarter", 0, 1, "'Xfauxvecquarter' (vectorial quarter-precision auxiliary operations - requires Xfvecquarter extension)">;
+  0, 1, "vectorial quarter-precision auxiliary operations - requires Xfvecquarter extension"> {
+  let Name = "xfauxvecquarter";
+  let Desc = "'Xfauxvecquarter' (vectorial quarter-precision auxiliary operations - requires Xfvecquarter extension)";
+}
 def HasExtXfauxvecquarter : Predicate<
   "Subtarget->hasExtXfauxvecquarter()">, AssemblerPredicate<(all_of FeatureExtXfauxvecquarter), "'Xfauxvecquarter' (vectorial quarter-precision auxiliary operations - requires Xfvecquarter extension)">;
 let Predicates = [HasExtXfauxvecquarter] in {
@@ -1365,7 +1413,10 @@ def VFNSUM_B : RVInstRVf<0b10, 0b10111, 0b0, VFMT_FP8, RISCVOpcode<"VFNSUM_B", 0
 
 // Subtarget definitions
 def FeatureExtXfauxvecaltquarter : RISCVExtension<
-  "xfauxvecaltquarter", 0, 1, "'Xfauxvecaltquarter' (- vectorial alternate quarter-precision auxiliary operations - requires Xfvecaltquarter extension)">;
+  0, 1, "- vectorial alternate quarter-precision auxiliary operations - requires Xfvecaltquarter extension"> {
+  let Name = "xfauxvecaltquarter";
+  let Desc = "'Xfauxvecaltquarter' (- vectorial alternate quarter-precision auxiliary operations - requires Xfvecaltquarter extension)";
+}
 def HasExtXfauxvecaltquarter : Predicate<
   "Subtarget->hasExtXfauxvecaltquarter()">, AssemblerPredicate<(all_of FeatureExtXfauxvecaltquarter), "'Xfauxvecaltquarter' (- vectorial alternate quarter-precision auxiliary operations - requires Xfvecaltquarter extension)">;
 let Predicates = [HasExtXfauxvecaltquarter] in {
@@ -1385,7 +1436,10 @@ def : InstAlias<"vfnsum.ab $rd, $rs1",   (VFNSUM_B FPR16:$rd, FPR16:$rs1), 0>;
 
 // Subtarget definitions
 def FeatureExtXfexpauxvechalf : RISCVExtension<
-  "xfexpauxvechalf", 0, 1, "'Xfexpauxvechalf' (vectorial half-precision expanding auxiliary operations - requires Xfvechalf extension)">;
+  0, 1, "vectorial half-precision expanding auxiliary operations - requires Xfvechalf extension"> {
+  let Name = "xfexpauxvechalf";
+  let Desc = "'Xfexpauxvechalf' (vectorial half-precision expanding auxiliary operations - requires Xfvechalf extension)";
+}
 def HasExtXfexpauxvechalf : Predicate<
   "Subtarget->hasExtXfexpauxvechalf()">, AssemblerPredicate<(all_of FeatureExtXfexpauxvechalf), "'Xfexpauxvechalf' (vectorial half-precision expanding auxiliary operations - requires Xfvechalf extension)">;
 let Predicates = [HasExtXfexpauxvechalf] in {
@@ -1425,7 +1479,10 @@ def VFNDOTPEX_S_R_H : RVInstRVf<0b10, 0b11101, 0b1, VFMT_FP32, RISCVOpcode<"VFND
 
 // Subtarget definitions
 def FeatureExtXfexpauxvecalthalf : RISCVExtension<
-  "xfexpauxvecalthalf", 0, 1, "'Xfexpauxvecalthalf' (vectorial alternate half-precision expanding auxiliary operations)">;
+  0, 1, "vectorial alternate half-precision expanding auxiliary operations"> {
+  let Name = "xfexpauxvecalthalf";
+  let Desc = "'Xfexpauxvecalthalf' (vectorial alternate half-precision expanding auxiliary operations)";
+}
 def HasExtXfexpauxvecalthalf : Predicate<
   "Subtarget->hasExtXfexpauxvecalthalf()">, AssemblerPredicate<(all_of FeatureExtXfexpauxvecalthalf), "'Xfexpauxvecalthalf' (vectorial alternate half-precision expanding auxiliary operations)">;
 let Predicates = [HasExtXfexpauxvecalthalf] in {
@@ -1449,7 +1506,10 @@ def : InstAlias<"vfndotpex.s.r.ah $rd, $rs1, $rs2",   (VFNDOTPEX_S_R_H FPR32:$rd
 
 // Subtarget definitions
 def FeatureExtXfexpauxvecquarter : RISCVExtension<
-  "xfexpauxvecquarter", 0, 1, "'Xfexpauxvecquarter' (vectorial quarter-precision expanding auxiliary operations)">;
+  0, 1, "vectorial quarter-precision expanding auxiliary operations"> {
+  let Name = "xfexpauxvecquarter";
+  let Desc = "'Xfexpauxvecquarter' (vectorial quarter-precision expanding auxiliary operations)";
+}
 def HasExtXfexpauxvecquarter : Predicate<
   "Subtarget->hasExtXfexpauxvecquarter()">, AssemblerPredicate<(all_of FeatureExtXfexpauxvecquarter), "'Xfexpauxvecquarter' (vectorial quarter-precision expanding auxiliary operations)">;
 let Predicates = [HasExtXfexpauxvecquarter] in {
@@ -1495,7 +1555,10 @@ def : InstAlias<"vfndotpex.ah.r.b $rd, $rs1, $rs2",   (VFNDOTPEX_H_R_B FPR16:$rd
 
 // Subtarget definitions
 def FeatureExtXfexpauxvecaltquarter : RISCVExtension<
-  "xfexpauxvecaltquarter", 0, 1, "'Xfexpauxvecaltquarter' (vectorial alternate quarter-precision expanding auxiliary operations)">;
+  0, 1, "vectorial alternate quarter-precision expanding auxiliary operations"> {
+  let Name = "xfexpauxvecaltquarter";
+  let Desc = "'Xfexpauxvecaltquarter' (vectorial alternate quarter-precision expanding auxiliary operations)";
+}
 def HasExtXfexpauxvecaltquarter : Predicate<
   "Subtarget->hasExtXfexpauxvecaltquarter()">, AssemblerPredicate<(all_of FeatureExtXfexpauxvecaltquarter), "'Xfexpauxvecaltquarter' (vectorial alternate quarter-precision expanding auxiliary operations)">;
 let Predicates = [HasExtXfexpauxvecaltquarter] in {
