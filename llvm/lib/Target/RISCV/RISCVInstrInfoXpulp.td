@@ -78,6 +78,14 @@ def tuimm12 : Operand<XLenVT>, TImmLeaf<XLenVT, [{return isUInt<12>(Imm);}]> {
 def powerOf2Minus1_pulp : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm+1);   }]>;
 def negativePowerOf2    : TImmLeaf<XLenVT, [{ return isPowerOf2_32(-Imm);    }]>;
 def powerOf2            : TImmLeaf<XLenVT, [{ return isPowerOf2_32(Imm);     }]>;
+// ImmLeaf twins of powerOf2Minus1_pulp/negativePowerOf2 for the plain-C clamp idioms: smin/smax
+// operands are ordinary constants, which a TImmLeaf (TargetConstant only) never
+// matches (upstream CORE-V powerOf2Minus1, RISCVInstrInfoXCV.td:723, is an ImmLeaf
+// too). The bound is capped at 2^30-1 so the p.clip/p.clipu field stays <= 31.
+def powerOf2Minus1_imm_pulp : ImmLeaf<XLenVT, [{
+  return isPowerOf2_32(Imm+1) && isUInt<30>(Imm); }]>;
+def negativePowerOf2_imm    : ImmLeaf<XLenVT, [{
+  return isPowerOf2_32(-Imm) && -Imm <= (1 << 30); }]>;
 def mask                : TImmLeaf<XLenVT, [{ return isMask_32(Imm);         }]>;
 def flippedMask         : TImmLeaf<XLenVT, [{ return isMask_32(~Imm);        }]>;
 def shiftedMask         : TImmLeaf<XLenVT, [{ return isShiftedMask_32(Imm);  }]>;
@@ -920,12 +928,23 @@ def betweenu
                 (umax (umin node:$value, node:$upperBound), 0)]>;
 
 
+// p.clipu clamps to [0, hi] with signed compares (GVSoC lib_CLIPU: a > hi -> hi,
+// a <= 0 -> 0), so the idiom is a signed clamp. umin(smax(x, 0), hi) is the same
+// value because smax(x, 0) is never negative.
+def clipu_idiom
+    : PatFrags<(ops node:$upperBound, node:$value),
+               [(smin (smax node:$value, 0), node:$upperBound),
+                (smax (smin node:$value, node:$upperBound), 0),
+                (umin (smax node:$value, 0), node:$upperBound)]>;
+
+// The bounds must be sign-compared: getZExtValue() of an i32 constant has the
+// upper 32 bits clear, so ~ of it never equals the other bound.
 def clip : PatFrag<(ops node:$lowerBound, node:$upperBound, node:$value),
                    (between node:$lowerBound, node:$upperBound, node:$value), [{
 
   if (auto bound1 = dyn_cast<ConstantSDNode>(N->getOperand(0)->getOperand(1)))
     if (auto bound2 = dyn_cast<ConstantSDNode>(N->getOperand(1)))
-      return (bound1->getZExtValue() == ~bound2->getZExtValue());
+      return (bound1->getSExtValue() == ~bound2->getSExtValue());
   return false;
 }]>;
 
@@ -1263,11 +1282,11 @@ def : Pat<(sext_inreg (i32 GPR:$rs1), i8 ), (P_EXTBS (i32 GPR:$rs1))>;
 def : Pat<(and (i32 GPR:$rs1), 0xffff), (P_EXTHZ (i32 GPR:$rs1))>;
 def : Pat<(and (i32 GPR:$rs1), 0xff  ), (P_EXTBZ (i32 GPR:$rs1))>;
 
-def : Pat<(clip negativePowerOf2, powerOf2Minus1_pulp:$upperBound, (i32 GPR:$rs1)),
+def : Pat<(clip negativePowerOf2_imm, powerOf2Minus1_imm_pulp:$upperBound, (i32 GPR:$rs1)),
           (P_CLIP (i32 GPR:$rs1), (trailing1sPlus1_pulp imm:$upperBound))>;
 def : Pat<(between (not (i32 GPR:$rs2)), (i32 GPR:$rs2), (i32 GPR:$rs1)),
           (P_CLIPR (i32 GPR:$rs1), (i32 GPR:$rs2))>;
-def : Pat<(betweenu powerOf2Minus1_pulp:$upperBound, (i32 GPR:$rs1)),
+def : Pat<(clipu_idiom powerOf2Minus1_imm_pulp:$upperBound, (i32 GPR:$rs1)),
           (P_CLIPU (i32 GPR:$rs1), (trailing1sPlus1_pulp imm:$upperBound))>;
 def : Pat<(betweenu (i32 GPR:$rs2), (i32 GPR:$rs1)),
           (P_CLIPUR (i32 GPR:$rs1), (i32 GPR:$rs2))>;
