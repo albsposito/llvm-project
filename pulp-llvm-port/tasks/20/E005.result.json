@@ -1,0 +1,16 @@
+{
+  "status": "done",
+  "branch": "work/20/E005",
+  "integration_head": "17f78490c034ac3ceda96276d61ac6870d47de74",
+  "commits": ["3b6a3807ac9a355f4b0792a5cb7148b9d86764ca"],
+  "note": "/home/ubuntu/llvm-project/pulp-llvm-port/notes/20/E005.md",
+  "signature_gone": true,
+  "repro_log": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/20-E005.repro.log",
+  "fix_log": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/20-E005.fix.log",
+  "causing_commit": "22f98740b618 [llvm][RISCV] Support RISCV vector tuple CodeGen and Calling Convention (#97995)",
+  "other_errors_seen": [
+    "llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp:148:35: unknown type name 'RISCVMachineFunctionInfo'; did you mean 'MachineFunctionInfo'?",
+    "llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp:150:16: no member named 'getUsedSSR' in 'llvm::MachineFunctionInfo'",
+    "llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2650:15: redefinition of 'getPreferredAddressingMode'"
+  ]
+}

@@ -6,7 +6,7 @@ source "$(dirname "$0")/../config.env"
 mkdir -p "$CCACHE_DIR"
 if [ -z "${BUILDER_IMAGE:-}" ]; then
   # Native build: same environment the container sets.
-  export CCACHE_DIR CCACHE_BASEDIR="$PORT_ROOT" CCACHE_COMPILERCHECK=content CCACHE_NOHASHDIR=true CCACHE_MAXSIZE=80G
+  export CCACHE_DIR CCACHE_BASEDIR="$PORT_ROOT" CCACHE_COMPILERCHECK=content CCACHE_NOHASHDIR=true CCACHE_MAXSIZE=100G
   exec "$@"
 fi
 workdir="$PWD"

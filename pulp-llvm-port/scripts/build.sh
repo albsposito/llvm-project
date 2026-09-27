@@ -5,11 +5,13 @@
 # so one build reports every error (cluster_errors.py needs all of them, not the first).
 set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
+source "$here/../config.env"; export LINK_JOBS="${LINK_JOBS:-2}" LOAD_LIMIT="${LOAD_LIMIT:-$(nproc)}"
 wt="$1"; bd="$2"; jobs="$3"; shift 3
 targets=("$@")
 [ ${#targets[@]} -eq 0 ] && targets=(clang lld llc llvm-mc opt llvm-objdump)
 mkdir -p "$bd"
-"$here/in-builder.sh" bash -c '
+source "$here/pathmode.sh"; pathmode "$wt" "$bd" || exit 3
+"${WT_RUN[@]}" "$here/in-builder.sh" bash -c '
 set -uo pipefail
 wt="$1"; bd="$2"; jobs="$3"; shift 3
 if [ ! -f "$bd/build.ninja" ]; then
@@ -19,8 +21,10 @@ if [ ! -f "$bd/build.ninja" ]; then
     -DLLVM_DEFAULT_TARGET_TRIPLE=riscv32-unknown-elf \
     -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_USE_LINKER=lld \
     -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-    -DLLVM_PARALLEL_LINK_JOBS=2 -DLLVM_INCLUDE_BENCHMARKS=OFF -DLLVM_INCLUDE_EXAMPLES=OFF \
+    -DLLVM_PARALLEL_LINK_JOBS="$LINK_JOBS" -DLLVM_INCLUDE_BENCHMARKS=OFF -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_INCLUDE_DOCS=OFF || exit 2
+elif ! grep -q "^LLVM_PARALLEL_LINK_JOBS:STRING=$LINK_JOBS\$" "$bd/CMakeCache.txt"; then
+  cmake -DLLVM_PARALLEL_LINK_JOBS="$LINK_JOBS" "$bd" >/dev/null || exit 2
 fi
-ninja -C "$bd" -j "$jobs" -k 0 "$@"
-' _ "$wt" "$bd" "$jobs" "${targets[@]}"
+ninja -C "$bd" -j "$jobs" -l "$LOAD_LIMIT" -k 0 "$@"
+' _ "$WT_SRC" "$WT_BLD" "$jobs" "${targets[@]}"

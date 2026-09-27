@@ -1,0 +1,15 @@
+{
+  "branch": "work/20/E007",
+  "int_head_before": "f0c493f1acbc72729347e4f471159b0956ff1828",
+  "build_rc": 0,
+  "errors_fixed": [
+    "redefinition of 'getPreferredAddressingMode'"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/20/work_20_E007.build.log",
+  "verdict": "LANDED",
+  "int_head_after": "17009d29cc0ec06159a31180050d38e6ba88db03",
+  "commits": [
+    "99275eb2f491323da80b7a56fb585062014c1d9f"
+  ]
+}

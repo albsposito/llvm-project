@@ -1,0 +1,25 @@
+{
+  "status": "done",
+  "branch": "work/20/R001",
+  "commits": [
+    "a9a3e049489812e339cd6b7983ddd2842f5985f7"
+  ],
+  "cluster_commits": {
+    "insn-tablegen": "a9a3e049489812e339cd6b7983ddd2842f5985f7"
+  },
+  "note": "notes/20/R001.md",
+  "signature_gone": true,
+  "cause": "Upstream 95c5386ddb8a '[RISCV][NFCI] Rationalize Immediate Definitions (#120718)' gave generic RISCVUImmOp (so uimm5) EncoderMethod=getImmOpValue and a constant-only MCOperandPredicate. The fork used uimm5 for the lp.setupi end-of-loop label ($uimmS of LOOP0setupi/LOOP1setupi); at 19 it used the default getMachineOpValue, where the fork's mc hunk emits fixup_pulpv2_loop_setupi. At 20 it went to getImmOpValue, which has no PULP fixup -> assertion. lp.setup/lp.starti/lp.endi use the fork operand uimm12pcrel (plain Operand, no EncoderMethod) and were unaffected.",
+  "fix": "RISCVInstrInfoXpulp.td (insn-tablegen cluster, not mc as guessed): new fork operand uimm5pcrel declared like uimm12pcrel (default encoder, UImmAsmOperand<5>, decodeUImmOperand<5>, OPERAND_UIMM5, 5-bit ImmLeaf), used for $uimmS of LOOP0setupi/LOOP1setupi. No MC C++ changed. Follows upstream's design of a dedicated label operand for vendor PC-relative operands (cv.beqimm uses simm13_lsb0: RISCVInstrInfoXCV.td:505, RISCVInstrInfo.td:271 at llvmorg-20.1.8).",
+  "verification": "Repro logs/20-R001.repro.log (port-20 clang asserts at RISCVMCCodeEmitter.cpp:555). Rebuild logs/20-R001.verify.log: clang llc llvm-mc llvm-objdump build, cluster_errors 0 clusters. Reproducer compiles rc 0 and 'llvm-objdump -dr' is identical to port-19 (lp.setupi x0, 0x3e8, 0x6 = 3e83507b, no relocations in either). Same with -mllvm -pulp-loop-range-immediate=0 (lp.starti/lp.endi/lp.counti): identical to port-19. Port-20-generated .s for a file with lp.setup/lp.starti/lp.endi/lp.counti/lp.setupi: port-19 and fixed build behave identically. Numeric-operand asm (lp.setupi x0/x1, lp.setup, lp.starti, lp.endi, lp.counti) assembles byte-identical to port-19. Lit: MC/RISCV/xpulp/xpulp-asm-parser.s and CodeGen/RISCV/xpulp-hwloop.ll PASS. policy_check: 0 fail, 0 warn.",
+  "asm_path_note": "Assembling hardware-loop instructions with a label operand from .s is broken identically in ref-18, port-19, port-20 and this build (pre-existing fork limitation, not a regression, not changed): lp.setupi with a label gives 'immediate must be an integer in the range [0, 31]' (parser class UImmAsmOperand<5> does not accept symbols); lp.setup/lp.starti/lp.endi with a label hit 'UNREACHABLE: Unknown match type detected!' in RISCVAsmParser (uimm12pcrel's UImmAsmOperand<12> rejects symbols without a diagnostic). Only the integrated clang/llc object path works with labels.",
+  "other_errors_seen": [
+    "pre-existing (ref-18..port-20): .s parsing of lp.setup/lp.starti/lp.endi with a label crashes llvm-mc/clang -c with 'Unknown match type detected!' (RISCVAsmParser.cpp:1763 at port-20); lp.setupi with a label is rejected as 'immediate must be an integer in the range [0, 31]'",
+    "LOOP0count/LOOP1count (lp.count) declare their rs1 register field as uimm5:$uimmS instead of GPR (pre-existing fork oddity, not touched)",
+    "fork mc hunk in RISCVMCCodeEmitter::getMachineOpValue still lists LOOP*setupi; it is reached again by this fix (not dead)"
+  ],
+  "proposed_test": "Claim confirmed: no fork test in data/fork-tests.txt writes an object for a PULP hardware loop. xpulp-hwloop.ll only checks llc text output of lp.setup (never lp.setupi); MC/RISCV/xpulp/xpulp-asm-parser.s uses -filetype=obj but contains no lp.* instruction; grep for 'lp.setupi' over llvm/test, clang/test, lld/test finds nothing. Proposed owner test llvm/test/CodeGen/RISCV/xpulp-hwloop-obj.ll: 'RUN: llc -mtriple=riscv32 -mattr=+xpulpv2 -filetype=obj < %s | llvm-objdump -d -r --mattr=+xpulpv2 - | FileCheck %s' on a loop with constant trip count 1000 (IR of benchmarks/gap9-sweep/sim/repro/lp_setupi_mc_crash.c), CHECK: '3e83507b  lp.setupi x0, 0x3e8, 0x6' and no R_ relocation; a second RUN with -pulp-loop-range-immediate=0 checking lp.starti/lp.endi/lp.counti encodings; and a variable-trip-count function checking lp.setup's encoded offset. Optionally an MC test for lp.* with numeric operands (encodings above).",
+  "files_changed": [
+    "llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td"
+  ]
+}

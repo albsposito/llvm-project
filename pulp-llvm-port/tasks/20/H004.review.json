@@ -1,0 +1,29 @@
+{
+  "verdict": "APPROVE",
+  "revision": 3,
+  "reasons": [
+    "The round-2 blocker is fixed. --worktree must be the top of its work tree: `rev-parse --show-toplevel` is compared with the resolved --worktree path, and any mismatch exits 2. The per-path probe now uses `ls-tree --full-tree`, so it no longer depends on the current directory. On real data, `--worktree wt/int-20/llvm` exits 2, and so does `pulp-llvm-port/logs`, a directory nested inside the llvm-project checkout. `wt/int-20/` with a trailing slash is accepted and scores the same as `wt/int-20`. The injected regression (add-imm.ll dropped from the candidate) is reported as a problem, not excused.",
+    "Every input failure found in rounds 1 and 2 now stops the run with exit 2 instead of being read as 'absent upstream': a typo tag, a nonexistent worktree, a non-git dir, a subdirectory of a work tree, a tag that is not an ancestor, tag == HEAD, a lone --worktree, and a failing ls-tree. Each case has a test in test_upstream_removed_rule_refuses_bad_inputs.",
+    "The rule's semantics are unchanged and sound. It applies only when a baseline-PASS test is MISSING from the candidate. Fork tests are never excused. A file still present in the worktree is never excused, which covers tests that exist but are skipped by a lit config or REQUIRES change. A file present at the upstream tag is never excused, which covers tests the port deleted. Reviewed renames are applied first. UNSUPPORTED, XFAIL and FAIL never reach the rule. Upstream moves are excused at their old path, and the new path is scored as a new test: acceptable.",
+    "Residual risks, all acceptable: (1) the tag is matched by name inside the given repository, not pinned by SHA to steps/<N>/base_tag. The ancestor and not-HEAD checks bound this, and lit.sh callers pass the step tag. When the port-step SOP invocation is updated to pass the 7th argument, use `$(cat steps/<N>/base_tag)`. (2) Without --baseline-renames, a fork test that upstream moved can be excused at its old path if fork-tests.txt has been updated to the new path. The new path is still enforced as a fork test, so coverage is kept."
+  ],
+  "checks": {
+    "unittest": "python3 -m unittest discover -s tests: Ran 25 tests, OK (includes the <repo>/llvm refusal case)",
+    "rescore_step20": "With baseline-renames and known-failures, --worktree wt/int-20 --upstream-tag llvmorg-20.1.8: problems=4, upstream_removed=125 (round-2 run, logic unchanged apart from the checks added in revision 3)",
+    "subdir_refused": "wt/int-20/llvm -> exit 2 'is not the top of a git work tree'; pulp-llvm-port/logs -> exit 2",
+    "injected_regression": "add-imm.ll dropped: wt/int-20 and wt/int-20/ -> problem (not excused)",
+    "all_125_audit": "None is a fork test, none is touched by the step-19 fork diff, none exists at llvmorg-20.1.8, and every one has a D or R commit in llvmorg-19.1.7..llvmorg-20.1.8",
+    "spot_check_10": {
+      "llvm/test/CodeGen/RISCV/rv64-legal-i32/ssub_sat.ll": "ca7ad38ca0d2 [RISCV] Remove riscv-experimental-rv64-legal-i32. (#102509)",
+      "llvm/test/CodeGen/RISCV/rv64-legal-i32/xtheadmac.ll": "ca7ad38ca0d2",
+      "llvm/test/CodeGen/RISCV/rv64-legal-i32/div.ll": "ca7ad38ca0d2",
+      "llvm/test/CodeGen/RISCV/rv64-legal-i32/rv64zba.ll": "ca7ad38ca0d2",
+      "llvm/test/CodeGen/RISCV/rv64-legal-i32/alu32.ll": "ca7ad38ca0d2",
+      "llvm/test/MC/RISCV/rv32zbkb-valid.s": "adb849e79f14 [RISCV][NFCI] Rename rv32+rv64 testcases (#120717)",
+      "llvm/test/CodeGen/RISCV/rvv/vmv.v.v-rv64.ll": "99fb40d488c9 [RISCV] Merge more rv32/rv64 intrtinsic tests ... NFC",
+      "llvm/test/CodeGen/RISCV/rvv/vsaddu-rv32.ll": "65d3c220a184 [RISCV] Merge more rv32/rv64 intrinsic tests that have the same content. NFC",
+      "llvm/test/CodeGen/RISCV/branch-relaxation.ll": "6d91d7ce6aeb [RISCV][NFC] Split branch-relaxation test",
+      "llvm/test/CodeGen/RISCV/GlobalISel/instruction-select/jump-table-brjt-pic-rv32.mir": "4087b871c5aa [RISCV][GISel] Move G_BRJT expansion to legalization (#73711)"
+    }
+  }
+}

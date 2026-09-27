@@ -1,0 +1,18 @@
+{
+  "status": "escalated",
+  "branch": "work/20/T003",
+  "commits": ["8bcb70882fc6487c06c8f4fe248bb4223f30262f"],
+  "note": "notes/20/T003.md",
+  "signature_gone": false,
+  "other_errors_seen": [],
+  "question": "The real bug is fixed: upstream 9122c5235ec8 ([RISCV] Enable bidirectional scheduling and tracking register pressure) made the pre-RA scheduler hoist fmul.d above frep.o. That was a miscompile: the multiply ran once and fmv.x.w was repeated instead. Commit 8bcb70882fc6 (fixup! [pulp] codegen-core, file RISCVInstrInfo.cpp owned by codegen-core, not passes) marks FREP_O/FREP_I as scheduling boundaries, next to the fork's existing LOOPnsetup boundaries. With it, the instruction stream for all 4 RUN lines of freploop-nested.ll is identical to port-19-green. The test still fails for one cosmetic reason: in main1 the assembler comment '# implicit-def: $f15_d' (IMPLICIT_DEF pseudo, no instruction or bytes emitted) now prints between 'li a0, 127' and 'frep.o a0, 2, 0, 0', so 'CHECK-NEXT: frep.o' at test line 60 fails. Making the test pass without touching it would need a Snitch-only override of upstream's scheduling policy (reverting 9122c5235ec8 for Snitch) just to move a comment. I did not do that. Should this commit land, with a test-regen task (cosmetic: comment line only) for freploop-nested.ll? Or does the conductor want a different expectation strategy?",
+  "evidence": {
+    "causing_commit": "9122c5235ec8 [RISCV] Enable bidirectional scheduling and tracking register pressure (#115445), adds RISCVSubtarget::overrideSchedPolicy (RISCVSubtarget.cpp:220 at llvmorg-20.1.8)",
+    "diagnosis": "-print-after-all on build/int-20 llc: FMUL_D is after FREP_O until register-coalescer and before it after machine-scheduler. At 19 (bottom-up only) the order is preserved. -misched-prera-direction=bottomup on int-20 restores @main.",
+    "repro_log": "logs/20-T003.repro.log",
+    "build_log": "logs/20-T003.build.log",
+    "verify_log": "logs/20-T003.verify.log (cluster_errors: 0 clusters)",
+    "lit_log_after_fix": "logs/20-T003.lit.log (only failure: line 60 CHECK-NEXT, comment line in between)",
+    "asm_diff_19_vs_fixed": "logs/20-T003.asm-19-vs-fixed.diff (only the .text/.attribute lines and the implicit-def comment position differ; with comments/attributes filtered, all four opt levels are identical to build/int-19)"
+  }
+}

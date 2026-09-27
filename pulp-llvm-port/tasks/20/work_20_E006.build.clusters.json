@@ -1,0 +1,36 @@
+{
+  "log": "tasks/20/work_20_E006.build.log",
+  "failed_targets": 2,
+  "clusters": [
+    {
+      "key": "extraneous closing brace ('}')",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVISelDAGToDAG.cpp:841"
+      ],
+      "samples": [
+        "../../wt/int-20/llvm/lib/Target/RISCV/RISCVISelDAGToDAG.cpp:841:1: error: extraneous closing brace ('}')\n  841 | }\n      | ^"
+      ],
+      "owners": [
+        "codegen-core"
+      ],
+      "count": 1,
+      "id": "E001"
+    },
+    {
+      "key": "redefinition of 'getPreferredAddressingMode'",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2650"
+      ],
+      "samples": [
+        "../../wt/int-20/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2650:15: error: redefinition of 'getPreferredAddressingMode'\n 2650 | RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,\n      |               ^\n../../wt/int-20/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2395:15: note: previous definition is here\n 2395 | RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,\n      |               ^"
+      ],
+      "owners": [
+        "codegen-core"
+      ],
+      "count": 1,
+      "id": "E002"
+    }
+  ]
+}

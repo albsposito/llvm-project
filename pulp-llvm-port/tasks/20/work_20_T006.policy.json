@@ -1,0 +1,14 @@
+{
+  "range": "17009d29cc0ec06159a31180050d38e6ba88db03..work/20/T006",
+  "commits": 1,
+  "fail": 0,
+  "warn": 1,
+  "findings": [
+    {
+      "commit": "1214736b3c0f",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xmempool-invalid.s"
+    }
+  ]
+}

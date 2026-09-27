@@ -1,0 +1,26 @@
+diff --git a/llvm/lib/Target/RISCV/RISCV.td b/llvm/lib/Target/RISCV/RISCV.td
+index 9401e2440a75..d069b7a0eec4 100644
+--- a/llvm/lib/Target/RISCV/RISCV.td
++++ b/llvm/lib/Target/RISCV/RISCV.td
+@@ -57,7 +57,7 @@ include "RISCVSchedSyntacoreSCR345.td"
+ include "RISCVSchedSyntacoreSCR7.td"
+ include "RISCVSchedTTAscalonD8.td"
+ include "RISCVSchedXiangShanNanHu.td"
+-include "RISCVSchedMempool.td"
++// PROBE ONLY: include "RISCVSchedMempool.td"
+ include "RISCVSchedSnitch.td"
+ 
+ //===----------------------------------------------------------------------===//
+diff --git a/llvm/lib/Target/RISCV/RISCVProcessors.td b/llvm/lib/Target/RISCV/RISCVProcessors.td
+index 9ce50315a965..d2c5246dad8e 100644
+--- a/llvm/lib/Target/RISCV/RISCVProcessors.td
++++ b/llvm/lib/Target/RISCV/RISCVProcessors.td
+@@ -597,7 +597,7 @@ def RP2350_HAZARD3 : RISCVProcessorModel<"rp2350-hazard3",
+                                           FeatureStdExtZcmp]>;
+ 
+ def MEMPOOL : RISCVProcessorModel<"mempool-rv32",
+-                                  MempoolModel,
++                                  NoSchedModel, // PROBE ONLY, never landed
+                                   [Feature32Bit,
+                                    FeatureStdExtM,
+                                    FeatureStdExtA,

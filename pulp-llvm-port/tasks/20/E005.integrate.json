@@ -1,0 +1,15 @@
+{
+  "branch": "work/20/E005",
+  "int_head_before": "fc2786e2c032ca20d45e19e15b3d9ff05884bbe6",
+  "build_rc": 1,
+  "errors_fixed": [
+    "extraneous closing brace ('}')"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/20/work_20_E005.build.log",
+  "verdict": "LANDED",
+  "int_head_after": "f0c493f1acbc72729347e4f471159b0956ff1828",
+  "commits": [
+    "3b6a3807ac9a355f4b0792a5cb7148b9d86764ca"
+  ]
+}

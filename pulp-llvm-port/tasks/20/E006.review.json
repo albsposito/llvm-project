@@ -1,0 +1,12 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [],
+  "policy_check": "scripts/policy_check.py --repo wt/20-E006 --range 17f78490c034..5a4afc65580f --notes-root notes --stack-base llvmorg-20.1.8: 1 commit, 0 fail, 0 warn.",
+  "diff_review": "Single commit 5a4afc65580f (parent 17f78490c034 = integration head; branch head work/20/E006 = 5a4afc65580f). git diff --stat 17f78490c034 5a4afc65580f: only llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp, 1 insertion: '#include \"RISCVMachineFunctionInfo.h\"' at line 15. No RISCV.td / RISCVProcessors.td changes (probe-hack files), no RISCVTargetTransformInfo.cpp changes (E007 territory): stash collision left no trace in the commit. Fork Xssr block in getReservedRegs (lines 147-153) unchanged. File is already fork-touched (llvmorg-20.1.8..17f78490c034 shows +9 lines), so rule 11 not triggered. Subject matches owner cluster fixup; Change-Note: 20/E006.md trailer present and note exists.",
+  "upstream_check": "82d5dd28b4de '[RISCV] Remove unused includes (NFC) (#115814)' is an ancestor of llvmorg-20.1.8 and not of llvmorg-19.1.7; it removes exactly this include line from RISCVRegisterInfo.cpp. The fix re-adds that exact line in the same position. Reference llvm/lib/Target/RISCV/RISCVFrameLowering.cpp:14 at llvmorg-20.1.8 includes RISCVMachineFunctionInfo.h directly and uses MF.getInfo<RISCVMachineFunctionInfo>() at line 248, as the note claims. getUsedSSR() is declared at RISCVMachineFunctionInfo.h:123 in the worktree.",
+  "build_evidence": "logs/20-E006.repro.log shows both signatures at RISCVRegisterInfo.cpp:148/150; logs/20-E006.verify.log builds RISCVRegisterInfo.cpp.o with no errors in that file; the only remaining errors (RISCVTargetTransformInfo.cpp:2650, RISCVISelDAGToDAG.cpp:841) are unrelated and listed in the result file.",
+  "oracle_cheating_check": "None: pure include addition, no removed/bypassed fork logic, no early returns, stubs, forced conditions, pattern deletions or test edits. The single changed line is necessary for the root cause.",
+  "note_check": "All four sections present; 'What breaks if this is wrong' names observable symptoms (LLVMRISCVCodeGen compile failure; ft0..ft7 allocated while mapped to SSR streams, visible in ssr-register-reserving.ll / Snitch kernels).",
+  "incident_note": "Result file reports shared-stash collision with E007 (wt/20-E007 holds E006's include uncommitted; E007's change saved in logs/20-E007.swapped-stash.patch). Not a defect of this commit, but the conductor must clean up wt/20-E007 before E007 is committed/reviewed."
+}

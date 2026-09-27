@@ -1,0 +1,41 @@
+{
+  "status": "done",
+  "branch": "work/20/F003",
+  "commits": [
+    "648dad91c13c244086633a135d40e64a55fd25ef"
+  ],
+  "note": "/home/ubuntu/llvm-project/pulp-llvm-port/notes/20/F003.md",
+  "signature_gone": true,
+  "root_cause": "PULPHardwareLoops::getLoopTripCount (inlined into convertToHardwareLoop) called MRI->getVRegDef(R)->getParent() on the loop's start/end operand without checking that it is a virtual register. RISC-V ISel selects compare-with-0 as the physical $x0 (upstream 450edb0b3766, RISCVInstrInfo.td:1592-1594), so every count-down-to-zero latch ('BNE/BEQ %iv.next, $x0', produced by LSR from ordinary for-loops) returned a null def and segfaulted. The code was copied from HexagonHardwareLoops, which has no zero register.",
+  "fix": "If the start/end operand is a physical register, accept it only when checkForImmediate proves a constant ($x0 = 0; computeCount already handles this case by copying $x0 into a vreg and using the original counter as the trip count) and do not queue it in OldInsts. Any other physical register has an unknown value at the preheader, so no hardware loop is formed (same rule as the existing checkForImmediate and HexagonHardwareLoops::checkForImmediate:1550). Virtual registers take exactly the previous path.",
+  "fork_commit": "f1b7aebff8c2 Federico Ficarelli 2022-08-25 [LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms",
+  "same_root_cause_covered": [
+    "SDK FirBasicKernelsFix.c (KerFirSeq) -O2/-Os, FirBasicKernelsf32.c -O2/-O3/-Os, ComplexMathFunctions/CmplxFunctionsFix.c -O2/-O3/-Os: crash ref-18, compile with fix",
+    "FirBasicKernelsf16.c: does not crash with the repro kit flags on ref-18 or on the fix",
+    "benchmarks/19-vs-18 five unsigned loop kernels: ref-18/port-19 IR has 'BEQ %5, $x0'; that IR crashes int-20 llc and compiles with the fixed llc (one lp.setup each). At 20 the C sources no longer reach the crash (different middle-end loop shape)",
+    "benchmarks/gap9-sweep/sim/repro/hwloop_var_tripcount_crash.c: crashes ref-18, port-19, int-20; with fix emits lp.setup x0, a0 (count n)",
+    "R001 reviewer shapes (constant 31-iteration single loop, nested constant loops): crash ref-18, port-19, int-20; compile with fix (single loop -> lp.setupi x0, 31)"
+  ],
+  "verification": {
+    "repro_log": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/20-F003.repro.log",
+    "verify_log": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/20-F003.verify.log",
+    "build_log": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/20-F003.build2.log (cluster_errors: 0 clusters)",
+    "gvsoc": "hwl.c (work, sum_loop, dot16, do/while(--n) countdown at n=1,2,3,7,64,1000) and nest.c (nested FIR using lp.setup x1 + x0, 20 (n,m) pairs, plus the 31-iteration loop) print output identical to GAP9 GCC on ri5ky_testbench. Clang built with -mllvm -pulp-loop-range-immediate=0 because of the separate R001 lp.setupi object-emission assertion. Sources: notes/20/F003-repro/{hwl.c,nest.c}",
+    "lit_fork_tests": "all 56 data/fork-tests.txt tests pass (logs/20-F003.lit-fork.log), including xpulp-hwloop.ll, freploop.ll, intrinsics/xpulpv.ll, riscv-xpulpv2-intrinsics.c, so the lp.* code they check is still produced",
+    "lit_codegen_riscv": "2093 tests, 1 failure: rvv/vsetvli-insert-zve64f.mir, which is already in data/known-failures.txt (logs/20-F003.lit-codegen.log)",
+    "reduced_ir": "notes/20/F003-repro/reduced.ll (llvm-reduce of KerFirSeq), notes/20/F003-repro/countdown.ll (hand-written count-down loop)"
+  },
+  "verifier_finding": "Not explained by this root cause. The xpulp-hwloop.ll -verify-machineinstrs errors are reported after 'PULP Hardware Loop Fixup' (PULPFixupHwLoops.cpp: 'Using an undefined physical register' x3, 'MBB has unexpected successors' x1, function for_1x), not after PULPHardwareLoops. The error set is identical with int-20 and with this fix. Not fixed.",
+  "other_errors_seen": [
+    "Missed optimisation, not a crash: computeCount's constant-bounds path (startIsImm && endIsImm) accepts only Cmp == EQ and declines NE latches. So constant-count loops whose latch is 'BNE %iv.next, $x0' to the header (for example the ten 100-iteration loops left after -O2 unrolls the inner loop of a nested constant-count loop, and notes/20/F003-repro/reduced.ll) get no hardware loop. The path also does not check whether the branch target is the header or the exit. Candidate for a separate task.",
+    "Missed optimisation: an inner loop without a dedicated preheader is declined ('loop has no preheader', FIXME in convertToHardwareLoop), e.g. nested3 in the scratch tests, so only the outer level gets a hardware loop.",
+    "FirBasicKernelsFix.c -O3: RISCVSubtarget::getMinRVVVectorSizeInBits assertion (survey bug 3, also on ref-18), a different root cause.",
+    "Object emission of lp.setupi (RISCVMCCodeEmitter 'Unhandled expression'): task R001, avoided with -S or -mllvm -pulp-loop-range-immediate=0."
+  ],
+  "proposed_test": {
+    "file": "llvm/test/CodeGen/RISCV/xpulp-hwloop-countdown.ll (new, not added)",
+    "run": "; RUN: llc -mtriple=riscv32 -mattr=+xpulpv -O2 < %s | FileCheck %s",
+    "content": "The IR of notes/20/F003-repro/countdown.ll (a do/while(--n) loop whose latch is 'icmp eq %i.next, 0'), plus the constant 31-iteration loop from notes/20/F003-repro/const-shapes.c (single31).",
+    "checks": "CHECK-LABEL: countdown: / CHECK: lp.setup x0, a1, [[END:.LBB[0-9_]+]] (count is the original n register, no addi -1 or bnez left in the loop body). CHECK-LABEL: single31: / CHECK: lp.setupi x0, 31. Generate with update_llc_test_checks.py. Note: do not add -verify-machineinstrs yet. countdown.ll with that flag hits the separate PULPFixupHwLoops verifier finding ('Using an undefined physical register', 'MBB has unexpected successors'), the same as xpulp-hwloop.ll."
+  }
+}

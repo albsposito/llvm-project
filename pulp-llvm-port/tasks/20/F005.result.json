@@ -1,0 +1,52 @@
+{
+ "status": "done",
+ "branch": "work/20/F005",
+ "integration_head": "6e4c7f2a471f58958f091e21cf5cf560410d8363",
+ "commits": [
+  "d01e531f008b"
+ ],
+ "note": "notes/20/F005.md",
+ "signature_gone": true,
+ "files_changed": [
+  "llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp (passes)"
+ ],
+ "defect_origin": "fork commit f1b7aebff8c2 (Federico Ficarelli 2022-08-25, [LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms) added PULPFixupHwLoops.cpp; later fork commits 8f9832300f0e/bded3e51fd64 do not touch the defective logic",
+ "root_cause": "Block placement runs after PULPHardwareLoops. PULPFixupHwLoops (f1b7aebff8c2) (1) used MachineLoop::getBottomBlock(), which derefs MF.end() when the loop ends the function (reported k05 -O3 crash); (2) when the latch was not the last loop block after the header (rotated above the header, or loop blocks placed after it) retargeted the loop end to the bottom block, leaving the latch outside the range (k05 -O2 1.7x work; seed 270 wrong result); (3) did not handle loops with several back edges (tail-duplicated latch): iterations via the copy are uncounted (seed 61 wrong; seeds 22/13 hang with attempt 1); (4) used L->getExitBlock() as the fall-out target, null with early exits or repeated exit edges -> exit branch erased with no replacement; (5) past-the-end reads: getDebugLoc before end() check, bump rule counting branches, and an empty latch (compare-only latch) in fixupLoopInstrs (notes/20/F005-reduced-emptylatch.ll also crashes int-20).",
+ "fix": "removeUncountableLoops (first): delete the LOOPsetup (keep software loop, whose branches are still intact) when L->getLoopLatch()==null (several back edges) or the latch has !=1 out-of-loop successor - justified bail-out, hardware has one counting and one fall-out point. fixupLoopLayout: move rotated latch (+contiguous loop blocks before it) after the bottom, or the unique latch alone to the end when other loop blocks follow it; fallthrough repair as ARMBlockPlacement::moveBasicBlock (ARMBlockPlacement.cpp:246 @llvmorg-20.1.8); old 'update end to bottom' kept only when the setup block is not the latch. fixupLoopLatch: ExitBlock = latch's own exit (getLatchExit) instead of L->getExitBlock(), so 'Bcc exit; j header' is replaced by 'j exit' in the same round. getLayoutBottom replaces getBottomBlock. getDebugLoc inside the end() check. Bump rule: latch counts non-terminators (<=1 keeps), other blocks keep old size()<=2. NOP inserted when the latch has no instruction to label (same as existing inline-asm workaround).",
+ "not_in_PULPHardwareLoops": "Root cause is entirely in PULPFixupHwLoops.cpp; PULPHardwareLoops.cpp (F003) untouched.",
+ "ref18": "ref-18 cannot reach the fixup pass on k05 -O3 (clang: getMinRVVVectorSizeInBits assert = F004; llc on the step-20 IR: crash in 'PULP Hardware Loops' = F003-like). ref-18 -O2 asm shows the same rotated-latch mis-layout (logs/f005/k05.ref18.O2.s lines 240-241, 561-562) and runs 87708 cycles vs 48875 fixed on 31x31.",
+ "repro": {
+  "before": "build/20-F004 clang -O3 k05: !isKnownSentinel in MachineLoop::getBottomBlock (logs/20-F005.repro.log)",
+  "reduced": "notes/20/F005-reduced.ll (k05 crash), notes/20/F005-reduced-emptylatch.ll (empty latch, crashes int-20 too); both compile with the fix",
+  "after": "k05 O2/O3/Os compile and match GCC on GVSoC"
+ },
+ "sim": {
+  "sweep_driver_32x32": "O2/O3/Os checksum 0x56c64fd1 == GCC",
+  "odd_size_driver": "notes/20/F005-k05_odd-driver.c 7 sizes x O2/O3/Os: 21/21 == GCC (logs/f005/sim-results-r2.txt); O2 31x31 48875 cycles (int-20-equivalent F004 84091, GCC 45924)"
+ },
+ "sweep": "src/*.c + build/gen/k12_*.c at O2/O3/Os vs build/int-20: byte-identical asm except k05 O2 (fixed layout) and k05 O3 (now compiles); no new failures; remaining failures: 'PULP Hardware Loops' (F003) and Sema/shim errors (logs/f005/sweep2.txt)",
+ "lit": "llvm/test/CodeGen/RISCV + data/fork-tests.txt: 2148/2149, only known rvv/vsetvli-insert-zve64f.mir (logs/20-F005.lit.log)",
+ "progress_md_verifier_item": "NOT explained by this defect. -verify-machineinstrs on xpulp-hwloop.ll gives the same 4 errors before and after: 'Using an undefined physical register' in the LoopEnd block created by fixupLoopInstrs (splice without adding live-ins) and 'MBB has unexpected successors' on the preheader block split by splitMBBAt (LOOPsetup is a non-branch terminator, analyzeBranch fails). Same two classes appear on k05 only on the pass-created blocks, none on blocks moved by this fix. Candidate for a separate task.",
+ "other_errors_seen": [
+  "Machine verifier errors after PULP Hardware Loop Fixup on xpulp-hwloop.ll (-verify-machineinstrs): new LoopEnd/split blocks created without live-ins; LOOPsetup is a non-branch terminator that analyzeBranch rejects. Unchanged by this task; PROGRESS.md item not explained by this defect.",
+  "MachineLoop::getBottomBlock() upstream bug still at llvmorg-23.1.0 (avoided locally).",
+  "Reviewer seed 61 -O3 / 270 -O2: now correct (same root cause: several back edges / latch not last); fixed here.",
+  "Bail-out removes the hardware loop for loops with several back edges (tail-duplicated latch); a performance opportunity would be to stop block placement from tail-duplicating hardware-loop latches (e.g. in PULPHardwareLoops/TII hooks) - not done, F003 owns PULPHardwareLoops.cpp.",
+  "PulpFixupHwLoops runs after BranchRelaxation; moving blocks could in principle push a conditional branch out of +-4KiB range (would be a loud MC error; pre-existing: the pass already inserts code after relaxation).",
+  "~70% of random loop programs and k01/k02/k04/k07/k08/k10a crash in 'PULP Hardware Loops' (F003).",
+  "sweep Sema/shim failures: v2h type errors in *-file.c, __builtin_pulp_add2div2 missing, AT_L2_EVENT undeclared."
+ ],
+ "proposed_test": {
+  "file": "llvm/test/CodeGen/RISCV/xpulp-hwloop-layout.ll",
+  "run": "; RUN: llc -O3 -mtriple=riscv32 -mattr=+m,+c,+zfinx,+xpulpv < %s | FileCheck %s",
+  "body": "functions from notes/20/F005-reduced.ll (latch rotated above header, loop at function end), notes/20/F005-reduced-emptylatch.ll (compare-only latch), and the reviewer's seed-22 kernel (benchmarks/hwloop-fuzz/w/22/kern.c, tail-duplicated latch -> no lp.setup expected)",
+  "checks": "generated with update_llc_test_checks.py; key properties: lp.setup immediately followed by the header label (no 'j'); the lp end label on the latch's last instruction followed by 'j <exit>' or fall-through to the exit; no 'j <header>' after the loop end; seed-22 function has no lp.setup; no crash"
+ },
+ "previous_attempts": "efe70bc94999 rejected (tasks/20/F005.review.json): rotated latch 'Bcc exit; j header' left 'j header' after the loop end when L->getExitBlock() was null (tail-duplicated latch) -> hang (fuzz seeds 22 -O3, 13 -O2); note misdescribed the counter-increment rule",
+ "fuzz": {
+  "tool": "benchmarks/hwloop-fuzz (copied to logs/f005/fuzz; one.sh compares build/20-F005 vs build/int-20, GVSoC vs GCC -O2)",
+  "seeds": "1-600 at O2/O3/Os: 523 builds compile and all 523 match GCC (346 with hardware loops), 0 mismatches, 0 hangs; 0 cases where int-20 compiles and this build fails; only compile failures are 'PULP Hardware Loops' (F003), 1277 (logs/20-F005.fuzz.txt)",
+  "reviewer_seeds": "22 (O2/O3/Os OK), 13 (O2 OK, Os OK, O3 F003 crash in both), 61 (O3 OK), 270 (O2 OK)",
+  "vs_int20": "of the 82 builds whose asm differs from int-20, int-20 gives a WRONG result on 52 (no hangs), this build on 0 (logs/20-F005.fuzz-base-changed.txt)"
+ }
+}

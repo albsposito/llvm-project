@@ -1,0 +1,14 @@
+{
+  "status": "done",
+  "branch": "work/20/E004",
+  "commits": ["1887a96d43550e27683d063fb489e83b59395102"],
+  "note": "notes/20/E004.md",
+  "signature_gone": true,
+  "verification": "Repro: logs/20-E004.repro.log (RISCVCommonTableGen fails with 'Processor does not define resources for WriteFCvtF32ToF16'). Fix: one line in RISCVSchedMempool.td, defm UnsupportedSchedZfh -> UnsupportedSchedZfhmin, following upstream 9fa517208fbf which split the Zfhmin classes out of UnsupportedSchedZfh and made the same change in RISCVSchedRocket.td:262 at llvmorg-20.1.8. llvm-tblgen -gen-subtarget passes after this single change (no further missing classes; logs/20-E004.scratch-tblgen.log). Rebuild logs/20-E004.verify.log: RISCVCommonTableGen OK (RISCVGenSubtargetInfo.inc generated), LLVMRISCVCodeGen stops only on unrelated codegen-core C++ errors (logs/20-E004.verify.clusters.json); no errors in touched files. Generated MempoolModelSchedClasses: FP16 conversion/load/store/move classes are 8191 (unsupported) as at 19; WriteIDiv/WriteIRem unchanged (7,2,34,1,1,2). RISCVSchedSnitch.td defines no WriteRes and needs no change. policy_check: 0 fail, 0 warn.",
+  "other_errors_seen": [
+    "extraneous closing brace ('}') at RISCVISelDAGToDAG.cpp:841 (codegen-core)",
+    "no member named 'getUsedSSR' in 'llvm::MachineFunctionInfo' at RISCVRegisterInfo.cpp:150 (codegen-core)",
+    "unknown type name 'RISCVMachineFunctionInfo' at RISCVRegisterInfo.cpp:148 (codegen-core)",
+    "redefinition of 'getPreferredAddressingMode' at RISCVTargetTransformInfo.cpp:2650 (codegen-core; upstream f590963db836 added it for XCVmem)"
+  ]
+}

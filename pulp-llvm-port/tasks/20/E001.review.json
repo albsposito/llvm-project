@@ -1,0 +1,14 @@
+{
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [],
+  "evidence": {
+    "policy_check": "Reviewer reran scripts/policy_check.py --range 94bbab7f1554..work/20/E001 --stack-base llvmorg-20.1.8: 1 commit, fail 0, warn 0. Subject matches cluster commit '[pulp] insn-tablegen: Xpulp/Xsmallfloat/Xssr/Xdma/Xfrep instructions and sched models'; Change-Note: 20/E001.md present.",
+    "diff": "Single file llvm/lib/Target/RISCV/RISCVInstrInfoXsmallfloatGen.td (+84/-21): only the 21 FeatureExtXf* RISCVExtension definitions changed, from <name,0,1,desc> to <0,1,desc-body> { let Name; let Desc; }. No predicates, instructions, encodings, tests or other fork logic touched.",
+    "upstream": "d280a9c5e22662fd24708245add50b152ab10fc8 '[NFC] [RISCV] Refactor class RISCVExtension (#120040)' exists, is ancestor of llvmorg-20.1.8 and not of llvmorg-19.1.7; it removes the leading name parameter and derives Name/Desc from FeatureStdExt/FeatureVendor record names, matching the note. Fix uses the upstream constructor (CORE-V FeatureVendorXCVelw/XCVmem at RISCVFeatures.td:1183/:1204) with explicit Name/Desc overrides, which is justified in the note (FeatureExt* prefix is not stripped by upstream's !subst) and identical to the precedent already on port/20 for FeaturePULPExtV2/Xfrep/Xdma/Xssr/Xmempool (RISCVFeatures.td:1483-1518).",
+    "generated_equivalence": "Reviewer ran llvm-tblgen -dump-json on port/19 (wt/int-19 @9b2edaf923ad, build/int-19 tblgen) and on work/20/E001 (build/20-E001 tblgen): for all 21 smallfloat records Name, Desc, MajorVersion(0), MinorVersion(1), FieldName (HasExtXf*), Value(true), Implies([]) and Experimental(0) are identical; HasExtXf* Predicate CondStrings identical. -gen-riscv-target-def: all non-PROC 'xf' rows (GET_SUPPORTED_EXTENSIONS entries such as {\"xfalthalf\", {0, 1}}) identical; SNITCH/MEMPOOL default march strings identical (PROC rows differ only by upstream's 3 new MVENDORID/MARCHID/MIMPID columns). Only other fork-record delta vs port/19 is upstream's FeaturesStdExtSsqosid typo record, unrelated to this task.",
+    "coalescing": "E001/E002/E003 all point at the same token run RISCVInstrInfoXsmallfloatGen.td:9 columns 3/19/22 and are the positional shift of the removed 'name' template parameter (string->major, int->desc, string->implies). One root cause; one edit removes all three (repro log 54 RISCVExtension: errors, build log 0).",
+    "oracle_cheating": "None found: no deleted or bypassed fork code, no test edits, no early returns/stubs, no records dropped. The desc template argument is overridden by the explicit Desc and so is informational only; harmless.",
+    "residual": "Build still red on RISCVSchedMempool.td:15 'Processor does not define resources for WriteFCvtF32ToF16' in an untouched file; correctly reported in other_errors_seen and out of scope (rule 5)."
+  }
+}

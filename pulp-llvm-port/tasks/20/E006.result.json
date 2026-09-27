@@ -1,0 +1,12 @@
+{
+  "status": "done",
+  "branch": "work/20/E006",
+  "commits": ["5a4afc65580f66298d90579d02764e06eabe77e7"],
+  "note": "notes/20/E006.md",
+  "signature_gone": true,
+  "other_errors_seen": [
+    "llvm/lib/Target/RISCV/RISCVISelDAGToDAG.cpp:841:1: error: extraneous closing brace ('}')",
+    "llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2650:15: error: redefinition of 'getPreferredAddressingMode'",
+    "INCIDENT: git stash is shared across worktrees; E006 and E007 popped each other's stash. wt/20-E007 currently holds E006's RISCVRegisterInfo.cpp include (uncommitted) instead of its own TTI change. E007's lost change is saved verbatim in logs/20-E007.swapped-stash.patch (identical to stash commit 31408c89ceec). E006 did not modify wt/20-E007."
+  ]
+}

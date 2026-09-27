@@ -1,0 +1,20 @@
+{
+  "branch": "work/20/E001",
+  "int_head_before": "94bbab7f1554874b4f17e51bbdadef698136489f",
+  "build_rc": 1,
+  "errors_fixed": [
+    "Value specified for template argument 'RISCVExtension:desc' is of type int; expected type string: N",
+    "Value specified for template argument 'RISCVExtension:implies' is of type string; expected type list<SubtargetFeature>: \"'Xfalthalf' (alternate half-precision floats)\"",
+    "Value specified for template argument 'RISCVExtension:major' is of type string; expected type int: \"xfalthalf\""
+  ],
+  "errors_new": [],
+  "build_log": "tasks/20/work_20_E001.build.log",
+  "errors_unmasked": [
+    "Processor does not define resources for WriteFCvtF32ToF16"
+  ],
+  "verdict": "LANDED",
+  "int_head_after": "92320420722327d37e9329a268abee1b35107f59",
+  "commits": [
+    "963f162ed2856968a7b864771385228ef70ab88c"
+  ]
+}

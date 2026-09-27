@@ -282,7 +282,7 @@ class PolicyAndIntegrateTest(unittest.TestCase):
 
 
 class LitDiffTest(unittest.TestCase):
-    def run_diff(self, cand, base=None, renames=None):
+    def run_diff(self, cand, base=None, renames=None, extra=()):
         with tempfile.TemporaryDirectory() as tmp:
             c = Path(tmp) / "c.json"
             c.write_text(json.dumps({"tests": [{"name": n, "code": k} for n, k in cand.items()]}))
@@ -297,7 +297,7 @@ class LitDiffTest(unittest.TestCase):
                 m = Path(tmp) / "renames.json"
                 m.write_text(json.dumps(renames))
                 args += ["--baseline-renames", str(m)]
-            r = py("lit_diff.py", *args)
+            r = py("lit_diff.py", *args, *extra)
             return r.returncode, json.loads((Path(tmp) / "o.json").read_text())
 
     def test_green(self):
@@ -314,6 +314,80 @@ class LitDiffTest(unittest.TestCase):
         self.assertEqual(problems["llvm/test/CodeGen/RISCV/xpulp-hwloop.ll"], "fork test is UNSUPPORTED, not PASS")
         self.assertEqual(problems["llvm/test/MC/RISCV/rv32xssr-valid.s"], "fork test did not run")
         self.assertEqual(problems["llvm/test/CodeGen/RISCV/add.ll"], "regressed from PASS to XFAIL")
+
+    def test_upstream_removed_rule(self):
+        # Upstream tag has kept.ll only; worktree additionally still has stale.ll on disk.
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "wt"
+            repo.mkdir()
+            sh(repo, "git", "init", "-q", "-b", "main")
+            sh(repo, "git", "config", "user.email", "t@example.com")
+            sh(repo, "git", "config", "user.name", "t")
+            write(repo, "llvm/test/CodeGen/RISCV/kept.ll", "x\n")
+            commit(repo, "upstream")
+            sh(repo, "git", "tag", "llvmorg-20.1.8")
+            write(repo, "llvm/test/CodeGen/RISCV/stale.ll", "x\n")
+            commit(repo, "fork")
+            names = ["gone", "kept", "stale"]
+            base = {f"LLVM :: CodeGen/RISCV/{n}.ll": "PASS" for n in names}
+            base["LLVM :: CodeGen/RISCV/xpulp-hwloop.ll"] = "PASS"
+            cand = {"LLVM :: MC/RISCV/rv32xssr-valid.s": "PASS"}
+            extra = ["--worktree", str(repo), "--upstream-tag", "llvmorg-20.1.8"]
+            rc, rep = self.run_diff(cand, base, extra=extra)
+        problems = {}
+        for g in rep["groups"]:
+            for pr in g["tests"]:
+                problems.setdefault(pr["test"], []).append(pr["problem"])
+        # Deleted upstream (absent at the tag and in the worktree): excused and listed.
+        self.assertEqual(rep["upstream_removed"], ["llvm/test/CodeGen/RISCV/gone.ll"])
+        # Still at the upstream tag, still in the worktree, or a fork test: never excused.
+        self.assertEqual(problems["llvm/test/CodeGen/RISCV/kept.ll"], ["regressed from PASS to MISSING"])
+        self.assertEqual(problems["llvm/test/CodeGen/RISCV/stale.ll"], ["regressed from PASS to MISSING"])
+        self.assertEqual(problems["llvm/test/CodeGen/RISCV/xpulp-hwloop.ll"],
+                         ["fork test did not run", "regressed from PASS to MISSING"])
+        self.assertEqual(rc, 1)
+        # Without the two options the rule is off.
+        rc2, rep2 = self.run_diff(cand, base)
+        self.assertNotIn("upstream_removed", rep2)
+
+    def test_upstream_removed_rule_refuses_bad_inputs(self):
+        # A wrong tag or worktree must stop the run, never read as "absent upstream".
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "wt"
+            repo.mkdir()
+            sh(repo, "git", "init", "-q", "-b", "main")
+            sh(repo, "git", "config", "user.email", "t@example.com")
+            sh(repo, "git", "config", "user.name", "t")
+            write(repo, "llvm/test/CodeGen/RISCV/kept.ll", "x\n")
+            commit(repo, "upstream")
+            sh(repo, "git", "tag", "llvmorg-20.1.8")
+            write(repo, "llvm/test/CodeGen/RISCV/fork.ll", "x\n")
+            commit(repo, "fork")
+            sh(repo, "git", "checkout", "-q", "-b", "other", "llvmorg-20.1.8")
+            write(repo, "unrelated", "x\n")
+            commit(repo, "unrelated")
+            sh(repo, "git", "tag", "unrelated-tag")
+            sh(repo, "git", "checkout", "-q", "main")
+            c = Path(tmp) / "c.json"
+            c.write_text(json.dumps({"tests": []}))
+            b = Path(tmp) / "b.json"
+            b.write_text(json.dumps({"tests": [{"name": "LLVM :: CodeGen/RISCV/kept.ll", "code": "PASS"}]}))
+            ft = Path(tmp) / "ft.txt"
+            ft.write_text("")
+            common = ["--candidate", str(c), "--baseline", str(b), "--fork-tests", str(ft),
+                      "--out", str(Path(tmp) / "o.json")]
+            head = sh(repo, "git", "rev-parse", "HEAD").stdout.strip()
+            for wt, tag, why in [(repo, "llvmorg-20.1.8-typo", "does not resolve"),
+                                 (Path(tmp) / "nope", "llvmorg-20.1.8", "not a git work tree"),
+                                 (tmp, "llvmorg-20.1.8", "not a git work tree"),
+                                 (repo / "llvm", "llvmorg-20.1.8", "not the top of a git work tree"),
+                                 (repo, "unrelated-tag", "not an ancestor"),
+                                 (repo, head, "not the worktree HEAD")]:
+                r = py("lit_diff.py", *common, "--worktree", str(wt), "--upstream-tag", tag)
+                self.assertNotIn(r.returncode, (0, 1), (tag, r.stdout, r.stderr))
+                self.assertIn(why, r.stderr, (tag, r.stderr))
+            r = py("lit_diff.py", *common, "--worktree", str(repo))
+            self.assertIn("together", r.stderr)
 
     def test_evidence_backed_rename_and_rejection_cases(self):
         source = "llvm/test/CodeGen/RISCV/old.ll"
@@ -355,6 +429,47 @@ class LitDiffTest(unittest.TestCase):
         rc, report = self.run_diff(missing_fork, {"LLVM :: CodeGen/RISCV/xpulp-hwloop.ll": "PASS"}, [fork_entry])
         self.assertEqual(rc, 1)
         self.assertTrue(any(t["problem"] == "fork test did not run" for g in report["groups"] for t in g["tests"]))
+
+    def test_split_requires_every_successor_and_preserves_other_checks(self):
+        src = "llvm/test/CodeGen/RISCV/old.ll"
+        dst = "llvm/test/CodeGen/RISCV/new.ll"
+        secondary = "llvm/test/CodeGen/RISCV/second.ll"
+        entry = {"source": src, "destination": dst, "additional_destinations": [secondary],
+                 "upstream_commit": "a" * 40}
+        base = {"LLVM :: CodeGen/RISCV/old.ll": "PASS"}
+        cand = {"LLVM :: CodeGen/RISCV/xpulp-hwloop.ll": "PASS",
+                "LLVM :: MC/RISCV/rv32xssr-valid.s": "PASS",
+                "LLVM :: CodeGen/RISCV/new.ll": "PASS",
+                "LLVM :: CodeGen/RISCV/second.ll": "PASS"}
+        rc, report = self.run_diff(cand, base, [entry])
+        self.assertEqual(rc, 0, report)
+        self.assertEqual(report["baseline_renames"], [entry])
+        for code in (None, "FAIL", "UNRESOLVED", "TIMEOUT", "XPASS", "XFAIL", "UNSUPPORTED"):
+            with self.subTest(secondary=code):
+                changed = dict(cand)
+                if code is None:
+                    del changed["LLVM :: CodeGen/RISCV/second.ll"]
+                else:
+                    changed["LLVM :: CodeGen/RISCV/second.ll"] = code
+                rc, report = self.run_diff(changed, base, [entry])
+                self.assertEqual(rc, 1)
+                self.assertTrue(report["mapping_errors"])
+                if code == "FAIL":
+                    self.assertTrue(any(t["problem"] == "FAIL" for g in report["groups"] for t in g["tests"]))
+        for extra in (None, secondary, [None], [""], [dst], [secondary, secondary], [src],
+                      ["/tmp/test"], ["llvm/test/../test/x.ll"]):
+            with self.subTest(extra=extra):
+                self.assertTrue(self.run_diff(cand, base, [{**entry, "additional_destinations": extra}])[1]["mapping_errors"])
+        self.assertTrue(self.run_diff(cand, base, [{**entry, "additional_destination": []}])[1]["mapping_errors"])
+        other = {"source": "llvm/test/CodeGen/RISCV/other.ll", "destination": secondary,
+                 "upstream_commit": "b" * 40}
+        self.assertTrue(self.run_diff(cand, {**base, "LLVM :: CodeGen/RISCV/other.ll": "PASS"},
+                                      [entry, other])[1]["mapping_errors"])
+        for name in ("LLVM :: CodeGen/RISCV/unrelated.ll", "LLVM :: CodeGen/RISCV/xpulp-hwloop.ll"):
+            self.assertEqual(self.run_diff({**cand, name: "FAIL"}, base, [entry])[0], 1)
+        missing = dict(cand)
+        del missing["LLVM :: CodeGen/RISCV/xpulp-hwloop.ll"]
+        self.assertEqual(self.run_diff(missing, base, [entry])[0], 1)
 
 
 DIS_REF = """

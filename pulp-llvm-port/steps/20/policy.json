@@ -1,0 +1,20 @@
+{
+  "range": "94bbab7f1554..port/20",
+  "commits": 11,
+  "fail": 0,
+  "warn": 2,
+  "findings": [
+    {
+      "commit": "1a4b5a586bfe",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xmempool-invalid.s"
+    },
+    {
+      "commit": "890ead770f74",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/CodeGen/RISCV/freploop-nested.ll"
+    }
+  ]
+}

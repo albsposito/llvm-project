@@ -1,0 +1,950 @@
+{
+  "tests": 84,
+  "failures": 0,
+  "disabled": 0,
+  "errors": 0,
+  "timestamp": "2026-09-27T11:19:23Z",
+  "time": "0.001s",
+  "name": "AllTests",
+  "testsuites": [
+    {
+      "name": "TargetParserTest",
+      "tests": 33,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2026-09-27T11:19:23Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "testCSKYCPUArchList",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/CSKYTargetParserTest.cpp",
+          "line": 1002,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "testInvalidCSKYArch",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/CSKYTargetParserTest.cpp",
+          "line": 1014,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "testCSKYArch",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/CSKYTargetParserTest.cpp",
+          "line": 1027,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "CSKYFPUVersion",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/CSKYTargetParserTest.cpp",
+          "line": 1041,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "CSKYExtensionFeatures",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/CSKYTargetParserTest.cpp",
+          "line": 1051,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "CSKYFPUFeatures",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/CSKYTargetParserTest.cpp",
+          "line": 1071,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "CSKYArchExtFeature",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/CSKYTargetParserTest.cpp",
+          "line": 1083,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "RISCVPrintEnabledExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 1200,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "testARMCPUArchList",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 534,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "testInvalidARMArch",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 546,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "testARMArch",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 562,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "testARMExtension",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 653,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMFPUVersion",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 719,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMFPUNeonSupportLevel",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 730,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMFPURestriction",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 741,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMExtensionFeatures",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 754,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMFPUFeatures",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 784,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMArchExtFeature",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 796,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMArchExtDependencies",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 841,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMparseHWDiv",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 848,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMparseArchEndianAndISA",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 855,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMparseArchProfile",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 907,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMparseArchVersion",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 951,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "getARMCPUForArch",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 959,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "ARMPrintSupportedExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 1023,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "testAArch64CPUArchList",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 1170,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "testAArch64Arch",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 1187,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "testAArch64Extension",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 1224,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "AArch64ExtensionFeatures",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 1299,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "AArch64ArchFeatures",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 1466,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "AArch64ArchPartialOrder",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 1487,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "AArch64ArchExtFeature",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 1540,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        },
+        {
+          "name": "AArch64PrintSupportedExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/TargetParserTest.cpp",
+          "line": 1629,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "TargetParserTest"
+        }
+      ]
+    },
+    {
+      "name": "ParseNormalizedArchString",
+      "tests": 12,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2026-09-27T11:19:23Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "RejectsInvalidChars",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 23,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        },
+        {
+          "name": "RejectsInvalidBaseISA",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 32,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        },
+        {
+          "name": "RejectsMalformedInputs",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 40,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        },
+        {
+          "name": "RejectsOnlyVersion",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 54,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        },
+        {
+          "name": "RejectsBadZ",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 62,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        },
+        {
+          "name": "RejectsBadS",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 70,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        },
+        {
+          "name": "RejectsBadX",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 78,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        },
+        {
+          "name": "DuplicateExtension",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 86,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        },
+        {
+          "name": "AcceptsValidBaseISAsAndSetsXLen",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 94,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        },
+        {
+          "name": "AcceptsArbitraryExtensionsAndVersions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 128,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        },
+        {
+          "name": "UpdatesFLenMinVLenMaxELen",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 146,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        },
+        {
+          "name": "AcceptsUnknownMultiletter",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 158,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseNormalizedArchString"
+        }
+      ]
+    },
+    {
+      "name": "ParseArchString",
+      "tests": 30,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2026-09-27T11:19:23Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "RejectsInvalidChars",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 166,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsInvalidBaseISA",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 173,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsUnsupportedBaseISA",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 189,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "AcceptsSupportedBaseISAsAndSetsXLenAndFLen",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 197,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsUnrecognizedExtensionNamesByDefault",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 326,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "AcceptsVersionInLongOrShortForm",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 353,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsUnrecognizedExtensionVersionsByDefault",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 368,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "AcceptsUnderscoreSplittingExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 386,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "AcceptsRelaxSingleLetterExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 406,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "AcceptsRelaxMixedLetterExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 425,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "AcceptsAmbiguousFromRelaxExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 447,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsRelaxExtensionsNotStartWithEorIorG",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 474,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsMultiLetterExtensionFollowBySingleLetterExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 481,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsDoubleOrTrailingUnderscore",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 497,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsDuplicateExtensionNames",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 509,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsExperimentalExtensionsIfNotEnableExperimentalExtension",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 532,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "AcceptsExperimentalExtensionsIfEnableExperimentalExtension",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 540,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RequiresExplicitVersionNumberForExperimentalExtensionByDefault",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 558,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "AcceptsUnrecognizedVersionIfNotExperimentalExtensionVersionCheck",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 565,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsUnrecognizedVersionForExperimentalExtension",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 574,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsExtensionVersionForG",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 582,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "AddsImpliedExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 589,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsConflictingExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 614,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "MissingDepency",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 675,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsUnrecognizedProfileNames",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 700,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsProfilesWithUnseparatedExtraExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 708,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "AcceptsBareProfileNames",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 715,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsProfilesWithAdditionalExtensionsGivenAlreadyInProfile",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 754,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "RejectsExperimentalProfilesIfEnableExperimentalExtensionsNotSet",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 764,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        },
+        {
+          "name": "ZceImplication",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 827,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchString"
+        }
+      ]
+    },
+    {
+      "name": "ParseArchSTring",
+      "tests": 1,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2026-09-27T11:19:23Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "AcceptsProfileNamesWithSeparatedAdditionalExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 742,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ParseArchSTring"
+        }
+      ]
+    },
+    {
+      "name": "ToFeatures",
+      "tests": 4,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2026-09-27T11:19:23Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "IIsDroppedAndExperimentalExtensionsArePrefixed",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 770,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ToFeatures"
+        },
+        {
+          "name": "UnsupportedExtensionsAreDropped",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 784,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ToFeatures"
+        },
+        {
+          "name": "UnsupportedExtensionsAreKeptIfIgnoreUnknownIsFalse",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 791,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ToFeatures"
+        },
+        {
+          "name": "AddAllExtensionsAddsNegativeExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 799,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "ToFeatures"
+        }
+      ]
+    },
+    {
+      "name": "OrderedExtensionMap",
+      "tests": 1,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2026-09-27T11:19:23Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "ExtensionsAreCorrectlyOrdered",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 811,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "OrderedExtensionMap"
+        }
+      ]
+    },
+    {
+      "name": "isSupportedExtensionWithVersion",
+      "tests": 1,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2026-09-27T11:19:23Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "AcceptsSingleExtensionWithVersion",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 915,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "isSupportedExtensionWithVersion"
+        }
+      ]
+    },
+    {
+      "name": "getTargetFeatureForExtension",
+      "tests": 1,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2026-09-27T11:19:23Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "RetrieveTargetFeatureFromOneExt",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 924,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "getTargetFeatureForExtension"
+        }
+      ]
+    },
+    {
+      "name": "RiscvExtensionsHelp",
+      "tests": 1,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2026-09-27T11:19:23Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "CheckExtensions",
+          "file": "..\/..\/wt\/int-20\/llvm\/unittests\/TargetParser\/RISCVISAInfoTest.cpp",
+          "line": 935,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-09-27T11:19:23Z",
+          "time": "0s",
+          "classname": "RiscvExtensionsHelp"
+        }
+      ]
+    }
+  ]
+}

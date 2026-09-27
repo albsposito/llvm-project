@@ -1,0 +1,28 @@
+ninja: Entering directory `build/int-20'
+[1/27] Generating VCSRevision.h
+[2/27] Generating VCSVersion.inc
+[3/27] Building CXX object tools/clang/lib/Basic/CMakeFiles/obj.clangBasic.dir/Version.cpp.o
+[4/27] Building CXX object lib/Object/CMakeFiles/LLVMObject.dir/IRSymtab.cpp.o
+[5/27] Linking CXX static library lib/libLLVMObject.a
+[6/27] Generating VCSVersion.inc
+[7/27] Linking CXX static library lib/libclangBasic.a
+[8/27] Linking CXX executable bin/llvm-objdump
+[9/27] Building CXX object tools/lld/Common/CMakeFiles/lldCommon.dir/Version.cpp.o
+[10/27] Linking CXX static library lib/liblldCommon.a
+[11/27] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o
+[12/27] Building CXX object lib/CodeGen/AsmPrinter/CMakeFiles/LLVMAsmPrinter.dir/AsmPrinter.cpp.o
+[13/27] Linking CXX static library lib/libLLVMAsmPrinter.a
+[14/27] Linking CXX static library lib/libLLVMRISCVCodeGen.a
+[15/27] Linking CXX static library lib/libLLVMOptDriver.a
+[16/27] Building CXX object lib/LTO/CMakeFiles/LLVMLTO.dir/LTO.cpp.o
+[17/27] Linking CXX static library lib/libLLVMLTO.a
+[18/27] Linking CXX static library lib/liblldWasm.a
+[19/27] Linking CXX static library lib/liblldCOFF.a
+[20/27] Linking CXX static library lib/liblldMachO.a
+[21/27] Linking CXX static library lib/liblldMinGW.a
+[22/27] Linking CXX static library lib/liblldELF.a
+[23/27] Linking CXX executable bin/opt
+[24/27] Linking CXX executable bin/llc
+[25/27] Linking CXX executable bin/lld
+[26/27] Linking CXX executable bin/clang-20
+[27/27] Creating executable symlink bin/clang

@@ -1,0 +1,66 @@
+{
+  "log": "logs/probe-20b.log",
+  "failed_targets": 3,
+  "clusters": [
+    {
+      "key": "extraneous closing brace ('}')",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVISelDAGToDAG.cpp:841"
+      ],
+      "samples": [
+        "../../wt/20-probe/llvm/lib/Target/RISCV/RISCVISelDAGToDAG.cpp:841:1: error: extraneous closing brace ('}')\n  841 | }\n      | ^"
+      ],
+      "owners": [
+        "codegen-core"
+      ],
+      "count": 1,
+      "id": "E001"
+    },
+    {
+      "key": "no member named 'getUsedSSR' in 'llvm::MachineFunctionInfo'",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp:150"
+      ],
+      "samples": [
+        "../../wt/20-probe/llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp:150:16: error: no member named 'getUsedSSR' in 'llvm::MachineFunctionInfo'\n  150 |       if(RVFI->getUsedSSR() & (1<<n))\n      |          ~~~~  ^"
+      ],
+      "owners": [
+        "codegen-core"
+      ],
+      "count": 1,
+      "id": "E002"
+    },
+    {
+      "key": "redefinition of 'getPreferredAddressingMode'",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2650"
+      ],
+      "samples": [
+        "../../wt/20-probe/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2650:15: error: redefinition of 'getPreferredAddressingMode'\n 2650 | RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,\n      |               ^\n../../wt/20-probe/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2395:15: note: previous definition is here\n 2395 | RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,\n      |               ^"
+      ],
+      "owners": [
+        "codegen-core"
+      ],
+      "count": 1,
+      "id": "E003"
+    },
+    {
+      "key": "unknown type name 'RISCVMachineFunctionInfo'; did you mean 'MachineFunctionInfo'?",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp:148"
+      ],
+      "samples": [
+        "../../wt/20-probe/llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp:148:35: error: unknown type name 'RISCVMachineFunctionInfo'; did you mean 'MachineFunctionInfo'?\n  148 |     const auto *RVFI = MF.getInfo<RISCVMachineFunctionInfo>();\n      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~\n      |                                   MachineFunctionInfo\n../../wt/20-probe/llvm/include/llvm/CodeGen/MachineFunction.h:104:8: note: 'MachineFunctionInfo' declared here\n  104 | struct MachineFunctionInfo {\n      |        ^"
+      ],
+      "owners": [
+        "codegen-core"
+      ],
+      "count": 1,
+      "id": "E004"
+    }
+  ]
+}

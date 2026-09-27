@@ -1,0 +1,23 @@
+ninja: Entering directory `/work/build'
+[1/22] Generating VCSRevision.h
+[2/22] Generating VCSVersion.inc
+[3/22] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelLowering.cpp.o
+[4/22] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o
+[5/22] Building CXX object tools/clang/lib/Basic/CMakeFiles/obj.clangBasic.dir/Version.cpp.o
+[6/22] Building CXX object lib/Object/CMakeFiles/LLVMObject.dir/IRSymtab.cpp.o
+[7/22] Linking CXX static library lib/libLLVMObject.a
+[8/22] Generating VCSVersion.inc
+[9/22] Linking CXX static library lib/libclangBasic.a
+[10/22] Linking CXX executable bin/llvm-objdump
+[11/22] Building CXX object tools/lld/Common/CMakeFiles/lldCommon.dir/Version.cpp.o
+[12/22] Linking CXX static library lib/liblldCommon.a
+[13/22] Building CXX object lib/CodeGen/AsmPrinter/CMakeFiles/LLVMAsmPrinter.dir/AsmPrinter.cpp.o
+[14/22] Linking CXX static library lib/libLLVMAsmPrinter.a
+[15/22] Linking CXX static library lib/libLLVMRISCVCodeGen.a
+[16/22] Linking CXX executable bin/llc
+[17/22] Linking CXX executable bin/opt
+[18/22] Building CXX object lib/LTO/CMakeFiles/LLVMLTO.dir/LTO.cpp.o
+[19/22] Linking CXX static library lib/libLLVMLTO.a
+[20/22] Linking CXX executable bin/lld
+[21/22] Linking CXX executable bin/clang-20
+[22/22] Creating executable symlink bin/clang

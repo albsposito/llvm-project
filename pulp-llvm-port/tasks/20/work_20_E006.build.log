@@ -1,0 +1,34 @@
+ninja: Entering directory `build/int-20'
+[1/29] Generating VCSRevision.h
+[2/29] Generating VCSVersion.inc
+[3/29] Building CXX object tools/clang/lib/Basic/CMakeFiles/obj.clangBasic.dir/Version.cpp.o
+[4/29] Building CXX object lib/Object/CMakeFiles/LLVMObject.dir/IRSymtab.cpp.o
+[5/29] Linking CXX static library lib/libLLVMObject.a
+[6/29] Generating VCSVersion.inc
+[7/29] Building CXX object tools/lld/Common/CMakeFiles/lldCommon.dir/Version.cpp.o
+[8/29] Linking CXX static library lib/libclangBasic.a
+[9/29] Linking CXX static library lib/liblldCommon.a
+[10/29] Linking CXX executable bin/llvm-objdump
+[11/29] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-20/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-20/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp
+../../wt/int-20/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2650:15: error: redefinition of 'getPreferredAddressingMode'
+ 2650 | RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,
+      |               ^
+../../wt/int-20/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2395:15: note: previous definition is here
+ 2395 | RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,
+      |               ^
+1 error generated.
+[12/29] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVRegisterInfo.cpp.o
+[13/29] Building CXX object lib/CodeGen/AsmPrinter/CMakeFiles/LLVMAsmPrinter.dir/AsmPrinter.cpp.o
+[14/29] Linking CXX static library lib/libLLVMAsmPrinter.a
+[15/29] Building CXX object lib/LTO/CMakeFiles/LLVMLTO.dir/LTO.cpp.o
+[16/29] Linking CXX static library lib/libLLVMLTO.a
+[17/29] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-20/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-20/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV/RISCVISelDAGToDAG.cpp
+../../wt/int-20/llvm/lib/Target/RISCV/RISCVISelDAGToDAG.cpp:841:1: error: extraneous closing brace ('}')
+  841 | }
+      | ^
+1 error generated.
+ninja: build stopped: cannot make progress due to previous errors.

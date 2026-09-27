@@ -1,0 +1,19 @@
+{
+  "status": "done",
+  "branch": "work/20/T008",
+  "commits": ["8bcb70882fc6487c06c8f4fe248bb4223f30262f", "eaa1a22498475173ccfc5abeaccf3de51c363417"],
+  "note": "notes/20/T008.md",
+  "regen_report": "notes/20/T008-regen.md",
+  "signature_gone": true,
+  "other_errors_seen": [],
+  "evidence": {
+    "base": "worktree created from work/20/T003 (8bcb70882fc6) as instructed; T003 commit unmodified",
+    "four_run_lines": "build/20-T008 llc output byte-identical for default/-O1/-O2/-O3 (logs/20-T008.asm*.s); '# implicit-def: $f15_d' directly between 'li a0, 127' and 'frep.o a0, 2, 0, 0' in main1 in all four",
+    "repro_log": "logs/20-T008.repro.log (FAIL at line 60 before edit)",
+    "lit_log": "logs/20-T008.lit.log (PASS after edit)",
+    "oracle_check": "logs/20-T008.verify.log: with build/20-T008 llc PASS x4; with build/int-20 llc (no T003) FAIL x4",
+    "policy_check": "1a4b5a586bfe..work/20/T008: 2 commits, 0 FAIL, 1 WARN (test-edit, expected)",
+    "diff": "1 insertion, 0 deletions in llvm/test/CodeGen/RISCV/freploop-nested.ll",
+    "topology_note": "integration_head 1a4b5a586bfe (T006) is a sibling of work/20/T003, both children of 17009d29cc0e, so work/20/T008 does not contain 1a4b5a586bfe; it touches only rv32xmempool-invalid.s, no overlap. Conductor must cherry-pick/rebase T003+T008 onto port/20."
+  }
+}

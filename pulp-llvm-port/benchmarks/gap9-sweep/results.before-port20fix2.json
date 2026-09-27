@@ -1,0 +1,8758 @@
+{
+ "meta": {
+  "compilers": {
+   "ref18": {
+    "path": "/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/ref-18/bin/clang",
+    "version": "clang version 18.1.4 (https://github.com/albsposito/llvm-project.git 1c33bd3dba2bd1f3942842135daba498af1b3eb5)"
+   },
+   "port19": {
+    "path": "/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/port-19/bin/clang",
+    "version": "clang version 19.1.7 (https://github.com/albsposito/llvm-project.git 9b2edaf923ad46816535d7361e9daef79be0529c)"
+   },
+   "port20": {
+    "path": "/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/port-20/bin/clang",
+    "version": "clang version 20.1.8 (https://github.com/albsposito/llvm-project.git b6cd96bd37263d1ab670bf7b54fd64253fc87619)"
+   },
+   "gcc": {
+    "path": "/home/ubuntu/gap_riscv_toolchain_ubuntu/bin/riscv32-unknown-elf-gcc",
+    "version": "riscv32-unknown-elf-gcc (GCC) 7.1.1 20170509"
+   },
+   "port20fix": {
+    "path": "/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/port-20fix/bin/clang",
+    "version": "clang version 20.1.8 (https://github.com/albsposito/llvm-project.git 6e4c7f2a471f58958f091e21cf5cf560410d8363)"
+   }
+  },
+  "objdump": "/home/ubuntu/llvm-project/pulp-llvm-port/toolchains/port-20/bin/llvm-objdump -d --mattr=+m,+xpulpv,+zfinx",
+  "llvm_flags": [
+   "--target=riscv32-unknown-elf",
+   "-march=rv32imc_zfinx_xpulpv2",
+   "-mabi=ilp32",
+   "-mno-relax",
+   "-isystem",
+   "/home/ubuntu/gap_riscv_toolchain_ubuntu/riscv32-unknown-elf/include"
+  ],
+  "gcc_flags": [
+   "-march=rv32imcxgap9",
+   "-mPE=8",
+   "-mFC=1"
+  ],
+  "includes": [
+   "-I/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/gap9-sweep/src/shim",
+   "-I/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/gap9-sweep/build/gen",
+   "-I/home/ubuntu/gap_sdk_release/tools/autotiler_v3/BasicKernels/DSP_Libraries",
+   "-I/home/ubuntu/gap_sdk_release/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions",
+   "-I/home/ubuntu/gap_sdk_release/tools/autotiler_v3/Emulation",
+   "-D__gap9__",
+   "-D__GAP9__",
+   "-D__pulp__"
+  ],
+  "sdk": "/home/ubuntu/gap_sdk_release",
+  "sdk_head": "206cbda18bba22cc7ee837083ac385b6f4a98602",
+  "kernels": [
+   {
+    "kernel": "k01_fir_fix16",
+    "functions": [
+     "KerFirSeqBaseline",
+     "KerFirSeq"
+    ],
+    "source": "FirBasicKernelsFix.c (whole file)"
+   },
+   {
+    "kernel": "k02_fir_f32",
+    "functions": [
+     "KerFirSeqBaselinef32",
+     "KerFirSeqf32"
+    ],
+    "source": "FirBasicKernelsf32.c (whole file)"
+   },
+   {
+    "kernel": "k03_matmul_worker_i16",
+    "functions": [
+     "matmul_worker"
+    ],
+    "source": "cluster_kernels.c (extract)"
+   },
+   {
+    "kernel": "k04_matmul_simple_f32",
+    "functions": [
+     "MatMulSimpleSeq"
+    ],
+    "source": "MatMulRunTest.c (extract)"
+   },
+   {
+    "kernel": "k05_matmul_dsp_fix16",
+    "functions": [
+     "KerParMatMulDSP_Fix16"
+    ],
+    "source": "MatMulDSP.c (extract)"
+   },
+   {
+    "kernel": "k05_matmul_dsp_fix16-file",
+    "functions": [
+     "KerParMatMulDSP_Fix16"
+    ],
+    "source": "MatMulDSP.c (whole file)"
+   },
+   {
+    "kernel": "k06_matvect_dsp_f32",
+    "functions": [
+     "KerParMatVectDSP_f32"
+    ],
+    "source": "MatVectDSP.c (extract; file has no fixed-point kernel)"
+   },
+   {
+    "kernel": "k06_matvect_dsp_f32-file",
+    "functions": [
+     "KerParMatVectDSP_f32"
+    ],
+    "source": "MatVectDSP.c (whole file)"
+   },
+   {
+    "kernel": "k07_matadd_dsp_fix16",
+    "functions": [
+     "KerParMatAdd_DSP_Fix16"
+    ],
+    "source": "MatAddDSP.c (extract)"
+   },
+   {
+    "kernel": "k07_matadd_dsp_fix16-file",
+    "functions": [
+     "KerParMatAdd_DSP_Fix16"
+    ],
+    "source": "MatAddDSP.c (whole file)"
+   },
+   {
+    "kernel": "k08_preprocessing_fix",
+    "functions": [
+     "PreEmphasis",
+     "WindowingReal2Cmplx_Fix16",
+     "WindowingReal2Real_Fix16"
+    ],
+    "source": "PreProcessingFix.c (whole file)"
+   },
+   {
+    "kernel": "k09_cmplx_fix",
+    "functions": [
+     "CmplxMagSquared_Fix16"
+    ],
+    "source": "CmplxFunctionsFix.c (whole file)"
+   },
+   {
+    "kernel": "k10a_fft_radix2_scalar",
+    "functions": [
+     "Radix2FFT_DIF_Scalar"
+    ],
+    "source": "FftLibraryFix.c (extract)"
+   },
+   {
+    "kernel": "k10b_fft_radix2_seq_fix16",
+    "functions": [
+     "Radix2FFT_DIF_Seq_Fix16"
+    ],
+    "source": "FftLibraryFix.c (extract)"
+   },
+   {
+    "kernel": "k10_fft-file",
+    "functions": [
+     "Radix2FFT_DIF_Scalar",
+     "Radix2FFT_DIF_Seq_Fix16"
+    ],
+    "source": "FftLibraryFix.c (whole file)"
+   },
+   {
+    "kernel": "k11_dotprod_i8",
+    "functions": [
+     "dotprod_i8"
+    ],
+    "source": "written for sweep (gap_sumdotp4 loop)"
+   },
+   {
+    "kernel": "clip",
+    "functions": [
+     "clip_s8",
+     "clipu_u8"
+    ],
+    "source": "written for sweep (p.clip probe)"
+   },
+   {
+    "kernel": "k12_packed_add8",
+    "functions": [
+     "packed_add8"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_packed_add16",
+    "functions": [
+     "packed_add16"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_packed_shift8",
+    "functions": [
+     "packed_shift8"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_packed_shift16",
+    "functions": [
+     "packed_shift16"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_packed_max8",
+    "functions": [
+     "packed_max8"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_dot8",
+    "functions": [
+     "dot8"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_dot16",
+    "functions": [
+     "dot16"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_bit_extract",
+    "functions": [
+     "bit_extract"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_bit_count",
+    "functions": [
+     "bit_count"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_mac",
+    "functions": [
+     "mac"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_sum_loop",
+    "functions": [
+     "sum_loop"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_copy_loop",
+    "functions": [
+     "copy_loop"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_dot8_loop",
+    "functions": [
+     "dot8_loop"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_dot16_loop",
+    "functions": [
+     "dot16_loop"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   },
+   {
+    "kernel": "k12_packed_add8_loop",
+    "functions": [
+     "packed_add8_loop"
+    ],
+    "source": "19-vs-18/kernels.c line (anchor)"
+   }
+  ],
+  "families": {
+   "hwloop": "lp.*",
+   "postinc": "p.l*/p.s* with rs1! writeback",
+   "p-regoff": "p.l*/p.s* register-offset, no writeback",
+   "simd": "pv.*",
+   "mac": "p.mac*/p.msu*",
+   "clip": "p.clip*",
+   "bitmanip": "p.extract/insert/bclr/bset/cnt/ff1/fl1/clb/ror/bitrev",
+   "p-other": "other p.* (abs/min/max/exths/addN/...)",
+   "unknown": "words port20 llvm-objdump cannot decode (GAP9-only encodings)"
+  }
+ },
+ "rows": [
+  {
+   "kernel": "k01_fir_fix16",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k01_fir_fix16",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "assert",
+   "detail": "Assertion `hasVInstructions() && \"Tried to get vector length without Zve or V extension support!\"' failed",
+   "returncode": 1
+  },
+  {
+   "kernel": "k01_fir_fix16",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k01_fir_fix16",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "assert",
+   "detail": "Assertion `hasVInstructions() && \"Tried to get vector length without Zve or V extension support!\"' failed",
+   "returncode": 1
+  },
+  {
+   "kernel": "k01_fir_fix16",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k01_fir_fix16",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "assert",
+   "detail": "Assertion `hasVInstructions() && \"Tried to get vector length without Zve or V extension support!\"' failed",
+   "returncode": 1
+  },
+  {
+   "kernel": "k01_fir_fix16",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerFirSeqBaseline": {
+     "size": 124,
+     "decoded_bytes": 124,
+     "instructions": 42,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 3,
+      "postinc": 5,
+      "mac": 1,
+      "p-other": 1
+     },
+     "mnemonics": {
+      "blez": 2,
+      "slli": 4,
+      "addi": 8,
+      "srli": 3,
+      "mv": 4,
+      "add": 4,
+      "lp.setup": 3,
+      "li": 3,
+      "sub": 2,
+      "p.lh": 3,
+      "p.mac": 1,
+      "p.addrnr": 1,
+      "p.sw": 1,
+      "bge": 1,
+      "p.sh": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    },
+    "KerFirSeq": {
+     "size": 564,
+     "decoded_bytes": 564,
+     "instructions": 181,
+     "unknown": 0,
+     "mix": {
+      "p-other": 8,
+      "bitmanip": 5,
+      "hwloop": 6,
+      "simd": 12,
+      "postinc": 9,
+      "mac": 3,
+      "p-regoff": 1
+     },
+     "mnemonics": {
+      "addi": 27,
+      "srli": 7,
+      "sw": 13,
+      "p.addn": 5,
+      "mv": 10,
+      "blez": 3,
+      "srai": 2,
+      "p.bclr": 5,
+      "slli": 14,
+      "add": 11,
+      "lp.setup": 6,
+      "li": 7,
+      "lw": 33,
+      "pv.sdotsp.h": 12,
+      "bge": 3,
+      "sub": 3,
+      "p.lh": 6,
+      "p.mac": 3,
+      "p.addrnr": 3,
+      "p.sw": 3,
+      "beqz": 1,
+      "p.sh": 1,
+      "ret": 1,
+      "j": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "715fffdcc9409c6632bfeffdf9ee97832b8f8bb12540a8d64caa2a5a2f5b0ca5",
+   "warnings": 0
+  },
+  {
+   "kernel": "k01_fir_fix16",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerFirSeqBaseline": {
+     "size": 290,
+     "decoded_bytes": 290,
+     "instructions": 94,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 4,
+      "postinc": 7,
+      "mac": 1,
+      "p-other": 2,
+      "bitmanip": 2,
+      "p-regoff": 1
+     },
+     "mnemonics": {
+      "blez": 3,
+      "slli": 9,
+      "addi": 13,
+      "srli": 5,
+      "mv": 5,
+      "add": 14,
+      "lp.setup": 4,
+      "li": 5,
+      "sub": 3,
+      "p.lh": 3,
+      "p.mac": 1,
+      "p.addrnr": 1,
+      "p.sw": 2,
+      "p.sletu": 1,
+      "slti": 1,
+      "or": 1,
+      "andi": 2,
+      "beqz": 4,
+      "sltiu": 1,
+      "xori": 1,
+      "p.bclr": 2,
+      "lh": 3,
+      "sh": 2,
+      "p.lw": 1,
+      "beq": 1,
+      "p.sh": 2,
+      "bge": 1,
+      "ret": 2,
+      "j": 1
+     },
+     "clip_operands": []
+    },
+    "KerFirSeq": {
+     "size": 758,
+     "decoded_bytes": 758,
+     "instructions": 241,
+     "unknown": 0,
+     "mix": {
+      "p-other": 9,
+      "bitmanip": 7,
+      "hwloop": 7,
+      "simd": 12,
+      "postinc": 11,
+      "mac": 3,
+      "p-regoff": 2
+     },
+     "mnemonics": {
+      "addi": 31,
+      "srli": 9,
+      "sw": 13,
+      "p.addn": 5,
+      "mv": 11,
+      "blez": 4,
+      "srai": 2,
+      "p.bclr": 7,
+      "slli": 21,
+      "li": 10,
+      "mul": 1,
+      "add": 23,
+      "sub": 7,
+      "lp.setup": 7,
+      "lw": 33,
+      "pv.sdotsp.h": 12,
+      "bge": 3,
+      "p.lh": 6,
+      "p.mac": 3,
+      "p.addrnr": 3,
+      "p.sw": 4,
+      "beqz": 5,
+      "p.sletu": 1,
+      "slti": 1,
+      "or": 1,
+      "andi": 2,
+      "sltiu": 1,
+      "xori": 1,
+      "lh": 3,
+      "sh": 2,
+      "p.lw": 1,
+      "beq": 1,
+      "p.sh": 2,
+      "ret": 1,
+      "j": 4
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1e15cf569539a006fb3987e5600d0efaf1ba75391dea56046371c1a1678ca4f3",
+   "warnings": 0
+  },
+  {
+   "kernel": "k01_fir_fix16",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k01_fir_fix16",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k02_fir_f32",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeqBaselinef32",
+   "returncode": 1
+  },
+  {
+   "kernel": "k02_fir_f32",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeqBaselinef32",
+   "returncode": 1
+  },
+  {
+   "kernel": "k02_fir_f32",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeqBaselinef32",
+   "returncode": 1
+  },
+  {
+   "kernel": "k02_fir_f32",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeqBaselinef32",
+   "returncode": 1
+  },
+  {
+   "kernel": "k02_fir_f32",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeqf32",
+   "returncode": 1
+  },
+  {
+   "kernel": "k02_fir_f32",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeqf32",
+   "returncode": 1
+  },
+  {
+   "kernel": "k02_fir_f32",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerFirSeqBaselinef32": {
+     "size": 134,
+     "decoded_bytes": 134,
+     "instructions": 44,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 3,
+      "postinc": 5
+     },
+     "mnemonics": {
+      "blez": 2,
+      "slli": 4,
+      "addi": 8,
+      "srli": 3,
+      "mv": 4,
+      "add": 4,
+      "lp.setup": 3,
+      "li": 3,
+      "sub": 2,
+      "fcvt.s.w": 2,
+      "p.lw": 3,
+      "fmadd.s": 1,
+      "fcvt.w.s": 1,
+      "p.sw": 2,
+      "bge": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    },
+    "KerFirSeqf32": {
+     "size": 670,
+     "decoded_bytes": 670,
+     "instructions": 205,
+     "unknown": 0,
+     "mix": {
+      "p-other": 3,
+      "bitmanip": 3,
+      "hwloop": 6,
+      "postinc": 9,
+      "p-regoff": 1
+     },
+     "mnemonics": {
+      "addi": 26,
+      "srli": 7,
+      "sw": 12,
+      "p.addn": 3,
+      "blez": 3,
+      "srai": 2,
+      "p.bclr": 3,
+      "slli": 12,
+      "mv": 8,
+      "add": 11,
+      "lp.setup": 6,
+      "li": 9,
+      "lw": 32,
+      "fcvt.s.w": 21,
+      "fmadd.s": 15,
+      "fcvt.w.s": 15,
+      "bge": 3,
+      "sub": 3,
+      "p.lw": 6,
+      "p.sw": 4,
+      "beqz": 1,
+      "ret": 1,
+      "j": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "c8b993863a30e2fd17aba70d1c0ea7f6c2ed9ca338d25b025dd43f51271d4dc5",
+   "warnings": 0
+  },
+  {
+   "kernel": "k02_fir_f32",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerFirSeqBaselinef32": {
+     "size": 134,
+     "decoded_bytes": 134,
+     "instructions": 44,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 3,
+      "postinc": 5
+     },
+     "mnemonics": {
+      "blez": 2,
+      "slli": 4,
+      "addi": 8,
+      "srli": 3,
+      "mv": 4,
+      "add": 4,
+      "lp.setup": 3,
+      "li": 3,
+      "sub": 2,
+      "fcvt.s.w": 2,
+      "p.lw": 3,
+      "fmadd.s": 1,
+      "fcvt.w.s": 1,
+      "p.sw": 2,
+      "bge": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    },
+    "KerFirSeqf32": {
+     "size": 660,
+     "decoded_bytes": 660,
+     "instructions": 205,
+     "unknown": 0,
+     "mix": {
+      "p-other": 3,
+      "bitmanip": 3,
+      "hwloop": 6,
+      "postinc": 10,
+      "p-regoff": 1
+     },
+     "mnemonics": {
+      "addi": 26,
+      "srli": 7,
+      "sw": 13,
+      "p.addn": 3,
+      "blez": 3,
+      "srai": 2,
+      "p.bclr": 3,
+      "slli": 12,
+      "add": 11,
+      "mv": 8,
+      "lp.setup": 6,
+      "sub": 4,
+      "p.lw": 7,
+      "li": 9,
+      "lw": 29,
+      "fcvt.s.w": 21,
+      "fmadd.s": 15,
+      "fcvt.w.s": 15,
+      "bge": 3,
+      "p.sw": 4,
+      "beqz": 1,
+      "ret": 1,
+      "j": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1adbe5e85abd65ebc7344f7dbf9fde544754c1dddcb2b01bc310cf60b20ee05e",
+   "warnings": 0
+  },
+  {
+   "kernel": "k02_fir_f32",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeqf32",
+   "returncode": 1
+  },
+  {
+   "kernel": "k02_fir_f32",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerFirSeqf32",
+   "returncode": 1
+  },
+  {
+   "kernel": "k03_matmul_worker_i16",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "matmul_worker": {
+     "size": 158,
+     "decoded_bytes": 158,
+     "instructions": 55,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 2,
+      "mac": 3,
+      "postinc": 2
+     },
+     "mnemonics": {
+      "lw": 9,
+      "li": 7,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "blez": 3,
+      "addi": 6,
+      "sw": 3,
+      "nop": 2,
+      "lp.setup": 2,
+      "j": 2,
+      "mul": 1,
+      "slli": 3,
+      "add": 3,
+      "bge": 1,
+      "mv": 2,
+      "p.mac": 3,
+      "sub": 1,
+      "srli": 1,
+      "p.lh": 2,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "f628e547e9dbb2cd4f5f515e92ef3f58b00bb9b7adb5ec6cb8f80226b80ffc4b",
+   "warnings": 0
+  },
+  {
+   "kernel": "k03_matmul_worker_i16",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "matmul_worker": {
+     "size": 162,
+     "decoded_bytes": 162,
+     "instructions": 56,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 2,
+      "mac": 3,
+      "postinc": 2
+     },
+     "mnemonics": {
+      "lw": 9,
+      "li": 7,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "blez": 4,
+      "addi": 6,
+      "sw": 3,
+      "nop": 2,
+      "lp.setup": 2,
+      "j": 2,
+      "mul": 1,
+      "slli": 3,
+      "add": 3,
+      "bge": 1,
+      "mv": 2,
+      "p.mac": 3,
+      "sub": 1,
+      "srli": 1,
+      "p.lh": 2,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "4a85affed128f68cfb2ebd45b670f18418ceadb759bd493e4f07f50a570f5578",
+   "warnings": 0
+  },
+  {
+   "kernel": "k03_matmul_worker_i16",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "matmul_worker": {
+     "size": 158,
+     "decoded_bytes": 158,
+     "instructions": 55,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 2,
+      "mac": 3,
+      "postinc": 2
+     },
+     "mnemonics": {
+      "lw": 9,
+      "li": 7,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "blez": 3,
+      "addi": 6,
+      "sw": 3,
+      "nop": 2,
+      "lp.setup": 2,
+      "j": 2,
+      "mul": 1,
+      "slli": 3,
+      "add": 3,
+      "bge": 1,
+      "mv": 2,
+      "p.mac": 3,
+      "sub": 1,
+      "srli": 1,
+      "p.lh": 2,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "f869ea7d3346216160b111169834ea239c3c8f5502a5270a75abe58ca5c9486b",
+   "warnings": 0
+  },
+  {
+   "kernel": "k03_matmul_worker_i16",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "matmul_worker": {
+     "size": 162,
+     "decoded_bytes": 162,
+     "instructions": 56,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 2,
+      "mac": 3,
+      "postinc": 2
+     },
+     "mnemonics": {
+      "lw": 9,
+      "li": 7,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "blez": 4,
+      "addi": 6,
+      "sw": 3,
+      "nop": 2,
+      "lp.setup": 2,
+      "j": 2,
+      "mul": 1,
+      "slli": 3,
+      "add": 3,
+      "bge": 1,
+      "mv": 2,
+      "p.mac": 3,
+      "sub": 1,
+      "srli": 1,
+      "p.lh": 2,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "987ce82bc1ac626e892f163323db25b792fa10a9cf73400985b1efb3b777e50e",
+   "warnings": 0
+  },
+  {
+   "kernel": "k03_matmul_worker_i16",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "matmul_worker": {
+     "size": 154,
+     "decoded_bytes": 154,
+     "instructions": 54,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 2,
+      "mac": 3,
+      "postinc": 2
+     },
+     "mnemonics": {
+      "lw": 9,
+      "li": 7,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "blez": 3,
+      "addi": 6,
+      "sw": 3,
+      "nop": 1,
+      "lp.setup": 2,
+      "j": 2,
+      "mul": 1,
+      "slli": 3,
+      "add": 3,
+      "bge": 1,
+      "mv": 2,
+      "p.mac": 3,
+      "sub": 1,
+      "srli": 1,
+      "p.lh": 2,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "f3a60aac79e525c222c35b20d126b87b66d2dd7dd9d33273dcbfbf32e3108211",
+   "warnings": 0
+  },
+  {
+   "kernel": "k03_matmul_worker_i16",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "matmul_worker": {
+     "size": 158,
+     "decoded_bytes": 158,
+     "instructions": 55,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 2,
+      "mac": 3,
+      "postinc": 2
+     },
+     "mnemonics": {
+      "lw": 9,
+      "li": 7,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "blez": 4,
+      "addi": 6,
+      "sw": 3,
+      "nop": 1,
+      "lp.setup": 2,
+      "j": 2,
+      "mul": 1,
+      "slli": 3,
+      "add": 3,
+      "bge": 1,
+      "mv": 2,
+      "p.mac": 3,
+      "sub": 1,
+      "srli": 1,
+      "p.lh": 2,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "771b1b022c109ef5abeedbb704352d6f8c17e94cdd10d7126bd1152e9d1f6329",
+   "warnings": 0
+  },
+  {
+   "kernel": "k03_matmul_worker_i16",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "matmul_worker": {
+     "size": 142,
+     "decoded_bytes": 142,
+     "instructions": 51,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 2,
+      "postinc": 3,
+      "mac": 1
+     },
+     "mnemonics": {
+      "addi": 8,
+      "sw": 4,
+      "lw": 10,
+      "blez": 3,
+      "li": 5,
+      "slli": 4,
+      "mul": 1,
+      "srli": 2,
+      "add": 5,
+      "lp.setup": 2,
+      "sub": 1,
+      "p.lh": 2,
+      "p.mac": 1,
+      "p.sw": 1,
+      "bne": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "23aaaa8dfae56eee9025cd70f066cb5a06b0d44f5ae70f49b4dbc1253801ac6c",
+   "warnings": 0
+  },
+  {
+   "kernel": "k03_matmul_worker_i16",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "matmul_worker": {
+     "size": 140,
+     "decoded_bytes": 140,
+     "instructions": 51,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 2,
+      "postinc": 3,
+      "mac": 1
+     },
+     "mnemonics": {
+      "addi": 8,
+      "sw": 4,
+      "lw": 10,
+      "blez": 3,
+      "slli": 4,
+      "li": 5,
+      "mul": 1,
+      "srli": 2,
+      "add": 5,
+      "lp.setup": 2,
+      "sub": 1,
+      "p.lh": 2,
+      "p.mac": 1,
+      "p.sw": 1,
+      "bne": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "3ab05b02b806c78f46d4eccd21bb2e3d4b392d0470600277df6fb150c5bef1d0",
+   "warnings": 0
+  },
+  {
+   "kernel": "k03_matmul_worker_i16",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "matmul_worker": {
+     "size": 154,
+     "decoded_bytes": 154,
+     "instructions": 54,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 2,
+      "mac": 3,
+      "postinc": 2
+     },
+     "mnemonics": {
+      "lw": 9,
+      "li": 7,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "blez": 3,
+      "addi": 6,
+      "sw": 3,
+      "nop": 1,
+      "lp.setup": 2,
+      "j": 2,
+      "mul": 1,
+      "slli": 3,
+      "add": 3,
+      "bge": 1,
+      "mv": 2,
+      "p.mac": 3,
+      "sub": 1,
+      "srli": 1,
+      "p.lh": 2,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "23962f2c21693db369b3103ea10007f8173629645f6b340f1fc4ea0ec40b73d1",
+   "warnings": 0
+  },
+  {
+   "kernel": "k03_matmul_worker_i16",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "matmul_worker": {
+     "size": 158,
+     "decoded_bytes": 158,
+     "instructions": 55,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 2,
+      "mac": 3,
+      "postinc": 2
+     },
+     "mnemonics": {
+      "lw": 9,
+      "li": 7,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "blez": 4,
+      "addi": 6,
+      "sw": 3,
+      "nop": 1,
+      "lp.setup": 2,
+      "j": 2,
+      "mul": 1,
+      "slli": 3,
+      "add": 3,
+      "bge": 1,
+      "mv": 2,
+      "p.mac": 3,
+      "sub": 1,
+      "srli": 1,
+      "p.lh": 2,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "7c7df0a975cca02e994198cc28452cfa1e7ee8231102f030d995b6750eed424d",
+   "warnings": 0
+  },
+  {
+   "kernel": "k04_matmul_simple_f32",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @MatMulSimpleSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k04_matmul_simple_f32",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @MatMulSimpleSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k04_matmul_simple_f32",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @MatMulSimpleSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k04_matmul_simple_f32",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @MatMulSimpleSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k04_matmul_simple_f32",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @MatMulSimpleSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k04_matmul_simple_f32",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @MatMulSimpleSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k04_matmul_simple_f32",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "MatMulSimpleSeq": {
+     "size": 270,
+     "decoded_bytes": 270,
+     "instructions": 93,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 4,
+      "postinc": 6
+     },
+     "mnemonics": {
+      "addi": 14,
+      "sw": 5,
+      "bnez": 1,
+      "blez": 6,
+      "slli": 4,
+      "mv": 8,
+      "add": 12,
+      "sub": 4,
+      "srli": 4,
+      "lp.setup": 4,
+      "li": 8,
+      "p.lw": 4,
+      "fmadd.s": 2,
+      "p.sw": 2,
+      "bne": 2,
+      "lw": 10,
+      "ret": 2,
+      "mul": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "5041a2e1b1b7d93f8adef1e0178b60185f7657eb31a0db4764b8ca98a9868ed5",
+   "warnings": 0
+  },
+  {
+   "kernel": "k04_matmul_simple_f32",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "MatMulSimpleSeq": {
+     "size": 268,
+     "decoded_bytes": 268,
+     "instructions": 92,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 4,
+      "postinc": 6
+     },
+     "mnemonics": {
+      "addi": 14,
+      "sw": 4,
+      "bnez": 1,
+      "blez": 6,
+      "slli": 4,
+      "add": 11,
+      "sub": 5,
+      "srli": 4,
+      "mv": 8,
+      "lp.setup": 4,
+      "li": 9,
+      "p.lw": 4,
+      "fmadd.s": 2,
+      "p.sw": 2,
+      "bne": 2,
+      "lw": 8,
+      "ret": 2,
+      "mul": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "b9a21c31fd147715ecef08cc7c08b36c21fe0a7198bfc69dbd61d237ff54f870",
+   "warnings": 0
+  },
+  {
+   "kernel": "k04_matmul_simple_f32",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @MatMulSimpleSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k04_matmul_simple_f32",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @MatMulSimpleSeq",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatMulDSP_Fix16": {
+     "size": 1482,
+     "decoded_bytes": 1482,
+     "instructions": 538,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 20,
+      "mac": 17,
+      "clip": 15,
+      "postinc": 22,
+      "hwloop": 6,
+      "simd": 15
+     },
+     "mnemonics": {
+      "addi": 19,
+      "sw": 52,
+      "lw": 124,
+      "slli": 28,
+      "add": 54,
+      "li": 40,
+      "p.fl1": 1,
+      "srl": 2,
+      "p.min": 3,
+      "sub": 5,
+      "seqz": 1,
+      "neg": 1,
+      "and": 2,
+      "srli": 6,
+      "mul": 16,
+      "andi": 6,
+      "beqz": 9,
+      "p.maxu": 2,
+      "mv": 12,
+      "p.mac": 17,
+      "j": 12,
+      "p.addrnr": 15,
+      "p.clip": 15,
+      "sh": 15,
+      "beq": 3,
+      "lh": 20,
+      "p.sh": 5,
+      "bnez": 2,
+      "bgeu": 7,
+      "nop": 4,
+      "lp.setup": 6,
+      "p.lw": 16,
+      "pv.sdotsp.h": 15,
+      "bne": 1,
+      "ret": 1,
+      "p.lhu": 1
+     },
+     "clip_operands": [
+      "a0, t4, 0xf",
+      "a0, t3, 0xf",
+      "a0, t1, 0xf",
+      "a0, a6, 0xf",
+      "a0, s4, 0xf",
+      "a0, a6, 0xf",
+      "a0, s3, 0xf",
+      "a0, t1, 0xf",
+      "a0, s6, 0xf",
+      "a0, ra, 0xf",
+      "a0, s10, 0xf",
+      "a0, s8, 0xf",
+      "a0, a0, 0xf",
+      "a1, a1, 0xf",
+      "a0, a5, 0xf"
+     ]
+    }
+   },
+   "object_sha256": "79cd67038646a3fdc9a38adca7c9cb313369097b40121e6a422e1c71bf936160",
+   "warnings": 0
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "assert",
+   "detail": "Assertion `hasVInstructions() && \"Tried to get vector length without Zve or V extension support!\"' failed",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatMulDSP_Fix16": {
+     "size": 1458,
+     "decoded_bytes": 1458,
+     "instructions": 528,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 20,
+      "clip": 15,
+      "postinc": 22,
+      "hwloop": 6,
+      "mac": 15,
+      "simd": 15
+     },
+     "mnemonics": {
+      "addi": 17,
+      "sw": 51,
+      "lw": 116,
+      "slli": 29,
+      "add": 56,
+      "li": 39,
+      "p.fl1": 1,
+      "srl": 2,
+      "p.min": 3,
+      "sub": 6,
+      "seqz": 1,
+      "neg": 1,
+      "and": 2,
+      "srli": 6,
+      "mul": 16,
+      "andi": 6,
+      "beqz": 8,
+      "p.maxu": 2,
+      "j": 12,
+      "p.addrnr": 15,
+      "p.clip": 15,
+      "sh": 15,
+      "beq": 3,
+      "mv": 14,
+      "lh": 20,
+      "p.sh": 5,
+      "bnez": 3,
+      "bgeu": 7,
+      "lp.setup": 6,
+      "p.mac": 15,
+      "p.lw": 16,
+      "pv.sdotsp.h": 15,
+      "bne": 1,
+      "ret": 1,
+      "p.lhu": 1,
+      "nop": 2
+     },
+     "clip_operands": [
+      "a0, t4, 0xf",
+      "a0, t3, 0xf",
+      "a0, t1, 0xf",
+      "a0, a6, 0xf",
+      "a0, s4, 0xf",
+      "a0, a6, 0xf",
+      "a0, s2, 0xf",
+      "a0, s5, 0xf",
+      "a0, s3, 0xf",
+      "a0, t1, 0xf",
+      "a0, s10, 0xf",
+      "a0, s8, 0xf",
+      "a0, a0, 0xf",
+      "a1, a1, 0xf",
+      "a0, a5, 0xf"
+     ]
+    }
+   },
+   "object_sha256": "6c3ddafb9be9a6a21971fd6f3f1afbf9c8f7a6e8e056fec6201bd001401e61a1",
+   "warnings": 0
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "assert",
+   "detail": "Assertion `hasVInstructions() && \"Tried to get vector length without Zve or V extension support!\"' failed",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatMulDSP_Fix16": {
+     "size": 1506,
+     "decoded_bytes": 1506,
+     "instructions": 544,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 20,
+      "clip": 15,
+      "postinc": 22,
+      "hwloop": 6,
+      "simd": 15,
+      "mac": 15
+     },
+     "mnemonics": {
+      "addi": 16,
+      "sw": 55,
+      "lw": 129,
+      "li": 39,
+      "p.fl1": 1,
+      "slli": 30,
+      "srl": 2,
+      "p.min": 3,
+      "seqz": 1,
+      "srli": 6,
+      "andi": 6,
+      "add": 59,
+      "neg": 1,
+      "and": 2,
+      "sub": 6,
+      "mul": 16,
+      "beqz": 9,
+      "p.maxu": 2,
+      "j": 12,
+      "p.addrnr": 15,
+      "p.clip": 15,
+      "sh": 15,
+      "beq": 3,
+      "mv": 9,
+      "lh": 20,
+      "p.sh": 5,
+      "bne": 3,
+      "bgeu": 7,
+      "lp.setup": 6,
+      "nop": 3,
+      "p.lw": 16,
+      "pv.sdotsp.h": 15,
+      "p.mac": 15,
+      "ret": 1,
+      "p.lhu": 1
+     },
+     "clip_operands": [
+      "a1, t2, 0xf",
+      "a2, t1, 0xf",
+      "a3, t0, 0xf",
+      "a4, a7, 0xf",
+      "a6, s3, 0xf",
+      "a7, s9, 0xf",
+      "t0, s6, 0xf",
+      "s1, s8, 0xf",
+      "t2, s10, 0xf",
+      "a1, s11, 0xf",
+      "a3, s5, 0xf",
+      "a4, ra, 0xf",
+      "a0, a0, 0xf",
+      "a2, a5, 0xf",
+      "a3, a3, 0xf"
+     ]
+    }
+   },
+   "object_sha256": "a55ff1797663c1c2c909ccb2de92332e03620159ffadb07b21f3946ea216643a",
+   "warnings": 0
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "assert",
+   "detail": "Assertion `hasVInstructions() && \"Tried to get vector length without Zve or V extension support!\"' failed",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatMulDSP_Fix16": {
+     "size": 1606,
+     "decoded_bytes": 1606,
+     "instructions": 586,
+     "unknown": 0,
+     "mix": {
+      "p-other": 17,
+      "mac": 26,
+      "bitmanip": 5,
+      "hwloop": 7,
+      "postinc": 22,
+      "simd": 15,
+      "clip": 15,
+      "p-regoff": 4
+     },
+     "mnemonics": {
+      "lw": 152,
+      "addi": 31,
+      "slli": 23,
+      "sw": 77,
+      "p.min": 2,
+      "add": 56,
+      "sub": 7,
+      "bnez": 4,
+      "srli": 11,
+      "beqz": 13,
+      "mul": 6,
+      "lui": 2,
+      "not": 2,
+      "mv": 19,
+      "p.mac": 25,
+      "li": 31,
+      "p.bclr": 5,
+      "lp.setup": 7,
+      "lh": 18,
+      "p.sh": 9,
+      "p.lw": 16,
+      "pv.sdotsp.h": 15,
+      "p.addrnr": 15,
+      "p.clip": 15,
+      "sh": 11,
+      "bne": 2,
+      "bgeu": 1,
+      "p.lh": 1,
+      "ret": 1,
+      "j": 6,
+      "lhu": 2,
+      "p.macs": 1
+     },
+     "clip_operands": [
+      "t2, t2, 0x10",
+      "t0, t0, 0x10",
+      "t6, t6, 0x10",
+      "t5, t5, 0x10",
+      "t4, t4, 0x10",
+      "t3, t3, 0x10",
+      "t1, t1, 0x10",
+      "a7, a7, 0x10",
+      "a3, a3, 0x10",
+      "a4, a4, 0x10",
+      "a5, a4, 0x10",
+      "a0, a0, 0x10",
+      "a1, a1, 0x10",
+      "a2, a2, 0x10",
+      "a3, a3, 0x10"
+     ]
+    }
+   },
+   "object_sha256": "49b0f47ed20fffa95c7d2401bff02d3f31b0e06bdb567b8c33173aff62f7b7cd",
+   "warnings": 0
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatMulDSP_Fix16": {
+     "size": 1604,
+     "decoded_bytes": 1604,
+     "instructions": 586,
+     "unknown": 0,
+     "mix": {
+      "p-other": 17,
+      "mac": 26,
+      "bitmanip": 5,
+      "hwloop": 7,
+      "postinc": 22,
+      "simd": 15,
+      "clip": 15,
+      "p-regoff": 4
+     },
+     "mnemonics": {
+      "lw": 153,
+      "addi": 31,
+      "slli": 23,
+      "sw": 77,
+      "p.min": 2,
+      "add": 56,
+      "sub": 7,
+      "bnez": 4,
+      "srli": 11,
+      "beqz": 13,
+      "mul": 6,
+      "lui": 2,
+      "not": 2,
+      "mv": 18,
+      "p.mac": 25,
+      "li": 31,
+      "p.bclr": 5,
+      "lp.setup": 7,
+      "lh": 18,
+      "p.sh": 9,
+      "p.lw": 16,
+      "pv.sdotsp.h": 15,
+      "p.addrnr": 15,
+      "p.clip": 15,
+      "sh": 11,
+      "bne": 2,
+      "bgeu": 1,
+      "p.lh": 1,
+      "ret": 1,
+      "j": 6,
+      "lhu": 2,
+      "p.macs": 1
+     },
+     "clip_operands": [
+      "t2, t2, 0x10",
+      "t0, t0, 0x10",
+      "t6, t6, 0x10",
+      "t5, t5, 0x10",
+      "t4, t4, 0x10",
+      "t3, t3, 0x10",
+      "t1, t1, 0x10",
+      "a7, a7, 0x10",
+      "a3, a3, 0x10",
+      "a4, a4, 0x10",
+      "a5, a4, 0x10",
+      "a0, a0, 0x10",
+      "a1, a1, 0x10",
+      "a2, a2, 0x10",
+      "a3, a3, 0x10"
+     ]
+    }
+   },
+   "object_sha256": "fb3b1e4209ddf78f6b2df6db6aecb98c42c44d62f17a4206be13e0ec996829e7",
+   "warnings": 0
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatMulDSP_Fix16": {
+     "size": 1506,
+     "decoded_bytes": 1506,
+     "instructions": 544,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 20,
+      "clip": 15,
+      "postinc": 22,
+      "hwloop": 6,
+      "simd": 15,
+      "mac": 15
+     },
+     "mnemonics": {
+      "addi": 16,
+      "sw": 55,
+      "lw": 129,
+      "li": 39,
+      "p.fl1": 1,
+      "slli": 30,
+      "srl": 2,
+      "p.min": 3,
+      "seqz": 1,
+      "srli": 6,
+      "andi": 6,
+      "add": 59,
+      "neg": 1,
+      "and": 2,
+      "sub": 6,
+      "mul": 16,
+      "beqz": 9,
+      "p.maxu": 2,
+      "j": 12,
+      "p.addrnr": 15,
+      "p.clip": 15,
+      "sh": 15,
+      "beq": 3,
+      "mv": 9,
+      "lh": 20,
+      "p.sh": 5,
+      "bne": 3,
+      "bgeu": 7,
+      "lp.setup": 6,
+      "nop": 3,
+      "p.lw": 16,
+      "pv.sdotsp.h": 15,
+      "p.mac": 15,
+      "ret": 1,
+      "p.lhu": 1
+     },
+     "clip_operands": [
+      "a1, t2, 0x10",
+      "a2, t1, 0x10",
+      "a3, t0, 0x10",
+      "a4, a7, 0x10",
+      "a6, s3, 0x10",
+      "a7, s9, 0x10",
+      "t0, s6, 0x10",
+      "s1, s8, 0x10",
+      "t2, s10, 0x10",
+      "a1, s11, 0x10",
+      "a3, s5, 0x10",
+      "a4, ra, 0x10",
+      "a0, a0, 0x10",
+      "a2, a5, 0x10",
+      "a3, a3, 0x10"
+     ]
+    }
+   },
+   "object_sha256": "dea382c2d6dce0abc69a7bd4d91757b15e8771cb379b503cce5aced04217f240",
+   "warnings": 0
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "assert",
+   "detail": "Assertion `!NodePtr->isKnownSentinel()' failed (pass 'PULP Hardware Loop Fixup' on @KerParMatMulDSP_Fix16)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16-file",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16-file",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16-file",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16-file",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16-file",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16-file",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16-file",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatMulDSP_Fix16": {
+     "size": 1606,
+     "decoded_bytes": 1606,
+     "instructions": 586,
+     "unknown": 0,
+     "mix": {
+      "p-other": 17,
+      "mac": 26,
+      "bitmanip": 5,
+      "hwloop": 7,
+      "postinc": 22,
+      "simd": 15,
+      "clip": 15,
+      "p-regoff": 4
+     },
+     "mnemonics": {
+      "lw": 152,
+      "addi": 31,
+      "slli": 23,
+      "sw": 77,
+      "p.min": 2,
+      "add": 56,
+      "sub": 7,
+      "bnez": 4,
+      "srli": 11,
+      "beqz": 13,
+      "mul": 6,
+      "lui": 2,
+      "not": 2,
+      "mv": 19,
+      "p.mac": 25,
+      "li": 31,
+      "p.bclr": 5,
+      "lp.setup": 7,
+      "lh": 18,
+      "p.sh": 9,
+      "p.lw": 16,
+      "pv.sdotsp.h": 15,
+      "p.addrnr": 15,
+      "p.clip": 15,
+      "sh": 11,
+      "bne": 2,
+      "bgeu": 1,
+      "p.lh": 1,
+      "ret": 1,
+      "j": 6,
+      "lhu": 2,
+      "p.macs": 1
+     },
+     "clip_operands": [
+      "t2, t2, 0x10",
+      "t0, t0, 0x10",
+      "t6, t6, 0x10",
+      "t5, t5, 0x10",
+      "t4, t4, 0x10",
+      "t3, t3, 0x10",
+      "t1, t1, 0x10",
+      "a7, a7, 0x10",
+      "a3, a3, 0x10",
+      "a4, a4, 0x10",
+      "a5, a4, 0x10",
+      "a0, a0, 0x10",
+      "a1, a1, 0x10",
+      "a2, a2, 0x10",
+      "a3, a3, 0x10"
+     ]
+    }
+   },
+   "object_sha256": "66519052ae01d0f59f72a2b1987263f12eecc1b86a53809788dc5ba638aff036",
+   "warnings": 0
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16-file",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatMulDSP_Fix16": {
+     "size": 1604,
+     "decoded_bytes": 1604,
+     "instructions": 586,
+     "unknown": 0,
+     "mix": {
+      "p-other": 17,
+      "mac": 26,
+      "bitmanip": 5,
+      "hwloop": 7,
+      "postinc": 22,
+      "simd": 15,
+      "clip": 15,
+      "p-regoff": 4
+     },
+     "mnemonics": {
+      "lw": 153,
+      "addi": 31,
+      "slli": 23,
+      "sw": 77,
+      "p.min": 2,
+      "add": 56,
+      "sub": 7,
+      "bnez": 4,
+      "srli": 11,
+      "beqz": 13,
+      "mul": 6,
+      "lui": 2,
+      "not": 2,
+      "mv": 18,
+      "p.mac": 25,
+      "li": 31,
+      "p.bclr": 5,
+      "lp.setup": 7,
+      "lh": 18,
+      "p.sh": 9,
+      "p.lw": 16,
+      "pv.sdotsp.h": 15,
+      "p.addrnr": 15,
+      "p.clip": 15,
+      "sh": 11,
+      "bne": 2,
+      "bgeu": 1,
+      "p.lh": 1,
+      "ret": 1,
+      "j": 6,
+      "lhu": 2,
+      "p.macs": 1
+     },
+     "clip_operands": [
+      "t2, t2, 0x10",
+      "t0, t0, 0x10",
+      "t6, t6, 0x10",
+      "t5, t5, 0x10",
+      "t4, t4, 0x10",
+      "t3, t3, 0x10",
+      "t1, t1, 0x10",
+      "a7, a7, 0x10",
+      "a3, a3, 0x10",
+      "a4, a4, 0x10",
+      "a5, a4, 0x10",
+      "a0, a0, 0x10",
+      "a1, a1, 0x10",
+      "a2, a2, 0x10",
+      "a3, a3, 0x10"
+     ]
+    }
+   },
+   "object_sha256": "a04b247fa2310b5e38b38252299a8744398a76397bffbfe2ebe78323c93dd332",
+   "warnings": 0
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16-file",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k05_matmul_dsp_fix16-file",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 192,
+     "decoded_bytes": 192,
+     "instructions": 66,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "mac": 1,
+      "hwloop": 1
+     },
+     "mnemonics": {
+      "lw": 15,
+      "li": 5,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 2,
+      "addi": 8,
+      "sw": 5,
+      "srli": 2,
+      "add": 5,
+      "andi": 2,
+      "slli": 4,
+      "j": 2,
+      "mv": 3,
+      "beq": 1,
+      "blt": 1,
+      "sub": 1,
+      "p.mac": 1,
+      "lp.setup": 1,
+      "fmadd.s": 3,
+      "mul": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1f2aad37aec6fa205192c2808488a379dd7015bd3d6866751113f75236d4c953",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 326,
+     "decoded_bytes": 326,
+     "instructions": 112,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 2,
+      "hwloop": 5
+     },
+     "mnemonics": {
+      "addi": 16,
+      "sw": 6,
+      "lw": 23,
+      "li": 6,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 1,
+      "andi": 1,
+      "slli": 8,
+      "add": 11,
+      "blt": 1,
+      "srli": 4,
+      "p.addn": 1,
+      "bnez": 2,
+      "lp.setup": 5,
+      "sub": 3,
+      "mv": 5,
+      "nop": 4,
+      "fmadd.s": 6,
+      "j": 2,
+      "auipc": 1,
+      "jr": 1,
+      "mul": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "35e467a083e32dd523451362882cf322cf2cec13a390b7adaa553e84d8533fd9",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 192,
+     "decoded_bytes": 192,
+     "instructions": 66,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "mac": 1,
+      "hwloop": 1
+     },
+     "mnemonics": {
+      "lw": 15,
+      "li": 5,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 2,
+      "addi": 8,
+      "sw": 5,
+      "srli": 2,
+      "add": 5,
+      "andi": 2,
+      "slli": 4,
+      "j": 2,
+      "mv": 3,
+      "beq": 1,
+      "blt": 1,
+      "sub": 1,
+      "p.mac": 1,
+      "lp.setup": 1,
+      "fmadd.s": 3,
+      "mul": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "4a2976d92d058422d68e6c81fe8d26f0dba10590763fbd1fbe21dc5c6a8ce97f",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 326,
+     "decoded_bytes": 326,
+     "instructions": 112,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 2,
+      "hwloop": 5
+     },
+     "mnemonics": {
+      "addi": 16,
+      "sw": 6,
+      "lw": 23,
+      "li": 6,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 1,
+      "andi": 1,
+      "slli": 8,
+      "add": 11,
+      "blt": 1,
+      "srli": 4,
+      "p.addn": 1,
+      "bnez": 2,
+      "lp.setup": 5,
+      "sub": 3,
+      "mv": 5,
+      "nop": 4,
+      "fmadd.s": 6,
+      "j": 2,
+      "auipc": 1,
+      "jr": 1,
+      "mul": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "615811329ac9469dbc7ca61fdca391383fbd062632865739e6223174bf5cdf6f",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 188,
+     "decoded_bytes": 188,
+     "instructions": 66,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 1
+     },
+     "mnemonics": {
+      "lw": 15,
+      "li": 5,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 2,
+      "addi": 8,
+      "sw": 5,
+      "srli": 2,
+      "andi": 2,
+      "slli": 4,
+      "add": 6,
+      "j": 2,
+      "mv": 3,
+      "beq": 1,
+      "blt": 1,
+      "sub": 1,
+      "lp.setup": 1,
+      "fmadd.s": 3,
+      "mul": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "63461e3f52f3effe76846259eb710ad266cb7e5268a50466ef0836daaa103a47",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 322,
+     "decoded_bytes": 322,
+     "instructions": 111,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 2,
+      "hwloop": 5
+     },
+     "mnemonics": {
+      "addi": 16,
+      "sw": 6,
+      "lw": 23,
+      "li": 5,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 1,
+      "andi": 1,
+      "slli": 8,
+      "add": 11,
+      "blt": 1,
+      "srli": 4,
+      "p.addn": 1,
+      "bnez": 2,
+      "lp.setup": 5,
+      "sub": 3,
+      "mv": 5,
+      "nop": 4,
+      "fmadd.s": 6,
+      "j": 2,
+      "auipc": 1,
+      "jr": 1,
+      "mul": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "aadecd51daed642cf9ec591f99de550b3db8abdc9202b3f1e727c2702dd32253",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 198,
+     "decoded_bytes": 198,
+     "instructions": 66,
+     "unknown": 0,
+     "mix": {
+      "p-other": 1,
+      "bitmanip": 1,
+      "hwloop": 2,
+      "postinc": 5
+     },
+     "mnemonics": {
+      "lw": 13,
+      "beqz": 2,
+      "addi": 10,
+      "sw": 6,
+      "li": 3,
+      "mul": 1,
+      "slli": 3,
+      "srli": 3,
+      "p.addn": 1,
+      "mv": 3,
+      "add": 6,
+      "p.bclr": 1,
+      "lp.setup": 2,
+      "blez": 1,
+      "sub": 1,
+      "p.lw": 4,
+      "fmadd.s": 3,
+      "p.sw": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "b51aabfbbd6ce3196460d62502f9962c963d365939a90f58f0f50e65563fa6c9",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 218,
+     "decoded_bytes": 218,
+     "instructions": 74,
+     "unknown": 0,
+     "mix": {
+      "p-other": 1,
+      "bitmanip": 1,
+      "hwloop": 1,
+      "postinc": 7
+     },
+     "mnemonics": {
+      "lw": 18,
+      "beqz": 2,
+      "addi": 9,
+      "sw": 6,
+      "li": 3,
+      "mul": 1,
+      "slli": 3,
+      "srli": 2,
+      "p.addn": 1,
+      "mv": 3,
+      "p.bclr": 1,
+      "add": 7,
+      "blez": 1,
+      "sub": 1,
+      "lp.setup": 1,
+      "p.lw": 5,
+      "fmadd.s": 3,
+      "p.sw": 2,
+      "bne": 2,
+      "ret": 3
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "df1096e9049d47e36f8e44a06bf3f4f588a003c8000ac4ebf563428b708b439c",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 188,
+     "decoded_bytes": 188,
+     "instructions": 66,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 1
+     },
+     "mnemonics": {
+      "lw": 15,
+      "li": 5,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 2,
+      "addi": 8,
+      "sw": 5,
+      "srli": 2,
+      "andi": 2,
+      "slli": 4,
+      "add": 6,
+      "j": 2,
+      "mv": 3,
+      "beq": 1,
+      "blt": 1,
+      "sub": 1,
+      "lp.setup": 1,
+      "fmadd.s": 3,
+      "mul": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "aa1eee0e7cd6e4942ddc0afa1b9a742374fba79852909891ad0a0b108703f157",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 322,
+     "decoded_bytes": 322,
+     "instructions": 111,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 2,
+      "hwloop": 5
+     },
+     "mnemonics": {
+      "addi": 16,
+      "sw": 6,
+      "lw": 23,
+      "li": 5,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 1,
+      "andi": 1,
+      "slli": 8,
+      "add": 11,
+      "blt": 1,
+      "srli": 4,
+      "p.addn": 1,
+      "bnez": 2,
+      "lp.setup": 5,
+      "sub": 3,
+      "mv": 5,
+      "nop": 4,
+      "fmadd.s": 6,
+      "j": 2,
+      "auipc": 1,
+      "jr": 1,
+      "mul": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "e695173f41cb4c4efcbb97116ffad5929feae315b30021bd2e7d32807dd2df10",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32-file",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32-file",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32-file",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32-file",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32-file",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32-file",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32-file",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 198,
+     "decoded_bytes": 198,
+     "instructions": 66,
+     "unknown": 0,
+     "mix": {
+      "p-other": 1,
+      "bitmanip": 1,
+      "hwloop": 2,
+      "postinc": 5
+     },
+     "mnemonics": {
+      "lw": 13,
+      "beqz": 2,
+      "addi": 10,
+      "sw": 6,
+      "li": 3,
+      "mul": 1,
+      "slli": 3,
+      "srli": 3,
+      "p.addn": 1,
+      "mv": 3,
+      "add": 6,
+      "p.bclr": 1,
+      "lp.setup": 2,
+      "blez": 1,
+      "sub": 1,
+      "p.lw": 4,
+      "fmadd.s": 3,
+      "p.sw": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "0d4b5dbbce2726767ed587d38be57f615273ee17fc9746ce27d45a30bae177e8",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32-file",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatVectDSP_f32": {
+     "size": 218,
+     "decoded_bytes": 218,
+     "instructions": 74,
+     "unknown": 0,
+     "mix": {
+      "p-other": 1,
+      "bitmanip": 1,
+      "hwloop": 1,
+      "postinc": 7
+     },
+     "mnemonics": {
+      "lw": 18,
+      "beqz": 2,
+      "addi": 9,
+      "sw": 6,
+      "li": 3,
+      "mul": 1,
+      "slli": 3,
+      "srli": 2,
+      "p.addn": 1,
+      "mv": 3,
+      "p.bclr": 1,
+      "add": 7,
+      "blez": 1,
+      "sub": 1,
+      "lp.setup": 1,
+      "p.lw": 5,
+      "fmadd.s": 3,
+      "p.sw": 2,
+      "bne": 2,
+      "ret": 3
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "5cd617d83b012328d3bff8e9fb5a668bafc07c067bf8725de16c84664a84cae9",
+   "warnings": 0
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32-file",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k06_matvect_dsp_f32-file",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerParMatAdd_DSP_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerParMatAdd_DSP_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerParMatAdd_DSP_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerParMatAdd_DSP_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerParMatAdd_DSP_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerParMatAdd_DSP_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatAdd_DSP_Fix16": {
+     "size": 88,
+     "decoded_bytes": 88,
+     "instructions": 28,
+     "unknown": 0,
+     "mix": {
+      "p-other": 4,
+      "hwloop": 1,
+      "postinc": 3,
+      "clip": 1
+     },
+     "mnemonics": {
+      "lhu": 3,
+      "lw": 3,
+      "p.mulu": 1,
+      "p.min": 2,
+      "add": 5,
+      "bgeu": 1,
+      "slli": 2,
+      "sub": 1,
+      "addi": 2,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lh": 2,
+      "p.addrnr": 1,
+      "p.clip": 1,
+      "p.sh": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a5, a5, 0x10"
+     ]
+    }
+   },
+   "object_sha256": "1498a25b0526c44dd4efac2c121d8b65f6f96688bdc81d8d3ccd1aa5d6c46618",
+   "warnings": 0
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatAdd_DSP_Fix16": {
+     "size": 88,
+     "decoded_bytes": 88,
+     "instructions": 28,
+     "unknown": 0,
+     "mix": {
+      "p-other": 4,
+      "hwloop": 1,
+      "postinc": 3,
+      "clip": 1
+     },
+     "mnemonics": {
+      "lhu": 3,
+      "lw": 3,
+      "p.mulu": 1,
+      "p.min": 2,
+      "add": 5,
+      "bgeu": 1,
+      "slli": 2,
+      "sub": 1,
+      "addi": 2,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lh": 2,
+      "p.addrnr": 1,
+      "p.clip": 1,
+      "p.sh": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a5, a5, 0x10"
+     ]
+    }
+   },
+   "object_sha256": "49a727b6edb29f7926b5004b7e7822201456344a0c3227f3f91051f8bddd6e14",
+   "warnings": 0
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerParMatAdd_DSP_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @KerParMatAdd_DSP_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16-file",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16-file",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16-file",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16-file",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16-file",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16-file",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16-file",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatAdd_DSP_Fix16": {
+     "size": 88,
+     "decoded_bytes": 88,
+     "instructions": 28,
+     "unknown": 0,
+     "mix": {
+      "p-other": 4,
+      "hwloop": 1,
+      "postinc": 3,
+      "clip": 1
+     },
+     "mnemonics": {
+      "lhu": 3,
+      "lw": 3,
+      "p.mulu": 1,
+      "p.min": 2,
+      "add": 5,
+      "bgeu": 1,
+      "slli": 2,
+      "sub": 1,
+      "addi": 2,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lh": 2,
+      "p.addrnr": 1,
+      "p.clip": 1,
+      "p.sh": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a5, a5, 0x10"
+     ]
+    }
+   },
+   "object_sha256": "a7b9a6b26a48927632aaa7adef3ef744fe1ec3c87ec7cc8488b93b50f8bb215a",
+   "warnings": 0
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16-file",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "KerParMatAdd_DSP_Fix16": {
+     "size": 88,
+     "decoded_bytes": 88,
+     "instructions": 28,
+     "unknown": 0,
+     "mix": {
+      "p-other": 4,
+      "hwloop": 1,
+      "postinc": 3,
+      "clip": 1
+     },
+     "mnemonics": {
+      "lhu": 3,
+      "lw": 3,
+      "p.mulu": 1,
+      "p.min": 2,
+      "add": 5,
+      "bgeu": 1,
+      "slli": 2,
+      "sub": 1,
+      "addi": 2,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lh": 2,
+      "p.addrnr": 1,
+      "p.clip": 1,
+      "p.sh": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a5, a5, 0x10"
+     ]
+    }
+   },
+   "object_sha256": "1a002038242d27475ab52997259d3e0e8600424e3ee24c7cbe0b5d0d88e4d7b7",
+   "warnings": 0
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16-file",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k07_matadd_dsp_fix16-file",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:578:132: error: passing 'int' to parameter of incompatible type 'v2h' (vector of 2 'float16' values)",
+   "returncode": 1
+  },
+  {
+   "kernel": "k08_preprocessing_fix",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingFix.c:83:42: error: argument value 16384 is outside the valid range [-2147483648, -2147483648]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k08_preprocessing_fix",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingFix.c:83:42: error: argument value 16384 is outside the valid range [-2147483648, -2147483648]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k08_preprocessing_fix",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingFix.c:83:42: error: argument value 16384 is outside the valid range [-2147483648, -2147483648]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k08_preprocessing_fix",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingFix.c:83:42: error: argument value 16384 is outside the valid range [-2147483648, -2147483648]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k08_preprocessing_fix",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingFix.c:83:42: error: argument value 16384 is outside the valid range [-2147483648, -2147483648]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k08_preprocessing_fix",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingFix.c:83:42: error: argument value 16384 is outside the valid range [-2147483648, -2147483648]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k08_preprocessing_fix",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "PreEmphasis": {
+     "size": 182,
+     "decoded_bytes": 182,
+     "instructions": 61,
+     "unknown": 0,
+     "mix": {
+      "p-other": 5,
+      "hwloop": 2,
+      "postinc": 4
+     },
+     "mnemonics": {
+      "addi": 6,
+      "sw": 6,
+      "mv": 3,
+      "lw": 10,
+      "lh": 4,
+      "auipc": 1,
+      "jalr": 1,
+      "blez": 1,
+      "sll": 2,
+      "p.exths": 3,
+      "beqz": 2,
+      "slli": 3,
+      "srli": 2,
+      "lp.setup": 2,
+      "p.mulsrn": 2,
+      "p.lh": 2,
+      "sub": 2,
+      "p.sh": 2,
+      "add": 1,
+      "sh": 1,
+      "ret": 1,
+      "neg": 1,
+      "sra": 2,
+      "j": 1
+     },
+     "clip_operands": []
+    },
+    "WindowingReal2Cmplx_Fix16": {
+     "size": 92,
+     "decoded_bytes": 92,
+     "instructions": 32,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 2,
+      "postinc": 4,
+      "p-other": 1,
+      "simd": 2
+     },
+     "mnemonics": {
+      "lw": 5,
+      "beqz": 1,
+      "slli": 3,
+      "addi": 4,
+      "srli": 2,
+      "mv": 3,
+      "li": 1,
+      "lp.setup": 2,
+      "p.lh": 2,
+      "p.mulsrn": 1,
+      "pv.pack.h": 1,
+      "p.sw": 2,
+      "bgeu": 1,
+      "sub": 1,
+      "add": 1,
+      "pv.add.sci.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    },
+    "WindowingReal2Real_Fix16": {
+     "size": 84,
+     "decoded_bytes": 84,
+     "instructions": 30,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 2,
+      "postinc": 4,
+      "p-other": 1
+     },
+     "mnemonics": {
+      "lw": 5,
+      "beqz": 1,
+      "slli": 3,
+      "addi": 4,
+      "srli": 2,
+      "mv": 3,
+      "lp.setup": 2,
+      "p.lh": 2,
+      "p.mulsrn": 1,
+      "p.sh": 2,
+      "bgeu": 1,
+      "sub": 1,
+      "add": 1,
+      "nop": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "9eab1fb7350568a8fd3b862d7cebf50ba746319c6e6b306d63e618942500edaa",
+   "warnings": 0
+  },
+  {
+   "kernel": "k08_preprocessing_fix",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "PreEmphasis": {
+     "size": 256,
+     "decoded_bytes": 256,
+     "instructions": 78,
+     "unknown": 0,
+     "mix": {
+      "p-other": 10,
+      "postinc": 5,
+      "hwloop": 2,
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "lh": 8,
+      "lw": 6,
+      "p.abs": 3,
+      "sw": 2,
+      "beqz": 3,
+      "slli": 5,
+      "addi": 7,
+      "srli": 3,
+      "mv": 5,
+      "p.lh": 3,
+      "bge": 1,
+      "bnez": 1,
+      "bgtz": 2,
+      "p.exths": 5,
+      "sh": 4,
+      "blez": 1,
+      "sll": 2,
+      "lp.setup": 2,
+      "p.mulsrn": 2,
+      "sub": 3,
+      "p.sh": 2,
+      "add": 2,
+      "ret": 2,
+      "p.fl1": 1,
+      "neg": 1,
+      "sra": 2
+     },
+     "clip_operands": []
+    },
+    "WindowingReal2Cmplx_Fix16": {
+     "size": 84,
+     "decoded_bytes": 84,
+     "instructions": 27,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 3,
+      "p-other": 1,
+      "simd": 1
+     },
+     "mnemonics": {
+      "lw": 5,
+      "beqz": 1,
+      "slli": 3,
+      "addi": 2,
+      "srli": 1,
+      "mv": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lh": 2,
+      "p.mulsrn": 1,
+      "pv.pack.h": 1,
+      "p.sw": 1,
+      "bgeu": 1,
+      "sub": 1,
+      "add": 1,
+      "auipc": 1,
+      "jr": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    },
+    "WindowingReal2Real_Fix16": {
+     "size": 78,
+     "decoded_bytes": 78,
+     "instructions": 25,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 3,
+      "p-other": 1
+     },
+     "mnemonics": {
+      "lw": 5,
+      "beqz": 1,
+      "slli": 3,
+      "addi": 2,
+      "srli": 1,
+      "mv": 1,
+      "lp.setup": 1,
+      "p.lh": 2,
+      "p.mulsrn": 1,
+      "p.sh": 1,
+      "bgeu": 1,
+      "sub": 1,
+      "li": 1,
+      "add": 1,
+      "auipc": 1,
+      "jr": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "0a160b160a37865745e3a66bb04a7e944f00cd7f650af773111951479c25fbb8",
+   "warnings": 0
+  },
+  {
+   "kernel": "k08_preprocessing_fix",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @WindowingReal2Cmplx_PadCenter_Fix32",
+   "returncode": 1
+  },
+  {
+   "kernel": "k08_preprocessing_fix",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @WindowingReal2Cmplx_PadCenter_Fix32",
+   "returncode": 1
+  },
+  {
+   "kernel": "k09_cmplx_fix",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @CmplxMagSquared_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k09_cmplx_fix",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @CmplxMagSquared_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k09_cmplx_fix",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @CmplxMagSquared_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k09_cmplx_fix",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @CmplxMagSquared_Fix16",
+   "returncode": 1
+  },
+  {
+   "kernel": "k09_cmplx_fix",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "CmplxMagSquared_Fix16": {
+     "size": 50,
+     "decoded_bytes": 50,
+     "instructions": 17,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "lw": 3,
+      "li": 1,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "pv.dotsp.h": 1,
+      "p.sw": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "54b902fd4840a0912d831ba73d3079779d11f25cacaadcb1d88c96e42d283696",
+   "warnings": 0
+  },
+  {
+   "kernel": "k09_cmplx_fix",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "CmplxMagSquared_Fix16": {
+     "size": 50,
+     "decoded_bytes": 50,
+     "instructions": 17,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "lw": 3,
+      "li": 1,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "pv.dotsp.h": 1,
+      "p.sw": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "30a3c2248acf44471ebaf4100197f9c5180900c9ad8dcef0676557dfefbd8f46",
+   "warnings": 0
+  },
+  {
+   "kernel": "k09_cmplx_fix",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "CmplxMagSquared_Fix16": {
+     "size": 36,
+     "decoded_bytes": 36,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "lw": 3,
+      "beqz": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "pv.dotsp.h": 1,
+      "p.sw": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "00139a73791519f0e14cf3aacca7316889c827c5ecf8b627a292adf630be3808",
+   "warnings": 0
+  },
+  {
+   "kernel": "k09_cmplx_fix",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "CmplxMagSquared_Fix16": {
+     "size": 36,
+     "decoded_bytes": 36,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "lw": 3,
+      "beqz": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "pv.dotsp.h": 1,
+      "p.sw": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "e543d01b6503495000127acd298b31e1cf95b06f7e047b4ac7c45a3bc541040f",
+   "warnings": 0
+  },
+  {
+   "kernel": "k09_cmplx_fix",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "CmplxMagSquared_Fix16": {
+     "size": 50,
+     "decoded_bytes": 50,
+     "instructions": 17,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "lw": 3,
+      "li": 1,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "pv.dotsp.h": 1,
+      "p.sw": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "9e47348200295705fb0eda0f2567d80ef8f01bf0fcde2d685cfd65c0750362d8",
+   "warnings": 0
+  },
+  {
+   "kernel": "k09_cmplx_fix",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "CmplxMagSquared_Fix16": {
+     "size": 50,
+     "decoded_bytes": 50,
+     "instructions": 17,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "lw": 3,
+      "li": 1,
+      "p.fl1": 1,
+      "srl": 1,
+      "p.min": 1,
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "pv.dotsp.h": 1,
+      "p.sw": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "70d1e1355ec82a8bffaa5c438975622ed47aaf50b195951f911125297f61888a",
+   "warnings": 0
+  },
+  {
+   "kernel": "k10a_fft_radix2_scalar",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @Radix2FFT_DIF_Scalar",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10a_fft_radix2_scalar",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @Radix2FFT_DIF_Scalar",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10a_fft_radix2_scalar",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @Radix2FFT_DIF_Scalar",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10a_fft_radix2_scalar",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @Radix2FFT_DIF_Scalar",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10a_fft_radix2_scalar",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @Radix2FFT_DIF_Scalar",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10a_fft_radix2_scalar",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @Radix2FFT_DIF_Scalar",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10a_fft_radix2_scalar",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "Radix2FFT_DIF_Scalar": {
+     "size": 324,
+     "decoded_bytes": 324,
+     "instructions": 107,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 5,
+      "hwloop": 3,
+      "postinc": 4,
+      "mac": 2
+     },
+     "mnemonics": {
+      "addi": 13,
+      "sw": 13,
+      "srli": 3,
+      "p.fl1": 1,
+      "li": 3,
+      "p.addn": 3,
+      "bge": 1,
+      "blez": 3,
+      "slli": 5,
+      "mv": 4,
+      "lp.setup": 3,
+      "lh": 10,
+      "add": 6,
+      "sub": 4,
+      "p.sh": 4,
+      "mul": 2,
+      "p.msu": 1,
+      "p.mac": 1,
+      "srai": 4,
+      "bne": 1,
+      "lw": 13,
+      "lhu": 2,
+      "p.exthz": 2,
+      "sh": 4,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "b3be9d5383dd5017a25d22534ff054b6c07e501a6d382625ae8fce09ae67237e",
+   "warnings": 0
+  },
+  {
+   "kernel": "k10a_fft_radix2_scalar",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "Radix2FFT_DIF_Scalar": {
+     "size": 294,
+     "decoded_bytes": 294,
+     "instructions": 99,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 3,
+      "hwloop": 3,
+      "postinc": 6,
+      "mac": 2,
+      "simd": 2
+     },
+     "mnemonics": {
+      "addi": 13,
+      "sw": 13,
+      "srli": 3,
+      "p.fl1": 1,
+      "li": 3,
+      "p.addn": 3,
+      "bge": 1,
+      "blez": 3,
+      "slli": 5,
+      "mv": 4,
+      "lp.setup": 3,
+      "lh": 8,
+      "add": 4,
+      "sub": 2,
+      "p.sh": 4,
+      "mul": 2,
+      "p.msu": 1,
+      "p.mac": 1,
+      "srai": 4,
+      "bne": 1,
+      "lw": 15,
+      "pv.add.h": 1,
+      "p.sw": 2,
+      "pv.sub.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "5d4c66575aadb2e39033ab858f75d3a2fc8a50475aeac412d95fb97a72c9493e",
+   "warnings": 0
+  },
+  {
+   "kernel": "k10a_fft_radix2_scalar",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @Radix2FFT_DIF_Scalar",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10a_fft_radix2_scalar",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @Radix2FFT_DIF_Scalar",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10b_fft_radix2_seq_fix16",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:614:45: error: use of unknown builtin '__builtin_pulp_add2div2' [-Wimplicit-function-declaration]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10b_fft_radix2_seq_fix16",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:614:45: error: use of unknown builtin '__builtin_pulp_add2div2' [-Wimplicit-function-declaration]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10b_fft_radix2_seq_fix16",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:614:45: error: use of unknown builtin '__builtin_pulp_add2div2' [-Wimplicit-function-declaration]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10b_fft_radix2_seq_fix16",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:614:45: error: use of unknown builtin '__builtin_pulp_add2div2' [-Wimplicit-function-declaration]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10b_fft_radix2_seq_fix16",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:614:45: error: use of unknown builtin '__builtin_pulp_add2div2' [-Wimplicit-function-declaration]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10b_fft_radix2_seq_fix16",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:614:45: error: use of unknown builtin '__builtin_pulp_add2div2' [-Wimplicit-function-declaration]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10b_fft_radix2_seq_fix16",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "Radix2FFT_DIF_Seq_Fix16": {
+     "size": 364,
+     "decoded_bytes": 364,
+     "instructions": 116,
+     "unknown": 5,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 6,
+      "simd": 5,
+      "postinc": 6
+     },
+     "mnemonics": {
+      "addi": 21,
+      "sw": 6,
+      "srli": 6,
+      "p.fl1": 1,
+      "p.addn": 1,
+      "beqz": 2,
+      "blez": 6,
+      "slli": 9,
+      "mv": 9,
+      "lp.setup": 6,
+      "lhu": 2,
+      "neg": 2,
+      "sh": 2,
+      "li": 3,
+      "bge": 1,
+      "lw": 14,
+      "add": 3,
+      "pv.sub.h": 3,
+      "<unknown>": 5,
+      "p.sw": 6,
+      "srai": 3,
+      "bne": 2,
+      "pv.add.h": 2,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "23b7fcee83013b86418985b1eaa92b8ba614cf391c33d7d4c16e737de9b9c352",
+   "warnings": 0
+  },
+  {
+   "kernel": "k10b_fft_radix2_seq_fix16",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "Radix2FFT_DIF_Seq_Fix16": {
+     "size": 364,
+     "decoded_bytes": 364,
+     "instructions": 116,
+     "unknown": 5,
+     "mix": {
+      "bitmanip": 1,
+      "p-other": 1,
+      "hwloop": 6,
+      "simd": 5,
+      "postinc": 6
+     },
+     "mnemonics": {
+      "addi": 21,
+      "sw": 6,
+      "srli": 6,
+      "p.fl1": 1,
+      "p.addn": 1,
+      "beqz": 2,
+      "blez": 6,
+      "slli": 9,
+      "mv": 9,
+      "lp.setup": 6,
+      "lhu": 2,
+      "neg": 2,
+      "sh": 2,
+      "li": 3,
+      "bge": 1,
+      "lw": 14,
+      "add": 3,
+      "pv.sub.h": 3,
+      "<unknown>": 5,
+      "p.sw": 6,
+      "srai": 3,
+      "bne": 2,
+      "pv.add.h": 2,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "6a26c14fde2f2c150b8febfe7367412abca64b51a49c1cc23777e46dcbc1d277",
+   "warnings": 0
+  },
+  {
+   "kernel": "k10b_fft_radix2_seq_fix16",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:614:45: error: use of unknown builtin '__builtin_pulp_add2div2' [-Wimplicit-function-declaration]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10b_fft_radix2_seq_fix16",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:614:45: error: use of unknown builtin '__builtin_pulp_add2div2' [-Wimplicit-function-declaration]",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10_fft-file",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:33:5: error: use of undeclared identifier 'AT_L2_EVENT'",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10_fft-file",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:33:5: error: use of undeclared identifier 'AT_L2_EVENT'",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10_fft-file",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:33:5: error: use of undeclared identifier 'AT_L2_EVENT'",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10_fft-file",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:33:5: error: use of undeclared identifier 'AT_L2_EVENT'",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10_fft-file",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:33:5: error: use of undeclared identifier 'AT_L2_EVENT'",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10_fft-file",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:33:5: error: use of undeclared identifier 'AT_L2_EVENT'",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10_fft-file",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:33:5: error: unknown type name 'AT_L2_EVENT'; did you mean 'AT_L2_MEM'?",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10_fft-file",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:33:5: error: unknown type name 'AT_L2_EVENT'; did you mean 'AT_L2_MEM'?",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10_fft-file",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:33:5: error: use of undeclared identifier 'AT_L2_EVENT'",
+   "returncode": 1
+  },
+  {
+   "kernel": "k10_fft-file",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "error",
+   "detail": "$SDK/tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c:33:5: error: use of undeclared identifier 'AT_L2_EVENT'",
+   "returncode": 1
+  },
+  {
+   "kernel": "k11_dotprod_i8",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dotprod_i8": {
+     "size": 46,
+     "decoded_bytes": 46,
+     "instructions": 15,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "blez": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 2,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "8fb41c42a4c8681e5daa30fd5f895f6059f2b92c38b6cd2ef6eeb4e81b2931d5",
+   "warnings": 0
+  },
+  {
+   "kernel": "k11_dotprod_i8",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dotprod_i8": {
+     "size": 46,
+     "decoded_bytes": 46,
+     "instructions": 15,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "blez": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 2,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "8fb41c42a4c8681e5daa30fd5f895f6059f2b92c38b6cd2ef6eeb4e81b2931d5",
+   "warnings": 0
+  },
+  {
+   "kernel": "k11_dotprod_i8",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dotprod_i8": {
+     "size": 46,
+     "decoded_bytes": 46,
+     "instructions": 15,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "blez": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 2,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "88255e91856c891ab7dcfad1ba04c0a6b9d96a3f77f4ba2314fb86dde2290cc0",
+   "warnings": 0
+  },
+  {
+   "kernel": "k11_dotprod_i8",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dotprod_i8": {
+     "size": 46,
+     "decoded_bytes": 46,
+     "instructions": 15,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "blez": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 2,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "88255e91856c891ab7dcfad1ba04c0a6b9d96a3f77f4ba2314fb86dde2290cc0",
+   "warnings": 0
+  },
+  {
+   "kernel": "k11_dotprod_i8",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dotprod_i8": {
+     "size": 44,
+     "decoded_bytes": 44,
+     "instructions": 14,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "blez": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "db7ca1d7190668680e6f32e8997905b7bf4b9d40417cdf91374361c458acad57",
+   "warnings": 0
+  },
+  {
+   "kernel": "k11_dotprod_i8",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dotprod_i8": {
+     "size": 44,
+     "decoded_bytes": 44,
+     "instructions": 14,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "blez": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "db7ca1d7190668680e6f32e8997905b7bf4b9d40417cdf91374361c458acad57",
+   "warnings": 0
+  },
+  {
+   "kernel": "k11_dotprod_i8",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dotprod_i8": {
+     "size": 40,
+     "decoded_bytes": 40,
+     "instructions": 14,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "blez": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "mv": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "6667094e2229af4b26576426cb92969902181c87901873cc74f3ce43648624a4",
+   "warnings": 0
+  },
+  {
+   "kernel": "k11_dotprod_i8",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dotprod_i8": {
+     "size": 40,
+     "decoded_bytes": 40,
+     "instructions": 14,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "blez": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "mv": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "ba7c333ecedf7286750eeeb4960cb1d7dca4efd0b40735d264fe9fb13561889f",
+   "warnings": 0
+  },
+  {
+   "kernel": "k11_dotprod_i8",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dotprod_i8": {
+     "size": 44,
+     "decoded_bytes": 44,
+     "instructions": 14,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "blez": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "b6a38e2d9c235471ebb216fce39abae5780009325916860595fedf7693ae46a1",
+   "warnings": 0
+  },
+  {
+   "kernel": "k11_dotprod_i8",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dotprod_i8": {
+     "size": 44,
+     "decoded_bytes": 44,
+     "instructions": 14,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "blez": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "b6a38e2d9c235471ebb216fce39abae5780009325916860595fedf7693ae46a1",
+   "warnings": 0
+  },
+  {
+   "kernel": "clip",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "clip_s8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clip": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x7"
+     ]
+    },
+    "clipu_u8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clipu": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x9"
+     ]
+    }
+   },
+   "object_sha256": "525190f190e2050f5fca1f10a5fe9cfd7695ca99af74fc3a481aee7531048a88",
+   "warnings": 0
+  },
+  {
+   "kernel": "clip",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "clip_s8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clip": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x7"
+     ]
+    },
+    "clipu_u8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clipu": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x9"
+     ]
+    }
+   },
+   "object_sha256": "525190f190e2050f5fca1f10a5fe9cfd7695ca99af74fc3a481aee7531048a88",
+   "warnings": 0
+  },
+  {
+   "kernel": "clip",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "clip_s8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clip": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x7"
+     ]
+    },
+    "clipu_u8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clipu": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x9"
+     ]
+    }
+   },
+   "object_sha256": "9a114bff30e56a7d4a7c00da4deeeaaa4ef8df1d60872282dd3f95d5ddf4635a",
+   "warnings": 0
+  },
+  {
+   "kernel": "clip",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "clip_s8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clip": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x7"
+     ]
+    },
+    "clipu_u8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clipu": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x9"
+     ]
+    }
+   },
+   "object_sha256": "9a114bff30e56a7d4a7c00da4deeeaaa4ef8df1d60872282dd3f95d5ddf4635a",
+   "warnings": 0
+  },
+  {
+   "kernel": "clip",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "clip_s8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clip": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x7"
+     ]
+    },
+    "clipu_u8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clipu": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x9"
+     ]
+    }
+   },
+   "object_sha256": "b00a5705da322d6b3403f09780df1e163e92bd4341f71b0450160ebc92de2276",
+   "warnings": 0
+  },
+  {
+   "kernel": "clip",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "clip_s8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clip": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x7"
+     ]
+    },
+    "clipu_u8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clipu": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x9"
+     ]
+    }
+   },
+   "object_sha256": "b00a5705da322d6b3403f09780df1e163e92bd4341f71b0450160ebc92de2276",
+   "warnings": 0
+  },
+  {
+   "kernel": "clip",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "clip_s8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clip": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x8"
+     ]
+    },
+    "clipu_u8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clipu": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x9"
+     ]
+    }
+   },
+   "object_sha256": "ec222c7b87ed181b418a547f8fa1c25ffa6b816153710cbd4f4005936abd1e50",
+   "warnings": 0
+  },
+  {
+   "kernel": "clip",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "clip_s8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clip": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x8"
+     ]
+    },
+    "clipu_u8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clipu": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x9"
+     ]
+    }
+   },
+   "object_sha256": "02cdcbfc949122e5525d891e573105b181ca6338a40beb9b522d16d297f438d0",
+   "warnings": 0
+  },
+  {
+   "kernel": "clip",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "clip_s8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clip": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x8"
+     ]
+    },
+    "clipu_u8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clipu": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x9"
+     ]
+    }
+   },
+   "object_sha256": "23d72b5f54e50f381b9f69c4ce6524ec8585422ecacd4c7cfcabb784435ed646",
+   "warnings": 0
+  },
+  {
+   "kernel": "clip",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "clip_s8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clip": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x8"
+     ]
+    },
+    "clipu_u8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "clip": 1
+     },
+     "mnemonics": {
+      "p.clipu": 1,
+      "ret": 1
+     },
+     "clip_operands": [
+      "a0, a0, 0x9"
+     ]
+    }
+   },
+   "object_sha256": "23d72b5f54e50f381b9f69c4ce6524ec8585422ecacd4c7cfcabb784435ed646",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "2efe5872c16774918d44d1c913e5bc8e880f669e1efe3aeccc5303ee70c67872",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "2efe5872c16774918d44d1c913e5bc8e880f669e1efe3aeccc5303ee70c67872",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "b7618f2e406297ab5305228ee5be6e9cbb2d5a7e5bfd4f5439351ffbe07f94b2",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "b7618f2e406297ab5305228ee5be6e9cbb2d5a7e5bfd4f5439351ffbe07f94b2",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1c943879bc665f4edde787985402b8abaf17f93161c5f61a5dcf57901efdc226",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1c943879bc665f4edde787985402b8abaf17f93161c5f61a5dcf57901efdc226",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "b2aaabc160532032701894f52ae70940b505dc1fdbe2e031fea4b7c112d1f492",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "66d0b1f3aa69dbee9d60131ee23588dc77e3ce2c2dede09608452cf5a2328ea6",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "0bbfc52f1ca252b6d8052c277897d4f196dd7e7321d06f9e9456749bb76ff66d",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "0bbfc52f1ca252b6d8052c277897d4f196dd7e7321d06f9e9456749bb76ff66d",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add16",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "80292c5717d07c88d62d3080fb5ff2a7d8c4b20a7e83f4a02ca24148fc69196e",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add16",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "80292c5717d07c88d62d3080fb5ff2a7d8c4b20a7e83f4a02ca24148fc69196e",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add16",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "963db4e6c7a600e03a120b8af1cab41be415f12227a2426ecaa6ffa9c314a3dd",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add16",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "963db4e6c7a600e03a120b8af1cab41be415f12227a2426ecaa6ffa9c314a3dd",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add16",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "3ff64766d18cb0767d0679fc206fd2fba62c45e28c726e993d6ce824d0a4d7f3",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add16",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "3ff64766d18cb0767d0679fc206fd2fba62c45e28c726e993d6ce824d0a4d7f3",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add16",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "ca64a55195f2925197cad9cb5e4763553aa9525f1293e553554cd3ca792c8120",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add16",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "34da7e3fc4fc313889b055971c2b7fdc26890c77c3d20c9595668e0d040b993e",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add16",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "fbbf1fbdf82c6a4aa8ec29cbf39ffc4215a88e6e377ff49337a2f4dc816db15a",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add16",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.add.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "fbbf1fbdf82c6a4aa8ec29cbf39ffc4215a88e6e377ff49337a2f4dc816db15a",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift8",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift8": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.b": 1,
+      "pv.srl.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "7733ec9ff435b926b8bb82699aa5911d84d59a248baf62299a132edc7171814f",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift8",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift8": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.b": 1,
+      "pv.srl.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "7733ec9ff435b926b8bb82699aa5911d84d59a248baf62299a132edc7171814f",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift8",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift8": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.b": 1,
+      "pv.srl.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "9f34df25c082c323f3c70cd0aa3e09675d4396372355eb4a03f5c92580ef73b0",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift8",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift8": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.b": 1,
+      "pv.srl.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "9f34df25c082c323f3c70cd0aa3e09675d4396372355eb4a03f5c92580ef73b0",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift8",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift8": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.b": 1,
+      "pv.srl.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "c56da95b062a49abea13c71058534e41780c9f735bb9c74f574488bee81cbe37",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift8",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift8": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.b": 1,
+      "pv.srl.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "c56da95b062a49abea13c71058534e41780c9f735bb9c74f574488bee81cbe37",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift8",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.srl.sci.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "df691de455981052973208374d48a01a68b79861bd62dcd67321a574b9bc4867",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift8",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.srl.sci.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "7f4f0b1da321c823dbcf3bb3001183534c25e58483467cd93668157c63b9be55",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift8",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift8": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.b": 1,
+      "pv.srl.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1960a760509893a1d57dd1bc90c2b7222458e9dadae1a5baf9f7ecc02cea258d",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift8",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift8": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.b": 1,
+      "pv.srl.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1960a760509893a1d57dd1bc90c2b7222458e9dadae1a5baf9f7ecc02cea258d",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift16",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift16": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.h": 1,
+      "pv.srl.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "9cf9988cfae7a283ed4004e2a8acb87b4716ce366134012029b4d2d7c64622b9",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift16",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift16": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.h": 1,
+      "pv.srl.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "9cf9988cfae7a283ed4004e2a8acb87b4716ce366134012029b4d2d7c64622b9",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift16",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift16": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.h": 1,
+      "pv.srl.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "045b590d500bcd47d4af387952cdbb006ee26a57c612835edaf487793631bcd9",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift16",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift16": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.h": 1,
+      "pv.srl.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "045b590d500bcd47d4af387952cdbb006ee26a57c612835edaf487793631bcd9",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift16",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift16": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.h": 1,
+      "pv.srl.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "c7f77077704b2eb30e5c9fa0dc3fe261c108afb4d55b046716f922f5a7babb6f",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift16",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift16": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.h": 1,
+      "pv.srl.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "c7f77077704b2eb30e5c9fa0dc3fe261c108afb4d55b046716f922f5a7babb6f",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift16",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.srl.sci.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "468d541b5750e8cc4268426fbf864f6afd1dc521226c1d55414bd699cc05e4c1",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift16",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift16": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.srl.sci.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "b843c5b7781465096cfa209bb914e4490680134d0c8339b687b85d8f88a3daa7",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift16",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift16": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.h": 1,
+      "pv.srl.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "6f7cf658f958e393ae5d927f36e15d9f9f2d352ed7c4f00046a895e3202a8160",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_shift16",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_shift16": {
+     "size": 10,
+     "decoded_bytes": 10,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 2
+     },
+     "mnemonics": {
+      "pv.add.sci.h": 1,
+      "pv.srl.h": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "6f7cf658f958e393ae5d927f36e15d9f9f2d352ed7c4f00046a895e3202a8160",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_max8",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_max8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.max.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "c2e94a1a21097f78aa1b9a43f8c1e0a90d53ccb8ca86747bd6413ee3e8efc6fb",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_max8",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_max8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.max.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "c2e94a1a21097f78aa1b9a43f8c1e0a90d53ccb8ca86747bd6413ee3e8efc6fb",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_max8",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_max8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.max.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1f8e30c307d1082c8e4cd31776ce70bbda1b3b75dd6b96076e0e0a9857476fe2",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_max8",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_max8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.max.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1f8e30c307d1082c8e4cd31776ce70bbda1b3b75dd6b96076e0e0a9857476fe2",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_max8",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_max8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.max.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "f1d0629b6606fd167f574185591eb02b79111c2efe731abd1589f7c03706a98d",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_max8",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_max8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.max.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "f1d0629b6606fd167f574185591eb02b79111c2efe731abd1589f7c03706a98d",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_max8",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_max8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.max.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "91ef34569942628cb68c51d91629c33aa7fea525d08dd0c63ed8aa93e4aa8d83",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_max8",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_max8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.max.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "62a6418dd2fc7eba8108819e7f04615e36f3df3d30b35f904c659a3d7262e360",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_max8",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_max8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.max.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "337546ed99e9cc7c52f19d7f2fb721f7b5328a09c5b3063a6f1725a41ced3e9a",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_max8",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_max8": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.max.b": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "337546ed99e9cc7c52f19d7f2fb721f7b5328a09c5b3063a6f1725a41ced3e9a",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "ce2299dbccb8cfa9440476ed6592ce84397f9368712dc1888011915b88706fb3",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "ce2299dbccb8cfa9440476ed6592ce84397f9368712dc1888011915b88706fb3",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "aceb5831d717be0fca3020a7632a81e3b2905d659118a8b98b72898704d164d1",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "aceb5831d717be0fca3020a7632a81e3b2905d659118a8b98b72898704d164d1",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "61346956d3955343092c51a1be143e1c3f4ac51bf53c7fab3529991698c3899a",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "61346956d3955343092c51a1be143e1c3f4ac51bf53c7fab3529991698c3899a",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "18eb928f51e56a23b9bb2d543e60036935e84c0eb56733cf129179b8cd840495",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "f9552352a961213f56e857332e5cbecf7a6d385c7eabb75647cc64b8625ab5e5",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "c9b6da4027a5245cc2ae3070d4cc68a788b1e8f3f0b5831c3c306e801666e920",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "c9b6da4027a5245cc2ae3070d4cc68a788b1e8f3f0b5831c3c306e801666e920",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1d2c7f9dca0a215a11e17e88e8135352a4e299522f4d812970cbe65b31f20acb",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1d2c7f9dca0a215a11e17e88e8135352a4e299522f4d812970cbe65b31f20acb",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "a1abdfe0d3406da598a22cefc067135f3b8577e7bb94e3b3e808c4c2f3d9f988",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "a1abdfe0d3406da598a22cefc067135f3b8577e7bb94e3b3e808c4c2f3d9f988",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "80efaa2cf0e4ff8e7dade97f6c40657db71f2ad3f7aa2b055041d01dacb1d71b",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "80efaa2cf0e4ff8e7dade97f6c40657db71f2ad3f7aa2b055041d01dacb1d71b",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "4c6674670e0c98c7f5bbdeb20db82daf16fe35365b5a9956447002146089acf5",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "d40873c19f3853821be3e6ea615312bc49ceff3eef0d8034ae3370688852e4b4",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "3f735e352b0570e28a1d4d0601bf88e4b90d3701ddfb241d7fddc81bd0d24b80",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "simd": 1
+     },
+     "mnemonics": {
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "3f735e352b0570e28a1d4d0601bf88e4b90d3701ddfb241d7fddc81bd0d24b80",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_extract",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_extract": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.extractu": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "568933cb08d02127040bba72a188777c3d6f893fa1ffe3cb10c299f4a1eaa7a2",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_extract",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_extract": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.extractu": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "568933cb08d02127040bba72a188777c3d6f893fa1ffe3cb10c299f4a1eaa7a2",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_extract",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_extract": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.extractu": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "2618aa29d06b83fc4d8219e1333ef82deb038f4e73c822bbd57dbec7ceb84fd0",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_extract",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_extract": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.extractu": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "2618aa29d06b83fc4d8219e1333ef82deb038f4e73c822bbd57dbec7ceb84fd0",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_extract",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_extract": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.extractu": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "633b5a451229b90e05f5270692a8de87a94d226589eb492a6026164e3fecb678",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_extract",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_extract": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.extractu": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "633b5a451229b90e05f5270692a8de87a94d226589eb492a6026164e3fecb678",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_extract",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_extract": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.extractu": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "7bb0b6ac02d9f24b96f255f02ac7656b439909562940cd3ad388af737e7e9214",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_extract",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_extract": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.extractu": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "a560547836e3163803bd0f9b4b62c0eb99e52d6f5ee8d4d2dbdabf6b18c8762b",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_extract",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_extract": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.extractu": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "6644093f853f71bc90b5f3be3aa9c6ebdfb6268a629fdd10dbb769dda8b050aa",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_extract",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_extract": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.extractu": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "6644093f853f71bc90b5f3be3aa9c6ebdfb6268a629fdd10dbb769dda8b050aa",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_count",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_count": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.cnt": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "9ceb4b8585b44c3c04c6f619f7910525d0549687589edd2f1f2314f6b22d6700",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_count",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_count": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.cnt": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "9ceb4b8585b44c3c04c6f619f7910525d0549687589edd2f1f2314f6b22d6700",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_count",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_count": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.cnt": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "8800bdb431c0544f2390a859fdb693ac7a4abd516818208dd9b1cf946fa8dd17",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_count",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_count": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.cnt": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "8800bdb431c0544f2390a859fdb693ac7a4abd516818208dd9b1cf946fa8dd17",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_count",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_count": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.cnt": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "f9e07a66b5b506e0e52d04a61c686b2291e82f23b3a785d07bfe4ed758424ba5",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_count",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_count": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.cnt": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "f9e07a66b5b506e0e52d04a61c686b2291e82f23b3a785d07bfe4ed758424ba5",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_count",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_count": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.cnt": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "88a343f28514b89f3b638cfae419421da88669098dd384490bc0fc0e770bd35c",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_count",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_count": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.cnt": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "6b6f3d71a81644ac34c784efa0e539f4f05ae5a3b41c97b40cf1b779f2184502",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_count",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_count": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.cnt": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "05e97dd2b76a6b0a3acb7a0727fc3e825bbb221a64153f2c202f5ad483c6fcf2",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_bit_count",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "bit_count": {
+     "size": 6,
+     "decoded_bytes": 6,
+     "instructions": 2,
+     "unknown": 0,
+     "mix": {
+      "bitmanip": 1
+     },
+     "mnemonics": {
+      "p.cnt": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "05e97dd2b76a6b0a3acb7a0727fc3e825bbb221a64153f2c202f5ad483c6fcf2",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_mac",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "mac": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "mac": 1
+     },
+     "mnemonics": {
+      "p.mac": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "10e5ee925749aee44cb0aa2a459054ef5909b22e8ccb43438120a6f8083258f5",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_mac",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "mac": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "mac": 1
+     },
+     "mnemonics": {
+      "p.mac": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "10e5ee925749aee44cb0aa2a459054ef5909b22e8ccb43438120a6f8083258f5",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_mac",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "mac": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "mac": 1
+     },
+     "mnemonics": {
+      "p.mac": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "05bb64abfaa54a7014a93b8a89382032e6a39c0d0b189ff0d645671e68a6eb9f",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_mac",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "mac": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "mac": 1
+     },
+     "mnemonics": {
+      "p.mac": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "05bb64abfaa54a7014a93b8a89382032e6a39c0d0b189ff0d645671e68a6eb9f",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_mac",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "mac": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "mac": 1
+     },
+     "mnemonics": {
+      "p.mac": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "88a28cec6f0c81013786cb470fd6da398a30610db200fb1fc6068452e8d1f592",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_mac",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "mac": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "mac": 1
+     },
+     "mnemonics": {
+      "p.mac": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "88a28cec6f0c81013786cb470fd6da398a30610db200fb1fc6068452e8d1f592",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_mac",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "mac": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "mac": 1
+     },
+     "mnemonics": {
+      "p.mac": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "638c5b8de3c5ba97db60176a0edb1604943932e7790c0907925e2cac22000298",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_mac",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "mac": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "mac": 1
+     },
+     "mnemonics": {
+      "p.mac": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "99ddd58aeef74372475403a0a8e6b8b9f2709bf72594e4bc2e006076813344c3",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_mac",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "mac": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "mac": 1
+     },
+     "mnemonics": {
+      "p.mac": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "eb1be7c47662848874cc0fbaa8dfda8db595387246e0ebe1988b915289d86f60",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_mac",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "mac": {
+     "size": 8,
+     "decoded_bytes": 8,
+     "instructions": 3,
+     "unknown": 0,
+     "mix": {
+      "mac": 1
+     },
+     "mnemonics": {
+      "p.mac": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "eb1be7c47662848874cc0fbaa8dfda8db595387246e0ebe1988b915289d86f60",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_sum_loop",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @sum_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_sum_loop",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @sum_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_sum_loop",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @sum_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_sum_loop",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @sum_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_sum_loop",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "sum_loop": {
+     "size": 34,
+     "decoded_bytes": 34,
+     "instructions": 12,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 2,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "5ef3715e0e960dada360e47cec47d5b200a9775ddd9a42b5f0f7a844a7020db4",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_sum_loop",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "sum_loop": {
+     "size": 34,
+     "decoded_bytes": 34,
+     "instructions": 12,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 2,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "5ef3715e0e960dada360e47cec47d5b200a9775ddd9a42b5f0f7a844a7020db4",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_sum_loop",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "sum_loop": {
+     "size": 32,
+     "decoded_bytes": 32,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "mv": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "add": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "6a4b237f37d070bc9f86cfe8bd15a5b69c1665ad123d8d7fc24c4ffc07d07647",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_sum_loop",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "sum_loop": {
+     "size": 32,
+     "decoded_bytes": 32,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "mv": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "add": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "4822bd3209908399cb6fb0dc10fde56bf8857e90acff69cf380b61aaa19dad2f",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_sum_loop",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "sum_loop": {
+     "size": 34,
+     "decoded_bytes": 34,
+     "instructions": 12,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 2,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "91d183d2c9d9ced473ee4aa99b05e1d48b4d66ec3fd01af2bc6e219fd3bb7394",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_sum_loop",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "sum_loop": {
+     "size": 34,
+     "decoded_bytes": 34,
+     "instructions": 12,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 2,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "91d183d2c9d9ced473ee4aa99b05e1d48b4d66ec3fd01af2bc6e219fd3bb7394",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_copy_loop",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @copy_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_copy_loop",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @copy_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_copy_loop",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @copy_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_copy_loop",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @copy_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_copy_loop",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "copy_loop": {
+     "size": 22,
+     "decoded_bytes": 22,
+     "instructions": 8,
+     "unknown": 0,
+     "mix": {
+      "postinc": 2
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "p.lw": 1,
+      "addi": 1,
+      "p.sw": 1,
+      "bne": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "18110cca364e2c17ace3606c211e9092e2f0d4c00ad1a7f1ab2bfcaad33cf76d",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_copy_loop",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "copy_loop": {
+     "size": 22,
+     "decoded_bytes": 22,
+     "instructions": 8,
+     "unknown": 0,
+     "mix": {
+      "postinc": 2
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "p.lw": 1,
+      "addi": 1,
+      "p.sw": 1,
+      "bne": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "18110cca364e2c17ace3606c211e9092e2f0d4c00ad1a7f1ab2bfcaad33cf76d",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_copy_loop",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "copy_loop": {
+     "size": 28,
+     "decoded_bytes": 28,
+     "instructions": 10,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "addi": 3,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "p.sw": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "6c40c111259c73f82a13a782dcee65afeb1e1983f1c22ab4613856a5fa1a5d7b",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_copy_loop",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "copy_loop": {
+     "size": 28,
+     "decoded_bytes": 28,
+     "instructions": 10,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "addi": 3,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lw": 1,
+      "p.sw": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "48f7ed336256c9cc4e021a9b258b3f7e7fbe038342af495ebd35d5e2a46b4cd2",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_copy_loop",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "copy_loop": {
+     "size": 22,
+     "decoded_bytes": 22,
+     "instructions": 8,
+     "unknown": 0,
+     "mix": {
+      "postinc": 2
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "p.lw": 1,
+      "addi": 1,
+      "p.sw": 1,
+      "bne": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "65a391ce93874565c9bafa19e1dcd2c013c4d820ce5fb772a3894c3a21dd287d",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_copy_loop",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "copy_loop": {
+     "size": 22,
+     "decoded_bytes": 22,
+     "instructions": 8,
+     "unknown": 0,
+     "mix": {
+      "postinc": 2
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "p.lw": 1,
+      "addi": 1,
+      "p.sw": 1,
+      "bne": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "65a391ce93874565c9bafa19e1dcd2c013c4d820ce5fb772a3894c3a21dd287d",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8_loop",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @dot8_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_dot8_loop",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @dot8_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_dot8_loop",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @dot8_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_dot8_loop",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @dot8_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_dot8_loop",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8_loop": {
+     "size": 40,
+     "decoded_bytes": 40,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1570e46f5c30c248696ff1ab3f472514b1df96166661653a312f98da979e7b46",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8_loop",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8_loop": {
+     "size": 40,
+     "decoded_bytes": 40,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1570e46f5c30c248696ff1ab3f472514b1df96166661653a312f98da979e7b46",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8_loop",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8_loop": {
+     "size": 38,
+     "decoded_bytes": 38,
+     "instructions": 14,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "mv": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "f721f9ebb7e9af89448dfa295a39b87146dcad8ca07d3e27b26e130c489bfe0a",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8_loop",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8_loop": {
+     "size": 38,
+     "decoded_bytes": 38,
+     "instructions": 14,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "mv": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "1bb6edbf242d624393ecac6e6d9e3220296d3c9aa4db4eb864a0d7f8407f3fab",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8_loop",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8_loop": {
+     "size": 40,
+     "decoded_bytes": 40,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "44ad8b9ff98fda8ecd67e7c95782b868e95856af3be1294bdc38654b2d806ccc",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot8_loop",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot8_loop": {
+     "size": 40,
+     "decoded_bytes": 40,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.b": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "44ad8b9ff98fda8ecd67e7c95782b868e95856af3be1294bdc38654b2d806ccc",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16_loop",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @dot16_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_dot16_loop",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @dot16_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_dot16_loop",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @dot16_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_dot16_loop",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @dot16_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_dot16_loop",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16_loop": {
+     "size": 40,
+     "decoded_bytes": 40,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "ef0e589c65ae2cc80da764956d98217f4fc8f608f6877bf0edcec50383d54b13",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16_loop",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16_loop": {
+     "size": 40,
+     "decoded_bytes": 40,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "ef0e589c65ae2cc80da764956d98217f4fc8f608f6877bf0edcec50383d54b13",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16_loop",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16_loop": {
+     "size": 38,
+     "decoded_bytes": 38,
+     "instructions": 14,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "mv": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.h": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "8c84646654f5e0c9063277e5c1737f9744cdb6403bf4b0f6288af45584332120",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16_loop",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16_loop": {
+     "size": 38,
+     "decoded_bytes": 38,
+     "instructions": 14,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "mv": 1,
+      "li": 2,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.h": 1,
+      "ret": 2
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "26dbcfe4f7e1c7c08ac521040d49865042df74a9c74700f6ed2883fd47b091d9",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16_loop",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16_loop": {
+     "size": 40,
+     "decoded_bytes": 40,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "2fd660875741fb14c8be8e067b056b879733976798f54d0458b1162ad4633d83",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_dot16_loop",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "dot16_loop": {
+     "size": 40,
+     "decoded_bytes": 40,
+     "instructions": 13,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 2,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "sub": 1,
+      "srli": 1,
+      "li": 1,
+      "nop": 1,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.sdotsp.h": 1,
+      "mv": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "2fd660875741fb14c8be8e067b056b879733976798f54d0458b1162ad4633d83",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8_loop",
+   "compiler": "ref18",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @packed_add8_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_packed_add8_loop",
+   "compiler": "ref18",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @packed_add8_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_packed_add8_loop",
+   "compiler": "port19",
+   "opt": "O2",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @packed_add8_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_packed_add8_loop",
+   "compiler": "port19",
+   "opt": "O3",
+   "status": "crash",
+   "detail": "crash in pass 'PULP Hardware Loops' on @packed_add8_loop",
+   "returncode": 1
+  },
+  {
+   "kernel": "k12_packed_add8_loop",
+   "compiler": "port20",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8_loop": {
+     "size": 28,
+     "decoded_bytes": 28,
+     "instructions": 9,
+     "unknown": 0,
+     "mix": {
+      "postinc": 3,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "p.lw": 2,
+      "pv.add.b": 1,
+      "p.sw": 1,
+      "bne": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "e1895cf2423a1bdd53c183593c322b391e881f2f026dd59d0f2ef33c734b6419",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8_loop",
+   "compiler": "port20",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8_loop": {
+     "size": 28,
+     "decoded_bytes": 28,
+     "instructions": 9,
+     "unknown": 0,
+     "mix": {
+      "postinc": 3,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "p.lw": 2,
+      "pv.add.b": 1,
+      "p.sw": 1,
+      "bne": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "e1895cf2423a1bdd53c183593c322b391e881f2f026dd59d0f2ef33c734b6419",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8_loop",
+   "compiler": "gcc",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8_loop": {
+     "size": 34,
+     "decoded_bytes": 34,
+     "instructions": 11,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 3,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.add.b": 1,
+      "p.sw": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "bfa87b00cd0111c1505ea67915ae8655ac3b33e1220e3ece3385c0ec2f3aa7c8",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8_loop",
+   "compiler": "gcc",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8_loop": {
+     "size": 34,
+     "decoded_bytes": 34,
+     "instructions": 11,
+     "unknown": 0,
+     "mix": {
+      "hwloop": 1,
+      "postinc": 3,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "addi": 2,
+      "srli": 1,
+      "lp.setup": 1,
+      "p.lw": 2,
+      "pv.add.b": 1,
+      "p.sw": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "a042310f7a267f5b403900b3f4fc98712e003dffab4984e5a83bfedff2f6f80b",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8_loop",
+   "compiler": "port20fix",
+   "opt": "O2",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8_loop": {
+     "size": 28,
+     "decoded_bytes": 28,
+     "instructions": 9,
+     "unknown": 0,
+     "mix": {
+      "postinc": 3,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "p.lw": 2,
+      "pv.add.b": 1,
+      "p.sw": 1,
+      "bne": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "38f861e408962e9665cfa7b1baa549f443b550fb58d35f38adf69695bd285c0e",
+   "warnings": 0
+  },
+  {
+   "kernel": "k12_packed_add8_loop",
+   "compiler": "port20fix",
+   "opt": "O3",
+   "status": "ok",
+   "detail": null,
+   "returncode": 0,
+   "functions": {
+    "packed_add8_loop": {
+     "size": 28,
+     "decoded_bytes": 28,
+     "instructions": 9,
+     "unknown": 0,
+     "mix": {
+      "postinc": 3,
+      "simd": 1
+     },
+     "mnemonics": {
+      "beqz": 1,
+      "slli": 1,
+      "add": 1,
+      "p.lw": 2,
+      "pv.add.b": 1,
+      "p.sw": 1,
+      "bne": 1,
+      "ret": 1
+     },
+     "clip_operands": []
+    }
+   },
+   "object_sha256": "38f861e408962e9665cfa7b1baa549f443b550fb58d35f38adf69695bd285c0e",
+   "warnings": 0
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+{
+ "status": "escalated",
+ "branch": "work/20/F001",
+ "commits": [
+  "8a8fab3863dc31f9f5534bcf93aa0c91f69a4a52"
+ ],
+ "note": "notes/20/F001.md",
+ "signature_gone": true,
+ "other_errors_seen": [
+  "PreProcessingFix.c at -O2/-O3/-Os now gets past Sema and hits the RISCVSubtarget::getMinRVVVectorSizeInBits assertion 'Tried to get vector length without Zve or V extension' (from TTI getInstructionCost in IPSCCP/FunctionSpecializer and LoopFullUnroll); this is survey section 4 item 3, a separate task",
+  "MathFuncsFix.c (FastFixedApprox.h:271): use of unknown builtin '__builtin_pulp_mul64hu' (GAP9 builtin missing in the fork, survey section 4 feature gap)"
+ ],
+ "fork_commit": "f1b7aebff8c2 [LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms (Federico Ficarelli, 2022-08-25), found with git log -S'ArgValue(*RoundArgNum)' e6c3289804a6..pulp/integer_SIMD_fix",
+ "fix": "clang/lib/Sema/SemaRISCV.cpp:1450 'auto norm = ArgValue(*RoundArgNum);' -> 'auto norm = ArgValue(*NormArgNum);' (one token)",
+ "question": "The one-token fix makes Sema enforce Round == 2^(Norm-1), the rule GAP9 GCC enforces and the fork's own comment states. Valid SDK calls (gap_mulsRN/gap_macsRN/gap_roundnorm with Norm=15, Round=1<<14) now compile, and out-of-range values are still rejected. But the two fork tests clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics.c and riscv-xpulpv2-intrinsics-diag.c each contain 8 calls with Norm=2, Round=1 (machhsRN, machhuRN, mulhhsRN, mulhhuRN, mulsRN, muluRN, subRN, subuRN). GAP9 GCC rejects those inputs, and they passed only because of the bug. With the fix both tests FAIL: 'argument value 1 is outside the valid range [2, 2]'. In the -diag test the Sema error also stops compilation before the expected 'needs target feature' errors. Rule 2 forbids me to edit tests. Does the owner approve a recorded test exception (a test-regen task) that changes the Round argument from 1 to 2 in those 16 calls: intrinsics.c lines 332,350,440,467,494,521,548,584 and -diag.c lines 42,44,54,57,60,63,66,70? In intrinsics.c the matching '@llvm.riscv.pulp.*RN(..., i32 2, i32 1)' CHECK lines would change to 'i32 2, i32 2', regenerated with update_cc_test_checks.py. The Round operand is ignored by instruction selection (p.*RN encodes only Norm), so generated code is unchanged. The alternative is to keep the defect, and then the GAP9 SDK DSP kernels using *RN macros stay uncompilable.",
+ "evidence": {
+  "repro_log": "logs/20-F001.repro.log (ref-18 and build/int-20 = integration head b6cd96bd: PreProcessingFix.c, MathFuncsFix.c and a 3-line probe all rejected with 'argument value 16384 is outside the valid range [-2147483648, -2147483648]'; mismatched mulsRN(a,b,2,1) accepted)",
+  "verify_log": "logs/20-F001.verify.log (build/20-F001: probe accepted, emits p.mulsrn/p.macsrn/p.addurn with norm 15/15/8; PreProcessingFix.c -fsyntax-only rc=0; bad inputs rejected: round 1<<13 with norm 15 -> range [16384,16384], norm 32 -> [0,31], macsRN round 1<<15 -> [16384,16384], mulsRN(2,1) -> [2,2]; GAP9 GCC rejects (2,1) for mulsRN/mulhhsRN/subRN/machhsRN and accepts (2,2) and (1,1))",
+  "lit_log": "logs/20-F001.lit.log (both fork tests fail with fix; build/int-20 passes both, 2/2)",
+  "build_log": "logs/20-F001-build.log (obj.clangSema clang built, exit 0, cluster_errors: 0 clusters)",
+  "gcc_rule": "riscv32-unknown-elf-gcc -march=rv32imcxgap9: 'Builtin __builtin_pulp_mul{hh,}{s,u}NRr (X, Y, Norm, Round) expects Norm and Round cst, Norm<=31, Round==2^(Norm-1)'",
+  "upstream_reference": "CORE-V RN builtins/intrinsics take no Round argument (clang/include/clang/Basic/BuiltinsRISCVXCV.td:35, llvm/include/llvm/IR/IntrinsicsRISCVXCV.td:82 at llvmorg-20.1.8), so upstream has no equivalent check",
+  "residual_difference": "Norm=0: fork expects Round=1, GCC rejects Norm=0 for RN forms; untouched (no SDK code reaches it, the SDK macro 1<<(0-1) is not a constant)"
+ },
+ "proposed_test": {
+  "file": "clang/test/Sema/riscv-xpulpv2-rn-builtins.c (new)",
+  "run": "// REQUIRES: riscv-registered-target\n// RUN: %clang_cc1 -triple riscv32 -target-feature +xpulpv -fsyntax-only -verify %s",
+  "checks": "valid (no diagnostic): __builtin_pulp_mulsRN(a,b,15,1<<14); __builtin_pulp_macsRN(a,b,c,15,1<<14); __builtin_pulp_adduRN(a,0,8,1<<7); __builtin_pulp_addRN(a,b,31,1u<<30). Invalid: __builtin_pulp_mulsRN(a,b,15,1<<13) // expected-error {{argument value 8192 is outside the valid range [16384, 16384]}}; __builtin_pulp_mulsRN(a,b,32,1<<14) // expected-error {{argument value 32 is outside the valid range [0, 31]}}; __builtin_pulp_macsRN(a,b,c,2,1) // expected-error {{argument value 1 is outside the valid range [2, 2]}}"
+ }
+}

@@ -1,0 +1,24 @@
+[
+  {
+    "source": "clang/test/Misc/target-invalid-cpu-note.c",
+    "destination": "clang/test/Misc/target-invalid-cpu-note/riscv.c",
+    "additional_destinations": [
+      "clang/test/Misc/target-invalid-cpu-note/aarch64.c",
+      "clang/test/Misc/target-invalid-cpu-note/amdgcn.c",
+      "clang/test/Misc/target-invalid-cpu-note/arm.c",
+      "clang/test/Misc/target-invalid-cpu-note/avr.c",
+      "clang/test/Misc/target-invalid-cpu-note/bpf.c",
+      "clang/test/Misc/target-invalid-cpu-note/hexagon.c",
+      "clang/test/Misc/target-invalid-cpu-note/lanai.c",
+      "clang/test/Misc/target-invalid-cpu-note/mips.c",
+      "clang/test/Misc/target-invalid-cpu-note/nvptx.c",
+      "clang/test/Misc/target-invalid-cpu-note/powerpc.c",
+      "clang/test/Misc/target-invalid-cpu-note/r600.c",
+      "clang/test/Misc/target-invalid-cpu-note/sparc.c",
+      "clang/test/Misc/target-invalid-cpu-note/systemz.c",
+      "clang/test/Misc/target-invalid-cpu-note/wasm.c",
+      "clang/test/Misc/target-invalid-cpu-note/x86.c"
+    ],
+    "upstream_commit": "39e3085a55880dbbc5aeddc3661342980d5e1467"
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "status": "escalated",
+  "branch": "work/20/T001",
+  "commits": [],
+  "note": null,
+  "signature_gone": false,
+  "other_errors_seen": [],
+  "question": "rv32xmempool-invalid.s fails only because upstream changed the wording of the CSR missing-extension diagnostic. The fork behaviour is correct (csrr of 'trace' without +xmempool is still rejected at the same line:col 5:13; with -mattr=+xmempool it assembles to the same encoding [0xf3,0x22,0x00,0x7d]). No code fix is appropriate: restoring the old message would mean reverting upstream code in RISCVAsmParser.cpp for all CSRs. Recommend a test-regen task to update the single CHECK line in llvm/test/MC/RISCV/rv32xmempool-invalid.s from 'error: system register use requires an option to be enabled' to \"error: system register 'trace' requires 'xmempool' to be enabled\" (cosmetic: diagnostic text only, no instruction change). Approve?",
+  "evidence": {
+    "upstream_commit": "107f3efdbede [RISCV][MC] Make error message of CSR with wrong extension more detailed (#104424) -- in llvmorg-19.1.7..llvmorg-20.1.8 (ancestor of 20.1.8, not of 19.1.7)",
+    "upstream_change": "RISCVAsmParser::parseCSRSystemRegister: 'system register use requires an option to be enabled' replaced by \"system register '<name>' [is RV32 only][ and ]requires '<feature>' to be enabled\", feature name taken from RISCVFeatureKV",
+    "upstream_test_updates": "same commit rewrote the CHECK lines of its own tests llvm/test/MC/RISCV/machine-csr-names-invalid.s and rv32-only-csr-names.s to the new wording (e.g. \"error: system register 'pmpcfg1' is RV32 only\")",
+    "fork_touch": "fork has no diff vs llvmorg-20.1.8 in the sysreg diagnostic path of RISCVAsmParser.cpp; no other fork MC test uses the old message",
+    "repro_log": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/20-T001.repro.log (int-19 prints old message, int-20 prints new message, same location; +xmempool assembles)",
+    "lit_log": "/home/ubuntu/llvm-project/pulp-llvm-port/logs/20-T001.lit-r1.log",
+    "worktree": "not created: no code change needed; reproduced with build/int-20 whose wt/int-20 HEAD == integration_head 17009d29cc0e"
+  }
+}

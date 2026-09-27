@@ -1,0 +1,1 @@
+llvm/test/CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir # new upstream test at 20; fork PulpV2/PulpV4 register classes shift RC IDs so a hardcoded inline-asm flag prints reguse:FPR64 not reguse:VR (comment only, same code). Owner-approved 2026-09-27, notes/20/owner-test-exceptions.md; removal of the ID shift tracked as a step-23 design item

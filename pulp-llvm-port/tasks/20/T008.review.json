@@ -1,0 +1,25 @@
+{
+  "task": "20/T008",
+  "commits": ["8bcb70882fc6487c06c8f4fe248bb4223f30262f", "eaa1a22498475173ccfc5abeaccf3de51c363417"],
+  "scope": "Test commit eaa1a2249847 reviewed as an owner-exception edit (notes/20/owner-test-exceptions.md section T003). Code commit 8bcb70882fc6 was already approved (tasks/20/T003.review.json). This review only confirms it is unchanged.",
+  "verdict": "APPROVE",
+  "reasons": [],
+  "evidence": {
+    "t003_unchanged": "work/20/T008~1 == work/20/T003 == 8bcb70882fc6487c06c8f4fe248bb4223f30262f. The hash is identical, so the content is the approved commit. The worktree wt/20-T008 HEAD is eaa1a2249847 and it is clean.",
+    "diff": "git diff 8bcb70882fc6 eaa1a2249847: 1 file, 1 insertion, 0 deletions. The only line added is '; CHECK-NEXT:   # implicit-def: $f{{[0-9]+}}_d' at llvm/test/CodeGen/RISCV/freploop-nested.ll:60, between main1's 'CHECK: li [[rBound]], 127' (line 59) and 'CHECK-NEXT: frep.o [[rBound]], 2, 0, 0' (line 61). No RUN line, IR line or other CHECK line changed. Every existing CHECK-NEXT in main1 (frep.o, fmul.d, fadd.d, fmv.x.w, csrci, csrsi) is still CHECK-NEXT. The new line is itself a CHECK-NEXT, so the li -> comment -> frep.o chain stays contiguous. The register is a pattern and the register class is fixed ($f..._d).",
+    "four_run_lines": "I ran build/20-T008/bin/llc myself (built 11:53, after the T003 source change at 11:43; RISCVInstrInfo.cpp:3259-3260 has the FREP_O/FREP_I cases) with default, -O1, -O2 and -O3 -mcpu=snitch -snitch-frep-inference. The four outputs are byte-identical (md5 423efef1...). In main1: 'li a0, 127' / '# implicit-def: $f15_d' / 'frep.o a0, 2, 0, 0' / 'fmul.d' / 'fadd.d' / 'fmv.x.w' / 'csrci' / 'csrsi'. FileCheck of the edited test passes at all four levels (rc=0).",
+    "oracle_still_bites": "With build/int-20/bin/llc (no T003) the edited test FAILS at all four levels. The first failure is in main at line 15 (fmul.d hoisted above li/frep.o). To show that main1's edited block catches the miscompile on its own, I checked main1's output alone (sed from 'main1:') against the test's check lines 50+. It FAILS at all four levels with int-20 and PASSES at all four with 20-T008. With int-20, main1 emits 'fmul.d' then '# implicit-def: $f14_d' then 'li' then 'frep.o' then 'fadd.d', so frep.o would repeat the wrong two instructions, and the strict chain rejects it.",
+    "regen_report": "notes/20/T008-regen.md classifies the single block as cosmetic. That is correct: the added line matches an assembler comment for an IMPLICIT_DEF pseudo, the instructions checked are unchanged, and the frep count is 3/3. The report explains why update_llc_test_checks.py was not used: the test is a hand-written fork test, and the owner exception covers this one-line hand edit. No semantic rows.",
+    "note": "notes/20/T008.md has all four sections. It cites upstream 9122c5235ec8, whose range was already verified in the T003 review (ancestor of llvmorg-20.1.8, not of llvmorg-19.1.7). 'What breaks if this is wrong' names an observable symptom (fmul.d leaving the frep body makes the test fail, and the comment line moving would give a cosmetic failure).",
+    "commit_metadata": "Subject 'fixup! [pulp] tests: fork-authored lit tests and pipeline expectations' as the task requires. The trailers Change-Note, Task, Test-Regen and Owner-Exception are in one block."
+  },
+  "oracle_cheating_check": "None. No line deleted or relaxed, no RUN line touched, no CHECK-NEXT turned into CHECK, no XFAIL or REQUIRES. The edit adds a constraint.",
+  "minor_notes": [
+    "The worker's result notes a topology issue: integration_head 1a4b5a586bfe (T006) is a sibling of work/20/T003, not an ancestor, so the conductor must rebase or cherry-pick T003+T008 onto port/20. T006 touches only rv32xmempool-invalid.s, so no conflict is expected. This is a landing concern, not a review defect.",
+    "If a later scheduler change moves the IMPLICIT_DEF comment again, this test will fail with no change to the instructions. The note documents this as a cosmetic failure to re-examine."
+  ],
+  "warnings_checked": [
+    "scripts/policy_check.py --repo wt/20-T008 --range 1a4b5a586bfe..work/20/T008 --notes-root notes --stack-base llvmorg-20.1.8 gives 2 commits, 0 FAIL, 1 WARN. The same WARN appears with range 8bcb70882fc6..eaa1a2249847.",
+    "WARN test-edit on eaa1a2249847 (llvm/test/CodeGen/RISCV/freploop-nested.ll): acceptable. The edit is the single line the owner approved in owner-test-exceptions.md#t003. The regen report exists and is correct (cosmetic). I verified independently that the line matches llc output at all four RUN lines and that the test still fails without the T003 fix."
+  ]
+}

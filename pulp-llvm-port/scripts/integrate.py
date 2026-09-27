@@ -104,6 +104,10 @@ def main():
         print(json.dumps(result))
         return 0 if verdict == "LANDED" else 1
 
+    if not Path(args.errors_before).is_file():
+        return finish("REJECTED", reason=f"--errors-before {args.errors_before} does not exist; nothing was applied")
+    if args.lit_before and not Path(args.lit_before).is_file():
+        return finish("REJECTED", reason=f"--lit-before {args.lit_before} does not exist; nothing was applied")
     if git(wt, "status", "--porcelain").strip():
         return finish("REJECTED", reason="integration worktree is dirty; conductor must clean it first")
 
@@ -124,6 +128,9 @@ def main():
     build_log = logdir / f"{tag}.build.log"
     rc = run(args.build_cmd, build_log)
     before = {c["key"] for c in json.loads(Path(args.errors_before).read_text())["clusters"]}
+    if rc == 0:
+        # A clean build writes no clusters file; write an empty one so the next landing has its --errors-before.
+        Path(build_log).with_suffix(".clusters.json").write_text(json.dumps({"log": str(build_log), "failed_targets": [], "clusters": []}))
     after = error_keys(build_log, wt) if rc != 0 else set()
     new = sorted(after - before)
     fixed = sorted(before - after)

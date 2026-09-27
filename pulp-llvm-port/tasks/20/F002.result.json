@@ -1,0 +1,70 @@
+{
+ "status": "done",
+ "branch": "work/20/F002",
+ "commits": [
+  "244806a5f73e9d83919f15e9592dc6b4a27736e1"
+ ],
+ "note": "notes/20/F002.md",
+ "signature_gone": true,
+ "owner_cluster_used": "insn-tablegen (only llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td changed; fixup! [pulp] insn-tablegen: ...)",
+ "root_cause": "Builtin ISel patterns in RISCVInstrInfoXpulp.td pass the user value instead of the ISA encoding: int_riscv_pulp_clip used trailing0s(lowerBound) (=log2(-lo)) instead of trailing1sPlus1(upperBound) (=log2(hi+1)+1); int_riscv_pulp_bextract/bextractu passed Size into the width-minus-one field. Both from fork commit f1b7aebff8c2 (Federico Ficarelli 2022-08-25, [LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms). Same defect class, same pattern block, same cluster, so fixed together per the conductor's scope addition.",
+ "fix": "clip: (P_CLIP rs1, (trailing1sPlus1_pulp upperBound)), same xform as p.clipu, the idiom pattern and upstream CORE-V cv.clip (RISCVInstrInfoXCV.td:723,771 @llvmorg-20.1.8). bextract[u]: new TImmLeaf bitFieldWidth (1..32) + SDNodeXForm minus1, encode Size-1.",
+ "isa_semantics": "gvsoc2/core/models/cpu/iss/include/isa/pulp_v2.hpp:1930 p_clipi_exec [-2^(N-1),2^(N-1)-1]; :1940 p_clipui_exec; :1949/:1958 p.clipr/p.clipur (low=-rs2-1, high=rs2); :1987/:1996 p_extracti_exec/p_extractui_exec width=imm+1; :2023 p_inserti_exec, :2041 p_bseti_exec also width=imm+1",
+ "paths_checked": {
+  "builtin clip [-128,127]": "before 7 (ref-18 and port-20), after 8 = GCC (word 14851533 identical)",
+  "builtin clip [-32768,32767]": "before 15, after 16 = GCC",
+  "builtin clip [-1,0]": "before 0, after 1 = GCC (GVSoC treats 0 and 1 alike, so no numeric diff on sim)",
+  "builtin clipu [0,255]": "9 before and after = GCC (already correct)",
+  "clip_r / clipu_r builtins": "p.clipr/p.clipur, correct, unchanged",
+  "idiom min(max(x,~b),b)": "p.clipr, correct, unchanged",
+  "idiom min(max(x,-128),127) and clipu idiom": "not matched at all (emits li+p.max+li+p.min, numerically correct); see other_errors_seen",
+  "SDK DctLibraryFix.c gap_clip(...,15) via steps/20/fixes/repro.sh": "ref-18 and unfixed port-20: p.clip a1,s0,0xf; GCC 0x10; fixed: 0x10 at -O2 and -Os (-O3 crashes for an unrelated reason, see other_errors_seen)",
+  "bextract(a,8,8)/bextractu(a,8,8)": "before 8,8; after 7,8 = GCC (bextractu word ce851533 identical)",
+  "bextract[u](a,32,0)": "before: fatal 'Cannot select: intrinsic %llvm.riscv.pulp.bextract' (ref-18 and port-20); after p.extract[u] 31,0",
+  "bextractu(a,16,16), (1,0)": "after 15,16 and 0,0 (GCC folds these to srl/bclr, semantically equal)",
+  "binsert / bset / bclr (mask-based)": "already width-1 via maskWidthMinus1, = GCC 7,8; unchanged",
+  "pv.* forms": "no pv.* builtin takes a width/size field (lane indices and shift amounts only); none changed"
+ },
+ "evidence_logs": [
+  "logs/20-F002.repro.log",
+  "logs/20-F002.after.log",
+  "logs/20-F002.fix.log",
+  "logs/20-F002.lit.log",
+  "logs/20-F002-sim/"
+ ],
+ "simulator": {
+  "available": true,
+  "official_test": "benchmarks/gap9-sweep/sim/tests/clip.c built with fixed clang: 'CLIP: ALL OK, mismatches=0', exit 0 (logs/20-F002-sim/sim.official.post.txt); was 8 mismatches with port-20 per sim/README.md",
+  "extended_test": "logs/20-F002-sim/clipall.c (32 inputs x clip 8/16/1-bit, clipu, clipr/clipur, idioms, bextract[u] at (8,8),(16,16),(1,0),(5,4),(32,0)); run with logs/20-F002-sim/sim2.sh",
+  "results": {
+   "gap9_gcc": "0 mismatches",
+   "ref-18": "28 mismatches (clip only; bextract section not in that run)",
+   "port-20 unfixed (without the size-32 case, which crashes)": "79 mismatches (b8 20, b16 8, bextract8_8 15, bextractu8_8 16, bextractu5_4 16, bextract1_0 4)",
+   "port-20 fixed": "0 mismatches, exit 0"
+  }
+ },
+ "lit": "All 56 fork lit tests from data/fork-tests.txt pass with the fixed build (scripts/wlit.sh ... -s). xpulpv.ll checks p.clip/p.extract immediates only as {{[0-9]+}}, so no existing test expected the old value; no test edited.",
+ "policy_check": "0 FAIL, 0 WARN",
+ "other_errors_seen": [
+  "Sema (clang-builtins cluster, SemaRISCV.cpp:1416) does not require lo == -(hi+1) for __builtin_pulp_clip; GCC rejects e.g. clip(x,-4,15) ('expects ... Min=-2^(N-1), Max=2^(N-1)-1'). Clang accepts it and now encodes from the upper bound. The fork test llvm/test/CodeGen/RISCV/intrinsics/xpulpv.ll and clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics.c use exactly such an inconsistent call (clip(-10,-4,15)); they pass (immediate is wildcarded). Separate task: add the Sema check like GCC.",
+  "Sema allows __builtin_pulp_bextract[u] Size=0 (range [0,32], SemaRISCV.cpp:1422); GCC rejects Size=0 ('Size>0'). Before this fix Size=0 silently extracted 1 bit; now it fails ISel ('Cannot select'). Separate clang-builtins task: tighten Sema range to [1,32].",
+  "Idiom patterns for p.clip/p.clipu (RISCVInstrInfoXpulp.td def : Pat<(clip negativePowerOf2, powerOf2Minus1_pulp ...)> and betweenu) never match: the leaves are TImmLeaf, which only match TargetConstant, while smin/smax operands are plain constants. Plain-C clamps compile to li+p.max+li+p.min (correct, but slower than GCC's single p.clip). Missed optimization, not a miscompile; upstream CORE-V uses ImmLeaf. Separate task if wanted.",
+  "__builtin_bitinsert (fork-only, int_riscv_pulp_bitinsert) passes its size argument straight into p.insert's width-minus-one field; GAP9 GCC has no such builtin, so there is no oracle for its intended semantics. Not changed; owner to decide.",
+  "DctLibraryFix.c at -O3 crashes: Assertion 'hasVInstructions() && Tried to get vector length without Zve or V extension support!' RISCVSubtarget.cpp:176 getMinRVVVectorSizeInBits, via TTI::getInstructionCost in SimpleLoopUnswitch (not caused by this change: it fires in a mid-level IR loop pass, before instruction selection, which the .td patterns cannot affect; likely codegen-core TTI).",
+  "ref-18 clang miscompiles/hangs a simple copy loop in the extended sim test's main (lp.setup hardware loop never exits on GVSoC); worked around with optnone on the harness. Not investigated; unrelated to clip."
+ ],
+ "proposed_test": {
+  "file": "llvm/test/CodeGen/RISCV/xpulp-clip-extract-imm.ll (new)",
+  "run": "; RUN: llc -mtriple=riscv32 -mattr=+xpulpv -verify-machineinstrs < %s | FileCheck %s",
+  "checks": [
+   "call i32 @llvm.riscv.pulp.clip(i32 %x, i32 -128, i32 127) -> CHECK: p.clip a0, a0, 8",
+   "call i32 @llvm.riscv.pulp.clip(i32 %x, i32 -32768, i32 32767) -> CHECK: p.clip a0, a0, 16",
+   "call i32 @llvm.riscv.pulp.clip(i32 %x, i32 -1, i32 0) -> CHECK: p.clip a0, a0, 1",
+   "call i32 @llvm.riscv.pulp.clipu(i32 %x, i32 0, i32 255) -> CHECK: p.clipu a0, a0, 9",
+   "call i32 @llvm.riscv.pulp.bextract(i32 %x, i32 8, i32 8) -> CHECK: p.extract a0, a0, 7, 8",
+   "call i32 @llvm.riscv.pulp.bextractu(i32 %x, i32 8, i32 8) -> CHECK: p.extractu a0, a0, 7, 8",
+   "call i32 @llvm.riscv.pulp.bextractu(i32 %x, i32 32, i32 0) -> CHECK: p.extractu a0, a0, 31, 0"
+  ],
+  "optional_mc": "llvm-mc -triple=riscv32 -mattr=+xpulpv -show-encoding: p.clip a0,a0,8 -> [0x33,0x15,0x85,0x14]; p.extractu a0,a0,7,8 -> [0x33,0x15,0x85,0xce] (words identical to GAP9 GCC)"
+ }
+}

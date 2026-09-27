@@ -1,0 +1,21 @@
+{
+  "verdict": "APPROVE",
+  "task": "20/T006",
+  "commit": "1214736b3c0f4f322a61e31dd32722f8005f9191",
+  "reasons": [],
+  "checks": {
+    "diff": "git show 1214736b3c0f: 1 file, +1/-1. Only llvm/test/MC/RISCV/rv32xmempool-invalid.s line 4 changes: '# CHECK: :[[@LINE+1]]:13: error: system register use requires an option to be enabled' -> '# CHECK: :[[@LINE+1]]:13: error: system register 'trace' requires 'xmempool' to be enabled'. Byte-level (cat -A) check: both RUN lines, blank line and input 'csrr    t0, trace' untouched, no whitespace changes. Range 17009d29cc0e..work/20/T006 is exactly this one commit; branch head == result commit.",
+    "owner_exception": "Matches notes/20/owner-test-exceptions.md section T001 exactly: one CHECK line, approved text verbatim, [[@LINE+1]]:13 location and 'error:' prefix kept.",
+    "upstream": "107f3efdbede exists and is in llvmorg-19.1.7..llvmorg-20.1.8 (ancestor of 20.1.8, not of 19.1.7). Its RISCVAsmParser::parseCSRSystemRegister builds \"system register '\" + SysReg->Name + \"' requires '\" + Feature->Key + \"' to be enabled\" (RV32-only clause not applicable on riscv32). Fork: trace is gated by FeatureExtXmempool (RISCVSystemOperands.td:471) whose Name is 'xmempool' (RISCVFeatures.td:1518), so Key='xmempool' - the new text is exactly what upstream code emits. Upstream's own updated tests (machine-csr-names-invalid.s, rv32-only-csr-names.s) keep the ':[[@LINE]]:COL: error: <new message>' form, only swapping the message text; the fork edit does the same.",
+    "independent_run": "build/int-20/bin/llvm-mc on the worktree file prints '5:13: error: system register 'trace' requires 'xmempool' to be enabled', exit 1 (so 'not llvm-mc' holds); piping into build/int-20/bin/FileCheck with the file as check file PASSES.",
+    "regen_report": "notes/20/T006-regen.md lists the single changed block, classified cosmetic (diagnostic wording only, 0 instructions before/after, input unchanged) - correct; declares the hand edit under the owner exception instead of an update script. Commit carries Change-Note, Task, Test-Regen and Owner-Exception trailers; subject is the tests-cluster fixup.",
+    "oracle_cheating": "None: no RUN line removed, no XFAIL/REQUIRES/UNSUPPORTED, expectation not weakened (still a full specific error string at a fixed line:col; arguably stronger than before). No code changes.",
+    "note": "notes/20/T006.md has all four sections; 'What breaks if this is wrong' names an observable symptom (FileCheck no-match in llvm-lit; loss of trace gating would fail 'not llvm-mc')."
+  },
+  "warnings_checked": [
+    {
+      "warn": "WARN test-edit: test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xmempool-invalid.s",
+      "why_acceptable": "Reproduced by running scripts/policy_check.py myself (fail 0, warn 1). Role is test-regen; the edit is a hand edit authorised only by owner exception T001 (rule 3 has no update script for MC -invalid tests); regen report checked and correct (cosmetic, one block); diff confirmed to be exactly the approved line."
+    }
+  ]
+}

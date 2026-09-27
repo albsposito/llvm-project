@@ -30,6 +30,7 @@ The owner of this port judges it by its output (tests, downstream programs, inst
 ## Scope and safety
 
 13. Work only in your assigned worktree under `wt/`. You MUST NOT touch another worktree, the main clone's checked-out files, or any branch other than your own `work/...` branch.
+13a. You MUST NOT use `git stash`, because the stash stack is shared by every worktree of the clone and parallel agents pop each other's entries (it happened at step 20). To set work aside, save `git diff > <file>` under `logs/` or make a temporary commit on your own branch.
 14. You MUST NOT push, force-push, or delete branches or tags, because the integration branch and tags are the conductor's checkpoints.
 15. You MUST NOT run a full `ninja` of the tree in a worker worktree; build the targets named in your task (`scripts/build.sh <wt> <build> $JOBS_PER_BUILD <targets>`), because thirty full builds on one host starve everyone.
 16. Everything you decide goes into files (result file, change note), not only into your final message, because the conductor reads files.

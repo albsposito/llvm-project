@@ -1,0 +1,33 @@
+{
+  "verdict": "APPROVE",
+  "task": "20/E007",
+  "branch": "work/20/E007",
+  "base": "17f78490c034ac3ceda96276d61ac6870d47de74",
+  "commits_reviewed": ["99275eb2f491323da80b7a56fb585062014c1d9f"],
+  "reasons": [],
+  "warnings_checked": [],
+  "policy_check": "scripts/policy_check.py --repo wt/20-E007 --range 17f78490c034..99275eb2f491 --notes-root notes --stack-base llvmorg-20.1.8: 1 commit, 0 FAIL, 0 WARN",
+  "checks": {
+    "scope": "git show --stat 99275eb2f491 and git diff 17f78490c034 HEAD --stat: only llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp (+4/-10). Parent is 17f78490c034. Worktree clean. No RISCVRegisterInfo.cpp change (stash collision left no trace in the commit), no probe hack (RISCV.td/RISCVProcessors.td untouched).",
+    "upstream_claim": "f590963db836 '[RISCV] Implement RISCVTTIImpl::getPreferredAddressingMode for HasVendorXCVmem (#120533)' is an ancestor of llvmorg-20.1.8 and not of llvmorg-19.1.7. llvmorg-20.1.8 RISCVTargetTransformInfo.cpp:2395-2401 = 'if (hasVendorXCVmem() && !is64Bit()) return AMK_PostIndexed; return BasicTTIImplBase::getPreferredAddressingMode(L, SE);'. BasicTTIImpl.h does not override the hook; TargetTransformInfoImpl.h:275-277 returns AMK_None.",
+    "fork_reference": "port/19 RISCVTargetTransformInfo.cpp:1980-1987 = 'if (hasPULPExtV2()) return AMK_PostIndexed; return AMK_None;' (no XLEN check).",
+    "header": "Single declaration at RISCVTargetTransformInfo.h:391 on the branch; git grep shows exactly one definition in the .cpp (line 2395).",
+    "case_table": {
+      "non-PULP, no XCVmem (rv32/rv64)": "20.1.8: AMK_None; branch: both checks false -> base -> AMK_None. Unchanged.",
+      "non-PULP, XCVmem, rv32": "20.1.8: AMK_PostIndexed; branch: Xpulpv2 false, upstream line -> AMK_PostIndexed. Unchanged.",
+      "non-PULP, XCVmem, rv64": "20.1.8: AMK_None; branch: falls through -> AMK_None. Unchanged.",
+      "Xpulpv2, rv32": "port/19: AMK_PostIndexed; branch: first line -> AMK_PostIndexed. Unchanged.",
+      "Xpulpv2, rv64": "port/19: AMK_PostIndexed (no XLEN check); branch: first line, unconditional -> AMK_PostIndexed. Unchanged.",
+      "Xpulpv2 + XCVmem, rv32": "port/19: AMK_PostIndexed; 20.1.8 semantics: AMK_PostIndexed; branch: AMK_PostIndexed. Order irrelevant.",
+      "Xpulpv2 + XCVmem, rv64": "port/19: AMK_PostIndexed; branch: fork line first -> AMK_PostIndexed. Matches port/19 (upstream-only would give AMK_None, but upstream has no Xpulpv2 so the fork's answer is the correct reference)."
+    },
+    "escalation_conflict_codegen_core_2": "The open escalation concerns ISel selection priority (PULP post-increment patterns vs getPostIndexedAddressParts returning early for XCVmem). This hook is only the LSR addressing-mode hint and returns one enum; for Xpulpv2+XCVmem it yields AMK_PostIndexed under either ordering on rv32, so the commit neither chooses a new priority policy nor affects the escalation. Escalation stays open as is.",
+    "oracle_cheating": "No early return added beyond the fork's pre-existing one (moved, not new), no stub, no condition forced, no fork logic dropped: fork's 'return AMK_None' fallback is replaced by upstream's base call which returns the identical AMK_None. No tests touched. Structure mirrors upstream's per-vendor 'if (ST->hasVendorX...) return' dispatch in the same function (rule 12).",
+    "build_evidence": "logs/20-E007.repro.log contains the redefinition error; logs/20-E007.verify.log shows RISCVTargetTransformInfo.cpp.o built ([32/58]) with no error; remaining failures are RISCVRegisterInfo.cpp (20/E006) and RISCVISelDAGToDAG.cpp:841 (listed in other_errors_seen).",
+    "note": "notes/20/E007.md has all four sections, cites f590963db836 with subject, names observable symptoms (loss of p.lw post-increment in PULP loops; xcvmem-heuristic.ll failure). Its remark that no lit test pins Xpulpv2 LSR post-increment is accurate and worth a follow-up test, not a blocker."
+  },
+  "followups": [
+    "Consider an Xpulpv2 counterpart of llvm/test/CodeGen/RISCV/xcvmem-heuristic.ll so this hook is pinned by lit.",
+    "Leftover stash@{0} (E006's 88e363ba0409, re-stored by the E007 worker) is redundant with 5a4afc65580f; conductor may drop it. Reviewer did not touch the stash."
+  ]
+}

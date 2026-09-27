@@ -1,0 +1,63 @@
+{
+ "status": "done",
+ "branch": "work/20/F006",
+ "commits": [
+  "db15c7f1187d212bb5797f5a70d87d2832fe6305"
+ ],
+ "note": "notes/20/F006.md",
+ "signature_gone": true,
+ "pushed": {
+  "remote": "origin",
+  "remote_branch": "f32-postinc-20",
+  "commit": "db15c7f1187d212bb5797f5a70d87d2832fe6305",
+  "result": "new branch created, no force"
+ },
+ "land_after": "20/F005 (d01e531f008b). On the bare integration head, the new loop shapes hit the pre-existing PULPFixupHwLoops layout defect in 1 of 400 float fuzz seeds (wrong result). On top of F005: 0 wrong results.",
+ "scope": "f32 post-increment LOADS only (p.lw ri/rr), gated on Xpulpv2 && Zfinx; codegen-core only (RISCVISelLowering.cpp, RISCVISelDAGToDAG.cpp); no insn-tablegen commit. f32 post-increment stores were tried and dropped: the PULP hwloop pass does not accept P_SW_*_PostIncrement as the induction update, so axpy lost its lp.setup and got 14% slower (diff kept at logs/20-F006.loads-and-stores.diff). f64 is out of scope (a Zdinx pair); unchanged. Non-post-increment reg-reg p.lw for f32 is not added.",
+ "results": {
+  "microbench_gvsoc_O2_cycles": {
+   "f32_dot_1024": {
+    "before": 5144,
+    "after": 4120,
+    "gcc": 4117
+   },
+   "f32_mul_1024": {
+    "before": 8215,
+    "after": 6167,
+    "gcc": 5139
+   },
+   "f32_axpy_1024": {
+    "before": 7190,
+    "after": 6168,
+    "gcc": 5140
+   },
+   "evidence": "logs/20-F006-mb/results.txt"
+  },
+  "k06_gvsoc_cycles": {
+   "O2": {
+    "before": 66737,
+    "after": 66737,
+    "gcc": 50290
+   },
+   "O3": {
+    "before": 66350,
+    "after": 66350,
+    "gcc": 50477
+   },
+   "checksum": "matches GCC (0xbf3cac76)"
+  },
+  "k06_finding": "k06 is unchanged. Its hot loop is unrolled by 2, with loads at ptr-4 and ptr+0 and then ptr+=8. DAGCombiner refuses post-increment when another load uses the same base with a foldable offset. The int version of that loop is not post-incremented either, so the float type restriction was not the k06 bottleneck. Only a cold -O3 path changes (p.lw rr form).",
+  "other_float_kernels": "k02_fir_f32 and k04_matmul_simple_f32 now select p.lw post-increment (12 and 4 at -O2, checked with -stop-before=pulp-hwloops). They still crash in 'PULP Hardware Loops', the same pre-existing crash as before the change. k10a_fft_radix2_scalar: no post-increment formed, same pre-existing crash.",
+  "integer_unchanged": "All 40 other sweep kernel builds (O2/O3) are byte-identical (ignoring .ident). llc output of 303 RUN lines of xpulp/zfinx/zdinx CodeGen tests is byte-identical. Runtime sweep: 42 kernel/opt pairs, identical cycles/instrs/checksums. Integer fuzzer, 300 seeds: all compiled programs byte-identical.",
+  "lit": "wlit on LIT_PATHS: 4720 PASS + 1 known owner-approved FAIL (vsetvli-insert-zve64f.mir), same as steps/20/lit-final (logs/20-F006-lit/lit.json)",
+  "fuzz_float": "vs integration build: 1 new wrong result (seed 153, pre-existing PULPFixupHwLoops layout bug 'lp.setup; j', fixed by F005) and 1 new crash (seed 379, PULPHardwareLoops::convertToHardwareLoop segfault, pre-existing crash site). With F005 applied as the base: 0 wrong results, 0 hangs, the same seed-379 crash. logs/20-F006-fuzz/"
+ },
+ "other_errors_seen": [
+  "PULPHardwareLoops::convertToHardwareLoop segfault ('PULP Hardware Loops' crash) on most random loop programs (247/400 float, 210/300 int on the integration build); new trigger: logs/20-F006-fuzz/seed379-kern.c (-O2/-Os)",
+  "PULPFixupHwLoops broken layout (lp.setup followed by j, latch outside range): wrong results on the integration build; fixed by pending 20/F005",
+  "Hardware-loop pass does not accept P_SW_*_PostIncrement as an induction update, so store-post-increment loops lose lp.setup (k12_copy_loop 1.75x GCC, and blocks f32 p.sw)",
+  "k06-style unrolled loops (two loads from one pointer at -4/0) are never post-incremented, for i32 or f32. The remaining 32.7% k06 gap vs GCC needs an LSR/DAGCombiner change that would also alter integer code",
+  "Pre-existing verifier errors after PULP Hardware Loop Fixup (undefined physreg use in LOOPnsetup) on simple nested loops, with the int and float before builds"
+ ],
+ "proposed_test": "llvm/test/CodeGen/RISCV/xpulp-postinc-f32.ll: RUN llc -mtriple=riscv32 -mattr=+m,+xpulpv,+zfinx -verify-machineinstrs -stop-before=pulp-hwloops (plus a full-pipeline RUN). Check that a float dot product loop gives two 'P_LW_ri_PostIncrement' (asm: p.lw aN, 4(aM!)) feeding FMADD_S_INX through COPY %x.sub_32. Check that a register-stride float load gives P_LW_rr_PostIncrement. Check that a float store loop keeps a plain SW_INX (no p.sw). A second RUN with -mattr=+m,+xpulpv,+f should check that no p.lw is emitted for float loads."
+}

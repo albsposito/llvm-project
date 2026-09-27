@@ -1,0 +1,23 @@
+{
+ "status": "done",
+ "branch": "work/20/T009",
+ "commits": [
+  "8a8fab3863dc31f9f5534bcf93aa0c91f69a4a52",
+  "cd57ae026a086bcc4ae759048622a6d939de179e"
+ ],
+ "commit_notes": "first commit is F001 (unmodified base, from work/20/F001); second is the T009 test-regen commit",
+ "note": "notes/20/T009.md",
+ "regen_report": "notes/20/T009-regen.md",
+ "owner_exception": "notes/20/owner-test-exceptions.md#f001",
+ "signature_gone": true,
+ "other_errors_seen": [],
+ "method": "intrinsics.c has hand-written CHECK lines (no update_cc_test_checks NOTE header, named [[RES]] captures), so update_cc_test_checks.py was NOT run (it would rewrite every check); the 24 lines (16 calls + 8 CHECK-NEXT operands) were edited by an exact-match script under the owner exception. Diff: 2 files, +24/-24, no RUN/other call/other CHECK/expected-diagnostic change.",
+ "evidence": {
+  "repro_log": "logs/20-T009.repro.log (build/20-T009 = F001, unedited tests: both FAIL, 16x 'argument value 1 is outside the valid range [2, 2]')",
+  "lit_log": "logs/20-T009.lit.log (build/20-T009, edited tests: 2/2 PASS; diag test: all 91 expected errors still fire, no extra diagnostics)",
+  "old_build_log": "logs/20-T009.oldbuild.log (build/int-20 b6cd96bd, no F001, RUN lines by hand: edited tests also PASS, rc=0 for both RUN|FileCheck and -verify, because the old defective check tests Round == 2^(Round-1), which Round=2 satisfies; so these tests alone do not distinguish F001 from the defect — F001's proposed Sema test would)",
+  "codegen_log": "logs/20-T009.codegen.log (int-20 clang -O2 mulsRN/machhsRN/subuRN Round=1 vs 2: objdump identical; build/20-T009 llc on llvm.riscv.pulp.mulsRN(...,2,1) vs (...,2,2): identical p.mulsrn a0, a0, a1, 2)",
+  "build_log": "logs/20-T009.build.log (clang FileCheck llc llvm-objdump not count llvm-config, exit 0, cluster_errors 0 clusters)",
+  "policy_check": "0 FAIL, 2 WARN (test-edit, reviewer checks regen report); range b6cd96bd..work/20/T009 includes F001's commit as expected"
+ }
+}

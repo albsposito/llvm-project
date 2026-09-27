@@ -1,0 +1,40 @@
+{
+ "status": "done",
+ "branch": "work/20/F004",
+ "commits": [
+  "c3572677dff3"
+ ],
+ "note": "notes/20/F004.md",
+ "signature_gone": true,
+ "files_changed": [
+  "llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp (codegen-core)"
+ ],
+ "defect_origin": "fork commit f1b7aebff8c2 (Federico Ficarelli 2022-08-25, [LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms) made v2i16/v4i8 legal in GPRs; upstream RISCVTTIImpl assumes legal vector => RVV",
+ "upstream_reference": [
+  "6d516c6e28a1 [llvm][RISCV] Do not assume V extension on seeing vector type. (#166994)",
+  "dfdc69b4c27d [RISCV][llvm] Preliminary P extension codegen support (#162668)",
+  "4540415f19d9 [RISCV] Fix crash in getShuffleCost for P-extension without V extension (#186149)"
+ ],
+ "call_chain": "SimpleLoopUnswitch (nontrivial, -O3 only) -> TTI::getInstructionCost -> RISCVTTIImpl::getMemoryOpCost -> RISCVTargetLowering::getLMULCost -> RISCVSubtarget::getMinRVVVectorSizeInBits assert; also reachable via getVectorInstrCost, getScalarizationOverhead, getShuffleCost (shown with print<cost-model>)",
+ "repro": {
+  "note": "The assertion fires only at -O3 (nontrivial unswitch). At -O2/-Os the same file's only failure is the F003 PULP Hardware Loops segfault in @KerFirSeq (optimizer-only -emit-llvm compiles pass at -O2/-Os before and after); at -O3 after this fix the file proceeds to the same F003 crash. Isolated with -emit-llvm and llc -O3 -stop-before=pulp-hwloops (passes after fix).",
+  "ref18": "toolchains/ref-18/bin/clang -O3: getMinRVVVectorSizeInBits assertion (logs/20-F004.repro-pre.log)",
+  "before": "build/20-F004 at integration head: -O3 and -O3 -emit-llvm assert (logs/20-F004.repro.log); print<cost-model> asserts on first v2i16 load",
+  "after": "-O3 -emit-llvm passes, llc -O3 -stop-before=pulp-hwloops passes, print<cost-model> succeeds for all cost kinds (logs/20-F004.verify.log)"
+ },
+ "costs_after": "throughput: load/store v2i16/v4i8=1, add/sub/and/shl/smax/abs=1, mul v2i16=5, icmp=1, select=3, extract/insertelement=1, shuffles=1, reduce.add v2i16=3, sext v4i8->v4i16=3 (unchanged path), trunc=0; before: assertion. Samples logs/20-F004.cost.ll, logs/20-F004.cast.ll",
+ "design_choice": "Followed upstream exactly: 6d516c6e28a1 for getMemoryOpCost; P-extension-style 'return 1 for fixed vectors' guards (predicate hasPULPExtV2) in getShuffleCost/getScalarizationOverhead/getVectorInstrCost. Deliberately did NOT add upstream's getCastInstrCost guard: the fork already falls back to BasicTTI there without V (no crash), so cast costs stay unchanged. Reviewer note re rule 9: the early returns are cost values mirroring upstream, not removal of functionality.",
+ "sweep": "benchmarks/gap9-sweep/src/*.c at O2/Os/O3 with this build: 0 getMinRVVVectorSizeInBits failures (logs/20-F004.sweep.log)",
+ "lit": "fork tests (56 from data/fork-tests.txt) all pass; plus llvm/test/CodeGen/RISCV, Analysis/CostModel/RISCV, Transforms/{SimpleLoopUnswitch,LoopVectorize/RISCV,SLPVectorizer/RISCV}: 2430 tests, only failure is known CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (data/known-failures.txt) (logs/20-F004.lit.log)",
+ "other_errors_seen": [
+  "PULP Hardware Loops segfault (F003) in @KerFirSeq/@KerFirSeqf32/@MatMulSimpleSeq/@KerParMatAdd_DSP_Fix16/@Radix2FFT_DIF_Scalar at O2/Os/O3",
+  "k05_matmul_dsp_fix16.c -O3: Assertion `!NodePtr->isKnownSentinel()' in 'PULP Hardware Loop Fixup' on @KerParMatMulDSP_Fix16 (previously masked by this task's assertion)",
+  "Sema rounding-check bug: 'argument value 16384 is outside the valid range' (k08_preprocessing_fix.c)",
+  "missing builtins e.g. __builtin_pulp_add2div2; v2h type errors in *-file.c sweep variants; AT_L2_EVENT undeclared (sweep shim issues)"
+ ],
+ "proposed_test": {
+  "file": "llvm/test/Analysis/CostModel/RISCV/xpulpv2-packed-simd.ll",
+  "run": "; RUN: opt < %s -mtriple=riscv32 -mattr=+xpulpv,+zfinx -passes='print<cost-model>' -disable-output 2>&1 | FileCheck %s  (plus a second RUN with -cost-kind=code-size)",
+  "checks": "CHECK lines (generated with utils/update_analyze_test_checks.py) for load/store <2 x i16>/<4 x i8> (cost 1), extractelement/insertelement (1), shufflevector (1), add/smax (1), mul v2i16 (5); body = logs/20-F004.cost.ll. Optionally an -O3 SimpleLoopUnswitch reproducer: opt -mtriple=riscv32 -mattr=+xpulpv -passes='simple-loop-unswitch<nontrivial>' on a loop with a <2 x i16> load and a loop-invariant branch, CHECK that it does not crash."
+ }
+}

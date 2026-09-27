@@ -1,0 +1,31 @@
+{
+  "status": "done",
+  "branch": "work/20/T007",
+  "commits": [
+    "bc600fc4abd9ee95f75e03be05a180f0ec1a84e5",
+    "95cdae054f78de51a907ab549195847b4a58d1e2",
+    "8d7e1dc0a150e9b8eee37f8122bd2bbacb7cdd68"
+  ],
+  "note": "notes/20/T007.md",
+  "signature_gone": true,
+  "other_errors_seen": [
+    "llvm/test/CodeGen/RISCV/freploop-nested.ll fails (CHECK-NEXT on wrong line); known step-20 failure owned by T008, fails before and after this change",
+    "xpulp-hwloop.ll with an added -verify-machineinstrs (not in its RUN line) reports 'Using an undefined physical register' / 'MBB has unexpected successors' after PULP Hardware Loop Fixup; identical at int-19, so pre-existing and not a lit failure"
+  ],
+  "renames": {"PulpV2": "GPRAV2", "PulpV4": "GPRAV4"},
+  "clusters_touched": {
+    "codegen-core": "RISCVRegisterInfo.td, RISCVISelLowering.cpp",
+    "insn-tablegen": "RISCVInstrInfoXpulp.td (185 lines)",
+    "mc": "Disassembler/RISCVDisassembler.cpp (DecodeGPRAV2/4RegisterClass, needed because the generated decoder calls Decode<Class>RegisterClass by name)"
+  },
+  "evidence": {
+    "repro_log": "logs/20-T007.repro.log (both tests FAIL at integration head)",
+    "verify_log": "logs/20-T007.verify.log (both PASS, no test edits)",
+    "build_log": "logs/20-T007-build2.log (cluster_errors: 0 clusters)",
+    "fork_tests_log": "logs/20-T007.forktests.log",
+    "ordering": "TopoOrderRC (CodeGenRegisters.cpp:973 at llvmorg-20.1.8) sorts by RSI, member count, then StringRef name; new IDs 7 GPR, 8 GPRAV2, 9 GPRAV4, 10 GPRF32",
+    "masks": "GPR/GPRAV2/GPRAV4 SubClassMask arrays byte-identical (first word 0x7f6bf380), mirroring int-19 where GPR/PulpV2/PulpV4 were identical (0x03fbbff8)",
+    "no_behaviour_change": "llc asm (default and -O0) for xpulpv.ll, pulp-select-pseudo.ll, xpulp-hwloop.ll byte-identical before/after; post-ISel vreg classes in xpulpv.ll 435 gpr/19 gprav2/22 gprav4 == int-19 435 gpr/19 pulpv2/22 pulpv4 (pre-fix step 20: 327/127/22); no test spells pulpv2/pulpv4 as a class name",
+    "all fork llvm CodeGen/MC tests pass except known freploop-nested.ll": true
+  }
+}

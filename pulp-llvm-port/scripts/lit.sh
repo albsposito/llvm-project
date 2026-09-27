@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 # Run the green-defining test suite for a worktree and diff it against a baseline.
-#   scripts/lit.sh <worktree> <build-dir> <jobs> <out-dir> [baseline-lit.json] [baseline-renames.json]
+#   scripts/lit.sh <worktree> <build-dir> <jobs> <out-dir> [baseline-lit.json] [baseline-renames.json] [upstream-tag]
 # Writes <out-dir>/lit.json (lit results), <out-dir>/unit.json (RISCVISAInfo gtest) and
 # <out-dir>/lit_diff.json (lit_diff.py report). Exit status is lit_diff.py's (0 = green).
 set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 source "$here/../config.env"
-wt="$1"; bd="$2"; jobs="$3"; out="$4"; baseline="${5:-}"; renames="${6:-}"
+wt="$1"; bd="$2"; jobs="$3"; out="$4"; baseline="${5:-}"; renames="${6:-}"; upstream_tag="${7:-}"
 mkdir -p "$out"
 # Remove prior evidence before any command can fail.
 rm -f "$out/lit.json" "$out/unit.json" "$out/unit.exit" "$out/lit_diff.json"
-"$here/in-builder.sh" bash -c '
+source "$here/pathmode.sh"; pathmode "$wt" "$bd" || exit 3
+out=$(realpath -m "$out")
+"${WT_RUN[@]}" "$here/in-builder.sh" bash -c '
 set -uo pipefail
 wt="$1"; bd="$2"; jobs="$3"; out="$4"; shift 4
 ninja -C "$bd" -j "$jobs" -k 0 llvm-test-depends clang-test-depends lld || exit 3
@@ -31,7 +33,7 @@ n=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))[\"tests\"])"
 echo "unit ($t) exit $urc, $n tests"
 [ "$urc" -eq 0 ] && [ "$n" -gt 0 ] || exit 5
 exit 0
-' _ "$wt" "$bd" "$jobs" "$out" $LIT_PATHS
+' _ "$WT_SRC" "$WT_BLD" "$jobs" "$out" $LIT_PATHS
 rc=$?
 [ $rc -eq 3 ] && { echo "lit.sh: building test dependencies failed ($rc)"; exit $rc; }
 [ $rc -ne 0 ] && echo "lit.sh: RISCVISAInfo unit tests failed or did not run ($rc), see $out/unit.log"
@@ -41,4 +43,5 @@ args=(--candidate "$out/lit.json" --fork-tests "$here/../data/fork-tests.txt" --
       --unit "$out/unit.json" --unit-exit "$urc")
 [ -n "$baseline" ] && args+=(--baseline "$baseline")
 [ -n "$renames" ] && args+=(--baseline-renames "$renames")
+[ -n "$upstream_tag" ] && args+=(--worktree "$wt" --upstream-tag "$upstream_tag")
 python3 "$here/lit_diff.py" "${args[@]}"

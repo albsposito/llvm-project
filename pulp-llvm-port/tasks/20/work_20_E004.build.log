@@ -1,0 +1,292 @@
+CMake Deprecation Warning at /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/cmake/Modules/CMakePolicy.cmake:6 (cmake_policy):
+  The OLD behavior for policy CMP0116 will be removed from a future version
+  of CMake.
+
+  The cmake-policies(7) manual explains that the OLD behaviors of all
+  policies are deprecated and that a policy should be set to OLD only under
+  specific short-term circumstances.  Projects should be ported to the NEW
+  behavior and not rely on setting a policy to OLD.
+Call Stack (most recent call first):
+  CMakeLists.txt:8 (include)
+
+
+CMake Deprecation Warning at /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/cmake/Modules/CMakePolicy.cmake:6 (cmake_policy):
+  The OLD behavior for policy CMP0116 will be removed from a future version
+  of CMake.
+
+  The cmake-policies(7) manual explains that the OLD behaviors of all
+  policies are deprecated and that a policy should be set to OLD only under
+  specific short-term circumstances.  Projects should be ported to the NEW
+  behavior and not rely on setting a policy to OLD.
+Call Stack (most recent call first):
+  /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/lld/CMakeLists.txt:7 (include)
+
+
+CMake Deprecation Warning at /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/cmake/Modules/CMakePolicy.cmake:6 (cmake_policy):
+  The OLD behavior for policy CMP0116 will be removed from a future version
+  of CMake.
+
+  The cmake-policies(7) manual explains that the OLD behaviors of all
+  policies are deprecated and that a policy should be set to OLD only under
+  specific short-term circumstances.  Projects should be ported to the NEW
+  behavior and not rely on setting a policy to OLD.
+Call Stack (most recent call first):
+  /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/clang/CMakeLists.txt:7 (include)
+
+
+ninja: Entering directory `build/int-20'
+[1/241] Generating VCSRevision.h
+[2/241] Generating VCSVersion.inc
+[3/241] Building CXX object tools/clang/lib/Basic/CMakeFiles/obj.clangBasic.dir/Version.cpp.o
+[4/241] Building RISCVGenExegesis.inc...
+[5/241] Building RISCVGenO0PreLegalizeGICombiner.inc...
+[6/241] Building RISCVGenMCPseudoLowering.inc...
+[7/241] Building RISCVGenRegisterBank.inc...
+[8/241] Building RISCVGenCompressInstEmitter.inc...
+[9/241] Building RISCVTargetParserDef.inc...
+[10/238] Building RISCVGenDisassemblerTables.inc...
+[11/238] Building RISCVGenRegisterInfo.inc...
+[12/238] Building RISCVGenMacroFusion.inc...
+[13/238] Building RISCVGenPreLegalizeGICombiner.inc...
+[14/238] Building RISCVGenMCCodeEmitter.inc...
+[15/238] Building RISCVGenAsmWriter.inc...
+[16/238] Building RISCVGenPostLegalizeGICombiner.inc...
+[17/238] Building RISCVGenAsmMatcher.inc...
+[18/238] Building RISCVGenSearchableTables.inc...
+[19/238] Building RISCVGenSubtargetInfo.inc...
+[20/238] Building CXX object lib/Object/CMakeFiles/LLVMObject.dir/IRSymtab.cpp.o
+[21/238] Linking CXX static library lib/libLLVMObject.a
+[22/238] Generating VCSVersion.inc
+[23/238] Linking CXX static library lib/libclangBasic.a
+[24/238] Building CXX object tools/lld/Common/CMakeFiles/lldCommon.dir/Version.cpp.o
+[25/238] Linking CXX static library lib/liblldCommon.a
+[26/238] Building CXX object lib/CodeGen/AsmPrinter/CMakeFiles/LLVMAsmPrinter.dir/AsmPrinter.cpp.o
+[27/238] Linking CXX static library lib/libLLVMAsmPrinter.a
+[28/238] Building CXX object lib/LTO/CMakeFiles/LLVMLTO.dir/LTO.cpp.o
+[29/238] Linking CXX static library lib/libLLVMLTO.a
+[30/238] Building RISCVGenInstrInfo.inc...
+[31/238] Building RISCVGenGlobalISel.inc...
+[32/238] Building RISCVGenDAGISel.inc...
+[33/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVConstantPoolValue.cpp.o
+[34/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVRedundantCopyElimination.cpp.o
+[35/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVSelectionDAGInfo.cpp.o
+[36/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVPostRAExpandPseudoInsts.cpp.o
+[37/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVRegisterInfo.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVRegisterInfo.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-20/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-20/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVRegisterInfo.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVRegisterInfo.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVRegisterInfo.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp
+../../wt/int-20/llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp:148:35: error: unknown type name 'RISCVMachineFunctionInfo'; did you mean 'MachineFunctionInfo'?
+  148 |     const auto *RVFI = MF.getInfo<RISCVMachineFunctionInfo>();
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~
+      |                                   MachineFunctionInfo
+../../wt/int-20/llvm/include/llvm/CodeGen/MachineFunction.h:104:8: note: 'MachineFunctionInfo' declared here
+  104 | struct MachineFunctionInfo {
+      |        ^
+../../wt/int-20/llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp:150:16: error: no member named 'getUsedSSR' in 'llvm::MachineFunctionInfo'
+  150 |       if(RVFI->getUsedSSR() & (1<<n))
+      |          ~~~~  ^
+2 errors generated.
+[38/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVLandingPadSetup.cpp.o
+[39/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandAtomicPseudoInsts.cpp.o
+[40/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMergeBaseOffset.cpp.o
+[41/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVCallingConv.cpp.o
+[42/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o
+[43/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMachineFunctionInfo.cpp.o
+[44/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMakeCompressible.cpp.o
+[45/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVDeadRegisterDefinitions.cpp.o
+[46/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o
+[47/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMoveMerger.cpp.o
+[48/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInsertWriteVXRM.cpp.o
+[49/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o
+[50/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVOptWInstrs.cpp.o
+[51/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVIndirectBranchTracking.cpp.o
+[52/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVPushPopOptimizer.cpp.o
+[53/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVSubtarget.cpp.o
+[54/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandPseudoInsts.cpp.o
+[55/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInsertReadWriteCSR.cpp.o
+[56/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVCodeGenPrepare.cpp.o
+[57/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o
+[58/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInsertVSETVLI.cpp.o
+[59/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVFrameLowering.cpp.o
+[60/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVGatherScatterLowering.cpp.o
+[61/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVAsmPrinter.cpp.o
+[62/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetObjectFile.cpp.o
+[63/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInstrInfo.cpp.o
+[64/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVVectorMaskDAGMutation.cpp.o
+[65/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVVectorPeephole.cpp.o
+[66/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVVLOptimizer.cpp.o
+[67/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-20/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-20/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp
+../../wt/int-20/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2650:15: error: redefinition of 'getPreferredAddressingMode'
+ 2650 | RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,
+      |               ^
+../../wt/int-20/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2395:15: note: previous definition is here
+ 2395 | RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,
+      |               ^
+1 error generated.
+[68/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVCallLowering.cpp.o
+[69/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetMachine.cpp.o
+[70/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVZacasABIFix.cpp.o
+[71/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelLowering.cpp.o
+[72/238] Building CXX object tools/lld/tools/lld/CMakeFiles/lld.dir/lld-driver.cpp.o
+[73/238] Building CXX object lib/Target/RISCV/TargetInfo/CMakeFiles/LLVMRISCVInfo.dir/RISCVTargetInfo.cpp.o
+[74/238] Linking CXX static library lib/libLLVMRISCVInfo.a
+[75/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMatInt.cpp.o
+[76/238] Building CXX object tools/lld/tools/lld/CMakeFiles/lld.dir/lld.cpp.o
+[77/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCAsmInfo.cpp.o
+[78/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVInstPrinter.cpp.o
+[79/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCExpr.cpp.o
+[80/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVELFObjectWriter.cpp.o
+[81/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCObjectFileInfo.cpp.o
+[82/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVTargetStreamer.cpp.o
+[83/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVELFStreamer.cpp.o
+[84/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/COFFLinkerContext.cpp.o
+[85/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVAsmBackend.cpp.o
+[86/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o
+FAILED: lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o 
+ccache /usr/bin/clang++ -DGTEST_HAS_RTTI=0 -D_DEBUG -D_GLIBCXX_ASSERTIONS -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-20/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV -I/home/ubuntu/llvm-project/pulp-llvm-port/build/int-20/include -I/home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/include -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -Werror=unguarded-availability-new -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wc++98-compat-extra-semi -Wimplicit-fallthrough -Wcovered-switch-default -Wno-noexcept-type -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wsuggest-override -Wstring-conversion -Wmisleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG -std=c++17 -fvisibility=hidden  -fno-exceptions -funwind-tables -fno-rtti -UNDEBUG -MD -MT lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o -MF lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o.d -o lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o -c /home/ubuntu/llvm-project/pulp-llvm-port/wt/int-20/llvm/lib/Target/RISCV/RISCVISelDAGToDAG.cpp
+../../wt/int-20/llvm/lib/Target/RISCV/RISCVISelDAGToDAG.cpp:841:1: error: extraneous closing brace ('}')
+  841 | }
+      | ^
+1 error generated.
+[87/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/CallGraphSort.cpp.o
+[88/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVBaseInfo.cpp.o
+[89/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCCodeEmitter.cpp.o
+[90/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/Chunks.cpp.o
+[91/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/ICF.cpp.o
+[92/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/LLDMapFile.cpp.o
+[93/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/DLL.cpp.o
+[94/238] Building CXX object lib/Target/RISCV/Disassembler/CMakeFiles/LLVMRISCVDisassembler.dir/RISCVDisassembler.cpp.o
+[95/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/DriverUtils.cpp.o
+[96/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULPExpandPseudoInsts.cpp.o
+[97/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVRegisterBankInfo.cpp.o
+[98/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/DebugTypes.cpp.o
+[99/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o
+[100/238] Building CXX object lib/Target/RISCV/AsmParser/CMakeFiles/LLVMRISCVAsmParser.dir/RISCVAsmParser.cpp.o
+[101/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/AVR.cpp.o
+[102/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/MSP430.cpp.o
+[103/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/MarkLive.cpp.o
+[104/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/AMDGPU.cpp.o
+[105/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/MipsArchTree.cpp.o
+[106/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVO0PreLegalizerCombiner.cpp.o
+[107/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/Symbols.cpp.o
+[108/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/MinGW.cpp.o
+[109/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVPostLegalizerCombiner.cpp.o
+[110/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/MapFile.cpp.o
+[111/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/Hexagon.cpp.o
+[112/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVPreLegalizerCombiner.cpp.o
+[113/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/PPC.cpp.o
+[114/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/SPARCV9.cpp.o
+[115/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/AArch64.cpp.o
+[116/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/AArch64ErrataFix.cpp.o
+[117/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVLegalizerInfo.cpp.o
+[118/238] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCTargetDesc.cpp.o
+[119/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/Mips.cpp.o
+[120/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/SystemZ.cpp.o
+[121/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/LoongArch.cpp.o
+[122/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/LTO.cpp.o
+[123/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/PPC64.cpp.o
+[124/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/X86.cpp.o
+[125/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/CallGraphSort.cpp.o
+[126/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/RISCV.cpp.o
+[127/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/DWARF.cpp.o
+[128/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/X86_64.cpp.o
+[129/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Arch/ARM.cpp.o
+[130/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/PDB.cpp.o
+[131/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/ARMErrataFix.cpp.o
+[132/238] Linking CXX static library lib/libLLVMRISCVDesc.a
+[133/238] Linking CXX static library lib/libLLVMRISCVAsmParser.a
+[134/238] Linking CXX static library lib/libLLVMRISCVDisassembler.a
+[135/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/Driver.cpp.o
+[136/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/InputFiles.cpp.o
+[137/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/ScriptLexer.cpp.o
+[138/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/EhFrame.cpp.o
+[139/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/DriverUtils.cpp.o
+[140/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Arch/ARM64_32.cpp.o
+[141/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/Writer.cpp.o
+[142/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Arch/ARM64Common.cpp.o
+[143/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Arch/X86_64.cpp.o
+[144/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Symbols.cpp.o
+[145/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/SymbolTable.cpp.o
+[146/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Arch/ARM64.cpp.o
+[147/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Dwarf.cpp.o
+[148/238] Building CXX object tools/lld/COFF/CMakeFiles/lldCOFF.dir/SymbolTable.cpp.o
+[149/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/ConcatOutputSection.cpp.o
+[150/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/EhFrame.cpp.o
+[151/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Target.cpp.o
+[152/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/MapFile.cpp.o
+[153/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/ExportTrie.cpp.o
+[154/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/ICF.cpp.o
+[155/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Thunks.cpp.o
+[156/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/MarkLive.cpp.o
+[157/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/OutputSections.cpp.o
+[158/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/ICF.cpp.o
+[159/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/LinkerScript.cpp.o
+[160/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/ScriptParser.cpp.o
+[161/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/DriverUtils.cpp.o
+[162/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/InputSection.cpp.o
+[163/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/LTO.cpp.o
+[164/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Relocations.cpp.o
+[165/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Target.cpp.o
+[166/238] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVInstructionSelector.cpp.o
+[167/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Driver.cpp.o
+[168/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Sections.cpp.o
+[169/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Writer.cpp.o
+[170/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Symbols.cpp.o
+[171/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/OutputSection.cpp.o
+[172/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/InputSection.cpp.o
+[173/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/MarkLive.cpp.o
+[174/238] Building CXX object tools/lld/MinGW/CMakeFiles/lldMinGW.dir/Driver.cpp.o
+[175/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Relocations.cpp.o
+[176/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/SectionPriorities.cpp.o
+[177/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/InputFiles.cpp.o
+[178/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/MapFile.cpp.o
+[179/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/SymbolTable.cpp.o
+[180/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/OutputSegment.cpp.o
+[181/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/Driver.cpp.o
+[182/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/WriterUtils.cpp.o
+[183/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/UnwindInfoSection.cpp.o
+[184/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/ObjC.cpp.o
+[185/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/Writer.cpp.o
+[186/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/OutputSections.cpp.o
+[187/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/MarkLive.cpp.o
+[188/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/BPSectionOrderer.cpp.o
+[189/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/SyntheticSections.cpp.o
+[190/238] Building CXX object tools/clang/tools/driver/CMakeFiles/clang.dir/clang-driver.cpp.o
+[191/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/InputChunks.cpp.o
+[192/238] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/llvm-objdump-driver.cpp.o
+[193/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/MapFile.cpp.o
+[194/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/OutputSegment.cpp.o
+[195/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/LTO.cpp.o
+[196/238] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/WasmDump.cpp.o
+[197/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/SymbolTable.cpp.o
+[198/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/Symbols.cpp.o
+[199/238] Building CXX object tools/opt/CMakeFiles/opt.dir/opt.cpp.o
+[200/238] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/OffloadDump.cpp.o
+[201/238] Building CXX object tools/lld/ELF/CMakeFiles/lldELF.dir/SyntheticSections.cpp.o
+[202/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/Relocations.cpp.o
+[203/238] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/XCOFFDump.cpp.o
+[204/238] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/COFFDump.cpp.o
+[205/238] Building CXX object tools/llvm-mc/CMakeFiles/llvm-mc.dir/Disassembler.cpp.o
+[206/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/SyntheticSections.cpp.o
+[207/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/InputFiles.cpp.o
+[208/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/LTO.cpp.o
+[209/238] Building CXX object tools/clang/tools/driver/CMakeFiles/clang.dir/cc1gen_reproducer_main.cpp.o
+[210/238] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/SourcePrinter.cpp.o
+[211/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/Driver.cpp.o
+[212/238] Building CXX object tools/llvm-mc/CMakeFiles/llvm-mc.dir/llvm-mc.cpp.o
+[213/238] Linking CXX executable bin/llvm-mc
+[214/238] Building CXX object tools/clang/tools/driver/CMakeFiles/clang.dir/cc1as_main.cpp.o
+[215/238] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/ELFDump.cpp.o
+[216/238] Building CXX object tools/lld/MachO/CMakeFiles/lldMachO.dir/InputFiles.cpp.o
+[217/238] Building CXX object tools/llc/CMakeFiles/llc.dir/llc.cpp.o
+[218/238] Building CXX object tools/lld/wasm/CMakeFiles/lldWasm.dir/Writer.cpp.o
+[219/238] Building CXX object tools/clang/tools/driver/CMakeFiles/clang.dir/driver.cpp.o
+[220/238] Building CXX object tools/llc/CMakeFiles/llc.dir/NewPMDriver.cpp.o
+[221/238] Building CXX object tools/opt/CMakeFiles/LLVMOptDriver.dir/optdriver.cpp.o
+[222/238] Building CXX object tools/clang/tools/driver/CMakeFiles/clang.dir/cc1_main.cpp.o
+[223/238] Building CXX object tools/opt/CMakeFiles/LLVMOptDriver.dir/NewPMDriver.cpp.o
+[224/238] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/MachODump.cpp.o
+[225/238] Building CXX object tools/llvm-objdump/CMakeFiles/llvm-objdump.dir/llvm-objdump.cpp.o
+[226/238] Linking CXX executable bin/llvm-objdump
+ninja: build stopped: cannot make progress due to previous errors.

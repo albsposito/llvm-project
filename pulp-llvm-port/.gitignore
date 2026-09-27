@@ -5,3 +5,9 @@ ccache/
 logs/
 toolchains/
 __pycache__/
+
+# Regenerable benchmark outputs (fuzzer runs, simulator binaries)
+benchmarks/hwloop-fuzz/w/
+benchmarks/gap9-sweep/sim/out/
+*.elf
+steps/*/lit-land/lit.json

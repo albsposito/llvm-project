@@ -1,0 +1,20 @@
+{
+  "status": "escalated",
+  "branch": "work/20/T002",
+  "commits": [],
+  "note": null,
+  "signature_gone": false,
+  "other_errors_seen": [],
+  "question": "vsetvli-insert-zve64f.mir is a NEW upstream test at 20 (added by d2b8acc10464, did not exist at llvmorg-19.1.7, so it was never PASS at port-19-green; lit_diff mislabels it). Its input MIR hardcodes the INLINEASM operand flag 3145737, which encodes register class ID 47 (flag>>16 = 48 = RCID+1). In upstream 20 class 47 is VR; in the fork, the two fork register classes PulpV2 (v2i16) and PulpV4 (v4i8) in RISCVRegisterInfo.td (cluster codegen-core, present since step 18) sort among the 32-bit classes and shift every later ID by +2, so ID 47 is FPR64 and llc prints the comment '/* reguse:FPR64 */' instead of '/* reguse:VR */'. The fork's actual vsetvli-insertion output is identical to upstream (the test passes when only that comment text is substituted). The pass under test is run alone (-run-pass=riscv-insert-vsetvli), so the open 19 escalation about fork pre-RA passes being placed before RISCVInsertVSETVLI is NOT involved. The only resolutions are (a) a changed test expectation/input (forbidden for a worker; a test-regen could not fix it with update_mir_test_checks either, because the input MIR's hardcoded ID is itself the problem), or (b) removing the fork's PulpV2/PulpV4 register classes and adding v2i16/v4i8 to GPR the way upstream later does for the P extension (llvmorg-23: GPR carries XLenVecI8VT/XLenVecI16VT, no separate classes), which is a fork redesign (deleting fork register classes) that AGENT_RULES says must be escalated. Owner decision: accept this test as a known fork-induced expected failure (register-class-ID skew, no behaviour change), or schedule the PulpV2/PulpV4 -> GPR redesign (best at step 23 following upstream's P-extension packed-type model)?",
+  "evidence": {
+    "causing_upstream_commit": "d2b8acc10464 [RISCV] Swap the order of SEWGreaterThanOrEqualAndLessThan64 and SEWGreaterThanOrEqual. (#120649) -- adds the test file (new file, git log --follow llvmorg-19.1.7..llvmorg-20.1.8)",
+    "upstream_class_ids": "llvm-tblgen -gen-register-info on pristine llvmorg-20.1.8 RISCV.td (scratchpad): FPR64=45, VM=46, VR=47",
+    "fork_class_ids": "build/int-20/lib/Target/RISCV/RISCVGenRegisterInfo.inc: PulpV2=9, PulpV4=10, FPR64=47, VM=48, VR=49",
+    "fork_hunk": "git -C wt/int-20 diff llvmorg-20.1.8 -- llvm/lib/Target/RISCV/RISCVRegisterInfo.td: adds def PulpV2/PulpV4 (owner commit 1ea0c09d95a9 '[pulp] codegen-core: lowering, ISel, instr/register info, TTI'); used by RISCVISelLowering.cpp:141-142 and 185 references in RISCVInstrInfoXpulp.td",
+    "repro_log": "logs/20-T002.repro.log (integration head 17009d29cc0e, build/int-20 binaries; FAIL as reported, then PASS after sed 's/reguse:FPR64/reguse:VR/' on llc output only)",
+    "only_diff": "line 27 CHECK-NEXT: comment text '/* reguse:VR */' vs '/* reguse:FPR64 */'; operand values, registers and all PseudoVSETIVLI/vector instructions identical",
+    "other_rc_id_tests": "no other test under llvm/test/CodeGen/RISCV hardcodes reguse/regdef flags at 19 or 20 (grep), which is why this skew never showed before",
+    "upstream_reference_for_redesign": "llvmorg-23.1.x RISCVRegisterInfo.td: packed [v4i8,v8i8]/[v2i16,v4i16] types added to GPR/GPRPair instead of separate register classes",
+    "worktree": "not created: no code change was possible without the redesign above"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "log": "tasks/20/work_20_E005.build.log",
+  "failed_targets": 1,
+  "clusters": [
+    {
+      "key": "redefinition of 'getPreferredAddressingMode'",
+      "kind": "compile",
+      "sites": [
+        "llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2650"
+      ],
+      "samples": [
+        "../../wt/int-20/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2650:15: error: redefinition of 'getPreferredAddressingMode'\n 2650 | RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,\n      |               ^\n../../wt/int-20/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp:2395:15: note: previous definition is here\n 2395 | RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,\n      |               ^"
+      ],
+      "owners": [
+        "codegen-core"
+      ],
+      "count": 1,
+      "id": "E001"
+    }
+  ]
+}

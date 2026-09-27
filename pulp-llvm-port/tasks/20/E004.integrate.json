@@ -1,0 +1,21 @@
+{
+  "branch": "work/20/E004",
+  "int_head_before": "92320420722327d37e9329a268abee1b35107f59",
+  "build_rc": 1,
+  "errors_fixed": [
+    "Processor does not define resources for WriteFCvtF32ToF16"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/20/work_20_E004.build.log",
+  "errors_unmasked": [
+    "extraneous closing brace ('}')",
+    "no member named 'getUsedSSR' in 'llvm::MachineFunctionInfo'",
+    "redefinition of 'getPreferredAddressingMode'",
+    "unknown type name 'RISCVMachineFunctionInfo'; did you mean 'MachineFunctionInfo'?"
+  ],
+  "verdict": "LANDED",
+  "int_head_after": "17f78490c034ac3ceda96276d61ac6870d47de74",
+  "commits": [
+    "1887a96d43550e27683d063fb489e83b59395102"
+  ]
+}

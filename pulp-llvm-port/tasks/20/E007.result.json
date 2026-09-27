@@ -1,0 +1,16 @@
+{
+  "status": "done",
+  "branch": "work/20/E007",
+  "base": "17f78490c034ac3ceda96276d61ac6870d47de74",
+  "commits": ["99275eb2f491323da80b7a56fb585062014c1d9f"],
+  "note": "notes/20/E007.md",
+  "signature_gone": true,
+  "repro_log": "logs/20-E007.repro.log",
+  "verify_log": "logs/20-E007.verify.log",
+  "other_errors_seen": [
+    "llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp:148: unknown type name 'RISCVMachineFunctionInfo' (missing include; fixed by 20/E006 commit 5a4afc65580f, not yet on integration head)",
+    "llvm/lib/Target/RISCV/RISCVRegisterInfo.cpp:150: no member named 'getUsedSSR' in 'llvm::MachineFunctionInfo' (same root cause as above, 20/E006)",
+    "llvm/lib/Target/RISCV/RISCVISelDAGToDAG.cpp:841: extraneous closing brace ('}')"
+  ],
+  "evidence": "Stash incident: git stash is shared across worktrees. While reproducing I stashed my TTI change, and when I popped, I got 20/E006's stash (88e363ba0409, one-line RISCVRegisterInfo.cpp include) instead of mine. I reverted RISCVRegisterInfo.cpp in wt/20-E007 and reapplied my change from a diff file I had saved beforehand (it matches logs/20-E007.swapped-stash.patch line for line). As a precaution I put E006's stash commit back on the stash list with 'git stash store' (stash@{0}, message '... restored by 20/E007 after accidental pop'). It is redundant, because E006 already committed the same change as 5a4afc65580f. My attempt to drop it again was denied by the permission system, so the conductor may drop it. My commit 99275eb2f491 touches only RISCVTargetTransformInfo.cpp. No probe hack was used on the new head: RISCV.td and RISCVProcessors.td were reverted before the rebase."
+}

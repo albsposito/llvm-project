@@ -7,6 +7,7 @@ Agent-led port of `pulp-platform/llvm-project` `integer_SIMD_fix` (LLVM 18) to L
 | File | For | What |
 |---|---|---|
 | `PROGRESS.md` | everyone | current state, decisions, escalations, owner actions |
+| `BACKLOG.md` | everyone | every open problem still to address, with priority and status |
 | `AGENT_RULES.md` | every agent | the rules a change must follow to land |
 | `PORTING.md` | every agent | route, fork anatomy, what breaks per version, how to research, roles, names |
 | `agent-sops/phase0-setup.sop.md` | conductor | once: clone, restack, 18 baseline |

@@ -1,0 +1,16 @@
+{
+  "branch": "work/20/E006",
+  "int_head_before": "17f78490c034ac3ceda96276d61ac6870d47de74",
+  "build_rc": 1,
+  "errors_fixed": [
+    "no member named 'getUsedSSR' in 'llvm::MachineFunctionInfo'",
+    "unknown type name 'RISCVMachineFunctionInfo'; did you mean 'MachineFunctionInfo'?"
+  ],
+  "errors_new": [],
+  "build_log": "tasks/20/work_20_E006.build.log",
+  "verdict": "LANDED",
+  "int_head_after": "fc2786e2c032ca20d45e19e15b3d9ff05884bbe6",
+  "commits": [
+    "5a4afc65580f66298d90579d02764e06eabe77e7"
+  ]
+}

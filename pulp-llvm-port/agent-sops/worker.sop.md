@@ -54,7 +54,7 @@ Make the smallest change that removes the problem, then rebuild the task's targe
 - You MUST change only files owned by the task's `owner_cluster`, unless the root cause spans clusters, in which case You MUST make one commit per owning cluster, each with its own fixup subject
 - You MUST follow every rule in AGENT_RULES.md; in particular You MUST NOT touch test files unless your role is `test-regen`, because tests are the oracle that judges your change
 - You MUST rebuild the task's targets and run `scripts/cluster_errors.py <log> --worktree <worktree>` on the new log; the task's signature MUST be gone and no new signature MUST appear in the files you touched
-- For a test task You MUST rerun the failing tests with `<build_dir>/bin/llvm-lit -v <tests>` and they MUST pass
+- For a test task You MUST rerun the failing tests with `scripts/wlit.sh <worktree> <build_dir> -v <tests relative to the worktree>` and they MUST pass (new build dirs are built at fixed paths `/work/src` and `/work/build` inside a private mount namespace so ccache is shared across worktrees, harness change 20/H005; their lit config only works through `scripts/wlit.sh` or `scripts/inwt.sh`, while the built tools in `<build_dir>/bin` can be run directly)
 - If two attempts leave the signature unchanged, You MUST escalate (step 6), because a third guess is how wrong fixes land
 
 ### 5. Commit, note, self-check

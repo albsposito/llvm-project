@@ -1,0 +1,24 @@
+{
+  "status": "done",
+  "branch": "work/20/T006",
+  "commits": ["1214736b3c0f4f322a61e31dd32722f8005f9191"],
+  "note": "notes/20/T006.md",
+  "regen_report": "notes/20/T006-regen.md",
+  "signature_gone": true,
+  "other_errors_seen": [],
+  "policy_check": {
+    "log": "logs/20-T006.policy.log",
+    "fail": 0,
+    "warn": 1,
+    "findings": ["WARN test-edit: test file regenerated, reviewer must check the regen report: llvm/test/MC/RISCV/rv32xmempool-invalid.s"],
+    "owner_exception_rule": "Rule 3 (CHECK lines only via LLVM update scripts) is not mechanically checked by policy_check.py, so it produced no FAIL; it is covered by notes/20/owner-test-exceptions.md#t001 and the hand edit is declared in the regen report and the Owner-Exception trailer for the reviewer.",
+    "history": "First commit 395fac83931c failed change-note and test-edit because the attribution line sat in a separate paragraph so git did not parse the trailers; amended (own unpushed branch) to one trailer block, no content change."
+  },
+  "change": "llvm/test/MC/RISCV/rv32xmempool-invalid.s line 4 only: 'error: system register use requires an option to be enabled' -> \"error: system register 'trace' requires 'xmempool' to be enabled\"; [[@LINE+1]]:13 and error: prefix kept; 1 file, +1/-1",
+  "upstream_commit": "107f3efdbede [RISCV][MC] Make error message of CSR with wrong extension more detailed (#104424)",
+  "verification": {
+    "repro_log": "logs/20-T006.repro.log (FAIL before)",
+    "verify_log": "logs/20-T006.verify.log (PASS after)",
+    "how": "build/20-T006/bin/llvm-lit is a small wrapper that runs wt/20-T006's lit with build/20-T006/test/lit.site.cfg.py (a copy of build/int-20's site config pointing the source root at wt/20-T006 and tools at build/int-20/bin); int-20 HEAD == integration_head. Plain build/int-20/bin/llvm-lit cannot load a config for a different worktree. Also checked: with -mattr=+xmempool, csrr t0, trace still assembles to [0xf3,0x22,0x00,0x7d]."
+  }
+}

@@ -1,0 +1,182 @@
+ninja: Entering directory `build/int-20'
+[1/172] Generating ../../bin/llvm-otool
+[2/172] Linking CXX executable bin/lli-child-target
+[3/172] Linking CXX executable bin/llvm-as
+[4/172] Linking CXX executable bin/llvm-ar
+[5/172] Generating ../../bin/llvm-lib
+[6/172] Generating ../../bin/llvm-dlltool
+[7/172] Generating ../../bin/llvm-ranlib
+[8/172] Linking CXX executable bin/llvm-ctxprof-util
+[9/172] Linking CXX executable bin/lli
+[10/172] Linking CXX executable bin/bugpoint
+[11/172] Linking CXX executable bin/llvm-c-test
+[12/172] Linking CXX executable bin/llvm-profdata
+[13/172] Linking CXX executable bin/diagtool
+[14/172] Linking CXX shared module lib/CheckerOptionHandlingAnalyzerPlugin.so
+[15/172] Linking CXX shared module lib/CheckerDependencyHandlingAnalyzerPlugin.so
+[16/172] Linking CXX shared library lib/libLTO.so.20.1
+[17/172] Linking CXX shared module lib/SampleAnalyzerPlugin.so
+[18/172] Creating library symlink lib/libLTO.so
+[19/172] Linking CXX executable bin/llvm-lto
+[20/172] Linking CXX executable bin/apinotes-test
+[21/172] Linking CXX executable bin/clang-fuzzer-dictionary
+[22/172] Linking CXX executable bin/clang-format
+[23/172] Linking CXX executable bin/clang-offload-bundler
+[24/172] Linking CXX executable bin/clang-offload-packager
+[25/172] Linking CXX executable bin/clang-sycl-linker
+[26/172] Linking CXX executable bin/clang-linker-wrapper
+[27/172] Linking CXX executable bin/clang-diff
+[28/172] Linking CXX executable bin/clang-nvlink-wrapper
+[29/172] Linking CXX executable bin/clang-import-test
+[30/172] Linking CXX executable bin/clang-installapi
+[31/172] Linking CXX executable bin/clang-scan-deps
+[32/172] Linking CXX executable bin/clang-refactor
+[33/172] Linking CXX executable bin/arcmt-test
+[34/172] Linking CXX executable tools/clang/unittests/Basic/BasicTests
+[35/172] Linking CXX executable bin/clang-repl
+[36/172] Linking CXX executable bin/clang-check
+[37/172] Linking CXX executable tools/clang/unittests/Lex/LexTests
+[38/172] Linking CXX executable bin/clang-extdef-mapping
+[39/172] Linking CXX shared library lib/libclang.so.20.1.8
+[40/172] Creating library symlink lib/libclang.so.20.1 lib/libclang.so
+[41/172] Linking CXX executable tools/clang/unittests/Driver/ClangDriverTests
+[42/172] Linking CXX executable tools/clang/unittests/Analysis/ClangAnalysisTests
+[43/172] Linking CXX executable tools/clang/unittests/Analysis/FlowSensitive/ClangAnalysisFlowSensitiveTests
+[44/172] Linking CXX executable bin/c-arcmt-test
+[45/172] Linking CXX executable tools/clang/unittests/StaticAnalyzer/StaticAnalysisTests
+[46/172] Linking CXX executable tools/clang/unittests/ASTMatchers/ASTMatchersTests
+[47/172] Linking CXX executable tools/clang/unittests/ASTMatchers/Dynamic/DynamicASTMatchersTests
+[48/172] Linking CXX executable bin/c-index-test
+[49/172] Building CXX object lib/Target/RISCV/MCA/CMakeFiles/LLVMRISCVTargetMCA.dir/RISCVCustomBehaviour.cpp.o
+[50/172] Linking CXX executable tools/clang/unittests/AST/ByteCode/InterpTests
+[51/172] Linking CXX executable tools/clang/unittests/Format/FormatTests
+[52/172] Linking CXX executable tools/clang/unittests/AST/ASTTests
+[53/172] Linking CXX static library lib/libLLVMRISCVTargetMCA.a
+[54/172] Linking CXX executable tools/clang/unittests/CrossTU/CrossTUTests
+[55/172] Building CXX object unittests/Target/RISCV/CMakeFiles/RISCVTests.dir/MCInstrAnalysisTest.cpp.o
+[56/172] Linking CXX executable tools/clang/unittests/Tooling/ToolingTests
+[57/172] Linking CXX executable tools/clang/unittests/Tooling/Syntax/SyntaxTests
+[58/172] Linking CXX executable tools/clang/unittests/Rewrite/RewriteTests
+[59/172] Linking CXX executable tools/clang/unittests/Sema/SemaTests
+[60/172] Linking CXX executable tools/clang/unittests/libclang/CrashTests/libclangCrashTests
+[61/172] Linking CXX executable tools/clang/unittests/libclang/libclangTests
+[62/172] Linking CXX executable tools/clang/unittests/InstallAPI/InstallAPITests
+[63/172] Linking CXX executable tools/clang/unittests/CodeGen/ClangCodeGenTests
+[64/172] Linking CXX executable tools/clang/unittests/Frontend/FrontendTests
+[65/172] Linking CXX executable tools/clang/unittests/Index/IndexTests
+[66/172] Linking CXX executable tools/clang/unittests/Support/ClangSupportTests
+[67/172] Linking CXX executable tools/clang/unittests/Serialization/SerializationTests
+[68/172] Linking CXX executable bin/dsymutil
+[69/172] Linking CXX executable tools/clang/unittests/Interpreter/ExceptionTests/ClangReplInterpreterExceptionTests
+[70/172] Linking CXX executable bin/llvm-cat
+[71/172] Linking CXX executable bin/llvm-cvtres
+[72/172] Linking CXX executable bin/llvm-cgdata
+[73/172] Linking CXX executable bin/llvm-cfi-verify
+[74/172] Linking CXX executable bin/llvm-cov
+[75/172] Linking CXX executable bin/llvm-cxxdump
+[76/172] Linking CXX executable tools/clang/unittests/Interpreter/ClangReplInterpreterTests
+[77/172] Linking CXX executable bin/llvm-cxxmap
+[78/172] Linking CXX executable bin/llvm-debuginfod-find
+[79/172] Linking CXX executable bin/llvm-debuginfo-analyzer
+[80/172] Linking CXX executable bin/llvm-dwarfdump
+[81/172] Copying llvm-locstats into /home/ubuntu/llvm-project/pulp-llvm-port/build/int-20/./bin
+[82/172] Linking CXX executable bin/llvm-ifs
+[83/172] Linking CXX executable bin/llvm-dwp
+[84/172] Linking CXX executable bin/llvm-dwarfutil
+[85/172] Linking CXX executable bin/llvm-extract
+[86/172] Linking CXX executable bin/llvm-gsymutil
+[87/172] Linking CXX executable bin/llvm-link
+[88/172] Linking CXX executable bin/llvm-isel-fuzzer
+[89/172] Linking CXX executable bin/llvm-libtool-darwin
+[90/172] Linking CXX executable bin/llvm-jitlink
+[91/172] Linking CXX executable bin/llvm-lipo
+[92/172] Linking CXX executable bin/llvm-mca
+[93/172] Linking CXX executable bin/llvm-ml
+[94/172] Linking CXX executable bin/llvm-modextract
+[95/172] Linking CXX executable bin/llvm-objcopy
+[96/172] Generating ../../bin/llvm-bitcode-strip
+[97/172] Generating ../../bin/llvm-install-name-tool
+[98/172] Generating ../../bin/llvm-strip
+[99/172] Linking CXX executable bin/llvm-nm
+[100/172] Linking CXX executable bin/llvm-rc
+[101/172] Generating ../../bin/llvm-windres
+[102/172] Linking CXX executable bin/llvm-pdbutil
+[103/172] Linking CXX executable bin/llvm-readobj
+[104/172] Generating ../../bin/llvm-readelf
+[105/172] Linking CXX executable bin/llvm-readtapi
+[106/172] Linking CXX executable bin/llvm-profgen
+[107/172] Linking CXX executable bin/llvm-lto2
+[108/172] Linking CXX executable bin/llvm-sim
+[109/172] Linking CXX executable bin/llvm-size
+[110/172] Linking CXX executable bin/llvm-rtdyld
+[111/172] Linking CXX executable bin/llvm-strings
+[112/172] Linking CXX executable bin/llvm-opt-fuzzer
+[113/172] Linking CXX executable bin/llvm-symbolizer
+[114/172] Generating ../../bin/llvm-addr2line
+[115/172] Linking CXX executable bin/llvm-tli-checker
+[116/172] Linking CXX executable bin/llvm-xray
+[117/172] Linking CXX executable bin/obj2yaml
+[118/172] Linking CXX executable bin/llvm-split
+[119/172] Linking CXX executable bin/sanstats
+[120/172] Linking CXX executable bin/llvm-reduce
+[121/172] Linking CXX executable bin/sancov
+[122/172] Linking CXX executable bin/verify-uselistorder
+[123/172] Linking CXX executable bin/yaml2obj
+[124/172] Linking CXX executable unittests/CGData/CGDataTests
+[125/172] Linking CXX executable unittests/Bitcode/BitcodeTests
+[126/172] Linking CXX executable unittests/DebugInfo/BTF/DebugInfoBTFTests
+[127/172] Linking CXX executable unittests/DebugInfo/GSYM/DebugInfoGSYMTests
+[128/172] Linking CXX executable unittests/DebugInfo/PDB/DebugInfoPDBTests
+[129/172] Linking CXX executable unittests/Analysis/AnalysisTests
+[130/172] Linking CXX executable unittests/CodeGen/GlobalISel/GlobalISelTests
+[131/172] Linking CXX executable unittests/CodeGen/CodeGenTests
+[132/172] Linking CXX executable unittests/DebugInfo/Symbolizer/DebugInfoSymbolizerTests
+[133/172] Linking CXX executable unittests/Debuginfod/DebuginfodTests
+[134/172] Linking CXX executable unittests/DebugInfo/DWARF/DebugInfoDWARFTests
+[135/172] Linking CXX executable unittests/DWARFLinkerParallel/DWARFLinkerParallelTests
+[136/172] Linking CXX executable unittests/DebugInfo/LogicalView/DebugInfoLogicalViewTests
+[137/172] Linking CXX executable unittests/ExecutionEngine/ExecutionEngineTests
+[138/172] Linking CXX executable unittests/ExecutionEngine/JITLink/JITLinkTests
+[139/172] Linking CXX executable unittests/FuzzMutate/FuzzMutateTests
+[140/172] Linking CXX executable unittests/InterfaceStub/InterfaceStubTests
+[141/172] Linking CXX executable unittests/Linker/LinkerTests
+[142/172] Linking CXX executable unittests/ExecutionEngine/Orc/OrcJITTests
+[143/172] Linking CXX executable unittests/Frontend/LLVMFrontendTests
+[144/172] Linking CXX executable unittests/ObjCopy/ObjCopyTests
+[145/172] Linking CXX executable unittests/MC/MCTests
+[146/172] Linking CXX executable unittests/Object/ObjectTests
+[147/172] Linking CXX executable unittests/ObjectYAML/ObjectYAMLTests
+[148/172] Linking CXX executable unittests/IR/IRTests
+[149/172] Linking CXX executable unittests/MI/MITests
+[150/172] Linking CXX executable unittests/MIR/MIRTests
+[151/172] Linking CXX executable unittests/ProfileData/ProfileDataTests
+[152/172] Linking CXX executable unittests/SandboxIR/SandboxIRTests
+[153/172] Linking CXX executable unittests/Passes/PassBuilderBindings/PassesBindingsTests
+[154/172] Linking CXX executable unittests/Transforms/IPO/IPOTests
+[155/172] Linking CXX executable unittests/Transforms/Coroutines/CoroTests
+[156/172] Linking CXX executable unittests/Passes/Plugins/PluginsTests
+[157/172] Linking CXX executable unittests/Target/TargetMachineCTests
+[158/172] Linking CXX executable unittests/Transforms/Instrumentation/InstrumentationTests
+[159/172] Linking CXX executable unittests/XRay/XRayTests
+[160/172] Linking CXX executable unittests/Transforms/Vectorize/VectorizeTests
+[161/172] Linking CXX executable unittests/tools/llvm-profdata/LLVMProfdataTests
+[162/172] Linking CXX executable unittests/Transforms/Vectorize/SandboxVectorizer/SandboxVectorizerTests
+[163/172] Linking CXX executable unittests/Transforms/Scalar/ScalarTests
+[164/172] Linking CXX executable unittests/Transforms/Utils/UtilsTests
+[165/172] Building CXX object tools/llvm-exegesis/lib/RISCV/CMakeFiles/LLVMExegesisRISCV.dir/Target.cpp.o
+[166/172] Linking CXX static library lib/libLLVMExegesisRISCV.a
+[167/172] Building CXX object unittests/tools/llvm-exegesis/CMakeFiles/LLVMExegesisTests.dir/RISCV/TargetTest.cpp.o
+[168/172] Linking CXX executable bin/llvm-exegesis
+[169/172] Building CXX object unittests/Target/RISCV/CMakeFiles/RISCVTests.dir/RISCVInstrInfoTest.cpp.o
+[170/172] Linking CXX executable unittests/Target/RISCV/RISCVTests
+[171/172] Building CXX object unittests/tools/llvm-exegesis/CMakeFiles/LLVMExegesisTests.dir/RISCV/SnippetGeneratorTest.cpp.o
+[172/172] Linking CXX executable unittests/tools/llvm-exegesis/LLVMExegesisTests
+********************
+Failed Tests (1):
+  LLVM :: CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir
+
+
+Total Discovered Tests: 4721
+  Failed: 1 (0.02%)
+unit (TargetParserTests) exit 0, 84 tests
+{"green": false, "totals": {"PASS": 4720, "FAIL": 1}, "problems": 125, "upstream_removed": 0}

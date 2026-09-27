@@ -1,0 +1,22 @@
+{
+  "status": "escalated",
+  "branch": "work/20/T004",
+  "commits": [],
+  "note": null,
+  "signature_gone": false,
+  "other_errors_seen": [],
+  "question": "The failure is not in the passes cluster and has no fork-local fix that is clearly correct. Which fix should land? (A) Fix the TableGen clique sweep in upstream llvm/utils/TableGen/Common/CodeGenRegisters.cpp (CodeGenRegisterClass::computeSubClasses, the 'Sweep up missed clique members' loop, which stops at the first non-member), so that register classes with identical members, equal RSI and equal size stay mutual subclasses even when a same-size class sorts between them alphabetically. This needs an Upstream-File-Edit trailer: the file is UNMAPPED, not fork-touched. It is robust and changes no fork names. (B) Rename PulpV2/PulpV4 (185 uses in RISCVInstrInfoXpulp.td [insn-tablegen], 2 in RISCVRegisterInfo.td [codegen-core], 2 in RISCVISelLowering.cpp [codegen-core]) to names that sort between 'GPR' and 'GPRF32' (e.g. GPR0V2/GPR0V4). Fork-only, but it depends on the alphabetical tie-break and can break again when upstream adds a class. (C) Follow the later upstream/PULP-22 design: drop PulpV2/PulpV4 and add v4i8/v2i16 to GPRRegisterClass (upstream P extension in llvmorg-22 uses XLenVecI8VT/XLenVecI16VT in GPRRegisterClass; pulp/llvmorg-22.1.7-pulp has no PulpV classes). This is a behaviour-level redesign (type legality, ISel) and out of scope for one task. No upstream code at llvmorg-20.1.8 shows which of these upstream would choose.",
+  "evidence": {
+    "repro_log": "logs/20-T004.repro.log (build/20-T004 llc fails with 'Expected a PulpV4 register, but got a GPR register'; build/int-19 llc passes the same test)",
+    "build_log": "logs/20-T004-build.log",
+    "mechanism": "MachineVerifier checks that the vreg class (gpr) is a subclass of the operand class (PulpV4 = outs of PseudoPV_ADD_SC_B_VL, RISCVInstrInfoXpulp.td:884). At port-19 GPR, GPRF16, GPRF32, PulpV2 and PulpV4 had identical members (X0-X31) and formed one TableGen 'clique', contiguous IDs 3..7, all mutual subclasses (int-19 RISCVGenRegisterInfo.inc: GPRSubClassMask and PulpV4SubClassMask both 0x03fbbff8). At llvmorg-20.1.8, GPRF32 is built from the new X*_W sub-registers, so it is no longer a clique member. It still has the same RSI and size, so TopoOrderRC (order by RSI, then size, then name) places it alphabetically between GPR(7) and PulpV2(9)/PulpV4(10). computeSubClasses() sweeps clique members only while they are contiguous ('for (I2 = next(I); I2 != E && testSubClass(&RC,&*I2); ++I2)'), so for PulpV4 it stops at GPRF32 and never marks GPR as a subclass. int-20 PulpV4SubClassMask = 0x7f6bf600 (no GPR bit 7); GPRSubClassMask = 0x7f6bf680 (PulpV4 still a subclass of GPR, so the relation is now one-way).",
+    "proof": "Running llvm-tblgen -gen-register-info on a scratch copy of the step-20 RISCV .td files with PulpV2/PulpV4 renamed to GPR0V2/GPR0V4 gives contiguous IDs 7,8,9 and mutual masks (GPRSubClassMask == GPR0V4SubClassMask == 0x7f6bf380). This confirms the ordering is the only cause.",
+    "upstream_commits": [
+      "bc91f3cdd57c [RISCV] Add 32 bit GPR sub-register for Zfinx. (#108336): GPRF32 moves to X*_W sub-registers, breaks the clique (direct cause)",
+      "8a7843ca0ff5 [RISCV] Add 16 bit GPR sub-register for Zhinx. (#107446): GPRF16 moves to X*_H sub-registers (removes the other clique member, harmless on its own because it sorts before GPR)"
+    ],
+    "upstream_tablegen_status": "The computeSubClasses clique sweep is unchanged through llvmorg-22.1.8 (only NFC 9281947a7dd8), so there is no upstream fix to backport.",
+    "scope": "Only this lit test hits the symptom in steps/20/lit-r1/lit.json. It is hand-written MIR that gives PulpV4 defs a gpr vreg. The test is not at fault and was not touched.",
+    "owner_clusters": "RISCVRegisterInfo.td -> codegen-core, RISCVInstrInfoXpulp.td -> insn-tablegen, CodeGenRegisters.cpp -> UNMAPPED (upstream). None is in the task's guessed 'passes' cluster."
+  }
+}

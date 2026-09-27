@@ -9,12 +9,18 @@ Green means all of:
     already fail at the LLVM 18 baseline, listed once in Phase 0 and approved by the owner)
   - every fork test is present and PASS (a fork test that is missing, UNSUPPORTED or XFAIL is
     not running, which is how a port silently loses coverage)
-  - no test that PASSed in the baseline is now anything other than PASS
+  - no test that PASSed in the baseline is now anything other than PASS, except a test that
+    upstream itself removed: with --worktree and --upstream-tag, a baseline-PASS test that is
+    MISSING is reported under "upstream_removed" (not a problem) only when it is absent from the
+    candidate worktree, absent from the upstream tag's tree, and not a fork test. Fork tests are
+    never excused; a test upstream moved rather than removed still needs --baseline-renames to
+    be checked at its new path, since this rule only proves the old path is gone upstream.
 Exit 0 when green, 1 otherwise. Failures are grouped by test directory for task clustering.
 """
 import argparse
 import json
 import re
+import subprocess
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -40,7 +46,8 @@ def load_renames(path, base, candidate):
     """Explicit upstream identity changes, only for absent baseline PASS tests.
 
     JSON is a list of {source, destination, upstream_commit} objects using repo
-    paths and full upstream SHA-1s. Evidence is reviewed separately; the hash is
+    paths and full upstream SHA-1s. Optional additional_destinations lists all other
+    successors of an upstream split; every successor must PASS. Evidence is reviewed separately; the hash is
     retained in the report so a passing comparison remains auditable.
     """
     entries = json.loads(Path(path).read_text())
@@ -56,16 +63,30 @@ def load_renames(path, base, candidate):
             raise ValueError("rename requires source, destination and upstream_commit")
         if not re.fullmatch(r"[0-9a-f]{40}", sha):
             raise ValueError(f"rename {src}: upstream_commit must be a full SHA-1")
-        if src in sources or dst in destinations or src == dst:
-            raise ValueError(f"duplicate or self rename: {src} -> {dst}")
+        allowed = {"source", "destination", "upstream_commit", "additional_destinations"}
+        if set(entry) - allowed:
+            raise ValueError(f"rename {src}: unknown fields")
+        extra = entry.get("additional_destinations", [])
+        if not isinstance(extra, list) or not all(isinstance(d, str) and d for d in extra):
+            raise ValueError(f"rename {src}: additional_destinations must be a list of paths")
+        targets = [dst, *extra]
+        for path in [src, *targets]:
+            if (not any(path.startswith(prefix) for prefix in SUITE_PREFIX.values())
+                    or any(part in ("", ".", "..") for part in path.split("/"))
+                    or "\\" in path or any(c.isspace() for c in path)):
+                raise ValueError(f"rename path must be a canonical repo test path: {path}")
+        if (src in sources or src in targets or len(set(targets)) != len(targets)
+                or destinations.intersection(targets)):
+            raise ValueError(f"duplicate or self rename: {src} -> {targets}")
         sources.add(src)
-        destinations.add(dst)
+        destinations.update(targets)
         if baseline.get(src) != "PASS":
             raise ValueError(f"rename source is not a baseline PASS: {src}")
         if src in candidate:
             raise ValueError(f"rename source still exists in candidate: {src}")
-        if candidate.get(dst) != "PASS":
-            raise ValueError(f"rename destination must PASS: {dst} ({candidate.get(dst, 'MISSING')})")
+        for target in targets:
+            if candidate.get(target) != "PASS":
+                raise ValueError(f"rename destination must PASS: {target} ({candidate.get(target, 'MISSING')})")
     if sources & destinations:
         raise ValueError("chained baseline renames are ambiguous")
     return entries
@@ -78,6 +99,8 @@ def main():
     ap.add_argument("--fork-tests", required=True)
     ap.add_argument("--known-failures", help="owner-approved list of repo-relative tests that fail at the 18 baseline")
     ap.add_argument("--baseline-renames", help="reviewed JSON upstream test identities with provenance SHA-1s")
+    ap.add_argument("--worktree", help="candidate worktree, for the upstream-removed rule")
+    ap.add_argument("--upstream-tag", help="the step's upstream base tag, for the upstream-removed rule")
     ap.add_argument("--out")
     ap.add_argument("--unit", help="gtest JSON; required for integration gate")
     ap.add_argument("--unit-exit", type=int)
@@ -89,8 +112,46 @@ def main():
         known = {l.split()[0] for l in Path(args.known_failures).read_text().splitlines()
                  if l.strip() and not l.startswith("#")}
     by_path = {to_repo_path(n): code for n, code in cand.items()}
+    all_fork_tests = {l.split("#")[0].strip() for l in Path(args.fork_tests).read_text().splitlines()
+                      if l.strip() and "/test/" in l and not l.startswith("#")}
     fork_tests = [l.strip() for l in Path(args.fork_tests).read_text().splitlines()
                   if l.strip() and "/test/" in l and not l.startswith("#") and l.strip() not in known]
+
+    def die(msg):
+        # Exit 2, distinct from 1 (not green): the inputs are wrong, the verdict is unknown.
+        print(msg, file=sys.stderr)
+        sys.exit(2)
+
+    def git(*a):
+        return subprocess.run(["git", "-C", args.worktree, *a], capture_output=True, text=True)
+
+    if bool(args.worktree) != bool(args.upstream_tag):
+        die("lit_diff: --worktree and --upstream-tag must be given together")
+    if args.worktree:
+        # Validate once: a bad path or tag must stop the run, never read as "absent upstream".
+        if git("rev-parse", "--is-inside-work-tree").stdout.strip() != "true":
+            die(f"lit_diff: --worktree {args.worktree} is not a git work tree")
+        top = git("rev-parse", "--show-toplevel").stdout.strip()
+        if Path(top).resolve() != Path(args.worktree).resolve():
+            die(f"lit_diff: --worktree {args.worktree} is not the top of a git work tree (top is {top})")
+        if git("rev-parse", "--verify", "--quiet", f"{args.upstream_tag}^{{tree}}").returncode != 0:
+            die(f"lit_diff: --upstream-tag {args.upstream_tag} does not resolve to a tree")
+        if git("merge-base", "--is-ancestor", args.upstream_tag, "HEAD").returncode != 0:
+            die(f"lit_diff: --upstream-tag {args.upstream_tag} is not an ancestor of the worktree HEAD")
+        head = git("rev-parse", "HEAD").stdout.strip()
+        if head == git("rev-parse", f"{args.upstream_tag}^{{commit}}").stdout.strip():
+            die("lit_diff: --upstream-tag must be the step's upstream base, not the worktree HEAD")
+
+    def removed_upstream(path):
+        if not args.worktree or path in all_fork_tests:
+            return False
+        if (Path(args.worktree) / path).exists():
+            return False
+        r = git("ls-tree", "--full-tree", "--name-only", args.upstream_tag, "--", path)
+        if r.returncode != 0:
+            die(f"lit_diff: git ls-tree failed for {path}: {r.stderr.strip()}")
+        return r.stdout.strip() == ""
+    upstream_removed = []
 
     renames = []
     mapping_errors = []
@@ -116,6 +177,9 @@ def main():
         new = cand.get(name, "MISSING")
         if new == "MISSING" and to_repo_path(name) in renamed:
             new = by_path[renamed[to_repo_path(name)]]
+        if code == "PASS" and new == "MISSING" and removed_upstream(to_repo_path(name)):
+            upstream_removed.append(to_repo_path(name))
+            continue
         if code == "PASS" and new != "PASS" and new not in BAD:
             problems.append({"test": to_repo_path(name), "problem": f"regressed from PASS to {new}"})
 
@@ -128,6 +192,8 @@ def main():
     report = {"green": not problems, "totals": dict(counts), "problems": len(problems),
               "groups": [{"dir": d, "count": len(ps), "tests": ps} for d, ps in
                          sorted(groups.items(), key=lambda kv: -len(kv[1]))]}
+    if args.worktree and args.upstream_tag:
+        report["upstream_removed"] = sorted(upstream_removed)
     if args.baseline_renames:
         report["baseline_renames"] = renames
         report["mapping_errors"] = mapping_errors
@@ -137,7 +203,8 @@ def main():
     text = json.dumps(report, indent=2)
     if args.out:
         Path(args.out).write_text(text)
-    print(json.dumps({k: report[k] for k in ("green", "totals", "problems")}))
+    print(json.dumps({**{k: report[k] for k in ("green", "totals", "problems")},
+                      "upstream_removed": len(upstream_removed)}))
     return 0 if report["green"] else 1
 
 
