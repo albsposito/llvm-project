@@ -16,6 +16,7 @@
 #include "llvm/CodeGen/Passes.h"
 #include "llvm/CodeGen/TargetInstrInfo.h"
 #include "llvm/CodeGen/LivePhysRegs.h"
+#include "llvm/Support/Debug.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Pass.h"
 
@@ -23,6 +24,8 @@
 #include <set>
 
 using namespace llvm;
+
+#define DEBUG_TYPE "hwloopsfixup"
 
 static cl::opt<signed> MaxLoopRangeImm(
     "pulp-loop-range-immediate", cl::Hidden, cl::init(50),
@@ -102,6 +105,8 @@ MachineBasicBlock *splitMBBAt(MachineBasicBlock *OldMBB, MachineInstr &MI) {
     }
 
   private:
+    bool removeUncountableLoops(MachineFunction &MF);
+    bool fixupLoopLayout(MachineFunction &MF);
     bool fixupLoopPreheader(MachineFunction &MF);
     bool fixupLoopLatch(MachineFunction &MF);
     bool fixupLoopInstrs(MachineFunction &MF);
@@ -158,6 +163,8 @@ bool PULPFixupHwLoops::runOnMachineFunction(MachineFunction &MF) {
   if (skipFunction(MF.getFunction())) {
     return false;
   }
+  bool removedLoops = removeUncountableLoops(MF);
+  bool fixedLayout = fixupLoopLayout(MF);
   bool fixedPreHd = fixupLoopPreheader(MF);
   bool fixedLatch = fixupLoopLatch(MF);
   bool fixedInstr = fixupLoopInstrs(MF);
@@ -181,7 +188,7 @@ bool PULPFixupHwLoops::runOnMachineFunction(MachineFunction &MF) {
     }
   }
 
-  return fixedPreHd || fixedLatch || fixedInstr;
+  return removedLoops || fixedLayout || fixedPreHd || fixedLatch || fixedInstr;
 }
 
 // Get the size of an instruction. This function currently only works if
@@ -192,6 +199,171 @@ size_t getMISize(const MachineInstr &MI) {
   const RISCVInstrInfo *RII =
       static_cast<const RISCVInstrInfo *>(MF->getSubtarget().getInstrInfo());
   return RII->getInstSizeInBytes(MI);
+}
+
+// Returns the last block of the run of loop blocks that starts at the loop
+// header and is contiguous in the layout. This is what
+// MachineLoop::getBottomBlock() computes, except that it stops at the end of
+// the function instead of dereferencing the end iterator, which asserts
+// (!NodePtr->isKnownSentinel()) when the loop is the last code in the function.
+static MachineBasicBlock *getLayoutBottom(MachineLoop *L) {
+  MachineBasicBlock *Bottom = L->getHeader();
+  for (MachineBasicBlock *Next = Bottom->getNextNode();
+       Next && L->contains(Next); Next = Next->getNextNode())
+    Bottom = Next;
+  return Bottom;
+}
+
+// From used to fall through into To (its layout successor) and no longer
+// does after a block move: make the edge an explicit branch, so that the
+// control flow does not change. Same approach as
+// ARMBlockPlacement::moveBasicBlock.
+static void keepFallthrough(MachineBasicBlock *From, MachineBasicBlock *To,
+                            const TargetInstrInfo *TII) {
+  if (!From || !To || !From->isSuccessor(To) || From->isLayoutSuccessor(To))
+    return;
+  MachineBasicBlock::iterator Last = From->getLastNonDebugInstr();
+  DebugLoc DL;
+  if (Last != From->end()) {
+    if (Last->isBarrier())
+      return; // Unconditional branch, return, ...: no fallthrough.
+    DL = Last->getDebugLoc();
+  }
+  TII->insertBranch(*From, To, nullptr, {}, DL);
+}
+
+// Returns the single successor of Latch outside L (where the hardware loop
+// continues when its count is exhausted), or nullptr if there is none or more
+// than one.
+static MachineBasicBlock *getLatchExit(MachineLoop *L,
+                                       MachineBasicBlock *Latch) {
+  MachineBasicBlock *Exit = nullptr;
+  for (MachineBasicBlock *Succ : Latch->successors()) {
+    if (L->contains(Succ))
+      continue;
+    if (Exit && Exit != Succ)
+      return nullptr;
+    Exit = Succ;
+  }
+  return Exit;
+}
+
+// The hardware counts iterations at one place only: the end of the loop
+// range, i.e. the latch named by the setup instruction. Block placement runs
+// after PULPHardwareLoops and may tail-duplicate the latch into another loop
+// block, which then also jumps back to the header (and tests the exit
+// condition). Iterations that take that second back edge are not counted, so
+// the counter and the software condition disagree: the loop runs too often,
+// too rarely or forever. A latch that can leave the loop to two different
+// blocks cannot be expressed either (the hardware has one fall-out point).
+// Such loops cannot be hardware loops; the software loop is still complete
+// at this point (its compare-and-branch instructions are only removed by
+// fixupLoopLatch below), so keep it as a normal loop by deleting the setup
+// instruction. The count register computed for it becomes dead code.
+bool PULPFixupHwLoops::removeUncountableLoops(MachineFunction &MF) {
+  MachineLoopInfo *MLI = &getAnalysis<MachineLoopInfoWrapperPass>().getLI();
+  SmallVector<MachineInstr *, 8> ToRemove;
+  for (MachineBasicBlock &MBB : MF)
+    for (MachineInstr &MI : MBB) {
+      if (!isHardwareLoop(MI))
+        continue;
+      MachineBasicBlock *LastMBB = MI.getOperand(0).getMBB();
+      MachineLoop *L = MLI->getLoopFor(LastMBB);
+      assert(L && L->contains(LastMBB) && "Loop does not contain LastMBB");
+      MachineBasicBlock *Latch = L->getLoopLatch(); // null: several back edges
+      if (!Latch || (Latch == LastMBB && !getLatchExit(L, LastMBB))) {
+        LLVM_DEBUG(dbgs() << "PULP hwloop fixup: " << printMBBReference(*LastMBB)
+                          << ": loop has " << (Latch ? "no single latch exit"
+                                                     : "several back edges")
+                          << ", keeping it a software loop\n");
+        ToRemove.push_back(&MI);
+      }
+    }
+  for (MachineInstr *MI : ToRemove)
+    MI->eraseFromParent();
+  return !ToRemove.empty();
+}
+
+// A PULP hardware loop repeats the address range from the instruction after
+// lp.setup (the loop header) to the end of the block named by the setup
+// instruction (the latch, chosen by PULPHardwareLoops): the jump back to the
+// header happens only when the end address is reached. Machine block
+// placement runs after PULPHardwareLoops and may place the latch above the
+// header (loop rotation, MachineBlockPlacement::findBestLoopTop), so that the
+// back edge is a fallthrough. Such a layout cannot be expressed as a hardware
+// loop: the latch would lie outside the repeated range. Move the latch (with
+// the loop blocks laid out right before it) after the last loop block that
+// follows the header, which restores the header-first layout the hardware
+// needs. The CFG does not change; broken fallthroughs become branches.
+bool PULPFixupHwLoops::fixupLoopLayout(MachineFunction &MF) {
+  MachineLoopInfo *MLI = &getAnalysis<MachineLoopInfoWrapperPass>().getLI();
+  const TargetInstrInfo *TII = MF.getSubtarget().getInstrInfo();
+
+  SmallVector<MachineInstr *, 8> Setups;
+  for (MachineBasicBlock &MBB : MF)
+    for (MachineInstr &MI : MBB)
+      if (isHardwareLoop(MI))
+        Setups.push_back(&MI);
+
+  bool Changed = false;
+  for (MachineInstr *MI : Setups) {
+    MachineBasicBlock *LastMBB = MI->getOperand(0).getMBB();
+    MachineLoop *L = MLI->getLoopFor(LastMBB);
+    assert(L && L->contains(LastMBB) && "Loop does not contain LastMBB");
+    MachineBasicBlock *Header = L->getHeader();
+    MachineBasicBlock *Bottom = getLayoutBottom(L);
+
+    // Is LastMBB in the layout run Header..Bottom?
+    bool InRun = false;
+    for (MachineBasicBlock *B = Header;; B = B->getNextNode()) {
+      if (B == LastMBB) {
+        InRun = true;
+        break;
+      }
+      if (B == Bottom)
+        break;
+    }
+
+    MachineBasicBlock *Top = LastMBB;
+    if (InRun) {
+      // In the run and last: the layout is fine. In the run but followed by
+      // other loop blocks (placed after the latch, reached by branches): if
+      // LastMBB is the loop's only latch, move it alone to the end of the run,
+      // so that the back edge is at the end of the range. (If LastMBB is not
+      // the latch, e.g. it was split, fixupLoopLatch retargets the end.)
+      if (LastMBB == Bottom || LastMBB == Header ||
+          L->getLoopLatch() != LastMBB)
+        continue;
+    } else {
+      // Rotated: collect the loop blocks laid out contiguously before LastMBB
+      // (the rest of the rotated loop top); they move together with it.
+      while (Top->getPrevNode() && L->contains(Top->getPrevNode()))
+        Top = Top->getPrevNode();
+      assert(Top != &MF.front() && "Hardware loop latch is the entry block");
+    }
+
+    MachineBasicBlock *BeforeTop = Top->getPrevNode();
+    MachineBasicBlock *AfterLast = LastMBB->getNextNode();
+    MachineBasicBlock *AfterBottom = Bottom->getNextNode();
+
+    MF.splice(std::next(Bottom->getIterator()), Top->getIterator(),
+              std::next(LastMBB->getIterator()));
+
+    keepFallthrough(BeforeTop, Top, TII);
+    keepFallthrough(Bottom, AfterBottom, TII);
+    keepFallthrough(LastMBB, AfterLast, TII);
+
+    // The branch from Bottom to Top (typically the loop back edge into the
+    // rotated latch) now targets the layout successor: drop it, so it does
+    // not cost a jump in every iteration.
+    MachineBasicBlock::iterator BI = Bottom->getLastNonDebugInstr();
+    if (BI != Bottom->end() && BI->getDesc().isUnconditionalBranch() &&
+        BI->getOperand(0).isMBB() && BI->getOperand(0).getMBB() == Top)
+      BI->eraseFromParent();
+
+    Changed = true;
+  }
+  return Changed;
 }
 
 bool PULPFixupHwLoops::fixupLoopPreheader(MachineFunction &MF) {
@@ -345,13 +517,13 @@ bool PULPFixupHwLoops::fixupLoopLatch(MachineFunction &MF) {
           MachineBasicBlock *LastMBB = MI.getOperand(0).getMBB();
           MachineLoop *L = MLI->getLoopFor(LastMBB);
           assert(L->contains(LastMBB) && "Loop does not contain LastMBB");
-          if (L->getBottomBlock() != LastMBB) {
+          if (getLayoutBottom(L) != LastMBB) {
             // Update the end of the loop from previous transformations. If the
             // new bottom is reachable from the previous LastMBB, and all blocks
             // are in layout order and are still in the loop, then update.
             MachineBasicBlock *current = LastMBB;
             bool reachedEnd = false;
-            while (current != L->getBottomBlock() && !reachedEnd) {
+            while (current != getLayoutBottom(L) && !reachedEnd) {
               bool found = false;
               for (MachineBasicBlock &succ : MF) {
                 if (current->isLayoutSuccessor(&succ) &&
@@ -365,8 +537,8 @@ bool PULPFixupHwLoops::fixupLoopLatch(MachineFunction &MF) {
                 reachedEnd = true;
               }
             }
-            if (current == L->getBottomBlock()) {
-              LastMBB = L->getBottomBlock();
+            if (current == getLayoutBottom(L)) {
+              LastMBB = getLayoutBottom(L);
               MachineOperand countMO = MI.getOperand(1);
               MI.removeOperand(1);
               MI.removeOperand(0);
@@ -374,11 +546,18 @@ bool PULPFixupHwLoops::fixupLoopLatch(MachineFunction &MF) {
               MI.addOperand(countMO);
             }
           }
-          assert(L->getBottomBlock() == LastMBB && "Last is not Bottom");
-          MachineBasicBlock *ExitBlock = L->getExitBlock();
+          assert(getLayoutBottom(L) == LastMBB && "Last is not Bottom");
+          // Where the hardware loop continues when the count is exhausted:
+          // the latch's own exit. L->getExitBlock() is not used, because it is
+          // null when other blocks also exit the loop (early exits) or when
+          // two exit edges go to the same block.
+          MachineBasicBlock *ExitBlock = getLatchExit(L, LastMBB);
           MachineBasicBlock::iterator LastI = LastMBB->getFirstTerminator();
-          DebugLoc LastIDL = LastI->getDebugLoc();
+          // LastMBB may have no terminator left (a back-edge branch removed
+          // in an earlier round of this do...while loop): do not dereference
+          // end() then.
           if (LastI != LastMBB->end()) {
+            DebugLoc LastIDL = LastI->getDebugLoc();
             if (LastI->getOpcode() == RISCV::BEQ ||
                 LastI->getOpcode() == RISCV::BNE ||
                 LastI->getOpcode() == RISCV::BLT ||
@@ -412,7 +591,19 @@ bool PULPFixupHwLoops::fixupLoopLatch(MachineFunction &MF) {
                             Cand->getOperand(1).isReg() &&
                             Cand->getOperand(0).getReg()
                             == Cand->getOperand(1).getReg()) {
-                          if (Cand->getParent()->size() <= 2) {
+                          // Count only the non-branch instructions: the
+                          // block's terminators are rewritten below and the
+                          // latch can end with two branches (conditional
+                          // plus unconditional), in which case size() <= 2
+                          // let the bump go and left the latch without any
+                          // instruction to mark the loop end with.
+                          // (Only for the latch; other blocks keep the
+                          // original rule.)
+                          MachineBasicBlock *CandMBB = Cand->getParent();
+                          if (CandMBB == LastMBB
+                                  ? std::distance(CandMBB->begin(),
+                                                  CandMBB->getFirstTerminator()) <= 1
+                                  : CandMBB->size() <= 2) {
                             // If this is part of the two last (potentially)
                             // mandatory (hw loops require length of at least 2)
                             // instructions in the block, it would require much
@@ -511,6 +702,19 @@ bool PULPFixupHwLoops::fixupLoopInstrs(MachineFunction &MF) {
                "Expect a basic block as loop operand");
         // Figure out which MBB that is the last one in the loop.
         MachineBasicBlock *LastMBB = MII->getOperand(0).getMBB();
+
+        // The latch can be left without any non-branch instruction once
+        // fixupLoopLatch removed its compare-and-branch (for example a loop
+        // whose counter update was folded into a post-increment load in the
+        // header). The loop end must still label an instruction of the loop:
+        // put a NOP there, as for inline asm below, instead of stepping
+        // before the start of the block.
+        if (LastMBB->getFirstTerminator() == LastMBB->begin()) {
+          DebugLoc DL = MII->getDebugLoc();
+          BuildMI(*LastMBB, LastMBB->getFirstTerminator(), DL,
+                  RII->get(RISCV::ADDI)).addReg(RISCV::X0).addReg(RISCV::X0)
+                                        .addImm(0);
+        }
 
         // Create a new basic block in the loop, and insert it after the
         // current last. It will be used to label the last instruction in the
