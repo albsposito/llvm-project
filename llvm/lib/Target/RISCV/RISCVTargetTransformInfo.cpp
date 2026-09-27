@@ -384,6 +384,13 @@ InstructionCost RISCVTTIImpl::getShuffleCost(TTI::ShuffleKind Kind,
                                              const Instruction *CxtI) {
   Kind = improveShuffleKindFromMask(Kind, Mask, Tp, Index, SubTp);
 
+  // PULP Xpulpv2 packed SIMD vectors (v2i16/v4i8) live in GPRs, not RVV
+  // registers, and V is normally not enabled. Skip the RVV cost analysis,
+  // which asserts in getMinRVVVectorSizeInBits(). Mirrors upstream's guard for
+  // the P extension (dfdc69b4c27d, 4540415f19d9).
+  if (ST->hasPULPExtV2() && isa<FixedVectorType>(Tp))
+    return 1;
+
   std::pair<InstructionCost, MVT> LT = getTypeLegalizationCost(Tp);
 
   // First, handle cases where having a fixed length vector enables us to
@@ -673,6 +680,13 @@ InstructionCost RISCVTTIImpl::getScalarizationOverhead(
     TTI::TargetCostKind CostKind, ArrayRef<Value *> VL) {
   if (isa<ScalableVectorType>(Ty))
     return InstructionCost::getInvalid();
+
+  // PULP Xpulpv2 packed SIMD vectors (v2i16/v4i8) live in GPRs, not RVV
+  // registers, and V is normally not enabled. Skip the RVV cost analysis,
+  // which asserts in getMinRVVVectorSizeInBits(). Mirrors upstream's guard for
+  // the P extension (dfdc69b4c27d, 4540415f19d9).
+  if (ST->hasPULPExtV2() && isa<FixedVectorType>(Ty))
+    return 1;
 
   // A build_vector (which is m1 sized or smaller) can be done in no
   // worse than one vslide1down.vx per element in the type.  We could
@@ -1774,7 +1788,10 @@ InstructionCost RISCVTTIImpl::getMemoryOpCost(unsigned Opcode, Type *Src,
   // Assume memory ops cost scale with the number of vector registers
   // possible accessed by the instruction.  Note that BasicTTI already
   // handles the LT.first term for us.
-  if (LT.second.isVector() && CostKind != TTI::TCK_CodeSize)
+  // Only RVV has LMUL; PULP packed vectors are legal without V (upstream
+  // 6d516c6e28a1).
+  if (ST->hasVInstructions() && LT.second.isVector() &&
+      CostKind != TTI::TCK_CodeSize)
     BaseCost *= TLI->getLMULCost(LT.second);
   return Cost + BaseCost;
 
@@ -1954,6 +1971,13 @@ InstructionCost RISCVTTIImpl::getVectorInstrCost(unsigned Opcode, Type *Val,
                                                  unsigned Index, Value *Op0,
                                                  Value *Op1) {
   assert(Val->isVectorTy() && "This must be a vector type");
+
+  // PULP Xpulpv2 packed SIMD vectors (v2i16/v4i8) live in GPRs, not RVV
+  // registers, and V is normally not enabled. Skip the RVV cost analysis,
+  // which asserts in getMinRVVVectorSizeInBits(). Mirrors upstream's guard for
+  // the P extension (dfdc69b4c27d, 4540415f19d9).
+  if (ST->hasPULPExtV2() && isa<FixedVectorType>(Val))
+    return 1;
 
   if (Opcode != Instruction::ExtractElement &&
       Opcode != Instruction::InsertElement)
