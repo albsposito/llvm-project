@@ -1447,7 +1447,7 @@ bool SemaRISCV::CheckBuiltinFunctionCall(const TargetInfo &TI,
     if (SemaRef.BuiltinConstantArgRange(TheCall, *NormArgNum, 0, 31))
       return true;
     if (RoundArgNum) {
-      auto norm = ArgValue(*RoundArgNum);
+      auto norm = ArgValue(*NormArgNum);
       auto round = 1u << (norm >= 1 ? norm - 1 : 0);
       // Check rounding factor: must be an immediate equal to 2^(n-1)
       // where n is the normalization factor
