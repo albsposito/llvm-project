@@ -47,6 +47,17 @@ def uimm12pcrel : Operand<XLenVT>, ImmLeaf<XLenVT, [{return isUInt<12>(Imm);}]> 
   let DecoderMethod = "decodeUImmOperand<12>";
 }
 
+// End-of-loop label of lp.setupi (5-bit field). Upstream's uimm5 now encodes
+// through getImmOpValue and accepts constants only (95c5386ddb8a), so the
+// label needs its own operand, like uimm12pcrel above, whose default encoder
+// (getMachineOpValue) emits fixup_pulpv2_loop_setupi.
+def uimm5pcrel : Operand<XLenVT>, ImmLeaf<XLenVT, [{return isUInt<5>(Imm);}]> {
+  let ParserMatchClass = UImmAsmOperand<5>;
+  let DecoderMethod = "decodeUImmOperand<5>";
+  let OperandType = "OPERAND_UIMM5";
+  let OperandNamespace = "RISCVOp";
+}
+
 // tuimm12 predicate - same ass uimm, but use TargetConstant (TImmLeaf)
 // instead of Constant (ImmLeaf)
 // FIXME: factor common code between uimm12 and tuimm12
@@ -455,7 +466,7 @@ def LOOP0setupi : Instruction, Sched<[WriteCSR]> {
     let Inst{7} = 0b0;
     let Inst{6-0} = 0b1111011;
 
-    dag InOperandList = (ins uimm5:$uimmS, uimm12pcrel:$uimmL);
+    dag InOperandList = (ins uimm5pcrel:$uimmS, uimm12pcrel:$uimmL);
     dag OutOperandList = (outs);
 
     let AsmString = "lp.setupi\tx0, $uimmL, $uimmS";
@@ -483,7 +494,7 @@ def LOOP1setupi : Instruction, Sched<[WriteCSR]> {
     let Inst{7} = 0b1;
     let Inst{6-0} = 0b1111011;
 
-    dag InOperandList = (ins uimm5:$uimmS, uimm12pcrel:$uimmL);
+    dag InOperandList = (ins uimm5pcrel:$uimmS, uimm12pcrel:$uimmL);
     dag OutOperandList = (outs);
 
     let AsmString = "lp.setupi\tx1, $uimmL, $uimmS";
