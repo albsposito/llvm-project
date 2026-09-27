@@ -884,9 +884,36 @@ bool RISCVDAGToDAGISel::tryPulpIndexedLoad(SDNode *Node) {
       if (simm12) Opcode = RISCV::P_LW_ri_PostIncrement;
       else        Opcode = RISCV::P_LW_rr_PostIncrement;
       break;
+    case MVT::f32:
+      // Zfinx keeps f32 in GPRF32 (the 32-bit sub-register of a GPR).
+      // An f32->f64 extending load is expanded before post-increment loads
+      // are formed (after legalization), so only plain f32 loads get here.
+      if (!Subtarget->hasStdExtZfinx() ||
+          Load->getExtensionType() != ISD::NON_EXTLOAD)
+        return false;
+      if (simm12) Opcode = RISCV::P_LW_ri_PostIncrement;
+      else        Opcode = RISCV::P_LW_rr_PostIncrement;
+      break;
   }
 
   if (!Opcode) return false;
+
+  if (Load->getMemoryVT() == MVT::f32) {
+    // p.lw defines a GPR; hand the loaded value to its users as f32 in
+    // GPRF32 through the sub_32 sub-register, the same way the Zfinx
+    // (f32 (bitconvert GPR)) pattern does (RISCVInstrInfoF.td). The copy is
+    // coalesced away, so no extra instruction is emitted.
+    MachineSDNode *LW = CurDAG->getMachineNode(
+        Opcode, DL, MVT::i32, MVT::i32, Chain.getSimpleValueType(), Base,
+        Offset, Chain);
+    SDValue Val = CurDAG->getTargetExtractSubreg(RISCV::sub_32, DL, MVT::f32,
+                                                 SDValue(LW, 0));
+    ReplaceUses(SDValue(Node, 0), Val);
+    ReplaceUses(SDValue(Node, 1), SDValue(LW, 1));
+    ReplaceUses(SDValue(Node, 2), SDValue(LW, 2));
+    CurDAG->RemoveDeadNode(Node);
+    return true;
+  }
 
   ReplaceNode(Node, CurDAG->getMachineNode(Opcode, DL, MVT::i32, MVT::i32,
                                            Chain.getSimpleValueType(),

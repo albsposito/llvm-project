@@ -727,6 +727,14 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
     setIndexedStoreAction(ISD::POST_INC, MVT::i32, Legal);
     setIndexedStoreAction(ISD::POST_INC, MVT::v2i16, Legal);
     setIndexedStoreAction(ISD::POST_INC, MVT::v4i8, Legal);
+    // With Zfinx an f32 lives in a 32-bit GPR (register class GPRF32), so
+    // p.lw can load it with post-increment, as GAP9 GCC does. Without Zfinx
+    // floats live in F registers, which p.lw cannot write. f32 post-increment
+    // stores (p.sw) are not enabled: the PULP hardware-loop pass does not
+    // accept a p.sw as the loop's induction update, so a loop whose pointer is
+    // advanced by the store loses its hardware loop and gets slower.
+    if (Subtarget.hasStdExtZfinx())
+      setIndexedLoadAction(ISD::POST_INC, MVT::f32, Legal);
   }
 
   setBooleanContents(ZeroOrOneBooleanContent);
@@ -21992,8 +22000,11 @@ bool RISCVTargetLowering::getIndexedAddressPartsPulp(
   if (Op->getOpcode() != ISD::ADD)
     return false;
 
-  // Xpulp supports i8, i16, and i32 post-increments only
-  if (!(VT == MVT::i8 || VT == MVT::i16 || VT == MVT::i32))
+  // Xpulp supports i8, i16, and i32 post-increments, plus f32 loads when Zfinx
+  // keeps floats in GPRs (selected onto the same p.lw instructions; f32 stores
+  // are rejected earlier because their indexed store action is not Legal).
+  if (!(VT == MVT::i8 || VT == MVT::i16 || VT == MVT::i32 ||
+        (VT == MVT::f32 && Subtarget.hasStdExtZfinx())))
     return false;
 
   Base = Op->getOperand(0);
