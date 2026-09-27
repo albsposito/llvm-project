@@ -2394,6 +2394,10 @@ unsigned RISCVTTIImpl::getMaximumVF(unsigned ElemWidth, unsigned Opcode) const {
 TTI::AddressingModeKind
 RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,
                                          ScalarEvolution *SE) const {
+  // PULP Xpulpv2 has post-increment loads/stores; prefer them in LSR.
+  if (ST->hasPULPExtV2())
+    return TTI::AMK_PostIndexed;
+
   if (ST->hasVendorXCVmem() && !ST->is64Bit())
     return TTI::AMK_PostIndexed;
 
@@ -2644,14 +2648,4 @@ bool RISCVTTIImpl::isLoweredToCall(const Function *F) {
     return false;
 
   return BaseT::isLoweredToCall(F);
-}
-
-TTI::AddressingModeKind
-RISCVTTIImpl::getPreferredAddressingMode(const Loop *L,
-                                         ScalarEvolution *SE) const {
-  if (ST->hasPULPExtV2()) {
-    return TTI::AMK_PostIndexed;
-  }
-
-  return TTI::AMK_None;
 }
