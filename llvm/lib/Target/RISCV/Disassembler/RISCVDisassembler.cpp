@@ -341,13 +341,13 @@ static DecodeStatus decodeUImmLog2XLenOperand(MCInst &Inst, uint32_t Imm,
   return MCDisassembler::Success;
 }
 
-static DecodeStatus DecodePulpV2RegisterClass(MCInst &Inst, uint64_t RegNo,
+static DecodeStatus DecodeGPRAV2RegisterClass(MCInst &Inst, uint64_t RegNo,
                                                uint64_t Address,
                                                const MCDisassembler *Decoder) {
   return DecodeGPRRegisterClass(Inst, RegNo, Address, Decoder);
 }
 
-static DecodeStatus DecodePulpV4RegisterClass(MCInst &Inst, uint64_t RegNo,
+static DecodeStatus DecodeGPRAV4RegisterClass(MCInst &Inst, uint64_t RegNo,
                                                uint64_t Address,
                                                const MCDisassembler *Decoder) {
   return DecodeGPRRegisterClass(Inst, RegNo, Address, Decoder);
