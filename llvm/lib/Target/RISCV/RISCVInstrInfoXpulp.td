@@ -299,30 +299,30 @@ class Pulp_Immediate_Branch<bits<3> funct3, string opcodestr>
         Sched<[WriteJmp, ReadJmp, ReadJmp]>;
 
 multiclass SC_SCI_H_B<bits<5> funct5, bit F, Operand sci, string opcodestr> {
-  def _H     : Pulp_ALU_rr<{funct5, F, 0}, 0b000, OPC_OP_V, "pv." # opcodestr # ".h", PulpV2>;
-  def _SC_H  : Pulp_ALU_rr<{funct5, F, 0}, 0b100, OPC_OP_V, "pv." # opcodestr # ".sc.h", PulpV2, GPR>;
-  def _SCI_H : Pulp_ALU_vsci<funct5, F,    0b110,                         "pv." # opcodestr # ".sci.h", PulpV2, sci>;
-  def _B     : Pulp_ALU_rr<{funct5, F, 0}, 0b001, OPC_OP_V, "pv." # opcodestr # ".b", PulpV4>;
-  def _SC_B  : Pulp_ALU_rr<{funct5, F, 0}, 0b101, OPC_OP_V, "pv." # opcodestr # ".sc.b", PulpV4, GPR>;
-  def _SCI_B : Pulp_ALU_vsci<funct5, F,    0b111,                         "pv." # opcodestr # ".sci.b", PulpV4, sci>;
+  def _H     : Pulp_ALU_rr<{funct5, F, 0}, 0b000, OPC_OP_V, "pv." # opcodestr # ".h", GPRAV2>;
+  def _SC_H  : Pulp_ALU_rr<{funct5, F, 0}, 0b100, OPC_OP_V, "pv." # opcodestr # ".sc.h", GPRAV2, GPR>;
+  def _SCI_H : Pulp_ALU_vsci<funct5, F,    0b110,                         "pv." # opcodestr # ".sci.h", GPRAV2, sci>;
+  def _B     : Pulp_ALU_rr<{funct5, F, 0}, 0b001, OPC_OP_V, "pv." # opcodestr # ".b", GPRAV4>;
+  def _SC_B  : Pulp_ALU_rr<{funct5, F, 0}, 0b101, OPC_OP_V, "pv." # opcodestr # ".sc.b", GPRAV4, GPR>;
+  def _SCI_B : Pulp_ALU_vsci<funct5, F,    0b111,                         "pv." # opcodestr # ".sci.b", GPRAV4, sci>;
 }
 
 multiclass DOTP<bits<5> funct5, bit F, Operand sci, string opcodestr> {
-  def _H     : Pulp_ALU_rr<{funct5, F, 0}, 0b000, OPC_OP_V, "pv." # opcodestr # ".h", PulpV2, PulpV2, GPR>;
-  def _SC_H  : Pulp_ALU_rr<{funct5, F, 0}, 0b100, OPC_OP_V, "pv." # opcodestr # ".sc.h", PulpV2, GPR, GPR>;
-  def _SCI_H : Pulp_ALU_vsci<funct5, F,    0b110,                         "pv." # opcodestr # ".sci.h", PulpV2, sci, GPR>;
-  def _B     : Pulp_ALU_rr<{funct5, F, 0}, 0b001, OPC_OP_V, "pv." # opcodestr # ".b", PulpV4, PulpV4, GPR>;
-  def _SC_B  : Pulp_ALU_rr<{funct5, F, 0}, 0b101, OPC_OP_V, "pv." # opcodestr # ".sc.b", PulpV4, GPR, GPR>;
-  def _SCI_B : Pulp_ALU_vsci<funct5, F,    0b111,                         "pv." # opcodestr # ".sci.b", PulpV4, sci, GPR>;
+  def _H     : Pulp_ALU_rr<{funct5, F, 0}, 0b000, OPC_OP_V, "pv." # opcodestr # ".h", GPRAV2, GPRAV2, GPR>;
+  def _SC_H  : Pulp_ALU_rr<{funct5, F, 0}, 0b100, OPC_OP_V, "pv." # opcodestr # ".sc.h", GPRAV2, GPR, GPR>;
+  def _SCI_H : Pulp_ALU_vsci<funct5, F,    0b110,                         "pv." # opcodestr # ".sci.h", GPRAV2, sci, GPR>;
+  def _B     : Pulp_ALU_rr<{funct5, F, 0}, 0b001, OPC_OP_V, "pv." # opcodestr # ".b", GPRAV4, GPRAV4, GPR>;
+  def _SC_B  : Pulp_ALU_rr<{funct5, F, 0}, 0b101, OPC_OP_V, "pv." # opcodestr # ".sc.b", GPRAV4, GPR, GPR>;
+  def _SCI_B : Pulp_ALU_vsci<funct5, F,    0b111,                         "pv." # opcodestr # ".sci.b", GPRAV4, sci, GPR>;
 }
 
 multiclass SDOTP<bits<5> funct5, bit F, Operand sci, string opcodestr> {
-  def _H     : Pulp_ALU_rr_wb<{funct5, F, 0}, 0b000, OPC_OP_V, "pv." # opcodestr # ".h", PulpV2, PulpV2, GPR>;
-  def _SC_H  : Pulp_ALU_rr_wb<{funct5, F, 0}, 0b100, OPC_OP_V, "pv." # opcodestr # ".sc.h", PulpV2, GPR, GPR>;
-  def _SCI_H : Pulp_ALU_vsci_wb<funct5, F,    0b110,                         "pv." # opcodestr # ".sci.h", PulpV2, sci, GPR>;
-  def _B     : Pulp_ALU_rr_wb<{funct5, F, 0}, 0b001, OPC_OP_V, "pv." # opcodestr # ".b", PulpV4, PulpV4, GPR>;
-  def _SC_B  : Pulp_ALU_rr_wb<{funct5, F, 0}, 0b101, OPC_OP_V, "pv." # opcodestr # ".sc.b", PulpV4, GPR, GPR>;
-  def _SCI_B : Pulp_ALU_vsci_wb<funct5, F,    0b111,                         "pv." # opcodestr # ".sci.b", PulpV4, sci, GPR>;
+  def _H     : Pulp_ALU_rr_wb<{funct5, F, 0}, 0b000, OPC_OP_V, "pv." # opcodestr # ".h", GPRAV2, GPRAV2, GPR>;
+  def _SC_H  : Pulp_ALU_rr_wb<{funct5, F, 0}, 0b100, OPC_OP_V, "pv." # opcodestr # ".sc.h", GPRAV2, GPR, GPR>;
+  def _SCI_H : Pulp_ALU_vsci_wb<funct5, F,    0b110,                         "pv." # opcodestr # ".sci.h", GPRAV2, sci, GPR>;
+  def _B     : Pulp_ALU_rr_wb<{funct5, F, 0}, 0b001, OPC_OP_V, "pv." # opcodestr # ".b", GPRAV4, GPRAV4, GPR>;
+  def _SC_B  : Pulp_ALU_rr_wb<{funct5, F, 0}, 0b101, OPC_OP_V, "pv." # opcodestr # ".sc.b", GPRAV4, GPR, GPR>;
+  def _SCI_B : Pulp_ALU_vsci_wb<funct5, F,    0b111,                         "pv." # opcodestr # ".sci.b", GPRAV4, sci, GPR>;
 }
 
 let hasSideEffects = 0, mayLoad = 0, mayStore = 1 in
@@ -810,20 +810,20 @@ defm PV_AND  : SC_SCI_H_B<0b01101, 0, simm6, "and">;
 
 let hasSideEffects = 0, mayStore = 0, mayLoad = 0, rs2 = 0 in {
   def PV_ABS_H : RVInstR<0b0111000, 0b000, OPC_OP_V,
-                         (outs PulpV2:$rd), (ins PulpV2:$rs1),
+                         (outs GPRAV2:$rd), (ins GPRAV2:$rs1),
                          "pv.abs.h", "$rd, $rs1">, Sched<[WriteIALU, ReadIALU]>;
 
   def PV_ABS_B : RVInstR<0b0111000, 0b001, OPC_OP_V,
-                         (outs PulpV4:$rd), (ins PulpV4:$rs1),
+                         (outs GPRAV4:$rd), (ins GPRAV4:$rs1),
                          "pv.abs.b", "$rd, $rs1">, Sched<[WriteIALU, ReadIALU]>;
 }
 
-def PV_EXTRACT_H : Pulp_ALU_vsci<0b01111, 0, 0b110, "pv.extract.h", PulpV2, uimm6, GPR>;
-def PV_EXTRACT_B : Pulp_ALU_vsci<0b01111, 0, 0b111, "pv.extract.b", PulpV4, uimm6, GPR>;
-def PV_EXTRACTU_H : Pulp_ALU_vsci<0b10010, 0, 0b110, "pv.extractu.h", PulpV2, uimm6, GPR>;
-def PV_EXTRACTU_B : Pulp_ALU_vsci<0b10010, 0, 0b111, "pv.extractu.b", PulpV4, uimm6, GPR>;
-def PV_INSERT_H   : Pulp_ALU_vsci_wb<0b10110, 0, 0b110, "pv.insert.h", GPR, uimm6, PulpV2>;
-def PV_INSERT_B   : Pulp_ALU_vsci_wb<0b10110, 0, 0b111, "pv.insert.b", GPR, uimm6, PulpV4>;
+def PV_EXTRACT_H : Pulp_ALU_vsci<0b01111, 0, 0b110, "pv.extract.h", GPRAV2, uimm6, GPR>;
+def PV_EXTRACT_B : Pulp_ALU_vsci<0b01111, 0, 0b111, "pv.extract.b", GPRAV4, uimm6, GPR>;
+def PV_EXTRACTU_H : Pulp_ALU_vsci<0b10010, 0, 0b110, "pv.extractu.h", GPRAV2, uimm6, GPR>;
+def PV_EXTRACTU_B : Pulp_ALU_vsci<0b10010, 0, 0b111, "pv.extractu.b", GPRAV4, uimm6, GPR>;
+def PV_INSERT_H   : Pulp_ALU_vsci_wb<0b10110, 0, 0b110, "pv.insert.h", GPR, uimm6, GPRAV2>;
+def PV_INSERT_B   : Pulp_ALU_vsci_wb<0b10110, 0, 0b111, "pv.insert.b", GPR, uimm6, GPRAV4>;
 
 defm PV_DOTUP   : DOTP<0b10000, 0, uimm6, "dotup">;
 defm PV_DOTUSP  : DOTP<0b10001, 0, simm6, "dotusp">;
@@ -832,22 +832,22 @@ defm PV_SDOTUP  : SDOTP<0b10100, 0, uimm6, "sdotup">;
 defm PV_SDOTUSP : SDOTP<0b10101, 0, simm6, "sdotusp">;
 defm PV_SDOTSP  : SDOTP<0b10111, 0, simm6, "sdotsp">;
 
-def PV_SHUFFLE_H       : Pulp_ALU_rr<0b1100000, 0b000, OPC_OP_V, "pv.shuffle.h", PulpV2>;
-def PV_SHUFFLE_SCI_H   : Pulp_ALU_vsci<0b11000, 0, 0b110, "pv.shuffle.sci.h", PulpV2, uimm6>;
-def PV_SHUFFLE_B       : Pulp_ALU_rr<0b1100000, 0b001, OPC_OP_V, "pv.shuffle.b", PulpV4>;
-def PV_SHUFFLEI0_SCI_B : Pulp_ALU_vsci<0b11000, 0, 0b111, "pv.shufflei0.sci.b", PulpV4, uimm6>;
-def PV_SHUFFLEI1_SCI_B : Pulp_ALU_vsci<0b11101, 0, 0b111, "pv.shufflei1.sci.b", PulpV4, uimm6>;
-def PV_SHUFFLEI2_SCI_B : Pulp_ALU_vsci<0b11110, 0, 0b111, "pv.shufflei2.sci.b", PulpV4, uimm6>;
-def PV_SHUFFLEI3_SCI_B : Pulp_ALU_vsci<0b11111, 0, 0b111, "pv.shufflei3.sci.b", PulpV4, uimm6>;
+def PV_SHUFFLE_H       : Pulp_ALU_rr<0b1100000, 0b000, OPC_OP_V, "pv.shuffle.h", GPRAV2>;
+def PV_SHUFFLE_SCI_H   : Pulp_ALU_vsci<0b11000, 0, 0b110, "pv.shuffle.sci.h", GPRAV2, uimm6>;
+def PV_SHUFFLE_B       : Pulp_ALU_rr<0b1100000, 0b001, OPC_OP_V, "pv.shuffle.b", GPRAV4>;
+def PV_SHUFFLEI0_SCI_B : Pulp_ALU_vsci<0b11000, 0, 0b111, "pv.shufflei0.sci.b", GPRAV4, uimm6>;
+def PV_SHUFFLEI1_SCI_B : Pulp_ALU_vsci<0b11101, 0, 0b111, "pv.shufflei1.sci.b", GPRAV4, uimm6>;
+def PV_SHUFFLEI2_SCI_B : Pulp_ALU_vsci<0b11110, 0, 0b111, "pv.shufflei2.sci.b", GPRAV4, uimm6>;
+def PV_SHUFFLEI3_SCI_B : Pulp_ALU_vsci<0b11111, 0, 0b111, "pv.shufflei3.sci.b", GPRAV4, uimm6>;
 
-def PV_SHUFFLE2_H : Pulp_ALU_rr_wb<0b1100100, 0b000, OPC_OP_V, "pv.shuffle2.h", PulpV2>;
-def PV_SHUFFLE2_B : Pulp_ALU_rr_wb<0b1100100, 0b001, OPC_OP_V, "pv.shuffle2.b", PulpV4>;
-def PV_PACK_H : Pulp_ALU_rr<0b1101000, 0b000, OPC_OP_V, "pv.pack.h", GPR, GPR, PulpV2>;
-def PV_PACKHI_B : Pulp_ALU_rr_wb<0b1101100, 0b001, OPC_OP_V, "pv.packhi.b", GPR, GPR, PulpV4>;
-def PV_PACKLO_B : Pulp_ALU_rr_wb<0b1110000, 0b001, OPC_OP_V, "pv.packlo.b", GPR, GPR, PulpV4>;
+def PV_SHUFFLE2_H : Pulp_ALU_rr_wb<0b1100100, 0b000, OPC_OP_V, "pv.shuffle2.h", GPRAV2>;
+def PV_SHUFFLE2_B : Pulp_ALU_rr_wb<0b1100100, 0b001, OPC_OP_V, "pv.shuffle2.b", GPRAV4>;
+def PV_PACK_H : Pulp_ALU_rr<0b1101000, 0b000, OPC_OP_V, "pv.pack.h", GPR, GPR, GPRAV2>;
+def PV_PACKHI_B : Pulp_ALU_rr_wb<0b1101100, 0b001, OPC_OP_V, "pv.packhi.b", GPR, GPR, GPRAV4>;
+def PV_PACKLO_B : Pulp_ALU_rr_wb<0b1110000, 0b001, OPC_OP_V, "pv.packlo.b", GPR, GPR, GPRAV4>;
 
 let isCodeGenOnly = 1 in
-def PV_PACKHI_B_nowb : Pulp_ALU_rr<0b1101100, 0b001, OPC_OP_V, "pv.packhi.b", GPR, GPR, PulpV4>;
+def PV_PACKHI_B_nowb : Pulp_ALU_rr<0b1101100, 0b001, OPC_OP_V, "pv.packhi.b", GPR, GPR, GPRAV4>;
 
 // Vectorial comparison operations
 defm PV_CMPEQ  : SC_SCI_H_B<0b00000, 1, simm6, "cmpeq">;
@@ -872,18 +872,18 @@ defm P_SH : Pulp_Store<0b01, "p.sh">, Sched<[WriteSTH, ReadStoreData, ReadMemBas
 defm P_SW : Pulp_Store<0b10, "p.sw">, Sched<[WriteSTW, ReadStoreData, ReadMemBase]>;
 
 let isCodeGenOnly = 1 in { // Helper for Patterns
-  def P_INSERTR_v2 : Pulp_ALU_rr_wb<0b1000000, 0b010, OPC_OP, "p.insertr", GPR, GPR, PulpV2>;
-  def P_INSERTR_v4 : Pulp_ALU_rr_wb<0b1000000, 0b010, OPC_OP, "p.insertr", GPR, GPR, PulpV4>;
-  def PV_SHUFFLE_H_GPR : Pulp_ALU_rr<0b1100000, 0b000, OPC_OP_V, "pv.shuffle.h", PulpV2, GPR, GPR>;
-  def PV_SHUFFLE_B_GPR : Pulp_ALU_rr<0b1100000, 0b001, OPC_OP_V, "pv.shuffle.b", PulpV4, GPR, GPR>;
+  def P_INSERTR_v2 : Pulp_ALU_rr_wb<0b1000000, 0b010, OPC_OP, "p.insertr", GPR, GPR, GPRAV2>;
+  def P_INSERTR_v4 : Pulp_ALU_rr_wb<0b1000000, 0b010, OPC_OP, "p.insertr", GPR, GPR, GPRAV4>;
+  def PV_SHUFFLE_H_GPR : Pulp_ALU_rr<0b1100000, 0b000, OPC_OP_V, "pv.shuffle.h", GPRAV2, GPR, GPR>;
+  def PV_SHUFFLE_B_GPR : Pulp_ALU_rr<0b1100000, 0b001, OPC_OP_V, "pv.shuffle.b", GPRAV4, GPR, GPR>;
 }
 
 // Pseudos used to lower vector splat operations on packed SIMD data types
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in {
-  def PseudoPV_ADD_SC_H_VL  : Pseudo<(outs PulpV2:$dst), (ins GPR:$src1, GPR:$src2, AVL:$vl),[]>;
-  def PseudoPV_ADD_SC_B_VL  : Pseudo<(outs PulpV4:$dst), (ins GPR:$src1, GPR:$src2, AVL:$vl),[]>;
-  def PseudoPV_ADD_SCI_H_VL : Pseudo<(outs PulpV2:$dst), (ins GPR:$src1, simm6:$imm, AVL:$vl),[]>;
-  def PseudoPV_ADD_SCI_B_VL : Pseudo<(outs PulpV4:$dst), (ins GPR:$src1, simm6:$imm, AVL:$vl),[]>;
+  def PseudoPV_ADD_SC_H_VL  : Pseudo<(outs GPRAV2:$dst), (ins GPR:$src1, GPR:$src2, AVL:$vl),[]>;
+  def PseudoPV_ADD_SC_B_VL  : Pseudo<(outs GPRAV4:$dst), (ins GPR:$src1, GPR:$src2, AVL:$vl),[]>;
+  def PseudoPV_ADD_SCI_H_VL : Pseudo<(outs GPRAV2:$dst), (ins GPR:$src1, simm6:$imm, AVL:$vl),[]>;
+  def PseudoPV_ADD_SCI_B_VL : Pseudo<(outs GPRAV4:$dst), (ins GPR:$src1, simm6:$imm, AVL:$vl),[]>;
 }
 
 } // Predicates = [IsRV32, HasPULPExtV2], DecoderNamespace = "RV32Xpulp"
@@ -1355,28 +1355,28 @@ def : Pat<(ushiftRound (machhu (i32 GPR:$rd), (i32 GPR:$rs1), (i32 GPR:$rs2)), u
 
 // Patterns for vectorial ALU operations
 class PatV2V2<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode PulpV2:$rs1, PulpV2:$rs2), (Inst PulpV2:$rs1, PulpV2:$rs2)>;
+    : Pat<(OpNode GPRAV2:$rs1, GPRAV2:$rs2), (Inst GPRAV2:$rs1, GPRAV2:$rs2)>;
 
 class PatV4V4<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode PulpV4:$rs1, PulpV4:$rs2), (Inst PulpV4:$rs1, PulpV4:$rs2)>;
+    : Pat<(OpNode GPRAV4:$rs1, GPRAV4:$rs2), (Inst GPRAV4:$rs1, GPRAV4:$rs2)>;
 
 class PatV2GPR<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode PulpV2:$rs1, (v2i16 (splat_vector (i32 GPR:$rs2)))), (Inst PulpV2:$rs1, (i32 GPR:$rs2))>;
+    : Pat<(OpNode GPRAV2:$rs1, (v2i16 (splat_vector (i32 GPR:$rs2)))), (Inst GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
 class PatV4GPR<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode PulpV4:$rs1, (v4i8 (splat_vector (i32 GPR:$rs2)))), (Inst PulpV4:$rs1, (i32 GPR:$rs2))>;
+    : Pat<(OpNode GPRAV4:$rs1, (v4i8 (splat_vector (i32 GPR:$rs2)))), (Inst GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
 class PatV2Simm6<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode PulpV2:$rs1, (v2i16 (splat_vector simm6:$imm))), (Inst PulpV2:$rs1, simm6:$imm)>;
+    : Pat<(OpNode GPRAV2:$rs1, (v2i16 (splat_vector simm6:$imm))), (Inst GPRAV2:$rs1, simm6:$imm)>;
 
 class PatV4Simm6<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode PulpV4:$rs1, (v4i8 (splat_vector simm6:$imm))), (Inst PulpV4:$rs1, simm6:$imm)>;
+    : Pat<(OpNode GPRAV4:$rs1, (v4i8 (splat_vector simm6:$imm))), (Inst GPRAV4:$rs1, simm6:$imm)>;
 
 class PatV2Uimm6<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode PulpV2:$rs1, (v2i16 (splat_vector uimm6:$imm))), (Inst PulpV2:$rs1, uimm6:$imm)>;
+    : Pat<(OpNode GPRAV2:$rs1, (v2i16 (splat_vector uimm6:$imm))), (Inst GPRAV2:$rs1, uimm6:$imm)>;
 
 class PatV4Uimm6<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode PulpV4:$rs1, (v4i8 (splat_vector uimm6:$imm))), (Inst PulpV4:$rs1, uimm6:$imm)>;
+    : Pat<(OpNode GPRAV4:$rs1, (v4i8 (splat_vector uimm6:$imm))), (Inst GPRAV4:$rs1, uimm6:$imm)>;
 
 multiclass GeneralSVectorPattern<SDPatternOperator OpNode, string Inst> {
   def : PatV2V2   <OpNode, !cast<RVInst>("PV_" # Inst # "_H")>;
@@ -1423,152 +1423,152 @@ def : PatV4V4<vec_avg<v4i8, srl>, PV_AVGU_B>;
 def : PatV4GPR<vec_avg<v4i8, srl>, PV_AVGU_SC_B>;
 def : PatV4Simm6<vec_avg<v4i8, srl>, PV_AVGU_SCI_B>;
 
-def : Pat<(abs PulpV2:$rs1), (PV_ABS_H PulpV2:$rs1)>;
-def : Pat<(abs PulpV4:$rs1), (PV_ABS_B PulpV4:$rs1)>;
+def : Pat<(abs GPRAV2:$rs1), (PV_ABS_H GPRAV2:$rs1)>;
+def : Pat<(abs GPRAV4:$rs1), (PV_ABS_B GPRAV4:$rs1)>;
 
-def : Pat<(i32 (vector_extract (v2i16 PulpV2:$rs1), uimm6:$index)),
-          (PV_EXTRACT_H PulpV2:$rs1, uimm6:$index)>;
-def : Pat<(i32 (vector_extract (v4i8 PulpV4:$rs1), uimm6:$index)),
-          (PV_EXTRACT_B PulpV4:$rs1, uimm6:$index)>;
-def : Pat<(i32 (sext_inreg (vector_extract PulpV2:$rs1, uimm6:$index), i16)),
-          (PV_EXTRACT_H PulpV2:$rs1, uimm6:$index)>;
-def : Pat<(i32 (sext_inreg (vector_extract PulpV4:$rs1, uimm6:$index), i8)),
-          (PV_EXTRACT_B PulpV4:$rs1, uimm6:$index)>;
-def : Pat<(i32 (and (vector_extract (v2i16 PulpV2:$rs1), uimm6:$index), 65535)),
-          (PV_EXTRACT_H PulpV2:$rs1, uimm6:$index)>;
-def : Pat<(i32 (and (vector_extract (v4i8 PulpV4:$rs1), uimm6:$index), 255)),
-          (PV_EXTRACT_B PulpV4:$rs1, uimm6:$index)>;
-def : Pat<(vector_insert PulpV2:$rd, (i32 GPR:$rs1), uimm6:$index),
-          (PV_INSERT_H PulpV2:$rd, (i32 GPR:$rs1), uimm6:$index)>;
-def : Pat<(vector_insert PulpV4:$rd, (i32 GPR:$rs1), uimm6:$index),
-          (PV_INSERT_B PulpV4:$rd, (i32 GPR:$rs1), uimm6:$index)>;
+def : Pat<(i32 (vector_extract (v2i16 GPRAV2:$rs1), uimm6:$index)),
+          (PV_EXTRACT_H GPRAV2:$rs1, uimm6:$index)>;
+def : Pat<(i32 (vector_extract (v4i8 GPRAV4:$rs1), uimm6:$index)),
+          (PV_EXTRACT_B GPRAV4:$rs1, uimm6:$index)>;
+def : Pat<(i32 (sext_inreg (vector_extract GPRAV2:$rs1, uimm6:$index), i16)),
+          (PV_EXTRACT_H GPRAV2:$rs1, uimm6:$index)>;
+def : Pat<(i32 (sext_inreg (vector_extract GPRAV4:$rs1, uimm6:$index), i8)),
+          (PV_EXTRACT_B GPRAV4:$rs1, uimm6:$index)>;
+def : Pat<(i32 (and (vector_extract (v2i16 GPRAV2:$rs1), uimm6:$index), 65535)),
+          (PV_EXTRACT_H GPRAV2:$rs1, uimm6:$index)>;
+def : Pat<(i32 (and (vector_extract (v4i8 GPRAV4:$rs1), uimm6:$index), 255)),
+          (PV_EXTRACT_B GPRAV4:$rs1, uimm6:$index)>;
+def : Pat<(vector_insert GPRAV2:$rd, (i32 GPR:$rs1), uimm6:$index),
+          (PV_INSERT_H GPRAV2:$rd, (i32 GPR:$rs1), uimm6:$index)>;
+def : Pat<(vector_insert GPRAV4:$rd, (i32 GPR:$rs1), uimm6:$index),
+          (PV_INSERT_B GPRAV4:$rd, (i32 GPR:$rs1), uimm6:$index)>;
 
 // insert/extract without immediate index
-def : Pat<(vector_insert PulpV2:$rd, (i32 GPR:$rs1), (i32 GPR:$index)),
-          (P_INSERTR_v2 PulpV2:$rd, (i32 GPR:$rs1),
+def : Pat<(vector_insert GPRAV2:$rd, (i32 GPR:$rs1), (i32 GPR:$index)),
+          (P_INSERTR_v2 GPRAV2:$rd, (i32 GPR:$rs1),
                      (P_INSERT (ADDI (XLenVT X0), 0b111100000), (i32 GPR:$index), 0, 4))>;
-def : Pat<(vector_insert PulpV4:$rd, (i32 GPR:$rs1), (i32 GPR:$index)),
-          (P_INSERTR_v4 PulpV4:$rd, (i32 GPR:$rs1),
+def : Pat<(vector_insert GPRAV4:$rd, (i32 GPR:$rs1), (i32 GPR:$index)),
+          (P_INSERTR_v4 GPRAV4:$rd, (i32 GPR:$rs1),
                      (P_INSERT (ADDI (XLenVT X0), 0b11100000), (i32 GPR:$index), 1, 3))>;
 
-def : Pat<(i32 (vector_extract PulpV2:$rs1, (i32 GPR:$rs2))),
-          (PV_SHUFFLE_H_GPR PulpV2:$rs1, (i32 GPR:$rs2))>;
-def : Pat<(i32 (vector_extract PulpV4:$rs1, (i32 GPR:$rs2))),
-          (PV_SHUFFLE_B_GPR PulpV4:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(i32 (vector_extract GPRAV2:$rs1, (i32 GPR:$rs2))),
+          (PV_SHUFFLE_H_GPR GPRAV2:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(i32 (vector_extract GPRAV4:$rs1, (i32 GPR:$rs2))),
+          (PV_SHUFFLE_B_GPR GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
 def : PatV2V2<dotup_h, PV_DOTUP_H>;
 
-def : Pat<(dotup_sc_h PulpV2:$rs1, (and (i32 GPR:$rs2), 65535)),
-          (PV_DOTUP_SC_H PulpV2:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(dotup_sc_h GPRAV2:$rs1, (and (i32 GPR:$rs2), 65535)),
+          (PV_DOTUP_SC_H GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(dotup_sc_h PulpV2:$rs1, uimm6:$sci),
-          (PV_DOTUP_SCI_H PulpV2:$rs1, uimm6:$sci)>;
+def : Pat<(dotup_sc_h GPRAV2:$rs1, uimm6:$sci),
+          (PV_DOTUP_SCI_H GPRAV2:$rs1, uimm6:$sci)>;
 
 def : PatV4V4<dotup_b, PV_DOTUP_B>;
 
-def : Pat<(dotup_sc_b PulpV4:$rs1, (and (i32 GPR:$rs2), 255)),
-          (PV_DOTUP_SC_B PulpV4:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(dotup_sc_b GPRAV4:$rs1, (and (i32 GPR:$rs2), 255)),
+          (PV_DOTUP_SC_B GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(dotup_sc_b PulpV4:$rs1, uimm6:$sci),
-          (PV_DOTUP_SCI_B PulpV4:$rs1, uimm6:$sci)>;
+def : Pat<(dotup_sc_b GPRAV4:$rs1, uimm6:$sci),
+          (PV_DOTUP_SCI_B GPRAV4:$rs1, uimm6:$sci)>;
 
 
 def : PatV2V2<dotusp_h , PV_DOTUSP_H>;
 
-def : Pat<(dotup_sc_h PulpV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16)),
-          (PV_DOTUSP_SC_H PulpV2:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(dotup_sc_h GPRAV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16)),
+          (PV_DOTUSP_SC_H GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(dotup_sc_h PulpV2:$rs1, simm6:$sci),
-          (PV_DOTUSP_SCI_H PulpV2:$rs1, simm6:$sci)>;
+def : Pat<(dotup_sc_h GPRAV2:$rs1, simm6:$sci),
+          (PV_DOTUSP_SCI_H GPRAV2:$rs1, simm6:$sci)>;
 
 def : PatV4V4<dotusp_b, PV_DOTUSP_B>;
 
-def : Pat<(dotup_sc_b PulpV4:$rs1, (sext_inreg (i32 GPR:$rs2), i8)),
-          (PV_DOTUSP_SC_B PulpV4:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(dotup_sc_b GPRAV4:$rs1, (sext_inreg (i32 GPR:$rs2), i8)),
+          (PV_DOTUSP_SC_B GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(dotup_sc_b PulpV4:$rs1, simm6:$sci),
-          (PV_DOTUSP_SCI_B PulpV4:$rs1, simm6:$sci)>;
+def : Pat<(dotup_sc_b GPRAV4:$rs1, simm6:$sci),
+          (PV_DOTUSP_SCI_B GPRAV4:$rs1, simm6:$sci)>;
 
 
 def : PatV2V2<dotsp_h , PV_DOTSP_H>;
 
-def : Pat<(dotsp_sc_h PulpV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16)),
-          (PV_DOTSP_SC_H PulpV2:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(dotsp_sc_h GPRAV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16)),
+          (PV_DOTSP_SC_H GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(dotsp_sc_h PulpV2:$rs1, simm6:$sci),
-          (PV_DOTSP_SCI_H PulpV2:$rs1, simm6:$sci)>;
+def : Pat<(dotsp_sc_h GPRAV2:$rs1, simm6:$sci),
+          (PV_DOTSP_SCI_H GPRAV2:$rs1, simm6:$sci)>;
 
 def : PatV4V4<dotsp_b, PV_DOTSP_B>;
 
-def : Pat<(dotsp_sc_b PulpV4:$rs1, (sext_inreg (i32 GPR:$rs2), i8)),
-          (PV_DOTSP_SC_B PulpV4:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(dotsp_sc_b GPRAV4:$rs1, (sext_inreg (i32 GPR:$rs2), i8)),
+          (PV_DOTSP_SC_B GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(dotsp_sc_b PulpV4:$rs1, simm6:$sci),
-          (PV_DOTSP_SCI_B PulpV4:$rs1, simm6:$sci)>;
+def : Pat<(dotsp_sc_b GPRAV4:$rs1, simm6:$sci),
+          (PV_DOTSP_SCI_B GPRAV4:$rs1, simm6:$sci)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_h PulpV2:$rs1, PulpV2:$rs2)),
-          (PV_SDOTUP_H (i32 GPR:$rd), PulpV2:$rs1, PulpV2:$rs2)>;
+def : Pat<(add (i32 GPR:$rd), (dotup_h GPRAV2:$rs1, GPRAV2:$rs2)),
+          (PV_SDOTUP_H (i32 GPR:$rd), GPRAV2:$rs1, GPRAV2:$rs2)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_h PulpV2:$rs1, (and (i32 GPR:$rs2), 65535))),
-          (PV_SDOTUP_SC_H (i32 GPR:$rd), PulpV2:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_h GPRAV2:$rs1, (and (i32 GPR:$rs2), 65535))),
+          (PV_SDOTUP_SC_H (i32 GPR:$rd), GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_h PulpV2:$rs1, uimm6:$sci)),
-          (PV_SDOTUP_SCI_H (i32 GPR:$rd), PulpV2:$rs1, uimm6:$sci)>;
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_h GPRAV2:$rs1, uimm6:$sci)),
+          (PV_SDOTUP_SCI_H (i32 GPR:$rd), GPRAV2:$rs1, uimm6:$sci)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_b PulpV4:$rs1, PulpV4:$rs2)),
-          (PV_SDOTUP_B (i32 GPR:$rd), PulpV4:$rs1, PulpV4:$rs2)>;
+def : Pat<(add (i32 GPR:$rd), (dotup_b GPRAV4:$rs1, GPRAV4:$rs2)),
+          (PV_SDOTUP_B (i32 GPR:$rd), GPRAV4:$rs1, GPRAV4:$rs2)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_b PulpV4:$rs1, (and (i32 GPR:$rs2), 255))),
-          (PV_SDOTUP_SC_B (i32 GPR:$rd), PulpV4:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_b GPRAV4:$rs1, (and (i32 GPR:$rs2), 255))),
+          (PV_SDOTUP_SC_B (i32 GPR:$rd), GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_b PulpV4:$rs1, uimm6:$sci)),
-          (PV_SDOTUP_SCI_B (i32 GPR:$rd), PulpV4:$rs1, uimm6:$sci)>;
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_b GPRAV4:$rs1, uimm6:$sci)),
+          (PV_SDOTUP_SCI_B (i32 GPR:$rd), GPRAV4:$rs1, uimm6:$sci)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotusp_h PulpV2:$rs1, PulpV2:$rs2)),
-          (PV_SDOTUSP_H (i32 GPR:$rd), PulpV2:$rs1, PulpV2:$rs2)>;
+def : Pat<(add (i32 GPR:$rd), (dotusp_h GPRAV2:$rs1, GPRAV2:$rs2)),
+          (PV_SDOTUSP_H (i32 GPR:$rd), GPRAV2:$rs1, GPRAV2:$rs2)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_h PulpV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16))),
-          (PV_SDOTUSP_SC_H (i32 GPR:$rd), PulpV2:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_h GPRAV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16))),
+          (PV_SDOTUSP_SC_H (i32 GPR:$rd), GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_h PulpV2:$rs1, simm6:$sci)),
-          (PV_SDOTUSP_SCI_H (i32 GPR:$rd), PulpV2:$rs1, simm6:$sci)>;
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_h GPRAV2:$rs1, simm6:$sci)),
+          (PV_SDOTUSP_SCI_H (i32 GPR:$rd), GPRAV2:$rs1, simm6:$sci)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotusp_b PulpV4:$rs1, PulpV4:$rs2)),
-          (PV_SDOTUSP_B (i32 GPR:$rd), PulpV4:$rs1, PulpV4:$rs2)>;
+def : Pat<(add (i32 GPR:$rd), (dotusp_b GPRAV4:$rs1, GPRAV4:$rs2)),
+          (PV_SDOTUSP_B (i32 GPR:$rd), GPRAV4:$rs1, GPRAV4:$rs2)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_b PulpV4:$rs1, (sext_inreg (i32 GPR:$rs2), i8))),
-          (PV_SDOTUSP_SC_B (i32 GPR:$rd), PulpV4:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_b GPRAV4:$rs1, (sext_inreg (i32 GPR:$rs2), i8))),
+          (PV_SDOTUSP_SC_B (i32 GPR:$rd), GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_b PulpV4:$rs1, simm6:$sci)),
-          (PV_SDOTUSP_SCI_B (i32 GPR:$rd), PulpV4:$rs1, simm6:$sci)>;
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_b GPRAV4:$rs1, simm6:$sci)),
+          (PV_SDOTUSP_SCI_B (i32 GPR:$rd), GPRAV4:$rs1, simm6:$sci)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotsp_h PulpV2:$rs1, PulpV2:$rs2)),
-          (PV_SDOTSP_H (i32 GPR:$rd), PulpV2:$rs1, PulpV2:$rs2)>;
+def : Pat<(add (i32 GPR:$rd), (dotsp_h GPRAV2:$rs1, GPRAV2:$rs2)),
+          (PV_SDOTSP_H (i32 GPR:$rd), GPRAV2:$rs1, GPRAV2:$rs2)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotsp_sc_h PulpV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16))),
-          (PV_SDOTSP_SC_H (i32 GPR:$rd), PulpV2:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(add (i32 GPR:$rd), (dotsp_sc_h GPRAV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16))),
+          (PV_SDOTSP_SC_H (i32 GPR:$rd), GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(add (i32 GPR:$rd), (dotsp_sc_h PulpV2:$rs1, simm6:$sci)),
-          (PV_SDOTSP_SCI_H (i32 GPR:$rd), PulpV2:$rs1, simm6:$sci)>;
+def : Pat<(add (i32 GPR:$rd), (dotsp_sc_h GPRAV2:$rs1, simm6:$sci)),
+          (PV_SDOTSP_SCI_H (i32 GPR:$rd), GPRAV2:$rs1, simm6:$sci)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotsp_b PulpV4:$rs1, PulpV4:$rs2)),
-          (PV_SDOTSP_B (i32 GPR:$rd), PulpV4:$rs1, PulpV4:$rs2)>;
+def : Pat<(add (i32 GPR:$rd), (dotsp_b GPRAV4:$rs1, GPRAV4:$rs2)),
+          (PV_SDOTSP_B (i32 GPR:$rd), GPRAV4:$rs1, GPRAV4:$rs2)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotsp_sc_b PulpV4:$rs1, (sext_inreg (i32 GPR:$rs2), i8))),
-          (PV_SDOTSP_SC_B (i32 GPR:$rd), PulpV4:$rs1, (i32 GPR:$rs2))>;
+def : Pat<(add (i32 GPR:$rd), (dotsp_sc_b GPRAV4:$rs1, (sext_inreg (i32 GPR:$rs2), i8))),
+          (PV_SDOTSP_SC_B (i32 GPR:$rd), GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(add (i32 GPR:$rd), (dotsp_sc_b PulpV4:$rs1, simm6:$sci)),
-          (PV_SDOTSP_SCI_B (i32 GPR:$rd), PulpV4:$rs1, simm6:$sci)>;
+def : Pat<(add (i32 GPR:$rd), (dotsp_sc_b GPRAV4:$rs1, simm6:$sci)),
+          (PV_SDOTSP_SCI_B (i32 GPR:$rd), GPRAV4:$rs1, simm6:$sci)>;
 
-def : Pat<(v2i16 (build_vector (i32 (vector_extract PulpV2:$rs1, (i32 GPR:$index0))),
-                               (i32 (vector_extract PulpV2:$rs1, (i32 GPR:$index1))))),
-          (PV_SHUFFLE_H PulpV2:$rs1, (PV_PACK_H (i32 GPR:$index1), (i32 GPR:$index0)))>;
+def : Pat<(v2i16 (build_vector (i32 (vector_extract GPRAV2:$rs1, (i32 GPR:$index0))),
+                               (i32 (vector_extract GPRAV2:$rs1, (i32 GPR:$index1))))),
+          (PV_SHUFFLE_H GPRAV2:$rs1, (PV_PACK_H (i32 GPR:$index1), (i32 GPR:$index0)))>;
 
-def : Pat<(v4i8 (build_vector (i32 (vector_extract PulpV4:$rs1, (i32 GPR:$index0))),
-                              (i32 (vector_extract PulpV4:$rs1, (i32 GPR:$index1))),
-                              (i32 (vector_extract PulpV4:$rs1, (i32 GPR:$index2))),
-                              (i32 (vector_extract PulpV4:$rs1, (i32 GPR:$index3))))),
-          (PV_SHUFFLE_B PulpV4:$rs1, (PV_PACKLO_B (PV_PACKHI_B_nowb (i32 GPR:$index3),
+def : Pat<(v4i8 (build_vector (i32 (vector_extract GPRAV4:$rs1, (i32 GPR:$index0))),
+                              (i32 (vector_extract GPRAV4:$rs1, (i32 GPR:$index1))),
+                              (i32 (vector_extract GPRAV4:$rs1, (i32 GPR:$index2))),
+                              (i32 (vector_extract GPRAV4:$rs1, (i32 GPR:$index3))))),
+          (PV_SHUFFLE_B GPRAV4:$rs1, (PV_PACKLO_B (PV_PACKHI_B_nowb (i32 GPR:$index3),
                                      (i32 GPR:$index2)), (i32 GPR:$index1), (i32 GPR:$index0)))>;
 
 
@@ -1603,10 +1603,10 @@ defm : GeneralUVectorPattern<setuge, "CMPGEU">;
 defm : GeneralUVectorPattern<setult, "CMPLTU">;
 defm : GeneralUVectorPattern<setule, "CMPLEU">;
 
-def : Pat<(v2i16 (bitconvert (i32 GPR:$rs1))), (v2i16 PulpV2:$rs1)>;
-def : Pat<(v4i8 (bitconvert (i32 GPR:$rs1))), (v4i8 PulpV4:$rs1)>;
-def : Pat<(i32 (bitconvert PulpV2:$rs1)), (i32 (i32 GPR:$rs1))>;
-def : Pat<(i32 (bitconvert PulpV4:$rs1)), (i32 (i32 GPR:$rs1))>;
+def : Pat<(v2i16 (bitconvert (i32 GPR:$rs1))), (v2i16 GPRAV2:$rs1)>;
+def : Pat<(v4i8 (bitconvert (i32 GPR:$rs1))), (v4i8 GPRAV4:$rs1)>;
+def : Pat<(i32 (bitconvert GPRAV2:$rs1)), (i32 (i32 GPR:$rs1))>;
+def : Pat<(i32 (bitconvert GPRAV4:$rs1)), (i32 (i32 GPR:$rs1))>;
 
 // Patterns for load/store instructions
 
@@ -1704,51 +1704,51 @@ defm : BinaryVectorBuiltin<"exor", "XOR">;
 defm : BinaryVectorBuiltin<"srl",  "SRL">;
 defm : BinaryVectorBuiltin<"sra",  "SRA">;
 defm : BinaryVectorBuiltin<"sll",  "SLL">;
-def : Pat<(int_riscv_pulp_abs2 PulpV2:$rs1), (PV_ABS_H PulpV2:$rs1)>;
-def : Pat<(int_riscv_pulp_abs4 PulpV4:$rs1), (PV_ABS_B PulpV4:$rs1)>;
-def : Pat<(int_riscv_pulp_neg2 PulpV2:$rs1), (PV_SUB_H X0, PulpV2:$rs1)>;
-def : Pat<(int_riscv_pulp_neg4 PulpV4:$rs1), (PV_SUB_B X0, PulpV4:$rs1)>;
+def : Pat<(int_riscv_pulp_abs2 GPRAV2:$rs1), (PV_ABS_H GPRAV2:$rs1)>;
+def : Pat<(int_riscv_pulp_abs4 GPRAV4:$rs1), (PV_ABS_B GPRAV4:$rs1)>;
+def : Pat<(int_riscv_pulp_neg2 GPRAV2:$rs1), (PV_SUB_H X0, GPRAV2:$rs1)>;
+def : Pat<(int_riscv_pulp_neg4 GPRAV4:$rs1), (PV_SUB_B X0, GPRAV4:$rs1)>;
 
 class PatV2V2GPR<SDPatternOperator op, Instruction instr>
-    : Pat<(op PulpV2:$rs1, PulpV2:$rs2, (i32 GPR:$rd)),
-          (instr (i32 GPR:$rd), PulpV2:$rs1, PulpV2:$rs2)>;
+    : Pat<(op GPRAV2:$rs1, GPRAV2:$rs2, (i32 GPR:$rd)),
+          (instr (i32 GPR:$rd), GPRAV2:$rs1, GPRAV2:$rs2)>;
 
 class PatV2GPRGPR<SDPatternOperator op, Instruction instr>
-    : Pat<(op PulpV2:$rs1, (i32 GPR:$rs2), (i32 GPR:$rd)),
-          (instr (i32 GPR:$rd), PulpV2:$rs1, (i32 GPR:$rs2))>;
+    : Pat<(op GPRAV2:$rs1, (i32 GPR:$rs2), (i32 GPR:$rd)),
+          (instr (i32 GPR:$rd), GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
 class PatV4V4GPR<SDPatternOperator op, Instruction instr>
-    : Pat<(op PulpV4:$rs1, PulpV4:$rs2, (i32 GPR:$rd)),
-          (instr (i32 GPR:$rd), PulpV4:$rs1, PulpV4:$rs2)>;
+    : Pat<(op GPRAV4:$rs1, GPRAV4:$rs2, (i32 GPR:$rd)),
+          (instr (i32 GPR:$rd), GPRAV4:$rs1, GPRAV4:$rs2)>;
 
 class PatV4GPRGPR<SDPatternOperator op, Instruction instr>
-    : Pat<(op PulpV4:$rs1, (i32 GPR:$rs2), (i32 GPR:$rd)),
-          (instr (i32 GPR:$rd), PulpV4:$rs1, (i32 GPR:$rs2))>;
+    : Pat<(op GPRAV4:$rs1, (i32 GPR:$rs2), (i32 GPR:$rd)),
+          (instr (i32 GPR:$rd), GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
 multiclass DotproductBuiltin<string intrin, string instr> {
   def : PatV2V2<!cast<Intrinsic>("int_riscv_pulp_dot" # intrin # "p2"),
                 !cast<RVInst>("PV_DOT" # instr # "P_H")>;
 
-  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_dot" # intrin # "psc2") PulpV2:$rs1, (i32 GPR:$rs2)),
-            (!cast<RVInst>("PV_DOT" # instr # "P_SC_H") PulpV2:$rs1, (i32 GPR:$rs2))>;
+  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_dot" # intrin # "psc2") GPRAV2:$rs1, (i32 GPR:$rs2)),
+            (!cast<RVInst>("PV_DOT" # instr # "P_SC_H") GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
   def : PatV4V4<!cast<Intrinsic>("int_riscv_pulp_dot" # intrin # "p4"),
                 !cast<RVInst>("PV_DOT" # instr # "P_B")>;
 
-  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_dot" # intrin # "psc4") PulpV4:$rs1, (i32 GPR:$rs2)),
-            (!cast<RVInst>("PV_DOT" # instr # "P_SC_B") PulpV4:$rs1, (i32 GPR:$rs2))>;
+  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_dot" # intrin # "psc4") GPRAV4:$rs1, (i32 GPR:$rs2)),
+            (!cast<RVInst>("PV_DOT" # instr # "P_SC_B") GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
-  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_sdot" # intrin # "p2") PulpV2:$rs1, PulpV2:$rs2, (i32 GPR:$rd)),
-            (!cast<RVInst>("PV_SDOT" # instr # "P_H") (i32 GPR:$rd), PulpV2:$rs1, PulpV2:$rs2)>;
+  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_sdot" # intrin # "p2") GPRAV2:$rs1, GPRAV2:$rs2, (i32 GPR:$rd)),
+            (!cast<RVInst>("PV_SDOT" # instr # "P_H") (i32 GPR:$rd), GPRAV2:$rs1, GPRAV2:$rs2)>;
 
-  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_sdot" # intrin # "psc2") PulpV2:$rs1, (i32 GPR:$rs2), (i32 GPR:$rd)),
-            (!cast<RVInst>("PV_SDOT" # instr # "P_SC_H") (i32 GPR:$rd), PulpV2:$rs1, (i32 GPR:$rs2))>;
+  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_sdot" # intrin # "psc2") GPRAV2:$rs1, (i32 GPR:$rs2), (i32 GPR:$rd)),
+            (!cast<RVInst>("PV_SDOT" # instr # "P_SC_H") (i32 GPR:$rd), GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_sdot" # intrin # "p4") PulpV4:$rs1, PulpV4:$rs2, (i32 GPR:$rd)),
-            (!cast<RVInst>("PV_SDOT" # instr # "P_B") (i32 GPR:$rd), PulpV4:$rs1, PulpV4:$rs2)>;
+  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_sdot" # intrin # "p4") GPRAV4:$rs1, GPRAV4:$rs2, (i32 GPR:$rd)),
+            (!cast<RVInst>("PV_SDOT" # instr # "P_B") (i32 GPR:$rd), GPRAV4:$rs1, GPRAV4:$rs2)>;
 
-  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_sdot" # intrin # "psc4") PulpV4:$rs1, (i32 GPR:$rs2), (i32 GPR:$rd)),
-            (!cast<RVInst>("PV_SDOT" # instr # "P_SC_B") (i32 GPR:$rd), PulpV4:$rs1, (i32 GPR:$rs2))>;
+  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_sdot" # intrin # "psc4") GPRAV4:$rs1, (i32 GPR:$rs2), (i32 GPR:$rd)),
+            (!cast<RVInst>("PV_SDOT" # instr # "P_SC_B") (i32 GPR:$rd), GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
 }
 
@@ -1800,14 +1800,14 @@ def : Pat<(int_riscv_pulp_pack4 (i32 GPR:$rs1), (i32 GPR:$rs2), (i32 GPR:$rs3), 
           (PV_PACKLO_B (PV_PACKHI_B_nowb (i32 GPR:$rs4), (i32 GPR:$rs3)), (i32 GPR:$rs2), (i32 GPR:$rs1))>;
 def : PatV2V2<int_riscv_pulp_shuffleh, PV_SHUFFLE_H>;
 def : PatV4V4<int_riscv_pulp_shuffleb, PV_SHUFFLE_B>;
-def : Pat<(int_riscv_pulp_pack4_lo (i32 GPR:$rs2), (i32 GPR:$rs1), PulpV4:$rd),
-          (PV_PACKLO_B PulpV4:$rd, (i32 GPR:$rs2), (i32 GPR:$rs1))>;
-def : Pat<(int_riscv_pulp_pack4_hi (i32 GPR:$rs2), (i32 GPR:$rs1), PulpV4:$rd),
-          (PV_PACKHI_B PulpV4:$rd, (i32 GPR:$rs2), (i32 GPR:$rs1))>;
-def : Pat<(int_riscv_pulp_shuffle2h PulpV2:$rd, PulpV2:$rs1, PulpV2:$rs2),
-          (PV_SHUFFLE2_H PulpV2:$rd, PulpV2:$rs1, PulpV2:$rs2)>;
-def : Pat<(int_riscv_pulp_shuffle4b PulpV4:$rd, PulpV4:$rs1, PulpV4:$rs2),
-          (PV_SHUFFLE2_B PulpV4:$rd, PulpV4:$rs1, PulpV4:$rs2)>;
+def : Pat<(int_riscv_pulp_pack4_lo (i32 GPR:$rs2), (i32 GPR:$rs1), GPRAV4:$rd),
+          (PV_PACKLO_B GPRAV4:$rd, (i32 GPR:$rs2), (i32 GPR:$rs1))>;
+def : Pat<(int_riscv_pulp_pack4_hi (i32 GPR:$rs2), (i32 GPR:$rs1), GPRAV4:$rd),
+          (PV_PACKHI_B GPRAV4:$rd, (i32 GPR:$rs2), (i32 GPR:$rs1))>;
+def : Pat<(int_riscv_pulp_shuffle2h GPRAV2:$rd, GPRAV2:$rs1, GPRAV2:$rs2),
+          (PV_SHUFFLE2_H GPRAV2:$rd, GPRAV2:$rs1, GPRAV2:$rs2)>;
+def : Pat<(int_riscv_pulp_shuffle4b GPRAV4:$rd, GPRAV4:$rs1, GPRAV4:$rs2),
+          (PV_SHUFFLE2_B GPRAV4:$rd, GPRAV4:$rs1, GPRAV4:$rs2)>;
 
 def : Pat<(int_riscv_pulp_bclr (i32 GPR:$rs1), shiftedFlippedMask:$mask),
           (P_BCLR (i32 GPR:$rs1), (flippedMaskWidthMinus1 imm:$mask), (trailing1s imm:$mask))>;
