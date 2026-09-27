@@ -57,6 +57,7 @@ for.body4:                                        ; preds = %for.body, %for.body
 
 ; CHECK:        csrsi 1984, 1
 ; CHECK:        li [[rBound:[a-zA-Z0-9_]*]], 127
+; CHECK-NEXT:   # implicit-def: $f{{[0-9]+}}_d
 ; CHECK-NEXT:   frep.o  [[rBound]], 2, 0, 0
 ; CHECK-NEXT:   fmul.d  {{.*}}
 ; CHECK-NEXT:   fadd.d  {{.*}}
