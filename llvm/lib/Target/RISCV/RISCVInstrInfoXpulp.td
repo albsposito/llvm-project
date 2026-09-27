@@ -71,6 +71,8 @@ def mask                : TImmLeaf<XLenVT, [{ return isMask_32(Imm);         }]>
 def flippedMask         : TImmLeaf<XLenVT, [{ return isMask_32(~Imm);        }]>;
 def shiftedMask         : TImmLeaf<XLenVT, [{ return isShiftedMask_32(Imm);  }]>;
 def shiftedFlippedMask  : TImmLeaf<XLenVT, [{ return isShiftedMask_32(~Imm); }]>;
+// Bit-field width of the bextract builtins, 1..32; p.extract[u] encodes width-1.
+def bitFieldWidth       : TImmLeaf<XLenVT, [{ return Imm >= 1 && Imm <= 32; }]>;
 
 //===----------------------------------------------------------------------===//
 // Operand and SDNode transformation definitions.
@@ -80,6 +82,11 @@ def trailing1sPlus1_pulp : SDNodeXForm<imm, [{
   return CurDAG->getTargetConstant(
                           countr_one<uint32_t>(N->getSExtValue()) + 1,
                           SDLoc(N), N->getValueType(0));
+}]>;
+
+def minus1 : SDNodeXForm<imm, [{
+  return CurDAG->getTargetConstant(N->getSExtValue() - 1,
+                                   SDLoc(N), N->getValueType(0));
 }]>;
 
 def 31minus : SDNodeXForm<imm, [{
@@ -1817,12 +1824,12 @@ def : Pat<(int_riscv_pulp_bset (i32 GPR:$rs1), shiftedMask:$mask),
           (P_BSET (i32 GPR:$rs1), (maskWidthMinus1 imm:$mask), (trailing0s imm:$mask))>;
 def : PatGprGpr<int_riscv_pulp_bset_r, P_BSETR>;
 
-def : Pat<(int_riscv_pulp_bextract (i32 GPR:$rs1), tuimm5:$size, tuimm5:$shift),
-          (P_EXTRACT (i32 GPR:$rs1), tuimm5:$size, tuimm5:$shift)>;
+def : Pat<(int_riscv_pulp_bextract (i32 GPR:$rs1), bitFieldWidth:$size, tuimm5:$shift),
+          (P_EXTRACT (i32 GPR:$rs1), (minus1 imm:$size), tuimm5:$shift)>;
 def : PatGprGpr<int_riscv_pulp_bextract_r, P_EXTRACTR>;
 
-def : Pat<(int_riscv_pulp_bextractu (i32 GPR:$rs1), tuimm5:$size, tuimm5:$shift),
-          (P_EXTRACTU (i32 GPR:$rs1), tuimm5:$size, tuimm5:$shift)>;
+def : Pat<(int_riscv_pulp_bextractu (i32 GPR:$rs1), bitFieldWidth:$size, tuimm5:$shift),
+          (P_EXTRACTU (i32 GPR:$rs1), (minus1 imm:$size), tuimm5:$shift)>;
 def : PatGprGpr<int_riscv_pulp_bextractu_r, P_EXTRACTUR>;
 
 def : Pat<(int_riscv_pulp_binsert (i32 GPR:$rd), shiftedFlippedMask,
@@ -1831,9 +1838,10 @@ def : Pat<(int_riscv_pulp_binsert (i32 GPR:$rd), shiftedFlippedMask,
 def : Pat<(int_riscv_pulp_binsert_r (i32 GPR:$rd), (i32 GPR:$rs1), (i32 GPR:$rs2)),
           (P_INSERTR (i32 GPR:$rd), (i32 GPR:$rs1), (i32 GPR:$rs2))>;
 
-def : Pat<(int_riscv_pulp_clip (i32 GPR:$rs1), negativePowerOf2:$lowerBound,
-                               powerOf2Minus1_pulp),
-          (P_CLIP (i32 GPR:$rs1), (trailing0s imm:$lowerBound))>;
+// p.clip rD, rs1, Is2 clamps to [-2^(Is2-1), 2^(Is2-1)-1], so [-2^N, 2^N-1] is Is2 = N+1.
+def : Pat<(int_riscv_pulp_clip (i32 GPR:$rs1), negativePowerOf2,
+                               powerOf2Minus1_pulp:$upperBound),
+          (P_CLIP (i32 GPR:$rs1), (trailing1sPlus1_pulp imm:$upperBound))>;
 def : PatGprGpr<int_riscv_pulp_clip_r, P_CLIPR>;
 
 def : Pat<(int_riscv_pulp_clipu (i32 GPR:$rs1), 0, powerOf2Minus1_pulp:$upperBound),
