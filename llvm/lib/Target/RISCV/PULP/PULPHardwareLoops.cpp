@@ -772,7 +772,19 @@ PULPHardwareLoops::getLoopTripCount(MachineLoop *L,
   if (isSwapped)
     Cmp = Comparison::getSwappedComparison(Cmp);
 
-  if (InitialValue->isReg()) {
+  // Unlike Hexagon, RISC-V instruction selection compares against the
+  // constant 0 by using the physical zero register directly, e.g. the latch
+  // of a count-down loop is "BNE %iv.next, $x0". A physical register has no
+  // virtual-register definition (getVRegDef returns null), so it cannot be
+  // checked for dominance nor collected as a dead old instruction. $x0 is a
+  // known constant that is available everywhere; any other physical register
+  // has an unknown value at the preheader, so do not form a hardware loop.
+  if (InitialValue->isReg() && InitialValue->getReg().isPhysical()) {
+    int64_t V;
+    if (!checkForImmediate(*InitialValue, V)) {
+      return nullptr;
+    }
+  } else if (InitialValue->isReg()) {
     llvm::Register R = InitialValue->getReg();
     MachineBasicBlock *DefBB = MRI->getVRegDef(R)->getParent();
     if (!MDT->properlyDominates(DefBB, Header)) {
@@ -783,7 +795,12 @@ PULPHardwareLoops::getLoopTripCount(MachineLoop *L,
     }
     OldInsts.push_back(MRI->getVRegDef(R));
   }
-  if (EndValue->isReg()) {
+  if (EndValue->isReg() && EndValue->getReg().isPhysical()) {
+    int64_t V;
+    if (!checkForImmediate(*EndValue, V)) {
+      return nullptr;
+    }
+  } else if (EndValue->isReg()) {
     llvm::Register R = EndValue->getReg();
     MachineBasicBlock *DefBB = MRI->getVRegDef(R)->getParent();
     if (!MDT->properlyDominates(DefBB, Header)) {
