@@ -838,8 +838,6 @@ static unsigned getSegInstNF(unsigned Intrinsic) {
   }
 }
 
-}
-
 bool RISCVDAGToDAGISel::tryPulpIndexedLoad(SDNode *Node) {
   if (!Subtarget->hasPULPExtV2())
     return false;
