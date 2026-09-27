@@ -325,11 +325,11 @@ int32_t test_builtin_pulp_machhsN(void) {
 
 // CHECK-LABEL: @test_builtin_pulp_machhsRN(
 // CHECK-NEXT:  entry:
-// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.machhsRN(i32 -458752, i32 131072, i32 -2, i32 2, i32 1)
+// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.machhsRN(i32 -458752, i32 131072, i32 -2, i32 2, i32 2)
 // CHECK-NEXT:    ret i32 [[RES]]
 //
 int32_t test_builtin_pulp_machhsRN(void) {
-  return __builtin_pulp_machhsRN(-(7u << 16), 2u << 16, -2, 2, 1);
+  return __builtin_pulp_machhsRN(-(7u << 16), 2u << 16, -2, 2, 2);
 }
 
 // CHECK-LABEL: @test_builtin_pulp_machhuN(
@@ -343,11 +343,11 @@ int32_t test_builtin_pulp_machhuN(void) {
 
 // CHECK-LABEL: @test_builtin_pulp_machhuRN(
 // CHECK-NEXT:  entry:
-// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.machhuRN(i32 458752, i32 131072, i32 -2, i32 2, i32 1)
+// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.machhuRN(i32 458752, i32 131072, i32 -2, i32 2, i32 2)
 // CHECK-NEXT:    ret i32 [[RES]]
 //
 int32_t test_builtin_pulp_machhuRN(void) {
-  return __builtin_pulp_machhuRN(7u << 16, 2u << 16, -2, 2, 1);
+  return __builtin_pulp_machhuRN(7u << 16, 2u << 16, -2, 2, 2);
 }
 
 // CHECK-LABEL: @test_builtin_pulp_macsN(
@@ -433,11 +433,11 @@ int32_t test_builtin_pulp_mulhhsN(void) {
 
 // CHECK-LABEL: @test_builtin_pulp_mulhhsRN(
 // CHECK-NEXT:  entry:
-// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.mulhhsRN(i32 -524288, i32 131072, i32 2, i32 1)
+// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.mulhhsRN(i32 -524288, i32 131072, i32 2, i32 2)
 // CHECK-NEXT:    ret i32 [[RES]]
 //
 int32_t test_builtin_pulp_mulhhsRN(void) {
-  return __builtin_pulp_mulhhsRN(-(8u << 16), 2u << 16, 2, 1);
+  return __builtin_pulp_mulhhsRN(-(8u << 16), 2u << 16, 2, 2);
 }
 
 // CHECK-LABEL: @test_builtin_pulp_mulhhu(
@@ -460,11 +460,11 @@ int32_t test_builtin_pulp_mulhhuN(void) {
 
 // CHECK-LABEL: @test_builtin_pulp_mulhhuRN(
 // CHECK-NEXT:  entry:
-// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.mulhhuRN(i32 524288, i32 131072, i32 2, i32 1)
+// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.mulhhuRN(i32 524288, i32 131072, i32 2, i32 2)
 // CHECK-NEXT:    ret i32 [[RES]]
 //
 int32_t test_builtin_pulp_mulhhuRN(void) {
-  return __builtin_pulp_mulhhuRN(8u << 16, 2u << 16, 2, 1);
+  return __builtin_pulp_mulhhuRN(8u << 16, 2u << 16, 2, 2);
 }
 
 // CHECK-LABEL: @test_builtin_pulp_muls(
@@ -487,11 +487,11 @@ int32_t test_builtin_pulp_mulsN(void) {
 
 // CHECK-LABEL: @test_builtin_pulp_mulsRN(
 // CHECK-NEXT:  entry:
-// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.mulsRN(i32 -7, i32 2, i32 2, i32 1)
+// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.mulsRN(i32 -7, i32 2, i32 2, i32 2)
 // CHECK-NEXT:    ret i32 [[RES]]
 //
 int32_t test_builtin_pulp_mulsRN(void) {
-  return __builtin_pulp_mulsRN(-7, 2, 2, 1);
+  return __builtin_pulp_mulsRN(-7, 2, 2, 2);
 }
 
 // CHECK-LABEL: @test_builtin_pulp_mulu(
@@ -514,11 +514,11 @@ int32_t test_builtin_pulp_muluN(void) {
 
 // CHECK-LABEL: @test_builtin_pulp_muluRN(
 // CHECK-NEXT:  entry:
-// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.muluRN(i32 7, i32 2, i32 2, i32 1)
+// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.muluRN(i32 7, i32 2, i32 2, i32 2)
 // CHECK-NEXT:    ret i32 [[RES]]
 //
 int32_t test_builtin_pulp_muluRN(void) {
-  return __builtin_pulp_muluRN(7, 2, 2, 1);
+  return __builtin_pulp_muluRN(7, 2, 2, 2);
 }
 
 // CHECK-LABEL: @test_builtin_pulp_subN(
@@ -541,11 +541,11 @@ int32_t test_builtin_pulp_subN_r(void) {
 
 // CHECK-LABEL: @test_builtin_pulp_subRN(
 // CHECK-NEXT:  entry:
-// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.subRN(i32 -7, i32 2, i32 2, i32 1)
+// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.subRN(i32 -7, i32 2, i32 2, i32 2)
 // CHECK-NEXT:    ret i32 [[RES]]
 //
 int32_t test_builtin_pulp_subRN(void) {
-  return __builtin_pulp_subRN(-7, 2, 2, 1);
+  return __builtin_pulp_subRN(-7, 2, 2, 2);
 }
 
 // CHECK-LABEL: @test_builtin_pulp_subRN_r(
@@ -577,11 +577,11 @@ int32_t test_builtin_pulp_subuN_r(void) {
 
 // CHECK-LABEL: @test_builtin_pulp_subuRN(
 // CHECK-NEXT:  entry:
-// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.subuRN(i32 7, i32 2, i32 2, i32 1)
+// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.subuRN(i32 7, i32 2, i32 2, i32 2)
 // CHECK-NEXT:    ret i32 [[RES]]
 //
 int32_t test_builtin_pulp_subuRN(void) {
-  return __builtin_pulp_subuRN(7, 2, 2, 1);
+  return __builtin_pulp_subuRN(7, 2, 2, 2);
 }
 
 // CHECK-LABEL: @test_builtin_pulp_subuRN_r(

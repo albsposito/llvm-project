@@ -39,9 +39,9 @@ void test_builtin_pulp_diag(int32_t *data) {
   (void) __builtin_pulp_clipu_r(10, 2); // expected-error {{'__builtin_pulp_clipu_r' needs target feature xpulpv}}
   (void) __builtin_pulp_maxsi(-1, 2); // expected-error {{'__builtin_pulp_maxsi' needs target feature xpulpv}}
   (void) __builtin_pulp_machhsN(-(7u << 16), 2u << 16, -2, 2); // expected-error {{'__builtin_pulp_machhsN' needs target feature xpulpv}}
-  (void) __builtin_pulp_machhsRN(-(7u << 16), 2u << 16, -2, 2, 1); // expected-error {{'__builtin_pulp_machhsRN' needs target feature xpulpv}}
+  (void) __builtin_pulp_machhsRN(-(7u << 16), 2u << 16, -2, 2, 2); // expected-error {{'__builtin_pulp_machhsRN' needs target feature xpulpv}}
   (void) __builtin_pulp_machhuN(7u << 16, 2u << 16, -2, 2); // expected-error {{'__builtin_pulp_machhuN' needs target feature xpulpv}}
-  (void) __builtin_pulp_machhuRN(7u << 16, 2u << 16, -2, 2, 1); // expected-error {{'__builtin_pulp_machhuRN' needs target feature xpulpv}}
+  (void) __builtin_pulp_machhuRN(7u << 16, 2u << 16, -2, 2, 2); // expected-error {{'__builtin_pulp_machhuRN' needs target feature xpulpv}}
   (void) __builtin_pulp_macsN(-7, 2, -2, 2); // expected-error {{'__builtin_pulp_macsN' needs target feature xpulpv}}
   (void) __builtin_pulp_macsRN(-7, 2, -2, 1, 1); // expected-error {{'__builtin_pulp_macsRN' needs target feature xpulpv}}
   (void) __builtin_pulp_macuN(7, 2, 2, 1); // expected-error {{'__builtin_pulp_macuN' needs target feature xpulpv}}
@@ -51,23 +51,23 @@ void test_builtin_pulp_diag(int32_t *data) {
   (void) __builtin_pulp_minusi(1, 3); // expected-error {{'__builtin_pulp_minusi' needs target feature xpulpv}}
   (void) __builtin_pulp_mulhhs(-(8u << 16), 2u << 16); // expected-error {{'__builtin_pulp_mulhhs' needs target feature xpulpv}}
   (void) __builtin_pulp_mulhhsN(-(8u << 16), 2u << 16, 1); // expected-error {{'__builtin_pulp_mulhhsN' needs target feature xpulpv}}
-  (void) __builtin_pulp_mulhhsRN(-(8u << 16), 2u << 16, 2, 1); // expected-error {{'__builtin_pulp_mulhhsRN' needs target feature xpulpv}}
+  (void) __builtin_pulp_mulhhsRN(-(8u << 16), 2u << 16, 2, 2); // expected-error {{'__builtin_pulp_mulhhsRN' needs target feature xpulpv}}
   (void) __builtin_pulp_mulhhu(8u << 16, 2u << 16); // expected-error {{'__builtin_pulp_mulhhu' needs target feature xpulpv}}
   (void) __builtin_pulp_mulhhuN(8u << 16, 2u << 16, 1); // expected-error {{'__builtin_pulp_mulhhuN' needs target feature xpulpv}}
-  (void) __builtin_pulp_mulhhuRN(8u << 16, 2u << 16, 2, 1); // expected-error {{'__builtin_pulp_mulhhuRN' needs target feature xpulpv}}
+  (void) __builtin_pulp_mulhhuRN(8u << 16, 2u << 16, 2, 2); // expected-error {{'__builtin_pulp_mulhhuRN' needs target feature xpulpv}}
   (void) __builtin_pulp_muls(-7, 2); // expected-error {{'__builtin_pulp_muls' needs target feature xpulpv}}
   (void) __builtin_pulp_mulsN(-7, 2, 1); // expected-error {{'__builtin_pulp_mulsN' needs target feature xpulpv}}
-  (void) __builtin_pulp_mulsRN(-7, 2, 2, 1); // expected-error {{'__builtin_pulp_mulsRN' needs target feature xpulpv}}
+  (void) __builtin_pulp_mulsRN(-7, 2, 2, 2); // expected-error {{'__builtin_pulp_mulsRN' needs target feature xpulpv}}
   (void) __builtin_pulp_mulu(7, 2); // expected-error {{'__builtin_pulp_mulu' needs target feature xpulpv}}
   (void) __builtin_pulp_muluN(7, 2, 1); // expected-error {{'__builtin_pulp_muluN' needs target feature xpulpv}}
-  (void) __builtin_pulp_muluRN(7, 2, 2, 1); // expected-error {{'__builtin_pulp_muluRN' needs target feature xpulpv}}
+  (void) __builtin_pulp_muluRN(7, 2, 2, 2); // expected-error {{'__builtin_pulp_muluRN' needs target feature xpulpv}}
   (void) __builtin_pulp_subN(-7, 2, 1); // expected-error {{'__builtin_pulp_subN' needs target feature xpulpv}}
   (void) __builtin_pulp_subN_r(7, 2, 1); // expected-error {{'__builtin_pulp_subN_r' needs target feature xpulpv}}
-  (void) __builtin_pulp_subRN(-7, 2, 2, 1); // expected-error {{'__builtin_pulp_subRN' needs target feature xpulpv}}
+  (void) __builtin_pulp_subRN(-7, 2, 2, 2); // expected-error {{'__builtin_pulp_subRN' needs target feature xpulpv}}
   (void) __builtin_pulp_subRN_r(-7, 2, 1); // expected-error {{'__builtin_pulp_subRN_r' needs target feature xpulpv}}
   (void) __builtin_pulp_subuN(7, 2, 1); // expected-error {{'__builtin_pulp_subuN' needs target feature xpulpv}}
   (void) __builtin_pulp_subuN_r(7, 2, 1); // expected-error {{'__builtin_pulp_subuN_r' needs target feature xpulpv}}
-  (void) __builtin_pulp_subuRN(7, 2, 2, 1); // expected-error {{'__builtin_pulp_subuRN' needs target feature xpulpv}}
+  (void) __builtin_pulp_subuRN(7, 2, 2, 2); // expected-error {{'__builtin_pulp_subuRN' needs target feature xpulpv}}
   (void) __builtin_pulp_subuRN_r(7, 2, 1); // expected-error {{'__builtin_pulp_subuRN_r' needs target feature xpulpv}}
   (void) __builtin_pulp_bclr(0x7FFFFFFF, 0xFFFF1FFF); // expected-error {{'__builtin_pulp_bclr' needs target feature xpulpv}}
   (void) __builtin_pulp_bclr_r(0xFFF, (3u << 5) | 4u); // expected-error {{'__builtin_pulp_bclr_r' needs target feature xpulpv}}
