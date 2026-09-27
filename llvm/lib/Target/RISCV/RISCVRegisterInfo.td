@@ -439,8 +439,13 @@ def FPR64C : RISCVRegisterClass<[f64], 64, (add
   (sequence "F%u_D", 8, 9)
 )>;
 
-// Xpulpv packed vector register classes
-def PulpV2 : RegisterClass<"RISCV", [v2i16], 32, (add
+// Xpulpv packed vector register classes (v2i16 and v4i8 held in a GPR).
+// They hold exactly the GPR registers and must stay mutual sub-classes of GPR.
+// TableGen only relates such identical classes while they sort next to each
+// other (classes of equal spill size and member count sort by name), so the
+// names must sort between "GPR" and "GPRF32" (formerly PulpV2/PulpV4).
+// Bridge until the classes are replaced by upstream's GPR-held packed types.
+def GPRAV2 : RegisterClass<"RISCV", [v2i16], 32, (add
     (sequence "X%u", 10, 17),
     (sequence "X%u", 5, 7),
     (sequence "X%u", 28, 31),
@@ -449,7 +454,7 @@ def PulpV2 : RegisterClass<"RISCV", [v2i16], 32, (add
     (sequence "X%u", 0, 4)
   )>;
 
-def PulpV4 : RegisterClass<"RISCV", [v4i8], 32, (add
+def GPRAV4 : RegisterClass<"RISCV", [v4i8], 32, (add
     (sequence "X%u", 10, 17),
     (sequence "X%u", 5, 7),
     (sequence "X%u", 28, 31),

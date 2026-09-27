@@ -138,8 +138,8 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
   }
 
   if (Subtarget.hasPULPExtV2()) {
-    addRegisterClass(MVT::v2i16, &RISCV::PulpV2RegClass);
-    addRegisterClass(MVT::v4i8, &RISCV::PulpV4RegClass);
+    addRegisterClass(MVT::v2i16, &RISCV::GPRAV2RegClass);
+    addRegisterClass(MVT::v4i8, &RISCV::GPRAV4RegClass);
   }
 
   static const MVT::SimpleValueType BoolVecVTs[] = {
