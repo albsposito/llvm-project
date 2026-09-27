@@ -17,3 +17,11 @@ Fork test (added by Federico Ficarelli, CINECA, in `f1b7aebff8c2`, 2022). The FR
 ## F001 — `clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics.c` and `riscv-xpulpv2-intrinsics-diag.c`: approved (2026-09-27)
 
 Fork defect fix 20/F001 (`8a8fab3863dc`): the `__builtin_pulp_*RN` Sema check compared the wrong argument (`RoundArgNum` instead of `NormArgNum`), so every valid call (Round == 2^(Norm-1), GAP9 GCC's rule) was rejected and some invalid ones accepted; introduced by fork commit `f1b7aebff8c2`. The two fork tests contain 16 calls with Norm=2, Round=1 (`machhsRN`, `machhuRN`, `mulhhsRN`, `mulhhuRN`, `mulsRN`, `muluRN`, `subRN`, `subuRN`, 8 in each file), which GCC rejects and which passed only because of the bug. The owner approved changing Round from 1 to 2 in exactly those 16 calls and the matching expected IR values in `riscv-xpulpv2-intrinsics.c` (`i32 2, i32 1` → `i32 2, i32 2`). Generated instructions are unchanged (the instruction encodes only Norm). Done by test-regen task 20/T009 on top of the F001 commit, independently reviewed, landed together with F001.
+
+## B40 — proposed regression tests: approved (2026-09-27)
+
+The owner approved adding the regression tests proposed in the `proposed_test` fields of tasks 20/F001, F002, F003, F004, F005, F006, R001 and E007 (new test files only; no existing test changes), so that tonight's fixes are guarded by lit. Done by test task 20/T010, independently reviewed. Each new test must fail on `port-20-green` (or on the build before its fix) and pass on the integration head, except where the fix predates the test's feature.
+
+## B12 — stricter builtin range checks: approved (2026-09-27)
+
+The owner approved making `__builtin_pulp_clip`, `__builtin_pulp_clipu` and `__builtin_pulp_bextract[u]` reject what GAP9 GCC rejects (clip: lo == -(hi+1); clip/clipu: hi <= 2^30-1; bextract: Size >= 1), including updating the existing fork test calls that use now-invalid arguments (e.g. `clip(-10,-4,15)`) to valid ones. Done by task 20/F011 (worker plus a test-regen commit), independently reviewed.

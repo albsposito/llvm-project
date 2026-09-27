@@ -56,3 +56,13 @@ llvm/test/MC/RISCV/xsmallfloat/rv32xsflt-xfvecquarter-valid.s
 llvm/test/MC/RISCV/xsmallfloat/rv32xsflt-xfvecsingle-invalid.s
 llvm/test/MC/RISCV/xsmallfloat/rv32xsflt-xfvecsingle-valid.s
 llvm/unittests/TargetParser/RISCVISAInfoTest.cpp
+# 20/T010 (owner exception B40, notes/20/owner-test-exceptions.md#b40): regression tests for 20/F001-F006, R001, E007
+llvm/test/CodeGen/RISCV/xpulp-clip-extract-imm.ll
+llvm/test/CodeGen/RISCV/xpulp-hwloop-countdown.ll
+llvm/test/CodeGen/RISCV/xpulp-hwloop-layout.ll
+llvm/test/CodeGen/RISCV/xpulp-hwloop-obj.ll
+llvm/test/CodeGen/RISCV/xpulp-postinc-f32.ll
+llvm/test/CodeGen/RISCV/xpulp-postinc-f32-mir.ll
+llvm/test/CodeGen/RISCV/xpulpv2-simd-cost-model.ll
+llvm/test/CodeGen/RISCV/xpulp-lsr-postinc-heuristic.ll
+clang/test/CodeGen/RISCV/riscv-xpulpv2-rn-builtins-range.c
