@@ -3253,6 +3253,11 @@ bool RISCVInstrInfo::isSchedulingBoundary(const MachineInstr &MI,
     case RISCV::LOOP1setup:
     case RISCV::LOOP0setupi:
     case RISCV::LOOP1setupi:
+    // frep repeats the instructions that immediately follow it, so nothing
+    // may be scheduled across it (the pre-RA scheduler is bidirectional since
+    // LLVM 20 and would otherwise hoist loop-body instructions above it).
+    case RISCV::FREP_O:
+    case RISCV::FREP_I:
       return true;
     default:;
   }
