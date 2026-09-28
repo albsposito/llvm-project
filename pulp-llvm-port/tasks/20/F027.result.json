@@ -1,0 +1,33 @@
+{
+ "status": "done",
+ "branch": "work/20/F027",
+ "commits": ["bd7b8f549bec"],
+ "cluster_commits": {"mc": "bd7b8f549bec"},
+ "note": "notes/20/F027.md",
+ "signature_gone": true,
+ "unmapped_files": [],
+ "cause": "Pre-existing fork defect (backlog B53). GNU as 2.28 (GAP9 GCC) keeps R_RISCV_REL12=57 (lp.setup/lp.starti/lp.endi, 12-bit halfword field bits 31:20) and R_RISCV_RELU5=58 (lp.setupi, 5-bit field bits 19:15), PC-relative to the lp.* instruction. Upstream numbers them R_RISCV_32_PCREL / R_RISCV_IRELATIVE (67820e015fc7, 9f854c048997). int-20 ld.lld: 58 -> 'unknown relocation (58)'; 57 -> SILENTLY overwrites the whole lp.* instruction with a 32-bit PC offset (links, program wrong/hangs); fork numbers R_PULPV2_LOOP_SETUP/SETUPI=66/67 mapped to R_NONE by fork commit f1b7aebff8c2 (field left 0 silently).",
+ "fix": "lld/ELF/Arch/RISCV.cpp only: helper pulpLoopFieldBits(type, loc) = 12/5 for 66/67, and for 57/58 only if the word at loc is an lp.* insn (opcode 0x7b, funct3 0/1/4 for 57, 5 for 58), precedent X86.cpp:102 R_386_GOT32X (llvmorg-20.1.8). getRelExpr: R_PC (replaces the fork's two R_NONE cases; checked in default: so 58 elsewhere still errors). relocate: unsigned range check (n+1 bits, error named R_PULPV2_LOOP_SETUP(I), negative shown signed) + 2-byte alignment + merge (val>>1) into the field, shape of R_RISCV_BRANCH (RISCV.cpp:390 @llvmorg-20.1.8); limits identical to fork RISCVAsmBackend (F010) and GNU as.",
+ "verification": {
+  "build": "logs/20-F027.verify.log (lld llc llvm-mc llvm-objdump llvm-readelf), cluster_errors: 0 clusters",
+  "repro": "logs/20-F027.repro.log (worktree lld before fix: t1.o 'unknown relocation (58)'; t2.o (REL12 only) links but lp.setup/starti/endi overwritten with garbage)",
+  "limits_gnu_as_objects": "logs/20-F027-evidence/lim.s: all 4 forms x both levels, setupi at 62 B and 4 B, setup at 8190 B, endi 12-bit, zero/4-byte distance: ld.lld .text byte-identical to GNU ld, every field equals GNU as's prefilled value",
+  "external_targets_and_errors": "t5.s (lp.setup to undefined symbol, --defsym): d=0,4,8190 identical to GNU ld; 8192 -> 'relocation R_PULPV2_LOOP_SETUP out of range: 8192 is not in [0, 8191]'; -2 -> '... -2 is not in [0, 8191]'; 8191 -> 'improper alignment ... not aligned to 2 bytes'. GNU ld has no check (8192 -> field 0, -2 -> 0xfff).",
+  "fork_numbers_66_67": "u.s (llvm-mc, external label -> R_PULPV2_LOOP_SETUP/SETUPI): now applied (int-20 left field 0); setupi at 100 B -> range error",
+  "fuzz_gcc_objects": "logs/20-F027-evidence/gl.sh, gl.txt: hwloop-fuzz seeds 1-80 x O2/O3/Os compiled by GAP9 GCC (-mPE=8 -mFC=1): 240/240 kern function bytes identical lld vs GNU ld and 240/240 same GVSoC RES (run once with linker relaxation on, once with --no-relax); 396 PULP relocs (383 REL12, 13 RELU5); int-20 lld on 20 REL12-only programs: 20/20 wrong or hang (int20-lld-gvsoc.txt), new lld 20/20 correct",
+  "gvsoc_kernel": "F010 kern.s via GNU as + GCC main/crt0: ld.lld RES 100237 exit 0 (same as GNU ld); --no-relax whole .text (incl. libgcc) byte-identical to GNU ld; mixed clang main/crt0 + GNU-as kern via ld.lld: RES 100237",
+  "llvm_only_links_unchanged": "all 194 LLVM sweep objects (benchmarks/gap9-sweep/build, ref18/port19/port20/port20fix...) linked with int-20 lld and this lld: 194/194 byte-identical ELFs excluding .comment (which contains the lld git hash); genuine R_RISCV_32_PCREL (.eh_frame, eh.s) resolves correctly in a mixed link with GNU-as loop objects; eh-only link identical to int-20. (The sweep itself is compile-only, so its objects are unaffected by an lld change.)",
+  "gcc_sweep_objects": "62 GCC sweep objects (331 PULP relocs): all link with lld (int-20: fail/corrupt); .text vs GNU ld identical for 55, the other 7 differ only in auipc/jalr/jr calls to symbols left undefined by the test link (--unresolved-symbols=ignore-all resolves differently), lp.* identical (sweep-link-compare.txt)",
+  "reverse_direction": "LLVM objects linked by GNU ld work when LLVM resolved the loop labels (the normal case): llvm-mc kern.s + GCC main via GNU ld RES 100237; clang loop.c/clip.c (default and -pulp-loop-range-immediate=0) via GNU ld run exit 0. GNU ld 2.28 rejects LLVM objects that carry R_PULPV2_LOOP_SETUP(I)=66/67 ('unrecognized relocation (0x42)') - only when the label is external/other section.",
+  "lit": "logs/20-F027-lit-lld.log: lld/test/ELF/riscv* 44/44 pass; logs/20-F027-lit-mc.log: llvm/test/MC/RISCV + fork MC tests 515/515 pass; no test edited",
+  "policy_check": "0 fail, 0 warn"
+ },
+ "other_errors_seen": [
+  "NEW, silent miscompile risk: LLVM MC resolves lp.setup/lp.setupi labels at assembly time even with +relax, so ld.lld relaxation inside the loop body moves the loop end but not the field. Repro logs/20-F027-evidence/t4.s: llvm-mc -mattr=+c,+xpulpv,+relax, 'call g' inside lp.setupi body relaxed to c.jal by ld.lld -> lp.setupi end offset 7 halfwords points 6 bytes past the real end. GNU as keeps R_RISCV_RELU5/REL12 so GNU ld/lld recompute it. Fix belongs in mc (emit R_PULPV2_LOOP_SETUP(I) when relaxation is on, like upstream forces branch relocations; lld now applies them). GAP9 flows use -mno-relax so not hit today.",
+  "Reverse interop: GNU ld 2.28 cannot link LLVM objects that carry R_PULPV2_LOOP_SETUP/SETUPI (66/67); if the mc fix above makes LLVM emit loop relocations under relax, GCC-ld compatibility would need GNU's 57/58 numbering (which clashes with upstream psABI) - owner decision.",
+  "GNU as 2.28 also defines R_RISCV_12_I=59 / R_RISCV_12_S=60 (fork RISCV.def moved them to 68/69); 59/60 clash with upstream R_RISCV_PLT32 / R_RISCV_SET_ULEB128. Not investigated which GCC constructs emit them; if a GCC object carries one, ld.lld would misapply it as PLT32/SET_ULEB128.",
+  "GNU objdump shows lp.* offsets >= 0x800 halfwords as negative (display only; hardware and GNU as treat the field as unsigned).",
+  "Pre-existing GNU as vs LLVM numeric-operand semantics difference (from F010) unchanged."
+ ],
+ "proposed_test": "lld/test/ELF/riscv-pulp-hwloop.s: assemble with llvm-mc -mattr=+c,+xpulpv an lp.setup/lp.setupi to an undefined symbol (emits R_PULPV2_LOOP_SETUP/SETUPI), link with --defsym at 4/8190 and CHECK the llvm-objdump encodings, plus 'not ld.lld' for 8192, -2 and odd distances CHECKing the error text. For the GNU numbering: yaml2obj an ELF with .text containing 0x0642507b/0x004640fb/0x0040007b/0x0030107b and .rela.text R_RISCV_IRELATIVE/R_RISCV_32_PCREL at those offsets (mimicking GNU as REL12/RELU5), CHECK the linked fields, and a data word with R_RISCV_32_PCREL in the same link CHECKed as a normal 32-bit PC offset."
+}

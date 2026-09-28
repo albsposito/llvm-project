@@ -1,0 +1,8 @@
+5183 [-march=rv32imcxgap9 -O2]:0x2073b30d 0xdfde6ac5 [-march=rv32imcxgap9 -O2 -mnohwloop]:0x448fd63a 0xdfde6ac5 [-march=rv32imcxgap9 -O0]:0x448fd63a 0xdfde6ac5 [-march=rv32imc -O2]:0x448fd63a 0xdfde6ac5
+562 [-march=rv32imcxgap9 -O2]:0x000000f9 0xcafafe3a [-march=rv32imcxgap9 -O2 -mnohwloop]:0x000006ff 0xcafafe3a [-march=rv32imcxgap9 -O0]:0x000006ff 0xcafafe3a [-march=rv32imc -O2]:0x000006ff 0xcafafe3a
+6012 [-march=rv32imcxgap9 -O2]:0xba0be6dc 0x328ffe39 [-march=rv32imcxgap9 -O2 -mnohwloop]:0xb1ae795c 0xa7f363b3 [-march=rv32imcxgap9 -O0]:0xb1ae795c 0xa7f363b3 [-march=rv32imc -O2]:0xb1ae795c 0xa7f363b3
+5050 [-march=rv32imcxgap9 -O2]:0x7d4d6cd9 0xcef6ec97 [-march=rv32imcxgap9 -O2 -mnohwloop]:0x6645f727 0xcef6ec97 [-march=rv32imcxgap9 -O0]:0x6645f727 0xcef6ec97 [-march=rv32imc -O2]:0x6645f727 0xcef6ec97
+27 [-march=rv32imcxgap9 -O2]:0x1b4a44be 0xdde53de1 [-march=rv32imcxgap9 -O2 -mnohwloop]:0x1b4a44be 0xdde53de1 [-march=rv32imcxgap9 -O0]:0x1b4a44be 0xdde53de1 [-march=rv32imc -O2]:0x1b4a44be 0xdde53de1
+6050 [-march=rv32imcxgap9 -O2]:0x1b32c8aa 0x51cca2d7 [-march=rv32imcxgap9 -O2 -mnohwloop]:0x1b32c8aa 0x870d81ab [-march=rv32imcxgap9 -O0]:0x1b32c8aa 0x870d81ab [-march=rv32imc -O2]:0x1b32c8aa 0x870d81ab
+330 [-march=rv32imcxgap9 -O2]:0x981786f0 0x251e5380 [-march=rv32imcxgap9 -O2 -mnohwloop]:0xc79b5ca6 0xb57263d2 [-march=rv32imcxgap9 -O0]:0xc79b5ca6 0xb57263d2 [-march=rv32imc -O2]:0xc79b5ca6 0xb57263d2
+9220 [-march=rv32imcxgap9 -O2]:0x482101bc 0x3e83db2b [-march=rv32imcxgap9 -O2 -mnohwloop]:0x62db8eed 0x88156fed [-march=rv32imcxgap9 -O0]:0x62db8eed 0x88156fed [-march=rv32imc -O2]:0x62db8eed 0x88156fed

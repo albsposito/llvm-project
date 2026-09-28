@@ -1,0 +1,38 @@
+hwloop-fuzz: trustworthy reference (backlog B101), 2026-09-28
+==============================================================
+
+Why
+  The fuzzer compared clang with GAP9 GCC -O2 with hardware loops. That GCC has a
+  hardware-loop bug (it replaces a register loop count with the constant 1 in about 0.2%
+  of generated kernels), so 7 of the 8 reported "clang wrong results" were GCC wrong.
+  Analysis: triage-2026-09-28/report.txt; reproducer: triage-2026-09-28/gcc-bug/.
+
+What changed
+  one.sh
+   - Reference is now host "gcc -O0" (hdrv.c, copied from triage-2026-09-28/host/),
+     cross-checked with GAP9 GCC "-O2 -mnohwloop" on GVSoC.
+   - 3 input sets (n,m,k) per seed, as triage scan/hostoracle.sh: set 0 = the historical
+     one.sh set, sets 1-2 random with zero bounds.
+   - MISMATCH[...] only when clang differs from host gcc -O0 (lists every failing input
+     set with bounds, got, ref). If the two references differ: separate
+     REFDISAGREE[...] flag (not a clang finding).
+   - Same interface: "one.sh <seed>", same status-line fields (ref=[...], O2:tag:lpN:OK).
+     NEW/BASE are now environment overrides (defaults unchanged), plus REF, XCHECK,
+     NSETS, OLEVELS, WD, CLANG_EXTRA. Script files are found relative to one.sh, so it
+     can be run from any directory.
+   - REF=gap9gcc restores the old reference (GAP9 GCC -O2 with hardware loops, 1 input
+     set by default) for comparison.
+  run.sh (new)   seed range in parallel, sorted lines + summary (MISMATCH, REFDISAGREE,
+                 crashes).
+  hdrv.c (new)   host driver.
+  README.md (new) usage, status line, reference and why.
+
+Validation (seeds 1-400, O2/O3/Os, int-20 snapshot at port/20 d17dc7f4f2f9, copied to
+the session scratchpad before build/ was deleted; results in validation-2026-09-28/)
+  REF=host (new):    1200 compiles, 3600 GVSoC runs + 1200 cross-check runs.
+                     MISMATCH: seed 27 only (O2, O3; all 3 input sets) = known clang
+                     miscompile (B03, two setups for one loop). REFDISAGREE: 0.
+                     Crashes: 0.
+  REF=gap9gcc (old): MISMATCH: seeds 27 and 330. 330 is the GAP9 GCC bug.
+  Extra seeds, REF=host: 960 O3 MISMATCH (known B03/B82 case; input sets 0 and 2);
+                     GCC-bug seeds 562, 5050, 6012 OK; 938 OK with these input sets.

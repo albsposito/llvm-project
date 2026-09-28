@@ -1,0 +1,33 @@
+{
+ "status": "done",
+ "branch": "work/20/F020",
+ "commits": ["1aeafd0d2b51"],
+ "commit_clusters": {"1aeafd0d2b51": "passes (llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp, computeCount only, +20 lines)"},
+ "note": "notes/20/F020.md",
+ "signature_gone": true,
+ "b71_same_root_cause": true,
+ "change": "computeCount: when a start/end register that holds a known constant (checkForImmediate) is not available in the preheader (its def does not dominate it, e.g. 'ADDI $x0, 256' left in the loop latch because an exit phi uses the same constant), use the immediate instead, as HexagonHardwareLoops::computeCount does for A2_tfrsi (lines 743-756 at llvmorg-20.1.8). Registers that are available keep being used, so all previously valid code is unchanged.",
+ "rule8": "Pre-existing fork defect. Fork commit f1b7aebff8c2 '[LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms' (git log pulp/integer_SIMD_fix -S'if (!MDT->properlyDominates(DefBB, Header))' -- llvm/lib/Target/RISCV) copied Hexagon's getLoopTripCount acceptance of in-loop constant registers but dropped computeCount's immediate substitution. Reference: llvm/lib/Target/Hexagon/HexagonHardwareLoops.cpp:710-719,743-756 at llvmorg-20.1.8. No CORE-V hwloop codegen upstream.",
+ "reproduction": "logs/20-F020.repro.log. At integration head 7459255b the given 30-line .ll no longer crashes only because 20/F007 declines its '!=' loop; the same file with icmp ult/slt/sge/uge (logs/20-F020/v_*.ll) and the full ImgIO.c (lenient flags, logs/20-F020/imgio.sh) still crash on int-20. ref-18 and int-19 crash on the original .ll.",
+ "b71": "Same root cause. Seed 256 C is masked on int-20 by F015, but it reproduces with toolchains/port-20fix2 (d9911b45): MIR taken before the pass (logs/20-F020/k256.pre.mir, -stop-before=pulp-hwloops) fails -verify-machineinstrs after -run-pass=pulp-hwloops with the unfixed pass (int-20 source) on %114 = ADDI $x0, 1 in bb.15 used as the end value and by the exit phi; with the fix it verifies clean.",
+ "evidence_logs": {
+  "reproducers_after": "given .ll + 9 predicate variants + k256.pre.mir: -verify-machineinstrs clean with build/20-F020; ImgIO.c compiles with and without -verify-machineinstrs",
+  "build": "logs/20-F020-build1.log (llc clang; cluster_errors 0 clusters), logs/20-F020-build2.log (lld llvm-test-depends clang-test-depends, rc 0)",
+  "gvsoc": "logs/20-F020.gvsoc.log. (1) logs/20-F020/gv/hdr.c + run.sh: SDK SkipCommentAndWhiteSpace/ReadValue/ReadPPMHeader verbatim behind a GetInputImageInfos-like 256-byte wrapper, 600 generated headers: RES 0x2432b340 ok=47 for GAP9 GCC and F020 at O2/O3/Os; int-20 fails to compile at O2/O3 (the crash), Os OK same hash. (2) logs/20-F020/gv/ir.ll + irrun.sh: 7 loops whose constant end is loaded inside the loop and feeds the exit phi, compared with the same IR built without xpulpv: 5 hwloops formed at O2 and O3, checks=452 bad=0; int-20 crashes on this file.",
+  "oracle": "logs/20-F020-oracle.log (copy of 20-F007 oracle in logs/20-F020/oracle): 1330/1330 OK at O2, O3, Os",
+  "fuzz": "logs/20-F020/fuzz/summary.txt, res.9001-9300.txt: fresh seeds 9001-9300 x O2/O3/Os, 900/900 asm identical to int-20, no NEWFAIL/OBJFAIL/crash/hang; seed 9220 O2/O3/Os MISMATCH vs GCC with identical asm on int-20 (pre-existing)",
+  "sdk_survey": "logs/20-F020/survey/summary.txt: strict 209/617 before and after (ImgIO.c still blocked in strict by the 2 missing PMSIS builtins); lenient ImgIO.c crash rc 134 -> OK (275 -> 276 ok), no other change, no new failure buckets",
+  "gap9_sweep": "logs/20-F020-sweep/static_compare.txt: 54/54 objects byte-identical disassembly int20 vs mine; runtime_compare.txt: 54/54 kernel/opt pairs checksum = GAP9 GCC, cycles and kernel objects identical to int-20",
+  "lit": "logs/20-F020-lit.log: CodeGen/RISCV, MC/RISCV, clang CodeGen/RISCV, clang/test/Sema, clang/test/Driver/riscv*, fork tests: 5713 pass, 126 unsupported, 1 fail = rvv/vsetvli-insert-zve64f.mir (data/known-failures.txt)"
+ },
+ "sdk_files_unblocked": {"strict": [], "lenient": ["libs/gap_lib/img_io/ImgIO.c"]},
+ "new_failure_buckets": [],
+ "unmapped_files": [],
+ "proposed_test": "llvm/test/CodeGen/RISCV/xpulp-hwloop-inloop-const-end.ll: RUN: llc -mtriple=riscv32 -mattr=+xpulpv,+m,+c -O2 -verify-machineinstrs < %s | FileCheck %s. (a) The reduced GetInputImageInfos function with 'icmp ult i32 %inc, 256' (two-exit loop, not converted): must compile, CHECK-NOT: lp.setup. (b) Guarded single-exit loop 'exit: %r = phi i32 [256, %loop], [%i, %entry]' with icmp ult/sgt/ugt step -4 (logs/20-F020/gv/ir.ll): CHECK: lp.setup and the preheader count computed from 'li aN, 256'. Generated with update_llc_test_checks.py.",
+ "other_errors_seen": [
+  "Dead trip-count code left behind: getLoopTripCount/computeCount emit the count (and F007's guard) into the preheader before convertToHardwareLoop checks the exit blocks, so a loop rejected afterwards ('multiple loop exit blocks') keeps ~10 dead instructions in the final assembly (e.g. logs/20-F020/v_ult.ll bb.4: li/sub/sltu/neg/and/addi, never used). No DCE runs after the pass. Code size/cycle waste, pre-existing (ref-18 leaves the SUB too); P3.",
+  "isDistanceCheckedOnEntry does not recognise a guard written against End-1 ('li a1,255; bltu a1,a0' for i < 256), so the F007 runtime guard is emitted although the guard already proves the distance (logs/20-F020/gv/ir.ll u_ult). Missed optimization, P3.",
+  "hwloop fuzz seed 9220 O2/O3/Os: wrong result vs GAP9 GCC on GVSoC, asm identical on build/int-20 (pre-existing, not analysed).",
+  "Harness hazard caused by this worker: two 'pkill -f' / 'pgrep -f' calls used broad patterns ('run.py --work', 'gvrun'). At that moment ps showed no survey run of another task, and the only gvrun processes found afterwards were this task's own, but a concurrent worker's run.py or GVSoC simulation started in that second may have been killed (13:24 and about 13:31). If F016-F021 report an unexplained killed survey/sim around then, this is the cause."
+ ]
+}

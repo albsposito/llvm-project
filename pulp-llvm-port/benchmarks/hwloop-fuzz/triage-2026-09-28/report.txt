@@ -1,0 +1,189 @@
+HARDWARE-LOOP FUZZER WRONG RESULTS: TRIAGE (2026-09-28)
+========================================================
+
+Compiler under test: build/int-20 = port/20 at 7459255b6120 (includes F007, F013, F015).
+Harness: benchmarks/hwloop-fuzz/gen.py + drv.c, with the same flags as one.sh
+(-march=rv32imc_zfinx_xpulpv2 -mno-relax -mllvm -pulp-loop-range-immediate=0).
+Nothing in the LLVM tree was changed. (The Write tool refused report.md, so this is report.txt.)
+
+BOTTOM LINE
+-----------
+There are 8 cases (seeds 27, 5050, 5183, 330, 562, 6050, 9220, 6012). All 8 still differ from
+GAP9 GCC on int-20, so F007 fixed none of them. They have TWO root causes, and only one of them is ours.
+
+Group A: GAP9 GCC 7.1.1 -O2 hardware loops replace a loop's count with the immediate 1
+    ("lp.setupi x1,1,..." for a loop whose count is in a register). THE GCC REFERENCE IS WRONG;
+    OUR CLANG IS RIGHT.
+    Seeds 5050, 5183, 330, 562, 6050, 9220, 6012 -> backlog B15, B70, B86.
+    Owner: nobody in LLVM; the fuzz harness oracle (one.sh). Fix size: about 5 lines of harness.
+
+Group B: Tail Duplication copies a preheader that holds LOOP0setup, so one loop has two setups.
+    PULPFixupHwLoops::fixupLoopInstrs then splits the latch once per setup. The second split moves
+    that setup's loop end one instruction up, so the last instruction of the body runs only once,
+    after the loop.
+    Seed 27 (plus latent: 938 -O3 = B82, 960 -O3 proven wrong with other inputs, 318, 371, 576, 1470)
+    -> backlog B03 and B82.
+    Owner: llvm/lib/Target/RISCV/PULP/PULPFixupHwLoops.cpp (or RISCVInstrInfoXpulp.td, option B.5).
+    Fix size: 1-10 lines.
+
+STATUS ON INT-20 (GVSoC, GAP9 GCC -O2 AS REFERENCE, AS IN ONE.SH)
+-----------------------------------------------------------------
+results-int20-gap9gcc-oracle.txt (script: chk.sh <seed>)
+
+  27    O0 OK  O1 OK  O2 BAD O3 BAD Os OK  Oz OK
+  5050  O0-Oz all BAD, the same value at every level
+  5183  O0-Oz all BAD, the same value
+  330   O0-Oz all BAD, the same value
+  562   O0-Oz all BAD, the same value
+  6050  O0-Oz all BAD, the same value
+  9220  O0-Oz all BAD, the same value
+  6012  O0-Oz all BAD, the same value
+
+For every seed except 27, clang gives the same value at every level, including -O0 and -Oz,
+which have no hardware loops. That points at the reference, not at clang.
+
+GROUP A: THE GAP9 GCC REFERENCE IS WRONG (B15, B70, B86)
+--------------------------------------------------------
+Evidence:
+ 1. Host oracle (host.sh <seed>, results-host-oracle.txt): host gcc and host clang at -O0/-O2/-O3
+    give exactly clang-int-20's value for all 7 seeds, and GAP9 GCC's value for seed 27.
+ 2. UB check: host "gcc -O1 -fsanitize=undefined,address -fno-sanitize-recover=all" runs clean on
+    all 8 kernels and prints the same value. (Host clang has no sanitizer runtime installed.)
+    The generator only uses unsigned arithmetic, masked indices and initialised variables, so there
+    is no UB. B86 (6012) is not UB and not a clang bug.
+ 3. GAP9 GCC variants on GVSoC (gccvar.sh, results-gap9gcc-variants.txt): with
+    -march=rv32imcxgap9 -O2 -mnohwloop, -march=rv32imcxgap9 -O0 and -march=rv32imc -O2, GAP9 GCC
+    itself gives clang's value for all 7 seeds. Only -march=rv32imcxgap9 -O2 with hardware loops
+    (the one.sh reference) differs.
+ 4. Signature: all 7 GCC assemblies (gcc-bug/<seed>.gap9gcc.s) contain "lp.setupi x1,1,(.Lxx)"
+    while the matching loop-end marker names a count register ("/* loop end a3 .L6 */"). Seed 27's
+    GCC output has no such setup. objdump of w/5183/gcc.elf shows the same encoding (001650fb), so
+    the simulator runs what GCC emitted. GVSoC is not at fault.
+
+Reduced reproducer: gcc-bug/gcc-hwloop-count-bug.c + gcc-hwloop-count-bug.drv.c
+    unsigned kern(unsigned *B, unsigned n, unsigned k) {
+      unsigned s = 0, t = 0;
+      if (n) t = 5;
+      for (unsigned i = 0; i < k; i++) t ^= 79u;
+      for (unsigned i = 0; i < n; i++) s += i;
+      return s ^ t;
+    }
+  With n=4, k=3 the expected result is (0+1+2+3)^(5^79^79^79) = 0x4c. On GVSoC, GAP9 GCC -O2 gives
+  0x4a (the second loop runs once), and -O2 -mnohwloop gives 0x4c. The GCC RTL dump shows where:
+  the machine-reorg hardware-loop pass (.299r.mach: "replacing loop 1 initializer with ...
+  UNSPECV_LC_SET (const_int 1)"); excerpt in gcc-bug/gcc-hwloop-count-bug.299r.mach.excerpt.txt.
+  A variant with a load in the loop is in gcc-hwloop-count-bug-load.c.
+  This is a GAP9 GCC defect. There is nothing to fix in LLVM.
+
+How often the oracle is wrong: scan/gccsig.sh over seeds 1-2000 finds the signature in 4 kernels
+(330, 562, 859, 1867), about 0.2%.
+
+Action (harness, not compiler): make the one.sh reference GAP9 GCC "-O2 -mnohwloop", or host
+"gcc -O0" with host/hdrv.c. Or rerun every MISMATCH with -mnohwloop before reporting it. Then close
+B15, B70 and B86 as "GAP9 GCC reference bug", pointing to gcc-bug/. (F003's review had already found
+another GAP9 GCC -O2 miscompile, do{c++;}while(--i>0).)
+
+GROUP B: TWO SETUPS FOR ONE LOOP GIVE A SHORTENED LOOP END (B03; B82 IS THE SAME BUG)
+------------------------------------------------------------------------------------
+Mechanism (seed 27 -O2, reduced to seed27/two-setups-one-loop.c):
+ 1. PULPHardwareLoops (pre-RA) puts "LOOP0setup %bb.loop, count" in the preheader of the loop.
+    This is correct.
+ 2. Tail Duplication (post-RA "tailduplication") duplicates that preheader into another predecessor.
+    There are 2 LOOP0setup before tail duplication and 3 after
+    (seed27/two-setups-one-loop.{before,after}-taildup.mir.txt). Two setups naming the same loop
+    are still correct at this point.
+ 3. PULPFixupHwLoops::fixupLoopInstrs, first pass (PULPFixupHwLoops.cpp:687-786 at 7459255b6120),
+    handles each setup separately. For each one it takes LastMBB from the setup operand (:702),
+    creates a new LoopEnd block (:734), moves the last non-branch instruction of LastMBB into it
+    (:720, :745) and retargets the setup (:781). The second setup of the same loop still names the
+    original LastMBB, which has already lost its last instruction. So the pass creates a second LoopEnd
+    holding the instruction before it, and that setup's range ends one instruction early
+    (seed27/two-setups-one-loop.after-fixup.mir.txt: "LOOP0setup %bb.9" and "%bb.10", two PseudoLOOPend).
+ 4. Output (seed27/two-setups-one-loop.s):
+        lp.setup x0, a2, .LBB0_10   # main path: end label on the dead 'addi a2,a2,-1'
+    .LBB0_6: ... lw a4, 0(a4)
+    .LBB0_10: addi a2, a2, -1
+    .LBB0_8:  add a0, a0, a4        # the other setup ends here (correct)
+    On the main path the accumulation "add a0,a0,a4" runs once after the loop instead of every
+    iteration.
+
+Proof:
+ - In the seed-27 -O2 assembly, changing only the wrong setup's end label to the other label
+   (seed27/kern.O2.handfixed.s) gives the GCC/host result on GVSoC.
+ - -mllvm -disable-tail-duplicate or -mllvm -tail-dup-size=0 fix seed 27 at -O2 and -O3, and fix
+   seed 960 -O3.
+ - The reduced reproducer (two-setups-one-loop.c + .drv.c, n=5, k=1) gives 0xeb588f8a on GVSoC at -O2
+   with default flags (with or without -pulp-loop-range-immediate=0). The host result is 0xeb29973a.
+
+B82 is wrong code, not only a performance problem: seed 938 -O3 has setups ending at .LBB0_6 and
+.LBB0_7 for the same loop. The driver's inputs take the correct one. With m=4
+("WD=w/938-m4 ./chk.sh 273 w/938/kern.c"; seed alias 273 has the same N,K and M=4), -O3 gives
+0x834d7210 instead of 0x834d7226. B82 should be upgraded to wrong code and merged into B03.
+
+Size: scan/scan1.sh + scan/multisetup.py look for loops entered by two lp.setup with different end
+labels. Seeds 1-2000 x O2/O3/Os (6000 compiles, scan/multi-end-1-2000.txt) find 9 compiles:
+27 (O2, O3), 318 (O3), 371 (O2, O3), 576 (O2), 938 (O3), 960 (O3), 1470 (O3). All are miscompiles
+of this kind; which ones show up depends on the inputs.
+
+Fix options:
+ B.1 (local to the fixup, about 10 lines, PULPFixupHwLoops.cpp): in the first pass of fixupLoopInstrs,
+     keep a DenseMap<MachineBasicBlock*, MachineBasicBlock*> from LastMBB to the LoopEnd already
+     created, and retarget later setups of the same loop to it instead of splitting again. The third
+     pass (length/padding, :799 onwards) then measures each setup against the same end. The extra "j"
+     from B82 stays (correct but slow).
+ B.5 (prevent the duplication, 2-4 lines, RISCVInstrInfoXpulp.td:415 LOOP0setup, :443 LOOP1setup,
+     plus the setupi forms): set "isNotDuplicable = 1". This is the upstream precedent: ARM marks its
+     low-overhead-loop start (t2WLS / t2DoLoopStart*, ARMInstrThumb2.td:5588-5712) isNotDuplicable,
+     and TailDuplicator.cpp:623 refuses to duplicate such blocks. It fixes B03 and removes B82's extra
+     jump. It changes code (some tail duplication is lost), and the .td is in the codegen-core /
+     insn-tablegen cluster.
+ Recommended: B.5 as the fix, plus B.1 or an assertion ("two setups share LastMBB") as a guard,
+ because other passes could still produce a duplicate. Under rule 5 these are two tasks if both
+ are done.
+
+RE-SWEEP WITH A CORRECT ORACLE
+------------------------------
+scan/hostoracle.sh: int-20 on GVSoC vs host gcc -O0, 3 input sets per seed (the one.sh set plus 2
+random sets that include zero bounds), O2/O3/Os. Seeds 1-600 plus 318, 371, 576, 938, 960, 1470:
+5454 runs (scan/hostoracle-1-600.txt). The only wrong results are seed 27 (O2/O3, all 3 input sets)
+and seed 960 (O3, 2 of the 3 random sets). 960 is a group-B case: -disable-tail-duplicate fixes it.
+No other clang wrong-code signature exists in this range. Seed 330, previously "wrong at every
+level", is correct.
+
+SIDE FINDINGS (not fixed; backlog candidates)
+---------------------------------------------
+ 1. "hwloopsfixup" is not registered with the pass registry before the pass is constructed:
+    initializePULPFixupHwLoopsPass is called only from the constructor (PULPFixupHwLoops.cpp:85),
+    and RISCVTargetMachine.cpp:148-151 initialises only PULPExpandPseudo and PULPHardwareLoops.
+    As a result, "llc -stop-before=hwloopsfixup" and "-run-pass=hwloopsfixup" fail with
+    '"hwloopsfixup" pass is not registered', so no MIR test can be written for the group-B fix until
+    this is fixed. Small; RISCVTargetMachine.cpp / RISCV.h.
+ 2. The decrement of the software loop counter stays inside the hardware loop ("addi a2,a2,-1",
+    dead) whenever the counter is also the lp.setup count register (fixupBump does not remove it).
+    This costs 1 instruction per iteration. Performance only.
+ 3. Fuzz harness: one fixed (N,M,K) per seed hides wrong paths (938, 960). Running 2-3 input sets
+    per seed, including zero bounds, costs little (scan/hostoracle.sh does this).
+
+RECOMMENDED FIX ORDER
+---------------------
+ 1. Harness first (no compiler change): switch the fuzz reference to GAP9 GCC -mnohwloop or host gcc,
+    and close B15/B70/B86 as a GCC bug. This removes 7 of the 8 "wrong results" from the queue.
+ 2. Side finding 1 (register hwloopsfixup), so that step 3 can have a -run-pass MIR test.
+    Touches RISCVTargetMachine.cpp and RISCV.h.
+ 3. B03 + B82 (group B), one task: B.5 in RISCVInstrInfoXpulp.td (codegen-core cluster), with the
+    B.1 guard as a separate task in PULPFixupHwLoops.cpp (passes cluster). Serialize the
+    PULPFixupHwLoops.cpp change against other fixup work in flight: B81 (offsetIncrease) and any
+    B04 crash fix that lands in the fixup.
+
+FILES
+-----
+ chk.sh      GVSoC check against GAP9 GCC (int-20, O0-Oz; env CLANG_EXTRA, OLEVELS, WD, BIN)
+ host.sh     host oracle (gcc/clang O0/O2/O3) + gcc UBSan/ASan
+ gccvar.sh   GAP9 GCC flag variants on GVSoC
+ dump.py     extracts the N-th -print-after-all dump
+ results-*.txt           result tables quoted above
+ gcc-bug/    group-A reproducer + driver, GAP9 GCC assemblies of the 8 seeds, RTL dump excerpt
+ seed27/     group-B reproducer (two-setups-one-loop.c/.drv.c/.ll/.s), MIR before/after tail
+             duplication and the fixup, hand-fixed seed-27 assembly (kern.O2.handfixed.s)
+ scan/       scanners and their outputs (multi-end-1-2000.txt, gcc-sig-1-2000.txt, hostoracle-1-600.txt)
+ w/<seed>/   per-seed kernels, objects, assemblies, ELFs

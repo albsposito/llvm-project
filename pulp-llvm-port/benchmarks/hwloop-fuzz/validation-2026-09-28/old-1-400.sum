@@ -1,0 +1,4 @@
+== seeds 1-400 REF=gap9gcc: 400 lines
+   MISMATCH (clang != reference): 2 seeds: 27 330 
+   REFDISAGREE (host gcc -O0 != GAP9 GCC -mnohwloop): 0 seeds: 
+   NEWFAIL/OBJFAIL (clang crash): 0   REFFAIL/GCCFAIL/XCHECKFAIL: 0

@@ -1,0 +1,77 @@
+# *** IR Dump After RISC-V pseudo instruction expansion pass (riscv-expand-pseudo) ***:
+# Machine code for function kern: NoPHIs, TracksLiveness, NoVRegs, TiedOpsRewritten, TracksDebugUserValues
+Function Live Ins: $x10, $x11, $x12, $x13
+
+bb.0.entry:
+  successors: %bb.1(0x40000000), %bb.2(0x40000000); %bb.1(50.00%), %bb.2(50.00%)
+  liveins: $x10, $x11, $x12, $x13
+  renamable $x14 = ADDI renamable $x12, 1
+  BNE renamable $x14, $x0, %bb.2
+
+bb.1:
+; predecessors: %bb.0
+  successors: %bb.6(0x80000000); %bb.6(100.00%)
+  liveins: $x11, $x12
+  renamable $x10 = ADDI $x0, 2
+  renamable $x13 = ADDI $x0, 3
+  LOOP0setup %bb.6, renamable $x12
+  PseudoBR %bb.6
+
+bb.2.for.body.preheader:
+; predecessors: %bb.0
+  successors: %bb.3(0x80000000); %bb.3(100.00%)
+  liveins: $x10, $x11, $x12, $x13, $x14
+  renamable $x16 = MUL killed renamable $x13, renamable $x14
+  renamable $x13 = ADDI $x0, 3
+  LOOP0setup %bb.3, renamable $x14
+  PseudoBR %bb.3
+
+bb.3.for.body (machine-block-address-taken):
+; predecessors: %bb.2, %bb.3
+  successors: %bb.4(0x04000000), %bb.3(0x7c000000); %bb.4(3.12%), %bb.3(96.88%)
+  liveins: $x10, $x11, $x12, $x13, $x14, $x16
+  renamable $x15 = ANDI renamable $x13, 63
+  renamable $x15 = XORI killed renamable $x15, 32
+  renamable $x15 = nuw nsw SLLI killed renamable $x15, 2
+  renamable $x15 = nuw ADD renamable $x10, killed renamable $x15
+  renamable $x15 = LW killed renamable $x15, 0 :: (load (s32) from %ir.arrayidx, !tbaa !6)
+  renamable $x14 = ADDI killed renamable $x14, -1
+  renamable $x13 = ADD killed renamable $x15, killed renamable $x13
+  BNE renamable $x14, $x0, %bb.3
+
+bb.4.for.cond5.preheader:
+; predecessors: %bb.3
+  successors: %bb.7(0x30000000), %bb.5(0x50000000); %bb.7(37.50%), %bb.5(62.50%)
+  liveins: $x11, $x12, $x13, $x16
+  renamable $x10 = ADDI killed renamable $x16, 2
+  BEQ renamable $x12, $x0, %bb.7
+
+bb.5.for.body8.preheader:
+; predecessors: %bb.4
+  successors: %bb.6(0x80000000); %bb.6(100.00%)
+  liveins: $x10, $x11, $x12, $x13
+  LOOP0setup %bb.6, renamable $x12
+  PseudoBR %bb.6
+
+bb.6.for.body8 (machine-block-address-taken):
+; predecessors: %bb.5, %bb.6, %bb.1
+  successors: %bb.7(0x04000000), %bb.6(0x7c000000); %bb.7(3.12%), %bb.6(96.88%)
+  liveins: $x10, $x11, $x12, $x13
+  renamable $x14 = ADDI renamable $x10, 53
+  renamable $x14 = ANDI killed renamable $x14, 63
+  renamable $x14 = nuw nsw SLLI killed renamable $x14, 2
+  renamable $x14 = nuw ADD renamable $x11, killed renamable $x14
+  renamable $x14 = LW killed renamable $x14, 0 :: (load (s32) from %ir.arrayidx11, !tbaa !6)
+  renamable $x12 = ADDI killed renamable $x12, -1
+  renamable $x10 = ADD killed renamable $x14, killed renamable $x10
+  BNE renamable $x12, $x0, %bb.6
+
+bb.7.for.cond.cleanup7:
+; predecessors: %bb.4, %bb.6
+  liveins: $x10, $x13
+  renamable $x10 = XOR killed renamable $x10, killed renamable $x13
+  PseudoRET implicit $x10
+
+# End machine code for function kern.
+
+

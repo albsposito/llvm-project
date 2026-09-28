@@ -1,0 +1,12 @@
+expr    0xc99577d9
+div     0x0a273cc2
+dot     0x00005432
+dot_sep 0x00005431
+toint   0x5437ab32
+fromf   0xa41c2a74
+fromi   0x2b7eef91
+tof     0x8a3c9bb0
+cmp     138
+toint(2.75) 2
+toint(-2.75) -2
+toint(2.5) 2

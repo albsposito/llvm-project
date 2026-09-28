@@ -1,0 +1,5 @@
+562 ref=[RES 0x000006ff 0xcafafe3a] refkind=host-gcc-O0+gap9gcc-O2-nohwloop sets=3 O2:same:lp3:OK O3:same:lp3:OK Os:same:lp3:OK
+938 ref=[RES 0xa47a90f1 0xdfde6ac5] refkind=host-gcc-O0+gap9gcc-O2-nohwloop sets=3 O2:same:lp1:OK O3:same:lp2:OK Os:same:lp4:OK
+960 ref=[RES 0x12b594bf 0xa1cf0b8a] refkind=host-gcc-O0+gap9gcc-O2-nohwloop sets=3 O2:same:lp3:OK O3:same:lp6:MISMATCH[s0:nmk=2,3,1:got=RES 0x12b5c4bf 0xa1cf0b8a:ref=RES 0x12b594bf 0xa1cf0b8a,s2:nmk=2,2,2:got=RES 0xafedcdc2 0xa1cf0b8a:ref=RES 0xad6dcdc2 0xa1cf0b8a] Os:same:lp3:OK
+5050 ref=[RES 0x6645f727 0xcef6ec97] refkind=host-gcc-O0+gap9gcc-O2-nohwloop sets=3 O2:same:lp6:OK O3:same:lp7:OK Os:same:lp8:OK
+6012 ref=[RES 0xb1ae795c 0xa7f363b3] refkind=host-gcc-O0+gap9gcc-O2-nohwloop sets=3 O2:same:lp5:OK O3:same:lp8:OK Os:same:lp5:OK

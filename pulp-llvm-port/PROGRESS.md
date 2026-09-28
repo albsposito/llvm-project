@@ -2,7 +2,7 @@
 
 Durable state of the port. The conductor updates this file at the end of every SOP step; after a context reset it is read before anything else.
 
-Current phase: Step 20: backlog session 2026-09-28. Landed today on local port/20 (each lit green 4729 PASS + 1 known): T010, F009, F008, F011, F010, F012, F015, F013, F014, F007 (int head 7459255b6120). Next landing before-files: tasks/20/work_20_F007.build.clusters.json / work_20_F007.lit_diff.json. Nothing in flight. B30 survey done (33.9% SDK parity; B87-B94). B25/B26 analysed (B65-B69). Owner decisions pending: B52, B54, B65. NO pushes without owner go-ahead (local port/20 is ahead of origin). Steps 21-23 paused.
+Current phase: Step 20: backlog push 2026-09-28 (evening, after a usage-limit pause and a server reboot). port/20 local head ccfd68f6ac76 (landed today since the push: F024, F021, F022, F027, F026, F017, F023 — NOT pushed). Resumed: F016 (B87), F018 (B91+B107), F019 rev2 (B92), F020 rev2 (B88/B71), F025 (B81), F028 (B03/B82). New wave 4: F029 (B112), F030 (B116), F031 (B104), F032 (B102), F033 (B76), F034 (B109), F035 (B90 T0+T1). Next landing before-files: tasks/20/work_20_F023.build.clusters.json / work_20_F023.lit_diff.json. Decisions D5/D6 recorded. Pushes need owner go-ahead. Steps 21-23 paused.
 
 ## Steps
 
@@ -28,6 +28,9 @@ Current phase: Step 20: backlog session 2026-09-28. Landed today on local port/2
 | D2 | (update 2026-09-27) The owner supplied the GAP9 SDK and the GAP9 GCC toolchain as the downstream benchmark corpus; first sweep after step 20 (DSP apps, MatMul) | Partially decided: corpus chosen; runner and simulator to be established |
 
 | D4 | Open problems are tracked only in `BACKLOG.md` (not GitHub issues; the fork is public and issues there would be world-readable) | Decided by owner 2026-09-27 |
+- D5 (owner, 2026-09-28): GAP9 is identified by a vendor extension `xgap9` (clang `-march=rv32imc_xgap9`, mirroring GCC's `rv32imcxgap9`); it implies Xpulpv and defines `__gap9__`, and GAP9-only instructions (complex/divN, later fp16) are gated on it. Chosen over a `-mcpu=gap9` processor. Implemented in 20/F017.
+- D6 (owner, 2026-09-28, fp16 design questions): (Q1) `(int)float16alt` copies GAP9 GCC (round to nearest, not C truncation) so SDK results match GCC; (Q7) `xgap9` implies the fp16 extensions (Zhinx + bfloat16 + packed fp16) once they exist; (Q5) match GCC's multiply-add fusion with `-ffp-contract=fast` in the SDK clang flags, clang default unchanged; (Q3/Q4) match GCC's mixed float16/float16alt promotion and varargs double promotion now (fp16 task T7, Upstream-File-Edit on SemaExpr.cpp accepted). Open: Q2 (vector compare lanes 0/1 vs 0/-1 on silicon), Q6, Q8, Q9 (conductor defaults: leave convertvector crash as B100, assume FC = cluster fp16 ISA as GVSoC, scalarize vfdiv/vfsqrt like GCC).
+- Incident 2026-09-28 14:09: a worker (20/F017) ran `cd <scratch>; rm -rf build` after the scratch dir had vanished and deleted pulp-llvm-port/build/ (build/int-20, int-18/19, all worker build dirs). Worktrees, commits, toolchains/, logs and ccache intact. build/int-20 rebuilt by the conductor (logs/rebuild-int-20.log); workers rebuild their own dirs. New AGENT_RULES 13c (safe deletes) and 13b (no pattern kills, after an earlier incident the same day).
 
 ## Owner actions
 

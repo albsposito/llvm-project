@@ -1,0 +1,95 @@
+{
+ "__builtin_pulp_add4div2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(4) signed char",
+   "__vector(4) signed char"
+  ],
+  "ret": "__vector(4) signed char",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_add4div4": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(4) signed char",
+   "__vector(4) signed char"
+  ],
+  "ret": "__vector(4) signed char",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_cplxmjrot2": {
+  "known": false
+ },
+ "__builtin_pulp_cplxmuls": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_cplxmulsdiv2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_cplxmulsdiv4": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_sub4div2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(4) signed char",
+   "__vector(4) signed char"
+  ],
+  "ret": "__vector(4) signed char",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_sub4div4": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(4) signed char",
+   "__vector(4) signed char"
+  ],
+  "ret": "__vector(4) signed char",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_vitmax2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_vitsel2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ }
+}

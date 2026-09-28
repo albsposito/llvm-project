@@ -1,0 +1,37 @@
+{
+  "status": "done",
+  "branch": "work/20/F023",
+  "commits": [
+    "6680c5eeee63",
+    "7d9bc27fbfde",
+    "47d735480aa6"
+  ],
+  "note": "notes/20/F023.md",
+  "signature_gone": true,
+  "other_errors_seen": [
+    "B83 removeSuccessor assertion (MachineBasicBlock.cpp:844) still in the same 21 runs of the F014 reviewer inputs (reord2-e76 at all -O levels, split*/split-snitch/split-e76 at -O0); not changed by this fix",
+    "Pre-existing: at -O0 the fast register allocator spills inside the frep body (frep output at -O0 is wrong regardless of N)",
+    "Known failure rvv/vsetvli-insert-zve64f.mir (B41) in llvm/test/CodeGen/RISCV lit run",
+    "Pre-existing -O0 fast-regalloc defect: ivuse.ll @inv at -O0 reloads x into fa4 before frep.o and body 'fmul.d fa4, fa4, fa4' clobbers it (before: N=3, now N=2); -O0 frep output is wrong independently of N",
+    "Process note: I ran rm -rf on my own just-created scratch output dir /home/ubuntu/llvm-project/pulp-llvm-port/logs/20-F023/new2 (absolute path, before regenerating it); rule 13c says never delete under logs/ - disclosing it; nothing else was deleted"
+  ],
+  "evidence_summary": {
+    "repro": "logs/20-F023.repro.log (ncount.ll -O2: frep.o a1, 3 over fadd.d; fcvt.w.d; xor)",
+    "after": "ncount, intbody, fcvth (F014 inputs) and logs/20-F023/ivuse.ll @addr (-O2 -disable-lsr; before: frep.o 4 over slli/add/fld/fmul/fsd, all iterations hit x[0]) now stay ordinary loops; @inv (pure FP) still frep.o 1",
+    "fork_frep_tests": "freploop.ll, freploop-nested.ll, sdma-intrinsics.ll (asm and stop-after MIR), ssr-register-reserving.ll byte-identical at -O1..-O3 vs build/int-20; only untested -O0 freploop*.ll changes (N drops by the in-loop end-count li, which is loop control: 2->1, 3->2)",
+    "f014_matrix": "logs/20-F023/{base,new}, gen.sh: all F014 rev3/review inputs byte-identical at -O1..-O3 x {default, -misched=ilpmax, -enable-post-misched} except ncount/intbody/fcvth (declined); at -O0 N drops by one (end-count li no longer counted)",
+    "lit": "logs/20-F023/lit.log: llvm/test/CodeGen/RISCV + llvm/test/MC/RISCV 2582 tests, only known failure vsetvli-insert-zve64f.mir; logs/20-F023/lit-clang.log fork clang tests 8/8 pass",
+    "gap9_sweep": "rev1 vs build/int-20@e21026f: 54/54 identical disassembly. rev2 changes only SNITCHFrepLoops.cpp (returns early without Xfrep). A rerun vs toolchains/port-20fix2 (d9911b451327, older than the integration head) differs in 5 f32 kernels via hardware-loop offsets from fixups landed between d9911b4 and 7459255, not from this change",
+    "hwloop_fuzzer": "not run: the change only affects functions with +xfrep (frep pass returns early without Xfrep; isSchedulingBoundary unchanged), PULPHardwareLoops untouched; GAP9 sweep identical",
+    "swap_rev2": "logs/20-F023-review/swap.ll @swap and @rot: no frep.o at -O0..-O3 (ordinary loops; logs/20-F023/swap.O2.new.s). ncount/intbody/fcvth/ivuse@addr still declined, ivuse@inv still frep.o 1 at -O1..-O3",
+    "matrix_rev2": "logs/20-F023/new2 (rev2) byte-identical to logs/20-F023/new (rev1) for all inputs/levels/flags (ignoring .option arch); hence four fork FREP tests still byte-identical to integration head at -O1..-O3 and F014 matrix unchanged; B83 in the same 21 runs. Scan of accepted -O1..-O3 frep bodies: no (sp) spill/reload or fmv.d/fsgnj among the N repeated instructions",
+    "lit_rev2": "logs/20-F023/lit2.log: CodeGen/RISCV + MC/RISCV 2582 tests, only known B41 vsetvli-insert-zve64f.mir fails; logs/20-F023/lit-clang2.log 8/8 pass"
+  },
+  "upstream_cause": "pre-existing fork defect from fork commit f1b7aebff8c2 [LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms (git log pulp/integer_SIMD_fix -SisInvalidLoopOperation)",
+  "declines_now": "loops with integer instructions, FP instructions with an integer operand (fcvt int<->fp, fmv.x.*, feq/flt/fle, fclass), FP format conversions, integer COPYs, calls/other branches, or any use of the induction variable other than its PHI/update/exit branch (address arithmetic, use after loop); any COPY; loop-carried PHIs needing a copy (swap/rotation, shared or loop-invariant back-edge value, PHI used after its update or live out of a loop exiting after the update)",
+  "b78_b83": "B78 second half (always-true FPR check) fixed; B78 verifier errors and B83 not touched and not fixed",
+  "unmapped_files": [],
+  "proposed_test": "llvm/test/CodeGen/RISCV/freploop-decline.ll: llc -O2 -mcpu=snitch with frep.infer on (a) ncount.ll body fadd.d; fcvt.w.d; xor -> CHECK-NOT: frep.o, CHECK: bnez; (b) ivuse.ll @addr with -disable-lsr -> CHECK-NOT: frep.o; (c) fcvth-style body with fcvt.s.d -> CHECK-NOT: frep.o; (d) pure FP body -> CHECK: frep.o {{.*}}, 1, 0, 0; (e) swap.ll @swap/@rot -> CHECK-NOT: frep.o",
+  "revision": 2,
+  "review_addressed": "tasks/20/F023.review.json: (a) every COPY in the body now declines; (b) phiMayNeedCopy declines any non-induction loop-carried PHI whose value stays live after its back-edge def (back-edge value is another PHI / shared by two header PHIs / loop-invariant, PHI result used after the def, feeding a PHI, or live out of a loop exiting after the def). Plain accumulators still convert. Note line 46 claim corrected (N exact at pass time and at -O1..-O3 unless RA adds spills inside the body; -O0 residual)."
+}

@@ -1,0 +1,32 @@
+{
+  "status": "done",
+  "branch": "work/20/F021",
+  "commits": ["1bb87a707e0eaf6eca014541336231fca119494f"],
+  "note": "notes/20/F021.md",
+  "signature_gone": true,
+  "root_cause": "Pre-existing fork defect (f1b7aebff8c2). RISCVTargetLowering::allowsMisalignedMemoryAccesses answered 'allowed and fast' for the PULP packed types v2i16/v4i8 at element (2-/1-byte) alignment (upstream RVV element-alignment rule a5b07a221a57, plus the fork's '|| hasPULPExtV2()'). DAGCombiner::tryStoreMergeOfLoads therefore merged two adjacent i16 (four i8) load->store copies into one v2i16 (v4i8) load/store; LegalizeDAG promotes that to an unaligned i32 access, which the target does not support, and splits it back into i16 accesses; the combiner re-merges: infinite loop. Confirmed with llc -debug-only=isel,dagcombine,legalizedag. Not fp16-specific: plain short pair copies and 4 x char copies hang too (ref-18, port-20, integration head).",
+  "fix": "One new block in allowsMisalignedMemoryAccesses: with Xpulpv2, v2i16/v4i8 get the i32 scalar answer (enableUnalignedScalarMem()), since they are loaded/stored as a promoted i32 lw/sw. The fork's '|| hasPULPExtV2()' line is kept (now only relevant for RVV types with V+Xpulpv2). Reference: scalar branch of the same function, RISCVISelLowering.cpp:21993-21997 at llvmorg-20.1.8; GAP9 GCC emits 2 x lh + 2 x sh for the same copy.",
+  "verification": {
+    "repro_before": "logs/20-F021.repro.log (all 4 C reproducers + the .ll killed after 20 s)",
+    "repro_after": "logs/20-F021.fixed.log (all compile instantly; code is lh/lh/sh/sh, 4 x lbu/sb)",
+    "gvsoc": "logs/20-F021-gvsoc/ : _Float16/__bf16/short pair copies, 4 x char copy, swapped half pair, offsets 0/2/4/6, NaN/Inf/denormal patterns: clang output (80 lines + checksum 0x405d4edc) identical to GAP9 GCC",
+    "gap9_sweep": "scratch copy, GAP9_EXTRA_COMPILERS=base=build/int-20 clang,mine=build/20-F021 clang: 54 rows each, all 54 objects byte-identical (incl. SIMD kernels)",
+    "lit": "logs/20-F021.lit.log: llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, clang/test/CodeGen/RISCV, clang/test/Driver/riscv*, clang/test/Sema, clang/test/Misc/target-invalid-cpu-note, clang/test/Preprocessor/riscv-nofdiv.c: 5855 tests, 1 failure = known failure vsetvli-insert-zve64f.mir (B41)",
+    "policy_check": "0 FAIL, 0 WARN",
+    "cluster_errors": "0 failed targets"
+  },
+  "sdk_survey": {
+    "method": "benchmarks/sdk-compile-survey/run.py --work <scratch>/F021-survey, snapshot = build/20-F021 clang, phases configure,db,inventory,gcc,strict,lenient,fp16probe (results phase not run, repo results.json untouched)",
+    "strict": "209 ok / 408 fail, identical per file to results.json (no strict file unblocked: DftLibraryf16a.c still fails strict on the float16 types, B90)",
+    "lenient": "identical per file to results.json",
+    "fp16probe": "DftLibraryf16a.c: timeout -> compiles (the only timeout in the survey). No new failure bucket from this change.",
+    "unblocks": ["tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16a.c (behind B90 float16 types and missing builtins)"],
+    "new_failure_buckets": []
+  },
+  "unmapped_files": [],
+  "other_errors_seen": [
+    "sdk-compile-survey fp16probe: 48 files that the committed results.json classifies 'only-missing-builtins' now fail with front-end errors ('assigning to v2s/v2h/v2ah/v4s from incompatible type int' from implicitly declared builtins such as __builtin_shuffle, 'argument to __builtin_pulp_mulsN must be a constant integer'); the int-20 clang gives the identical errors on the same command (checked on CNN_SoftMax.c), so this is survey/results.json drift, not this change",
+    "known failure llvm/test/CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (B41)"
+  ],
+  "proposed_test": "llvm/test/CodeGen/RISCV (new, e.g. xpulp-misaligned-pair-copy.ll): llc -mtriple=riscv32 -mattr=+xpulpv,+zfinx -O2 on functions copying (a) two adjacent i16, (b) two adjacent half, (c) two adjacent bfloat, (d) four adjacent i8, all with align 2 / align 1; CHECK two lh + two sh (four lbu + four sb) and that llc terminates; plus an align-4 variant checking a single lw/sw so the aligned merge still happens."
+}

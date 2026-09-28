@@ -1,0 +1,5 @@
+of 2000 samples, results equal to RNE / RTZ reference:
+fadd.ah   2000 / 1389
+fmul.ah   2000 / 1052
+fcvt.ah.s 2000 / 1036
+[run_sim] exit code: 0

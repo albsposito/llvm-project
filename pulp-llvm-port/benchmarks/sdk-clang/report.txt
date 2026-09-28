@@ -1,0 +1,308 @@
+# Building GAP9 SDK applications with our clang (B29 prototype)
+
+(Markdown content. It is saved as report.txt because the Write tool refused report.md.)
+
+Run on 2026-09-28.
+
+- **SDK:** `/home/ubuntu/gap_sdk_release` 5.21.14 (HEAD `206cbda18bba`). Not modified: `git status --ignored` is byte-identical before and after.
+- **Compiler:** a snapshot of `build/int-20` clang + ld.lld, `clang 20.1.8 (albsposito/llvm-project 7459255b6120)` (`compiler-version.txt`). The snapshot was taken before build/ was deleted and rebuilt today.
+- **Reference:** GAP9 GCC 7.1.1 and its binutils.
+- **Simulator:** GVSoC2 `gap.gap9.evk`, built out of tree from the SDK's `gvsoc2/` sources.
+
+## Headline
+
+**Real SDK apps build, link and run with our clang, through the SDK's own CMake, with no SDK edits.** There are two working setups:
+
+- **A, "clang + GNU binutils":** clang compiles every C/C++ file, GAP9 GCC assembles the hand-written runtime `.S` files, and GNU ld links.
+- **B, "all LLVM":** clang compiles and assembles everything and ld.lld links. This needs 6 small, behaviour-neutral SDK source edits (5 in 12 runtime `.S` files, 1 in a header); `make_patched_mirror.sh` applies them in a mirror.
+
+Both setups need a stop-gap header, `gap9_clang_compat.h`, which the wrapper force-includes. It covers:
+- the two missing builtins (F016);
+- the wrong run-time `__builtin_pulp_CoreCount()` (blocker 2), folded to `-mPE=8` as GCC does.
+
+**Results on 51 `examples/gap9/basic` apps** (GCC builds 49 of them and runs 28 to completion on GVSoC2):
+
+- **Setup A:** 45 build and link. 41 give exactly the GCC result: the same output, or the same GVSoC2 stop when GVSoC2 cannot run the app even with GCC. 25 of the 28 GCC-completing apps complete: 24 identically, plus `stack_usage`, whose printed stack figures differ.
+  - The 3 that fail: `full_custom_ld` (SDK app bug, see section 5), `getting_started` (float16) and `wrench` (C++ `<new>`).
+- **Setup B:** the same 45 build and link. 24 of the 28 GCC-completing apps complete: 22 identically, plus `stack_usage` (stack figures) and `hostfs` (only the mirror path in the output differs).
+  - The difference from A: `custom_bsp` was not run in B.
+  - The other differences are benign: GCC runs that time out or hang while clang completes (`mutex`, `watchdog/auto_rearm`).
+
+| app group | setup A | setup B |
+|---|---|---|
+| helloworld / perf (FC + 8-core cluster fork) | complete, same output | complete, same output |
+| helloworld_cxx (C++) | complete, same output | complete, same output |
+| 12 FreeRTOS kernel apps (a 13th, `mutex`, completes with clang but hangs with GCC) | complete, same output | complete, same output |
+| first_app1, mem_slab, memcheck, proxy, trace_control, precompiled_library, watchdog/simple | complete, same output | complete, same output |
+
+**No DSP, AutoTiler or NN app compiles yet.**
+- The first blocker is the missing `float16`/`float16alt` types (B90). The AutoTiler header `Emulation/Gap.h` needs them under `__gap9__` even for the int16 Fir.
+- With a type probe (`float16`=`_Float16`, `float16alt`=`__bf16`, probe only), `dsp/benchmarks/Fir` builds, links and runs, matching GCC up to the point where GVSoC2 stops.
+- The others then stop on missing fp builtins (`f32max/min/abs`, f16 vector max/min), on `__builtin_shuffle` (B92), and on implicit-int use of those unknown builtins.
+
+**New compiler findings:**
+1. The `CoreCount` fallback pattern is wrong: a silent miscompile that makes the cluster team fork run on 0 cores.
+2. A new back-end assertion in 'PULP Hardware Loops' (`MachineOperand::getReg() isReg()`) in the BSP driver `tlv320.c`, at `-Os`. Reproducer in `repro/`.
+3. LLVM MC rejects 5 GNU-as idioms used by the GAP9 runtime assembly.
+4. GAP binutils' `%tiny` relocations (types 59/60) collide with upstream `R_RISCV_SET_ULEB128`, so lld cannot link those GNU-as objects.
+
+B53 (loop relocations) did not show up in any runtime object.
+
+**The main limit on runtime comparison is GVSoC2, not the compiler.** Every DSP/AutoTiler/NN app also fails under GCC on GVSoC2:
+- The cluster controller (pe8) reads the cluster timer at 0x10200418 (`CL_TIMER_OFFSET`+0x18), which is not modelled.
+- MnistGraph and malloc use the hyperbus, which is not modelled.
+- The legacy GVSoC (gapy flow) is not built on this host.
+
+## 1. How the SDK picks its toolchain
+
+Only the CMake flow works in this release. The make flow (`utils/rules/pmsis_rules.mk`) includes `rtos/pmsis/os/freeRTOS/vendors/gwt/rules/freeRTOS_rules.mk`, and that file does not exist.
+
+**Compiler selection** (`utils/cmake/setup.cmake` → `macros.cmake:setupcrosscompile`):
+- It runs *before* `project()`. It does `find_program(GAP_RISCV_CC riscv32-unknown-elf-gcc)` and the same for CXX, AR, OBJDUMP, NM and SIZE, on the `PATH` that `configs/common.sh` sets from `$GAP_RISCV_GCC_TOOLCHAIN`.
+- It then sets `CMAKE_C_COMPILER` and `CMAKE_ASM_COMPILER` (the same gcc driver) and `CMAKE_*_COMPILER_FORCED`, and turns on ccache if it is installed.
+- A `CMAKE_TOOLCHAIN_FILE` is read inside `project()`, which is too late. But `find_program()` keeps an existing cache entry, so pre-seeding the `GAP_RISCV_*` entries with `cmake -C` swaps the compiler without touching the SDK. That is what `clang-gap9.cmake` does.
+
+**Flags** (`utils/cmake/gcc_flags.cmake`):
+- **Arch:** `-march=rv32imcxgap9 -mPE=8 -mFC=1 -mint64`. `-mint64` = the Int64 extension; `long` stays 32-bit, and the ABI is plain ILP32 (checked).
+- **C flags:**
+  - codegen: `-fcommon -fno-jump-tables -fno-tree-loop-distribute-patterns -fno-delete-null-pointer-checks -fomit-frame-pointer -Os`
+  - output and dialect: `-ffunction-sections -fdata-sections -funsigned-char -fno-exceptions -fmessage-length=0`
+  - warnings: `-Wall -Wextra -Werror` (unless `CONFIG_DISABLE_WERROR`), plus `-Wno-unused-parameter/-function/-variable/-but-set-variable -Wno-implicit-fallthrough -Wno-discarded-qualifiers`
+- **ASM:** `-x assembler-with-cpp -DASSEMBLY_LANGUAGE`.
+- **Link:** `-Wl,--gc-sections,-static,-lgcc -nostartfiles -nostdlib -lgcc -MD -MP -MT -flto`.
+  - The bare `-MT` swallows the next word.
+  - `-flto` at link time is a no-op, because objects are not compiled with `-flto`.
+
+**Linker scripts** (`rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/src/device/ld/`), in this order:
+- `gap_mem.ld`: MEMORY. FC-private L2 is aliased at 0x4, and cluster L1 is also aliased at 0x4.
+- `gap_fc_priv.ld`, `gap_irq_vectors.ld`, `gap_main_no_xip.ld` (or `_xip`), `gap_end.ld`.
+
+**Startup and runtime.** There is no toolchain crt0, no newlib libc and no libm. Everything is built from source for each app:
+- assembly: `startup_gap.S`, `gap_iet.S` (vectors), FreeRTOS `port_asm.S` and `freertos_task.S`, cluster `cluster-cc.S` and `cluster-pe-*.S`, `asm_util.S`, `timer_asm.S`, `gpio_asm.S`, `main.S`
+- PMSIS / FreeRTOS C, `libs/baselibs/printf` (semihosted printf), the pulp allocator, and the SDK's own stdlib (`vendors/gwt/libs`)
+
+The only prebuilt piece is GCC's `libgcc.a` (multilib `rv32imcxgap9/ilp32`), for soft-double and 64-bit helpers. GCC finds the newlib *headers* in its sysroot; clang needs `-isystem .../riscv32-unknown-elf/include`.
+
+**Run flow.** Pass `-DCONFIG_PLATFORM_GVSOC2=y`. The `run` target then calls `gvrun --target=$GVSOC2_TARGET --parameter chip/binary=<elf> run`: the ELF is loaded directly, with no flash image and no boot ROM. The SDK's `install/gvsoc2` has only `ri5ky_testbench`, so `build_gvsoc_gap9.sh` builds `gap.gap9.evk` into a private prefix (3 minutes).
+
+## 2. The prototype (files in this directory)
+
+| file | purpose |
+|---|---|
+| `clang-gap9.cmake` | `cmake -C` initial-cache script. Pre-seeds `GAP_RISCV_CC/CXX` with the wrapper and `GAP_RISCV_AR/NM/OBJDUMP/SIZE`, `CMAKE_AR/RANLIB` with llvm tools, and turns ccache off. ccache keys on the wrapper's mtime, so it would serve stale objects across compiler snapshots. |
+| `bin/riscv32-unknown-elf-clang` | GCC-compatible driver wrapper (Python), used for C, C++, `.S` and the link. See "Wrapper details" below. |
+| `gap9_clang_compat.h` | Stop-gaps, force-included with `GAP_CLANG_COMPAT=1`: `event_unit_read_fenced` (as `p.elw` inline asm, volatile, memory clobber, immediate offset, like GCC), `OffsetedWritePtr` (volatile pointer store = GCC's `p.sw`), `CoreCount()` → `-mPE` value, and the optional fp16 probe. The builtin blocks switch themselves off through `__has_builtin` once F016 lands. |
+| `setup.sh` | Compiler snapshot, SDK mirror (examples and nn_menu copied, the rest symlinked), venv (kconfiglib, xxhash, fdt; DftSimple also needs numpy, matplotlib, scipy), GVSoC2. |
+| `build_gvsoc_gap9.sh` | GVSoC2 `gap.gap9.evk` into `$SDK_CLANG_WORK/gvsoc2-install`, the same commands as `make gvsoc2.all`. |
+| `make_patched_mirror.sh` | Mirror `sdkp/` with a copied `rtos/` and the 6 edits that setup B needs. |
+| `build_app.sh <app> <variant>` | Configure and build one app. The variant name selects `gcc` / `clang`, `-compat`, `-nowerror`, `-gnuas`, `-gnuld`, `-fp16probe`, `-sdkp`. It writes `cfg.log`, `build.log` and `clang-cmds.log` (the translated command lines). |
+| `run_app.sh <elf>` | Run on GVSoC2 exactly like the SDK's `run` target. It uses `/home/ubuntu/gvsoc-venv`, because gvrun needs `rich`. |
+| `ladder.sh`, `compare.py`, `errs.sh` | Batch build and run, GCC vs clang comparison (line order ignored; cycle, time and PC numbers masked), error summary. |
+| `ladder.tsv`, `compare.txt` | Raw results of this run (app, variant, build rc, ELF, run rc) and the comparison table. |
+| `repro/tlv320.i`, `repro/tlv320.ll` | Reproducer for the new hardware-loop assertion. |
+
+**Wrapper details** (`bin/riscv32-unknown-elf-clang`):
+- **Drops** the GCC-only options: `-march=rv32imcxgap9`, `-mPE/-mFC`, `-mint64`, `-fno-tree-loop-distribute-patterns`, `-flto`, and at link time `-MD/-MP/-MT`. It keeps the `-mPE` value for the CoreCount fold.
+- **Adds:**
+  - target: `--target=riscv32-unknown-elf -march=rv32imc_zfinx_xpulpv2 -mabi=ilp32 -mno-relax`
+  - the newlib headers
+  - the macro shim `-D__gap9__ -D__pulp__ -D__pulp -D_pulp -D__riscv__ -D_riscv` (until F017)
+  - `-Wno-unknown-warning-option -Wno-ignored-optimization-argument -Wno-unused-command-line-argument`; without these, `-Werror` turns ignored GCC options into errors
+- **Links** with ld.lld (default; plus `--no-check-sections`, blocker 5) or GNU ld (`GAP_CLANG_LINKER=gnu`, via `--ld-path`), with GCC's GAP9 `libgcc.a` on the library path.
+- **Assembles** `.S` with clang's integrated assembler (default) or hands them to GAP9 GCC (`GAP_CLANG_AS=gnu`).
+
+**Usage** (`SDK_CLANG_WORK` defaults to `/tmp/sdk-clang-work`; this run used the scratchpad `.../scratchpad/work`):
+
+```
+./setup.sh
+./build_app.sh examples/gap9/basic/helloworld clang-compat-nowerror-gnuas-gnuld   # setup A
+./make_patched_mirror.sh
+./build_app.sh examples/gap9/basic/helloworld clang-compat-nowerror-sdkp          # setup B
+./run_app.sh $SDK_CLANG_WORK/bld/examples_gap9_basic_helloworld__clang-compat-nowerror-sdkp/helloworld
+```
+
+**Hand-made equivalent** (from an app directory, with `configs/gap9_evk_audio.sh` sourced):
+
+```
+GAP_CLANG_ROOT=<snapshot> GAP_CLANG_COMPAT=1 GAP_CLANG_AS=gnu GAP_CLANG_LINKER=gnu \
+  cmake -B build -C <this dir>/clang-gap9.cmake -DCONFIG_PLATFORM_GVSOC2=y -DCONFIG_DISABLE_WERROR=y
+cmake --build build
+```
+
+**Which linker, and why.**
+- **GNU ld** links the unmodified SDK: clang C objects plus GNU-as `.S` objects. So the reverse direction of B53 (LLVM objects linked by GNU ld) works.
+- **ld.lld** links everything once LLVM assembles the `.S` files (setup B), and mixing GCC's `libgcc.a` into an lld link works.
+- **ld.lld cannot link the GNU-as `.S` objects.** The cause is not B53's loop relocations (none of these objects has a relocated `lp.setup`) but GAP binutils' `%tiny()` relocations (blocker 4).
+- **With ld.lld, the SDK's two weak `system_exit` definitions resolve differently** (section 5). Without edit 6, lld-linked apps hang in GVSoC2 after `main` returns.
+
+## 3. The ladder (simple → complex)
+
+All builds use the SDK's CMake with the `gap9_evk_audio` config and `CONFIG_PLATFORM_GVSOC2=y`.
+
+**Column key:**
+- **strict** = wrapper only (SDK flags incl. `-Werror`, no compat header)
+- **A** = `clang-compat-nowerror-gnuas-gnuld`
+- **B** = `clang-compat-nowerror-sdkp`
+- **probe** = A + fp16probe
+
+"Same" means the same output lines, with the order of cluster-core prints and all cycle, timer and PC numbers masked. On GVSoC2 errors, clang stops at the same place, with the same message, as GCC.
+
+| app | GCC build / GVSoC2 run | strict | A | B | first clang blocker |
+|---|---|---|---|---|---|
+| basic/helloworld (FC + 8-core cluster fork) | ok / **completes** | fails | **completes, same** | **completes, same** | strict: `-Werror` on `fll.c` (clang-only warning), then the 2 builtins (F016). Without the CoreCount fold the 8 core prints are silently missing. |
+| basic/perf (cluster, perf counters) | ok / completes | fails | completes, same (cycles differ) | completes, same | as helloworld |
+| basic/os/kernel/* (12 FreeRTOS apps; `mutex` hangs with GCC) | ok / complete | fails | complete, same | complete, same | as helloworld |
+| basic/malloc | ok / GVSoC2 error (hyper0 unmodelled) | fails | same stop | same stop | none after compat (the stop is GVSoC2's) |
+| basic/gvsoc/pcer | ok / GVSoC2 error (unknown ebreak 257) | fails | same stop | same stop | as above |
+| dsp/benchmarks/Fir (int16) | ok / GVSoC2 error (pe8 → cluster timer 0x10200418) | fails | fails | fails | `tools/autotiler_v3/Emulation/Gap.h:29:12: error: unknown type name 'float16'` (B90). **Probe: builds, links, same output and same stop as GCC.** |
+| dsp/benchmarks/MatMul | ok / same pe8 stop | fails | fails | fails | float16. Probe: `FastFloatApprox16.h:578: passing 'int' to parameter of incompatible type 'v2h'` (implicit int from a missing f16 vector builtin); `MatMulDSPf16a.c:38: use of unknown builtin '__builtin_shuffle'` (B92) |
+| dsp/benchmarks/FFTL1 | ok / same pe8 stop | fails | fails | fails | float16. Probe: `FftLibraryf16a.c:63: __builtin_shuffle` |
+| dsp/benchmarks/DftSimple | ok / same pe8 stop | fails | fails | fails | float16. Probe: `FastFloatApprox.h:53: use of unknown builtin '__builtin_pulp_f32max'` (+ f32min, f32abs) |
+| dsp/autotiler/MatAdd, MatMul, DotProd (AutoTiler generator + kernels) | ok / same pe8 stop | fails | fails | fails | float16. Probe: f16 vector builtins (implicit int `v2h`/`v2ah`), `__builtin_shuffle`, `CNN_Bias_Linear_Activation_fp32.c:328 __builtin_pulp_f32max` |
+| nn/autotiler/MnistGraph (AutoTiler CNN) | ok / GVSoC2 error (hyper0) | fails | fails | fails | float16 (45 TUs). Probe: f16 vector builtins, `f32max/min/abs` |
+| nn/nntool/* | GCC fails as well: `No module named 'argcomplete'` (NNTool not installed) | – | – | – | not tried (harness) |
+
+The AutoTiler host generators are compiled with host gcc and run at build time. They work unchanged, because only the target compiler is swapped.
+
+**Code size** (sum of `.text` sections):
+
+| app | GCC | setup A | setup B |
+|---|---|---|---|
+| helloworld | 19,908 | 20,258 (+1.8%) | 20,194 (+1.4%) |
+| perf | 18,948 | 19,234 | 19,156 |
+
+### Sweep of examples/gap9/basic (51 apps; full table in compare.txt)
+
+**Harness:** GVSoC2 timeout 120-180 s. The host load was 40-77 during the sweep, so a few GCC runs timed out.
+
+| result | GCC | setup A | setup B |
+|---|---|---|---|
+| does not build | 2 (tlv320 x2: GCC fails too) | 6 | 6 |
+| completes (rc 0) | 28 | 26 | 26 |
+| same GVSoC2 stop as GCC (rc 1/timeout) | – | 17 | 16 |
+| identical to GCC (incl. same stop) | – | 41 | 38 (+2 benign: host path, gcc timeout) |
+| differs | – | 3 | 5 |
+| not run | – | 1 (vfs) | 2 (vfs, custom_bsp) |
+
+**The differences, all explained:**
+- `stack/stack_usage`: the printed stack usage differs (0x4c vs 0x7c bytes). Expected.
+- `os/kernel/mutex`: the GCC build hangs on GVSoC2 (also with a 400 s timeout); both clang builds complete. Not investigated.
+- `watchdog/auto_rearm` (B): GCC timed out; clang completed ("Still alive 29").
+- `bsp/filesystem/hostfs` (B): only the mirror path in the output differs.
+- `full_custom_ld` (A and B): an SDK app bug, section 5.
+
+**Clang build failures (6):**
+
+| app | error | cause |
+|---|---|---|
+| getting_started | `libs/include/Gap.h:29: unknown type name 'float16'` | B90 |
+| wrench (C++) | `wrench.cpp:85:10: fatal error: 'new' file not found` | clang is not given GCC's libstdc++ headers. `helloworld_cxx` works because it includes no C++ library headers. |
+| jpeg_compression | `libs/gap_lib/jpeg/dct.c:59: use of unknown builtin '__builtin_pulp_trunch'`, `dct.c:62 '__builtin_pulp_mulfsN'` | missing builtins (B97) |
+| bsp/display/ili9341/image | `LiveVariables.cpp:141 ... Can't find reaching def for virtreg` in `libs/gap_lib/img_io/ImgIO.c @GetInputImageInfos` | known B88 / F020 |
+| bsp/adc/tlv320 x2 | `MachineOperand.h:370: Register llvm::MachineOperand::getReg() const: Assertion 'isReg() && "This is not a register operand!"' failed`, in pass `'PULP Hardware Loops' on function '@pi_tlv320_configure'` (`rtos/pmsis/bsp/adc/tlv320/tlv320.c`) | **NEW** (GCC fails on these two apps for an unrelated reason) |
+
+The tlv320 assertion reproduces with `clang --target=riscv32-unknown-elf -march=rv32imc_zfinx_xpulpv2 -mabi=ilp32 -Os -c repro/tlv320.i`. It happens at `-Os` only (`-O2` is fine). The port-19 and port-20fix2 toolchains assert too; ref-18 is a non-assertions build and compiles the file.
+
+## 4. Blockers, ranked
+
+These are ranked by how many apps each one blocks and by how bad it is.
+
+1. **Two missing builtins: `__builtin_pulp_event_unit_read_fenced` and `__builtin_pulp_OffsetedWritePtr` (B87 / F016).**
+   - This blocks every PMSIS app, i.e. every SDK app.
+   - Exact errors: `error: use of unknown builtin '__builtin_pulp_event_unit_read_fenced' [-Wimplicit-function-declaration]` (160× in helloworld) and `'__builtin_pulp_OffsetedWritePtr'` (55×).
+   - The stop-gap in `gap9_clang_compat.h` is validated end to end: the cluster fork and barriers use `p.elw` on GVSoC2.
+
+2. **`__builtin_pulp_CoreCount()` is miscompiled: a silent wrong result (NEW; related to B91 / F018).**
+   - GCC folds it to 8 (from `-mPE=8`).
+   - Our clang uses `llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td:1875` `def : Pat<(int_riscv_pulp_CoreCount), (ANDI (LW (LUI 0x1A103), 0), 0x12)>`, i.e. `lui a0,0x1a103; lw a0,0(a0); andi a0,a0,18`.
+   - GCC without `-mPE` emits `li a0,0x1A103000; p.lw a0,18(a0)`. The fork uses the `0x12` as an ANDI mask where GCC uses it as the load offset.
+   - On GAP9 the result is 0. In `helloworld`, `pi_cl_team_fork(pi_cl_cluster_nb_cores(), ...)` then skips the team setup (`beqz`) and the 8 per-core "Hello World!" lines are silently missing. The FC and the cluster master still print, and the program exits 0.
+   - With the stop-gap fold the output matches GCC.
+   - The fix needs both the `-mPE` fold (F018) and a corrected fallback pattern.
+
+3. **LLVM MC rejects runtime assembly that GNU as accepts.** Every app, 12 `.S` files. Exact errors (helloworld, integrated assembler):
+   - `.func` / `.endfunc` → `error: unknown directive`, 44×, 8 files. These are GNU-as STABS-only directives.
+   - `%tiny(sym)(x0)` → `error: unrecognized operand modifier` + `unknown operand` (`cluster-cc.S:175,279,281,313`, `cluster-pe-workgroup.S:136`).
+   - `p.mul t4,t5,a0` → `error: unrecognized instruction mnemonic, did you mean: mul, p.msu, ...` (`cluster-cc.S:252`). GNU as emits plain `mul`.
+   - `p.lw sp, PI_CLUSTER_T_CC_STACK(s7)` (immediate offset, no `!`) → `error: invalid operand for instruction` (`cluster-cc.S:63`). GNU as emits plain `lw`.
+   - `.weak default_handler` then `.global` (inside macro DECLARE) → `error: default_handler changed binding to STB_GLOBAL` (`gap_iet.S:546`). GNU as keeps the symbol WEAK.
+
+   Workarounds: GNU as for `.S` (setup A), or the source edits (setup B). A compiler-side fix would accept the `p.mul` alias and non-post-increment `p.lw/p.sw imm(rs)` (small asm-parser aliases), and optionally ignore `.func/.endfunc`.
+
+4. **ld.lld cannot link GNU-as objects that use `%tiny` (NEW; not B53).**
+   - GAP binutils emit `R_RISCV_12_I` (type 59) and `R_RISCV_12_S` (type 60) for `%tiny`. Type 60 is **upstream `R_RISCV_SET_ULEB128`**.
+   - Exact lld error: `ld.lld: error: pmsis/libpmsis.a(cluster-cc.S.obj):(.cluster.text+0x168): R_RISCV_SET_ULEB128 not paired with R_RISCV_SUB_SET128`.
+   - GNU readelf of the same object: `00000168 0000283c R_RISCV_12_S __pi_cluster_nb_active_pe + 0`.
+   - Because the numbers clash, lld cannot simply add type 60. The practical fix is on the SDK side: `%tiny(`→`%lo(`, which is the same instruction in the 0x4..0x7FF window; only the range check is lost.
+   - No `R_PULPV2_LOOP_SETUP*` appears in any runtime object, so B53 does not block these apps. It will matter for GCC-built prebuilt libraries with loops.
+
+5. **ld.lld refuses the linker scripts' intentional VMA overlap:** `ld.lld: error: section .data_tiny_fc virtual address range overlaps with .data_tiny_l1` (`[0x4, 0x54F]` vs `[0x4, 0x4F]`).
+   - The FC and the cluster each see their own memory at the aliased low addresses. GNU ld does not check VMA overlap.
+   - Fix: `-Wl,--no-check-sections`, which the wrapper passes.
+
+6. **`float16`/`float16alt`/`v2h`/`v2ah` types (B90).**
+   - This blocks every DSP, AutoTiler and NN app, including integer-only ones: `Emulation/Gap.h:29` `typedef float16 v2h __attribute__((vector_size(4)))` is compiled into every AutoTiler TU when `__gap9__` is defined.
+   - `getting_started` hits the same problem through `libs/include/Gap.h`.
+
+7. **Behind the fp16 types:**
+   - missing fp builtins: `__builtin_pulp_f32max/f32min/f32abs` and the f16/f16alt vector max/min/abs family behind `FastFloatApprox16.h` (B97);
+   - `__builtin_shuffle` (B92 / F019);
+   - `trunch`/`mulfsN` (jpeg);
+   - implicit-int uses of those unknown builtins.
+
+   The survey's ISel hang (B89 / F021) was not reached in this app set.
+
+8. **Back-end crashes in code that now reaches codegen:** ImgIO.c (B88 / F020, known) and **tlv320.c (NEW, PULP Hardware Loops `getReg` assertion)**.
+
+9. **`-Werror`:** clang-only warnings (section 5). Only `fll.c` stops the strict build today.
+
+**Proposed backlog rows** (I did not edit BACKLOG.md):
+- **`CoreCount` fallback pattern wrong** (`RISCVInstrInfoXpulp.td:1875`, ANDI 0x12 instead of LW offset 18). A silent miscompile on GAP9 (0 cores; team fork runs nothing). P1, to fix together with F018.
+- **PULP Hardware Loops assertion** `MachineOperand::getReg() isReg()` on `@pi_tlv320_configure` (`tlv320.c`, `-Os`). Reproducer `benchmarks/sdk-clang/repro/tlv320.i`. P1 crash.
+- **LLVM MC compatibility with GAP9 runtime assembly:** `p.mul`, `p.lw/p.sw imm(rs)` without `!`, and optionally `.func/.endfunc`.
+- **GAP binutils relocations `R_RISCV_12_I` (59) / `R_RISCV_12_S` (60)** clash with upstream `SET_ULEB128`, so lld misreads GNU-as `%tiny` objects. Extend B53's scope or open a new item. The SDK-side fix is `%lo`.
+- **Clang ignores `__attribute__((tiny))`** (`-Wunknown-attributes`, 45× per PMSIS build). This is correct, because the `section` attribute still places the data, but every access takes `lui`+`lw`/`sw` where GCC uses one x0-relative access.
+- **C++ apps need GCC's libstdc++ include paths** (`wrench`: `'new' file not found`); a driver/sysroot item.
+- **GNU ld (GAP binutils) concatenates rather than merges LLVM's `.riscv.attributes`.** `llvm-objdump` then fails on setup-A ELFs with `invalid section length 19009 at offset 0x4B`. Cosmetic; use GNU objdump.
+
+## 5. SDK-side issues (not compiler bugs) and what the SDK build would need
+
+- **Toolchain hook:**
+  - `setupcrosscompile` hard-codes `riscv32-unknown-elf-gcc` (also as ASM compiler) and never sets `CMAKE_AR`.
+  - A `GAP_TOOLCHAIN=clang` switch, or honouring `CMAKE_C_COMPILER` / a toolchain file, would replace `clang-gap9.cmake`.
+  - ccache keyed on the compiler mtime is unsafe with a wrapper.
+- **GCC-only options in `gcc_flags.cmake`:**
+  - `-march=rv32imcxgap9 -mPE=8 -mFC=1 -mint64` → `--target=riscv32-unknown-elf -march=rv32imc_zfinx_xpulpv2 -mabi=ilp32` plus a `-mPE` equivalent (F018).
+  - `-Wno-discarded-qualifiers` (clang name: `-Wno-incompatible-pointer-types-discards-qualifiers`); `-fno-tree-loop-distribute-patterns` (needs `-Wno-ignored-optimization-argument` under `-Werror`).
+  - In the link flags: the bare `-MT` (it swallows `-flto`) and the no-op `-flto`.
+  - The link needs `-fuse-ld=lld -Wl,--no-check-sections` (or GNU ld), and `-L` to GCC's GAP9 libgcc. There is no compiler-rt for rv32imc_zfinx_xpulpv2 yet.
+- **Headers:** clang needs `-isystem <gcc-toolchain>/riscv32-unknown-elf/include` for newlib, and the libstdc++ include dirs for C++.
+- **`-Werror` differences** (clang warnings GCC 7 does not emit; counts from helloworld):
+  - `-Wimplicit-const-int-float-conversion`: `rtos/pmsis/implem/chips/gap9/fll_pmu/fll/fll.c:113,116` (`CONFIG_FAST_OSC_FREQUENCY` 24576063 → float). This is the first error of every strict build.
+  - `-Wtypedef-redefinition` (a C11 feature under `-std=gnu99`): `pmsis/drivers/i2c_slave.h:95`, `i2s.h:171`, ... (29).
+  - `-Wunknown-attributes` (`tiny`): `cluster/include/pmsis/implem/data.h:104-108`, `cluster/driver/cluster.c:51-58` (45).
+  - `-Wincompatible-pointer-types-discards-qualifiers`: `cluster/driver/cluster.c:152,255`.
+  - `-Wenum-conversion` (3).
+  - The compile survey adds `implicit-function-declaration` / `int-conversion` errors in 7 more files.
+  - With clang the SDK needs these fixed, or `CONFIG_DISABLE_WERROR=y`; the prototype uses the latter.
+- **Hand-written assembly** (blocker 3), edits 1-5 of `make_patched_mirror.sh`: drop `.func/.endfunc`; `%tiny(`→`%lo(`; `p.mul`→`mul`; `p.lw rd, imm(rs)`→`lw`; move `.weak default_handler` after its `.global`.
+- **Two weak `system_exit` definitions** (edit 6).
+  - `rtos/pmsis/os/freeRTOS/vendors/gwt/libs/include/stdlib.h:32` declares `void __attribute__((weak)) system_exit(int32_t)`. This makes the real definition in `rtos/pmsis/implem/rtos/os/system_gap.c:395` (semihosting exit + corestatus) weak too.
+  - `vendors/gwt/libs/src/stdlib.c:28` has a second weak stub that only writes corestatus and loops.
+  - GNU ld keeps `system_gap.c`'s definition; ld.lld keeps the stub (nm: `W system_exit` from `stdlib.c.obj`). Every lld-linked app that returns from `main` then hangs in GVSoC2.
+  - Fix: drop the `weak` from the header declaration.
+- **Linker scripts:** the aliased tiny sections overlap by design, so lld needs `--no-check-sections` (or an OVERLAY-style description).
+- **`Emulation/Gap.h` and `libs/include/Gap.h`** choose real or emulated fp16 types on `__gap9__` alone. They should test whether the type exists instead.
+- **`full_custom_ld` depends on GCC's emission order.**
+  - `algo_data0` and `algo_data1` share `.my_algo_section`.
+  - `init_area()` overwrites the first 64 KB of the section, and `check_area()` expects that range to be `algo_data1`. GCC 7 emits `algo_data1` first (at `__my_algo_area_addr`); clang emits declaration order. So clang fails: `algo_data0[0]=0x0, expected: 0x0`. The message prints the wrong array too; the failing check is on `algo_data1`.
+  - This is an app bug: layout within a section is not specified.
+- **GCC-isms in kernels:** `__builtin_shuffle` (use `__builtin_shufflevector` under `__clang__`), and implicitly declared builtins.
+
+## Caveats
+
+- **The compat header is a stop-gap, not the fix.** Re-run without `GAP_CLANG_COMPAT` once F016 and F018 land. The `p.elw` inline asm and the volatile store follow GCC's output but are not the compiler builtins.
+- **The fp16 probe has wrong float16alt semantics** (`__bf16` arithmetic is promoted to float). It only shows what lies behind the type errors.
+- **GVSoC2 `gap.gap9.evk` models too little of GAP9** to run the DSP/NN apps even with GCC: no cluster timer, no hyperbus, and some FC accesses and semihost ebreaks are missing. A runtime comparison of DSP/NN code needs the legacy GVSoC (gapy flow, not built here) or the `ri5ky_testbench` harness in `benchmarks/gap9-sweep`.
+- **The venv for the SDK's generators** needs kconfiglib, xxhash, fdt (plus numpy, matplotlib, scipy for DftSimple). NNTool apps were not attempted.
+- **Location of this run:** the scratch work dir (`/tmp/claude-1000/.../scratchpad/work`, logs under `bld/<app>__<variant>/`) is not durable. `ladder.tsv` and `compare.txt` here keep the results. `setup.sh` snapshots `build/int-20`; if that build is being rebuilt, point `INT=` at `toolchains/port-20fix2`.

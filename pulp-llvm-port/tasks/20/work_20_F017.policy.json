@@ -1,0 +1,20 @@
+{
+  "range": "e21026f4903f1dfc75f7c78ee1d4f4960f873693..work/20/F017",
+  "commits": 4,
+  "fail": 0,
+  "warn": 2,
+  "findings": [
+    {
+      "commit": "33ab3b28c31b",
+      "level": "WARN",
+      "rule": "commented-code",
+      "msg": "adds what looks like commented-out code in llvm/lib/Target/RISCV/RISCVFeatures.td: // \"xpulpv2\" (xpulpv version 2.0), \"xgap9\" is extension \"xgap\" version 9.0;"
+    },
+    {
+      "commit": "c78f25822cff",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/unittests/TargetParser/RISCVISAInfoTest.cpp"
+    }
+  ]
+}

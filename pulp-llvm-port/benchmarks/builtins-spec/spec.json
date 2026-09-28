@@ -1,0 +1,4506 @@
+{
+ "generated": "2026-09-28",
+ "clang_baseline": "build/int-20 (clang 20.1.8, albsposito/llvm-project 7459255b6120)",
+ "gcc": "/home/ubuntu/gap_riscv_toolchain_ubuntu/bin/riscv32-unknown-elf-gcc 7.1.1, -march=rv32imcxgap9 -mPE=8 -mFC=1 -O2 (GAP8-only builtins: -march=rv32imcxgap8)",
+ "excluded": [
+  "__builtin_pulp_OffsetedWritePtr (20/F016)",
+  "__builtin_pulp_event_unit_read_fenced (20/F016)",
+  "__builtin_pulp_CoreCount (defined; folding is 20/F018)",
+  "__builtin_shuffle (not a pulp builtin; 20/F019)"
+ ],
+ "batches": {
+  "A": {
+   "title": "f32 scalar builtins on existing F/Zfinx instructions",
+   "builtins": [
+    "__builtin_pulp_f32abs",
+    "__builtin_pulp_f32max",
+    "__builtin_pulp_f32min",
+    "__builtin_pulp_f32sqrt",
+    "__builtin_pulp_rdownsf2",
+    "__builtin_pulp_rintsf2",
+    "__builtin_pulp_rupsf2"
+   ],
+   "blocked_on": null,
+   "size": "S (~200 lines incl. tests)"
+  },
+  "B": {
+   "title": "GAP9 complex / divN packed-SIMD builtins (new instructions)",
+   "builtins": [
+    "__builtin_pulp_add2div2",
+    "__builtin_pulp_add2div4",
+    "__builtin_pulp_cplx_conj",
+    "__builtin_pulp_cplxmuls2",
+    "__builtin_pulp_cplxmuls2div2",
+    "__builtin_pulp_cplxmuls2div4",
+    "__builtin_pulp_cplxmuls2div8",
+    "__builtin_pulp_sub2div2",
+    "__builtin_pulp_sub2div4",
+    "__builtin_pulp_sub2rotmj"
+   ],
+   "blocked_on": "conductor decision: feature name for the GAP9-only instructions",
+   "size": "M (~500 lines incl. MC + codegen tests)"
+  },
+  "C": {
+   "title": "Fractional-multiply aliases, 64-bit high multiply, truncations (existing instructions)",
+   "builtins": [
+    "__builtin_pulp_macfs",
+    "__builtin_pulp_macfsN",
+    "__builtin_pulp_macfsRN",
+    "__builtin_pulp_macfu",
+    "__builtin_pulp_macfuN",
+    "__builtin_pulp_macfuRN",
+    "__builtin_pulp_mul64hs",
+    "__builtin_pulp_mul64hu",
+    "__builtin_pulp_mul64hus",
+    "__builtin_pulp_mulfs",
+    "__builtin_pulp_mulfsN",
+    "__builtin_pulp_mulfsRN",
+    "__builtin_pulp_mulfu",
+    "__builtin_pulp_mulfuN",
+    "__builtin_pulp_truncb",
+    "__builtin_pulp_trunch"
+   ],
+   "blocked_on": null,
+   "size": "S-M (~250 lines incl. tests)"
+  },
+  "D": {
+   "title": "float16 scalar builtins (Zhinx instructions exist)",
+   "builtins": [
+    "__builtin_pulp_f16abs",
+    "__builtin_pulp_f16max",
+    "__builtin_pulp_f16min",
+    "__builtin_pulp_f16sqrt"
+   ],
+   "blocked_on": "B90 (float16 = _Float16)",
+   "size": "S (~80 lines)"
+  },
+  "E1": {
+   "title": "float16alt scalar builtins",
+   "builtins": [
+    "__builtin_pulp_f16altabs",
+    "__builtin_pulp_f16altmax",
+    "__builtin_pulp_f16altmin",
+    "__builtin_pulp_f16altsqrt"
+   ],
+   "blocked_on": "B90 (float16alt type) + GAP9 alt-half GPR instructions",
+   "size": "M"
+  },
+  "E2": {
+   "title": "v2h / v2ah packed float16 max/min/abs",
+   "builtins": [
+    "__builtin_pulp_f16abs2",
+    "__builtin_pulp_f16altabs2",
+    "__builtin_pulp_f16altmax2",
+    "__builtin_pulp_f16altmin2",
+    "__builtin_pulp_f16max2",
+    "__builtin_pulp_f16min2"
+   ],
+   "blocked_on": "B90 (v2h/v2ah types) + GAP9 GPR vector smallfloat instructions",
+   "size": "M"
+  },
+  "E3": {
+   "title": "v2h / v2ah / v2s conversions",
+   "builtins": [
+    "__builtin_pulp_v2hftov2hi",
+    "__builtin_pulp_v2hftov2hi_u",
+    "__builtin_pulp_v2hftov2ohf",
+    "__builtin_pulp_v2hitov2hf",
+    "__builtin_pulp_v2hitov2hf_u",
+    "__builtin_pulp_v2hitov2ohf",
+    "__builtin_pulp_v2hitov2ohf_u",
+    "__builtin_pulp_v2ohftov2hf",
+    "__builtin_pulp_v2ohftov2hi",
+    "__builtin_pulp_v2ohftov2hi_u"
+   ],
+   "blocked_on": "B90 + GAP9 GPR vfcvt instructions",
+   "size": "M"
+  },
+  "F": {
+   "title": "CoreCount_m1 (fold like CoreCount)",
+   "builtins": [
+    "__builtin_pulp_CoreCount_m1"
+   ],
+   "blocked_on": "fold it inside task 20/F018",
+   "size": "XS"
+  },
+  "X": {
+   "title": "Not for GAP9 (GAP8-only or nonexistent in GCC)",
+   "builtins": [
+    "__builtin_pulp_add4div2",
+    "__builtin_pulp_add4div4",
+    "__builtin_pulp_cplxmjrot2",
+    "__builtin_pulp_cplxmuls",
+    "__builtin_pulp_cplxmulsdiv2",
+    "__builtin_pulp_cplxmulsdiv4",
+    "__builtin_pulp_sub4div2",
+    "__builtin_pulp_sub4div4",
+    "__builtin_pulp_vitmax2",
+    "__builtin_pulp_vitsel2"
+   ],
+   "blocked_on": null,
+   "size": "none"
+  }
+ },
+ "builtins": [
+  {
+   "name": "__builtin_pulp_CoreCount_m1",
+   "batch": "F",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int()",
+    "test_file": "gcc/CoreCount_m1.c",
+    "asm_file": "gcc/CoreCount_m1.s",
+    "asm": [
+     "t_CoreCount_m1: li a0,7",
+     "t_CoreCount_m1: ret"
+    ],
+    "encodings": {}
+   },
+   "clang_prototype": "int()",
+   "semantics": "Number of cluster cores minus 1. GAP9 GCC folds it to (-mPE value - 1): 7 with -mPE=8, 3 with -mPE=4, usable in static initializers. Without -mPE it reads the core count from the cluster peripheral (li 0x1a100000; p.lw 18(a0); addi -1).",
+   "emitted_instruction": "li rd,PE-1",
+   "fork_has_instruction": "n/a",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "-",
+   "suggested_lowering": "Implement in task 20/F018 together with CoreCount folding (CoreCount() - 1).",
+   "notes": "Wrapper gap_ncorem1 (Emulation/GapSystem.h:65); no SDK call site. Same mechanism as __builtin_pulp_CoreCount.",
+   "sdk": {
+    "wrappers": [
+     "gap_ncorem1"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapSystem.h:65: #define gap_ncorem1() __builtin_pulp_CoreCount_m1()"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_add2div2",
+   "batch": "B",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/add2div2.c",
+    "asm_file": "gcc/add2div2.s",
+    "asm": [
+     "t_add2div2: pv.add.h.div2 a0,a0,a1",
+     "t_add2div2: ret"
+    ],
+    "encodings": {
+     "pv.add.h.div2 a0,a0,a1": {
+      "gcc_encoding": "74b52557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)",
+   "semantics": "r[i] = (int16)(a[i] + b[i]) >> 1, i=0,1 (sum wraps to 16 bits BEFORE the arithmetic shift; not an overflow-free average).",
+   "emitted_instruction": "pv.add.h.div2 rd,rs1,rs2 (OP-V 0x57, funct7 0111010, funct3 010)",
+   "fork_has_instruction": "NO (llvm-mc: unknown mnemonic; disassembler: invalid encoding)",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/gap9/models/ips/gap/cpu/gap9_isa.py:92 gap9_VEC_ADD_16_DIV2 -> /home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/include/isa_lib/int.h:733 VEC_OP_DIV2(ADD,int32_t,int16_t)",
+   "suggested_lowering": "pattern (int_riscv_pulp_add2div2 GPRAV2, GPRAV2) -> PV_ADD_H_DIV2",
+   "notes": "Wrappers __ADD2DIV2 (builtins_gap9.h:213), __ADD2_DIV2 (pmsis_gcc.h:607), gap_add2div2. Used in FftLibraryFix.c. GCC accepts any 4-byte vector (v4s) by lax conversion; no constant folding. Upstream reference: CV_ADD_DIV2 (RISCVInstrInfoXCV.td:485, MC-only, different opcode).",
+   "sdk": {
+    "wrappers": [
+     "__ADD2DIV2",
+     "__ADD2_DIV2",
+     "gap_add2div2"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 5,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:174: #define gap_add2div2(x, y) __builtin_pulp_add2div2((x), (y))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:607: #define __ADD2_DIV2(x, y) __builtin_pulp_add2div2(x, y)",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:213: #define __ADD2DIV2(x, y) __builtin_pulp_add2div2((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_add2div4",
+   "batch": "B",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/add2div4.c",
+    "asm_file": "gcc/add2div4.s",
+    "asm": [
+     "t_add2div4: pv.add.h.div4 a0,a0,a1",
+     "t_add2div4: ret"
+    ],
+    "encodings": {
+     "pv.add.h.div4 a0,a0,a1": {
+      "gcc_encoding": "74b54557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)",
+   "semantics": "r[i] = (int16)(a[i] + b[i]) >> 2.",
+   "emitted_instruction": "pv.add.h.div4 (funct7 0111010, funct3 100)",
+   "fork_has_instruction": "NO",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/gap9/models/ips/gap/cpu/gap9_isa.py:93 / /home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/include/isa_lib/int.h:734",
+   "suggested_lowering": "-> PV_ADD_H_DIV4",
+   "notes": "Wrappers __ADD2DIV4, __ADD2_DIV4, gap_add2div4. FftLibraryFix.c.",
+   "sdk": {
+    "wrappers": [
+     "__ADD2DIV4",
+     "__ADD2_DIV4",
+     "gap_add2div4"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 4,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:175: #define gap_add2div4(x, y) __builtin_pulp_add2div4((x), (y))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:608: #define __ADD2_DIV4(x, y) __builtin_pulp_add2div4(x, y)",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:214: #define __ADD2DIV4(x, y) __builtin_pulp_add2div4((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_add4div2",
+   "batch": "X",
+   "gcc": {
+    "gap9_known": false,
+    "gap8_known": true,
+    "signature": "__vector(4) signed char(__vector(4) signed char, __vector(4) signed char)",
+    "test_file": "gcc/add4div2.c",
+    "asm_file": "gcc/add4div2.s",
+    "asm": [
+     "t_add4div2: pv.add.b.div2 a0,a0,a1",
+     "t_add4div2: ret"
+    ],
+    "encodings": {
+     "pv.add.b.div2 a0,a0,a1": {
+      "gcc_encoding": "00b53557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": null,
+   "semantics": null,
+   "emitted_instruction": null,
+   "fork_has_instruction": "no",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": null,
+   "suggested_lowering": "Do not implement for GAP9 (GCC parity does not require it).",
+   "notes": "GAP8 only: GAP9 GCC rejects it (implicit declaration); GAP8 GCC emits pv.add.b.div2 (encoding 00b53557 under gap8 gas). Not in the GVSoC GAP9 ISA.",
+   "sdk": {
+    "wrappers": [
+     "__ADD4DIV2"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:216: #define __ADD4DIV2(x, y) __builtin_pulp_add4div2((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_add4div4",
+   "batch": "X",
+   "gcc": {
+    "gap9_known": false,
+    "gap8_known": true,
+    "signature": "__vector(4) signed char(__vector(4) signed char, __vector(4) signed char)",
+    "test_file": "gcc/add4div4.c",
+    "asm_file": "gcc/add4div4.s",
+    "asm": [
+     "t_add4div4: pv.add.b.div4 a0,a0,a1",
+     "t_add4div4: ret"
+    ],
+    "encodings": {
+     "pv.add.b.div4 a0,a0,a1": {
+      "gcc_encoding": "02b53557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": null,
+   "semantics": null,
+   "emitted_instruction": null,
+   "fork_has_instruction": "no",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": null,
+   "suggested_lowering": "Do not implement for GAP9 (GCC parity does not require it).",
+   "notes": "GAP8 only (pv.add.b.div4).",
+   "sdk": {
+    "wrappers": [
+     "__ADD4DIV4"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:217: #define __ADD4DIV4(x, y) __builtin_pulp_add4div4((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_cplx_conj",
+   "batch": "B",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) short int)",
+    "test_file": "gcc/cplx_conj.c",
+    "asm_file": "gcc/cplx_conj.s",
+    "asm": [
+     "t_cplx_conj: pv.cplxconj.h a0,a0",
+     "t_cplx_conj: ret",
+     "t_cplx_conj_const: lui a5,%hi(.LC0)",
+     "t_cplx_conj_const: lw a0,%lo(.LC0)(a5)",
+     "t_cplx_conj_const: pv.cplxconj.h a0,a0",
+     "t_cplx_conj_const: ret"
+    ],
+    "encodings": {
+     "pv.cplxconj.h a0,a0": {
+      "gcc_encoding": "5c050557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(_Vector<2, short>)",
+   "semantics": "element 0 = bits 15:0 = real part, element 1 = bits 31:16 = imaginary part: r.re = a.re; r.im = (int16)(-a.im) (-(-32768) wraps to -32768).",
+   "emitted_instruction": "pv.cplxconj.h rd,rs1 (funct7 0101110, rs2=00000, funct3 000)",
+   "fork_has_instruction": "NO",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/gap9/models/ips/gap/cpu/gap9_isa.py:90 / /home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/include/isa_lib/int.h:1364 lib_CPLX_CONJ_16",
+   "suggested_lowering": "-> PV_CPLXCONJ_H",
+   "notes": "Wrappers __CPLXCONJ, __CPLX_CONJ, gap_cplxconj. FftLibraryFix.c. Not folded by GCC. Upstream ref CV_CPLXCONJ (RISCVInstrInfoXCV.td:476).",
+   "sdk": {
+    "wrappers": [
+     "__CPLXCONJ",
+     "__CPLX_CONJ",
+     "gap_cplxconj"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 10,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:165: #define gap_cplxconj(x) __builtin_pulp_cplx_conj((x))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:598: #define __CPLX_CONJ(x) __builtin_pulp_cplx_conj(x)",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:207: #define __CPLXCONJ(x) __builtin_pulp_cplx_conj((x))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_cplxmjrot2",
+   "batch": "X",
+   "gcc": {
+    "gap9_known": false,
+    "gap8_known": false,
+    "signature": null,
+    "test_file": null,
+    "asm_file": null,
+    "asm": [],
+    "encodings": {}
+   },
+   "clang_prototype": null,
+   "semantics": null,
+   "emitted_instruction": null,
+   "fork_has_instruction": "no",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": null,
+   "suggested_lowering": "Do not implement for GAP9 (GCC parity does not require it).",
+   "notes": "Not a builtin in any GAP GCC target (gap8/gap9/gap10 all report implicit declaration); only dead wrappers __CPLX_MJ / gap_cplxmj.",
+   "sdk": {
+    "wrappers": [
+     "__CPLX_MJ",
+     "gap_cplxmj"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:168: #define gap_cplxmj(x) __builtin_pulp_cplxmjrot2((x))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:601: #define __CPLX_MJ(x) __builtin_pulp_cplxmjrot2(x)"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_cplxmuls",
+   "batch": "X",
+   "gcc": {
+    "gap9_known": false,
+    "gap8_known": true,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/cplxmuls.c",
+    "asm_file": "gcc/cplxmuls.s",
+    "asm": [
+     "t_cplxmuls: pv.cplxmul.s a0,a0,a1",
+     "t_cplxmuls: ret"
+    ],
+    "encodings": {
+     "pv.cplxmul.s a0,a0,a1": {
+      "gcc_encoding": "54b50557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": null,
+   "semantics": null,
+   "emitted_instruction": null,
+   "fork_has_instruction": "no",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": null,
+   "suggested_lowering": "Do not implement for GAP9 (GCC parity does not require it).",
+   "notes": "GAP8 only (pv.cplxmul.s, one instruction). GAP9 code uses cplxmuls2 (GapBuiltins.h:153-161 selects on __GAP8__/__GAP9__).",
+   "sdk": {
+    "wrappers": [
+     "__CPLXMULS",
+     "__CPLX_MULS",
+     "gap_cplxmuls",
+     "gap_cplxmulsdiv2",
+     "gap_cplxmulsdiv4"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 20,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:154: #define gap_cplxmuls(x, y) __builtin_pulp_cplxmuls((x), (y))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:593: #define __CPLX_MULS(x, y) __builtin_pulp_cplxmuls(x, y)",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:202: #define __CPLXMULS(x, y) __builtin_pulp_cplxmuls((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_cplxmuls2",
+   "batch": "B",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/cplxmuls2.c",
+    "asm_file": "gcc/cplxmuls2.s",
+    "asm": [
+     "t_cplxmuls2: pv.cplxmul.h.r a5,a0,a1",
+     "t_cplxmuls2: pv.cplxmul.h.i a5,a0,a1",
+     "t_cplxmuls2: mv a0,a5",
+     "t_cplxmuls2: ret"
+    ],
+    "encodings": {
+     "pv.cplxmul.h.r a5,a0,a1": {
+      "gcc_encoding": "54b507d7",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     },
+     "pv.cplxmul.h.i a5,a0,a1": {
+      "gcc_encoding": "56b507d7",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)",
+   "semantics": "Q15 complex multiply, element 0 = bits 15:0 = real part, element 1 = bits 31:16 = imaginary part, products in 64-bit, no saturation: r.re = (int16)((a.re*b.re - a.im*b.im) >> 15); r.im = (int16)((a.re*b.im + a.im*b.re) >> 15)",
+   "emitted_instruction": "TWO instructions: pv.cplxmul.h.r rd,rs1,rs2 then pv.cplxmul.h.i rd,rs1,rs2 with the same rd. Both read rd: .r writes bits 15:0 and keeps rd[31:16]; .i writes bits 31:16 and keeps rd[15:0] (GVSoC Format_RRRR, lib_CPLXMUL_H_R/I). Encoding funct7 0101010 (.r) / 0101011 (.i), funct3 000, opcode 0x57.",
+   "fork_has_instruction": "NO",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/gap9/models/ips/gap/cpu/gap9_isa.py:75-83 gap9_CPLXMUL_H_R/_I -> /home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/include/isa_lib/int.h:1320-1334",
+   "suggested_lowering": "Define PV_CPLXMUL_H_R / PV_CPLXMUL_H_I as Pulp_ALU_rr_wb (tied $rd = $rd_wb, like the fork's existing *_wb classes); pattern: (int_riscv_pulp_cplxmuls2 a, b) -> (PV_CPLXMUL_H_I (PV_CPLXMUL_H_R (IMPLICIT_DEF), a, b), a, b). rd of the pair must not alias a or b while .i reads them (ordinary liveness guarantees it because a and b stay live).",
+   "notes": "Wrappers gap_cplxmuls/gap_cplxmulsdiv2/4/8 (GapBuiltins.h:158-161, the __GAP9__ branch; the GAP8 branch uses cplxmuls/cplxmulsdiv2/4). Used in FftLibraryFix.c. Upstream ref CV_CPLXMUL_R/_I (RISCVInstrInfoXCV.td:467-474, CVSIMDRRWb = tied rd).",
+   "sdk": {
+    "wrappers": [
+     "gap_cplxmuls",
+     "gap_cplxmulsdiv2",
+     "gap_cplxmulsdiv4"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 20,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:129: #define gap_cplxmuls(x, y) __builtin_pulp_cplxmuls2((x), (y))",
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:158: #define gap_cplxmuls(x, y) __builtin_pulp_cplxmuls2((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_cplxmuls2div2",
+   "batch": "B",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/cplxmuls2div2.c",
+    "asm_file": "gcc/cplxmuls2div2.s",
+    "asm": [
+     "t_cplxmuls2div2: pv.cplxmul.h.r.div2 a5,a0,a1",
+     "t_cplxmuls2div2: pv.cplxmul.h.i.div2 a5,a0,a1",
+     "t_cplxmuls2div2: mv a0,a5",
+     "t_cplxmuls2div2: ret"
+    ],
+    "encodings": {
+     "pv.cplxmul.h.r.div2 a5,a0,a1": {
+      "gcc_encoding": "54b527d7",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     },
+     "pv.cplxmul.h.i.div2 a5,a0,a1": {
+      "gcc_encoding": "56b527d7",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)",
+   "semantics": "Q15 complex multiply, element 0 = bits 15:0 = real part, element 1 = bits 31:16 = imaginary part, products in 64-bit, no saturation: r.re = (int16)((a.re*b.re - a.im*b.im) >> 16); r.im = (int16)((a.re*b.im + a.im*b.re) >> 16)",
+   "emitted_instruction": "TWO instructions: pv.cplxmul.h.r.div2 rd,rs1,rs2 then pv.cplxmul.h.i.div2 rd,rs1,rs2 with the same rd. Both read rd: .r writes bits 15:0 and keeps rd[31:16]; .i writes bits 31:16 and keeps rd[15:0] (GVSoC Format_RRRR, lib_CPLXMUL_H_R/I). Encoding funct7 0101010 (.r) / 0101011 (.i), funct3 010, opcode 0x57.",
+   "fork_has_instruction": "NO",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/gap9/models/ips/gap/cpu/gap9_isa.py:75-83 gap9_CPLXMUL_H_R/_I -> /home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/include/isa_lib/int.h:1320-1334",
+   "suggested_lowering": "Define PV_CPLXMUL_H_R_DIV2 / PV_CPLXMUL_H_I_DIV2 as Pulp_ALU_rr_wb (tied $rd = $rd_wb, like the fork's existing *_wb classes); pattern: (int_riscv_pulp_cplxmuls2div2 a, b) -> (PV_CPLXMUL_H_I_DIV2 (PV_CPLXMUL_H_R_DIV2 (IMPLICIT_DEF), a, b), a, b). rd of the pair must not alias a or b while .i reads them (ordinary liveness guarantees it because a and b stay live).",
+   "notes": "Wrappers gap_cplxmuls/gap_cplxmulsdiv2/4/8 (GapBuiltins.h:158-161, the __GAP9__ branch; the GAP8 branch uses cplxmuls/cplxmulsdiv2/4). Used in FftLibraryFix.c. Upstream ref CV_CPLXMUL_R/_I (RISCVInstrInfoXCV.td:467-474, CVSIMDRRWb = tied rd).",
+   "sdk": {
+    "wrappers": [
+     "gap_cplxmulsdiv2"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 8,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:130: #define gap_cplxmulsdiv2(x, y) __builtin_pulp_cplxmuls2div2((x), (y))",
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:159: #define gap_cplxmulsdiv2(x, y) __builtin_pulp_cplxmuls2div2((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_cplxmuls2div4",
+   "batch": "B",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/cplxmuls2div4.c",
+    "asm_file": "gcc/cplxmuls2div4.s",
+    "asm": [
+     "t_cplxmuls2div4: pv.cplxmul.h.r.div4 a5,a0,a1",
+     "t_cplxmuls2div4: pv.cplxmul.h.i.div4 a5,a0,a1",
+     "t_cplxmuls2div4: mv a0,a5",
+     "t_cplxmuls2div4: ret"
+    ],
+    "encodings": {
+     "pv.cplxmul.h.r.div4 a5,a0,a1": {
+      "gcc_encoding": "54b547d7",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     },
+     "pv.cplxmul.h.i.div4 a5,a0,a1": {
+      "gcc_encoding": "56b547d7",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)",
+   "semantics": "Q15 complex multiply, element 0 = bits 15:0 = real part, element 1 = bits 31:16 = imaginary part, products in 64-bit, no saturation: r.re = (int16)((a.re*b.re - a.im*b.im) >> 17); r.im = (int16)((a.re*b.im + a.im*b.re) >> 17)",
+   "emitted_instruction": "TWO instructions: pv.cplxmul.h.r.div4 rd,rs1,rs2 then pv.cplxmul.h.i.div4 rd,rs1,rs2 with the same rd. Both read rd: .r writes bits 15:0 and keeps rd[31:16]; .i writes bits 31:16 and keeps rd[15:0] (GVSoC Format_RRRR, lib_CPLXMUL_H_R/I). Encoding funct7 0101010 (.r) / 0101011 (.i), funct3 100, opcode 0x57.",
+   "fork_has_instruction": "NO",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/gap9/models/ips/gap/cpu/gap9_isa.py:75-83 gap9_CPLXMUL_H_R/_I -> /home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/include/isa_lib/int.h:1320-1334",
+   "suggested_lowering": "Define PV_CPLXMUL_H_R_DIV4 / PV_CPLXMUL_H_I_DIV4 as Pulp_ALU_rr_wb (tied $rd = $rd_wb, like the fork's existing *_wb classes); pattern: (int_riscv_pulp_cplxmuls2div4 a, b) -> (PV_CPLXMUL_H_I_DIV4 (PV_CPLXMUL_H_R_DIV4 (IMPLICIT_DEF), a, b), a, b). rd of the pair must not alias a or b while .i reads them (ordinary liveness guarantees it because a and b stay live).",
+   "notes": "Wrappers gap_cplxmuls/gap_cplxmulsdiv2/4/8 (GapBuiltins.h:158-161, the __GAP9__ branch; the GAP8 branch uses cplxmuls/cplxmulsdiv2/4). Used in FftLibraryFix.c. Upstream ref CV_CPLXMUL_R/_I (RISCVInstrInfoXCV.td:467-474, CVSIMDRRWb = tied rd).",
+   "sdk": {
+    "wrappers": [
+     "gap_cplxmulsdiv4"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 3,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:131: #define gap_cplxmulsdiv4(x, y) __builtin_pulp_cplxmuls2div4((x), (y))",
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:160: #define gap_cplxmulsdiv4(x, y) __builtin_pulp_cplxmuls2div4((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_cplxmuls2div8",
+   "batch": "B",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/cplxmuls2div8.c",
+    "asm_file": "gcc/cplxmuls2div8.s",
+    "asm": [
+     "t_cplxmuls2div8: pv.cplxmul.h.r.div8 a5,a0,a1",
+     "t_cplxmuls2div8: pv.cplxmul.h.i.div8 a5,a0,a1",
+     "t_cplxmuls2div8: mv a0,a5",
+     "t_cplxmuls2div8: ret"
+    ],
+    "encodings": {
+     "pv.cplxmul.h.r.div8 a5,a0,a1": {
+      "gcc_encoding": "54b567d7",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     },
+     "pv.cplxmul.h.i.div8 a5,a0,a1": {
+      "gcc_encoding": "56b567d7",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)",
+   "semantics": "Q15 complex multiply, element 0 = bits 15:0 = real part, element 1 = bits 31:16 = imaginary part, products in 64-bit, no saturation: r.re = (int16)((a.re*b.re - a.im*b.im) >> 18); r.im = (int16)((a.re*b.im + a.im*b.re) >> 18)",
+   "emitted_instruction": "TWO instructions: pv.cplxmul.h.r.div8 rd,rs1,rs2 then pv.cplxmul.h.i.div8 rd,rs1,rs2 with the same rd. Both read rd: .r writes bits 15:0 and keeps rd[31:16]; .i writes bits 31:16 and keeps rd[15:0] (GVSoC Format_RRRR, lib_CPLXMUL_H_R/I). Encoding funct7 0101010 (.r) / 0101011 (.i), funct3 110, opcode 0x57.",
+   "fork_has_instruction": "NO",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/gap9/models/ips/gap/cpu/gap9_isa.py:75-83 gap9_CPLXMUL_H_R/_I -> /home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/include/isa_lib/int.h:1320-1334",
+   "suggested_lowering": "Define PV_CPLXMUL_H_R_DIV8 / PV_CPLXMUL_H_I_DIV8 as Pulp_ALU_rr_wb (tied $rd = $rd_wb, like the fork's existing *_wb classes); pattern: (int_riscv_pulp_cplxmuls2div8 a, b) -> (PV_CPLXMUL_H_I_DIV8 (PV_CPLXMUL_H_R_DIV8 (IMPLICIT_DEF), a, b), a, b). rd of the pair must not alias a or b while .i reads them (ordinary liveness guarantees it because a and b stay live).",
+   "notes": "Wrappers gap_cplxmuls/gap_cplxmulsdiv2/4/8 (GapBuiltins.h:158-161, the __GAP9__ branch; the GAP8 branch uses cplxmuls/cplxmulsdiv2/4). No SDK call site. Upstream ref CV_CPLXMUL_R/_I (RISCVInstrInfoXCV.td:467-474, CVSIMDRRWb = tied rd).",
+   "sdk": {
+    "wrappers": [
+     "gap_cplxmulsdiv8"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:132: #define gap_cplxmulsdiv8(x, y) __builtin_pulp_cplxmuls2div8((x), (y))",
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:161: #define gap_cplxmulsdiv8(x, y) __builtin_pulp_cplxmuls2div8((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_cplxmulsdiv2",
+   "batch": "X",
+   "gcc": {
+    "gap9_known": false,
+    "gap8_known": true,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/cplxmulsdiv2.c",
+    "asm_file": "gcc/cplxmulsdiv2.s",
+    "asm": [
+     "t_cplxmulsdiv2: pv.cplxmul.s.div2 a0,a0,a1",
+     "t_cplxmulsdiv2: ret"
+    ],
+    "encodings": {
+     "pv.cplxmul.s.div2 a0,a0,a1": {
+      "gcc_encoding": "54b52557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": null,
+   "semantics": null,
+   "emitted_instruction": null,
+   "fork_has_instruction": "no",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": null,
+   "suggested_lowering": "Do not implement for GAP9 (GCC parity does not require it).",
+   "notes": "GAP8 only (pv.cplxmul.s.div2).",
+   "sdk": {
+    "wrappers": [
+     "__CPLXMULSDIV2",
+     "__CPLX_MULS_DIV2",
+     "gap_cplxmulsdiv2"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 8,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:155: #define gap_cplxmulsdiv2(x, y) __builtin_pulp_cplxmulsdiv2((x), (y))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:594: #define __CPLX_MULS_DIV2(x, y) __builtin_pulp_cplxmulsdiv2(x, y)",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:203: #define __CPLXMULSDIV2(x, y) __builtin_pulp_cplxmulsdiv2((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_cplxmulsdiv4",
+   "batch": "X",
+   "gcc": {
+    "gap9_known": false,
+    "gap8_known": true,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/cplxmulsdiv4.c",
+    "asm_file": "gcc/cplxmulsdiv4.s",
+    "asm": [
+     "t_cplxmulsdiv4: pv.cplxmul.s.div4 a0,a0,a1",
+     "t_cplxmulsdiv4: ret"
+    ],
+    "encodings": {
+     "pv.cplxmul.s.div4 a0,a0,a1": {
+      "gcc_encoding": "56b52557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": null,
+   "semantics": null,
+   "emitted_instruction": null,
+   "fork_has_instruction": "no",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": null,
+   "suggested_lowering": "Do not implement for GAP9 (GCC parity does not require it).",
+   "notes": "GAP8 only (pv.cplxmul.s.div4).",
+   "sdk": {
+    "wrappers": [
+     "__CPLXMULSDIV4",
+     "__CPLX_MULS_DIV4",
+     "gap_cplxmulsdiv4"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 3,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:156: #define gap_cplxmulsdiv4(x, y) __builtin_pulp_cplxmulsdiv4((x), (y))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:595: #define __CPLX_MULS_DIV4(x, y) __builtin_pulp_cplxmulsdiv4(x, y)",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:204: #define __CPLXMULSDIV4(x, y) __builtin_pulp_cplxmulsdiv4((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16abs",
+   "batch": "D",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float16(float16)",
+    "test_file": "gcc/f16abs.c",
+    "asm_file": "gcc/f16abs.s",
+    "asm": [
+     "t_f16abs: fabs.h a0,a0",
+     "t_f16abs: ret"
+    ],
+    "encodings": {
+     "fabs.h a0,a0": {
+      "gcc_encoding": "24a52553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zhinx' (Half Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "24a52553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fabs.h\ta0, a0",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fabs.h\tfa0, fa0"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Float16(_Float16)",
+   "semantics": "IEEE binary16 |a| (GCC type float16 = IEEE half).",
+   "emitted_instruction": "fabs.h (= fsgnjx.h) rd,rs1[,rs2] on GPRs",
+   "fork_has_instruction": "yes via upstream Zhinx (FMAX_H_INX etc.; encodings identical to GAP9, checked with llvm-mc +zhinx)",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "isa_smallfloats.py (Xf16)",
+   "suggested_lowering": "ISD::FMAXIMUMNUM/FMINIMUMNUM/FABS/FSQRT on f16 (int-20 llc already selects fmax.h/fsqrt.h/fabs.h with +zhinx)",
+   "notes": "Blocked on B90 (float16 = _Float16 with Zhinx). GCC converts float args with fcvt.h.s. Wrappers MaxF16/Maxf16/Clipf16 etc. (FloatDefines.h:74-99).",
+   "sdk": {
+    "wrappers": [
+     "AbsF",
+     "AbsF16",
+     "Absf16"
+    ],
+    "c_files_calling": 2,
+    "call_sites": 3,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:74: #define Absf16(a) __builtin_pulp_f16abs((a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16abs2",
+   "batch": "E2",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16(__vector(2) float16)",
+    "test_file": "gcc/f16abs2.c",
+    "asm_file": "gcc/f16abs2.s",
+    "asm": [
+     "t_f16abs2: vfabs.h a0,a0",
+     "t_f16abs2: ret"
+    ],
+    "encodings": {
+     "vfabs.h a0,a0": {
+      "gcc_encoding": "9ea52533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: fabs.h?",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: fabs.ah, fabs.h?"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfsgnjx.h\tfa0, fa0, fa0"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2h(v2h)",
+   "semantics": "element-wise on 2 x binary16 packed in one GPR.",
+   "emitted_instruction": "vfabs.h = vfsgnjx.h rd,rs1[,rs2] (OP 0x33, encoding 9ea52533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). Same encoding as the fork's Xfvechalf vfabs.h but with GPR operands.",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "AbsF2",
+     "Absv2h"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 1,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:78: #define Absv2h(a) __builtin_pulp_f16abs2((a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16altabs",
+   "batch": "E1",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float16alt(float16alt)",
+    "test_file": "gcc/f16altabs.c",
+    "asm_file": "gcc/f16altabs.s",
+    "asm": [
+     "t_f16altabs: fabs.ah a0,a0",
+     "t_f16altabs: ret"
+    ],
+    "encodings": {
+     "fabs.ah a0,a0": {
+      "gcc_encoding": "24a56553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "float16alt(float16alt)",
+   "semantics": "|a| on float16alt.",
+   "emitted_instruction": "fabs.ah = fsgnjx.ah (24a56553)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "AbsF",
+     "AbsF16",
+     "Absf16a"
+    ],
+    "c_files_calling": 2,
+    "call_sites": 3,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:82: #define Absf16a(a) __builtin_pulp_f16altabs((a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16altabs2",
+   "batch": "E2",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16alt(__vector(2) float16alt)",
+    "test_file": "gcc/f16altabs2.c",
+    "asm_file": "gcc/f16altabs2.s",
+    "asm": [
+     "t_f16altabs2: vfabs.ah a0,a0",
+     "t_f16altabs2: ret"
+    ],
+    "encodings": {
+     "vfabs.ah a0,a0": {
+      "gcc_encoding": "9ea51533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: fabs.h?",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: fabs.ah, fabs.h?"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2ah(v2ah)",
+   "semantics": "element-wise on 2 x float16alt packed in one GPR.",
+   "emitted_instruction": "vfabs.ah = vfsgnjx.ah (encoding 9ea51533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "AbsF2",
+     "Absv2ah"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 1,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:86: #define Absv2ah(a) __builtin_pulp_f16altabs2((a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16altmax",
+   "batch": "E1",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float16alt(float16alt, float16alt)",
+    "test_file": "gcc/f16altmax.c",
+    "asm_file": "gcc/f16altmax.s",
+    "asm": [
+     "t_f16altmax: fmax.ah a0,a0,a1",
+     "t_f16altmax: ret"
+    ],
+    "encodings": {
+     "fmax.ah a0,a0,a1": {
+      "gcc_encoding": "2cb55553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "float16alt(float16alt, float16alt)",
+   "semantics": "maximumNumber on float16alt (bfloat16 layout: 1-8-7).",
+   "emitted_instruction": "fmax.ah rd,rs1,rs2 (encoding 2cb55553: fmt=10, funct3=101)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "ClipF",
+     "Clipf16a",
+     "MaxF",
+     "MaxF16",
+     "Maxf16a"
+    ],
+    "c_files_calling": 12,
+    "call_sites": 253,
+    "files_failing_on_it": 14,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Bias_Linear_Activation_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatMul_Conv_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_SoftMax_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatAlgebra_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatMul_Conv_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Pooling_BasicKernels_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_SoftMax_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/SSD_BasicKernels_fp16.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16a.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:83: #define Maxf16a(a, b) __builtin_pulp_f16altmax((a), (b))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16altmax2",
+   "batch": "E2",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16alt(__vector(2) float16alt, __vector(2) float16alt)",
+    "test_file": "gcc/f16altmax2.c",
+    "asm_file": "gcc/f16altmax2.s",
+    "asm": [
+     "t_f16altmax2: vfmax.ah a0,a0,a1",
+     "t_f16altmax2: ret"
+    ],
+    "encodings": {
+     "vfmax.ah a0,a0,a1": {
+      "gcc_encoding": "8cb51533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2ah(v2ah, v2ah)",
+   "semantics": "element-wise on 2 x float16alt packed in one GPR.",
+   "emitted_instruction": "vfmax.ah (encoding 8cb51533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "ClipF2",
+     "Clipv2ah",
+     "MaxF2",
+     "Maxv2ah"
+    ],
+    "c_files_calling": 6,
+    "call_sites": 67,
+    "files_failing_on_it": 8,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Bias_Linear_Activation_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatAlgebra_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Pooling_BasicKernels_fp16.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16a.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:87: #define Maxv2ah(a, b) __builtin_pulp_f16altmax2((a), (b))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16altmin",
+   "batch": "E1",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float16alt(float16alt, float16alt)",
+    "test_file": "gcc/f16altmin.c",
+    "asm_file": "gcc/f16altmin.s",
+    "asm": [
+     "t_f16altmin: fmin.ah a0,a0,a1",
+     "t_f16altmin: ret"
+    ],
+    "encodings": {
+     "fmin.ah a0,a0,a1": {
+      "gcc_encoding": "2cb54553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "float16alt(float16alt, float16alt)",
+   "semantics": "minimumNumber on float16alt.",
+   "emitted_instruction": "fmin.ah (2cb54553)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "ClipF",
+     "Clipf16a",
+     "MinF",
+     "MinF16",
+     "Minf16a"
+    ],
+    "c_files_calling": 7,
+    "call_sites": 32,
+    "files_failing_on_it": 9,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Bias_Linear_Activation_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatAlgebra_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Pooling_BasicKernels_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/SSD_BasicKernels_fp16.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:84: #define Minf16a(a, b) __builtin_pulp_f16altmin((a), (b))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16altmin2",
+   "batch": "E2",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16alt(__vector(2) float16alt, __vector(2) float16alt)",
+    "test_file": "gcc/f16altmin2.c",
+    "asm_file": "gcc/f16altmin2.s",
+    "asm": [
+     "t_f16altmin2: vfmin.ah a0,a0,a1",
+     "t_f16altmin2: ret"
+    ],
+    "encodings": {
+     "vfmin.ah a0,a0,a1": {
+      "gcc_encoding": "8ab51533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2ah(v2ah, v2ah)",
+   "semantics": "element-wise on 2 x float16alt packed in one GPR.",
+   "emitted_instruction": "vfmin.ah (encoding 8ab51533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "ClipF2",
+     "Clipv2ah",
+     "MinF2",
+     "Minv2ah"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 21,
+    "files_failing_on_it": 3,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Bias_Linear_Activation_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16a.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:88: #define Minv2ah(a, b) __builtin_pulp_f16altmin2((a), (b))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16altsqrt",
+   "batch": "E1",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float16alt(float16alt)",
+    "test_file": "gcc/f16altsqrt.c",
+    "asm_file": "gcc/f16altsqrt.s",
+    "asm": [
+     "t_f16altsqrt: fsqrt.ah a0,a0",
+     "t_f16altsqrt: ret"
+    ],
+    "encodings": {
+     "fsqrt.ah a0,a0": {
+      "gcc_encoding": "5c055553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "float16alt(float16alt)",
+   "semantics": "sqrt on float16alt.",
+   "emitted_instruction": "fsqrt.ah (5c055553)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "SqrtF16",
+     "Sqrtf16a"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 2,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16a.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:100: #define Sqrtf16a(a) __builtin_pulp_f16altsqrt(a)"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16max",
+   "batch": "D",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float16(float16, float16)",
+    "test_file": "gcc/f16max.c",
+    "asm_file": "gcc/f16max.s",
+    "asm": [
+     "t_f16max: fmax.h a0,a0,a1",
+     "t_f16max: ret"
+    ],
+    "encodings": {
+     "fmax.h a0,a0,a1": {
+      "gcc_encoding": "2cb51553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zhinx' (Half Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "2cb51553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fmax.h\ta0, a0, a1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fmax.h\tfa0, fa0, fa1"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Float16(_Float16, _Float16)",
+   "semantics": "IEEE binary16 maximumNumber (GCC type float16 = IEEE half).",
+   "emitted_instruction": "fmax.h rd,rs1[,rs2] on GPRs",
+   "fork_has_instruction": "yes via upstream Zhinx (FMAX_H_INX etc.; encodings identical to GAP9, checked with llvm-mc +zhinx)",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "isa_smallfloats.py (Xf16)",
+   "suggested_lowering": "ISD::FMAXIMUMNUM/FMINIMUMNUM/FABS/FSQRT on f16 (int-20 llc already selects fmax.h/fsqrt.h/fabs.h with +zhinx)",
+   "notes": "Blocked on B90 (float16 = _Float16 with Zhinx). GCC converts float args with fcvt.h.s. Wrappers MaxF16/Maxf16/Clipf16 etc. (FloatDefines.h:74-99).",
+   "sdk": {
+    "wrappers": [
+     "ClipF",
+     "Clipf16",
+     "MaxF",
+     "MaxF16",
+     "Maxf16"
+    ],
+    "c_files_calling": 13,
+    "call_sites": 256,
+    "files_failing_on_it": 8,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Pooling_SQ8.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatMul_Conv_f16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_SoftMax_f16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:75: #define Maxf16(a, b) __builtin_pulp_f16max((a), (b))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16max2",
+   "batch": "E2",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16(__vector(2) float16, __vector(2) float16)",
+    "test_file": "gcc/f16max2.c",
+    "asm_file": "gcc/f16max2.s",
+    "asm": [
+     "t_f16max2: vfmax.h a0,a0,a1",
+     "t_f16max2: ret"
+    ],
+    "encodings": {
+     "vfmax.h a0,a0,a1": {
+      "gcc_encoding": "8cb52533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfmax.h\tfa0, fa0, fa1"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2h(v2h, v2h)",
+   "semantics": "element-wise on 2 x binary16 packed in one GPR.",
+   "emitted_instruction": "vfmax.h rd,rs1[,rs2] (OP 0x33, encoding 8cb52533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). Same encoding as the fork's Xfvechalf vfmax.h but with GPR operands.",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "ClipF2",
+     "Clipv2h",
+     "MaxF2",
+     "Maxv2h"
+    ],
+    "c_files_calling": 7,
+    "call_sites": 74,
+    "files_failing_on_it": 6,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Pooling_SQ8.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:79: #define Maxv2h(a, b) __builtin_pulp_f16max2((a), (b))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16min",
+   "batch": "D",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float16(float16, float16)",
+    "test_file": "gcc/f16min.c",
+    "asm_file": "gcc/f16min.s",
+    "asm": [
+     "t_f16min: fmin.h a0,a0,a1",
+     "t_f16min: ret"
+    ],
+    "encodings": {
+     "fmin.h a0,a0,a1": {
+      "gcc_encoding": "2cb50553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zhinx' (Half Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "2cb50553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fmin.h\ta0, a0, a1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fmin.h\tfa0, fa0, fa1"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Float16(_Float16, _Float16)",
+   "semantics": "IEEE binary16 minimumNumber (GCC type float16 = IEEE half).",
+   "emitted_instruction": "fmin.h rd,rs1[,rs2] on GPRs",
+   "fork_has_instruction": "yes via upstream Zhinx (FMAX_H_INX etc.; encodings identical to GAP9, checked with llvm-mc +zhinx)",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "isa_smallfloats.py (Xf16)",
+   "suggested_lowering": "ISD::FMAXIMUMNUM/FMINIMUMNUM/FABS/FSQRT on f16 (int-20 llc already selects fmax.h/fsqrt.h/fabs.h with +zhinx)",
+   "notes": "Blocked on B90 (float16 = _Float16 with Zhinx). GCC converts float args with fcvt.h.s. Wrappers MaxF16/Maxf16/Clipf16 etc. (FloatDefines.h:74-99).",
+   "sdk": {
+    "wrappers": [
+     "ClipF",
+     "Clipf16",
+     "MinF",
+     "MinF16",
+     "Minf16"
+    ],
+    "c_files_calling": 8,
+    "call_sites": 35,
+    "files_failing_on_it": 5,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Pooling_SQ8.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:76: #define Minf16(a, b) __builtin_pulp_f16min((a), (b))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16min2",
+   "batch": "E2",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16(__vector(2) float16, __vector(2) float16)",
+    "test_file": "gcc/f16min2.c",
+    "asm_file": "gcc/f16min2.s",
+    "asm": [
+     "t_f16min2: vfmin.h a0,a0,a1",
+     "t_f16min2: ret"
+    ],
+    "encodings": {
+     "vfmin.h a0,a0,a1": {
+      "gcc_encoding": "8ab52533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfmin.h\tfa0, fa0, fa1"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2h(v2h, v2h)",
+   "semantics": "element-wise on 2 x binary16 packed in one GPR.",
+   "emitted_instruction": "vfmin.h rd,rs1[,rs2] (OP 0x33, encoding 8ab52533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). Same encoding as the fork's Xfvechalf vfmin.h but with GPR operands.",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "ClipF2",
+     "Clipv2h",
+     "MinF2",
+     "Minv2h"
+    ],
+    "c_files_calling": 2,
+    "call_sites": 28,
+    "files_failing_on_it": 3,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Pooling_SQ8.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:80: #define Minv2h(a, b) __builtin_pulp_f16min2((a), (b))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f16sqrt",
+   "batch": "D",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float16(float16)",
+    "test_file": "gcc/f16sqrt.c",
+    "asm_file": "gcc/f16sqrt.s",
+    "asm": [
+     "t_f16sqrt: fsqrt.h a0,a0",
+     "t_f16sqrt: ret"
+    ],
+    "encodings": {
+     "fsqrt.h a0,a0": {
+      "gcc_encoding": "5c057553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zhinx' (Half Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "5c057553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fsqrt.h\ta0, a0",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fsqrt.h\tfa0, fa0"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Float16(_Float16)",
+   "semantics": "IEEE binary16 sqrt (GCC type float16 = IEEE half).",
+   "emitted_instruction": "fsqrt.h rd,rs1[,rs2] on GPRs",
+   "fork_has_instruction": "yes via upstream Zhinx (FMAX_H_INX etc.; encodings identical to GAP9, checked with llvm-mc +zhinx)",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "isa_smallfloats.py (Xf16)",
+   "suggested_lowering": "ISD::FMAXIMUMNUM/FMINIMUMNUM/FABS/FSQRT on f16 (int-20 llc already selects fmax.h/fsqrt.h/fabs.h with +zhinx)",
+   "notes": "Blocked on B90 (float16 = _Float16 with Zhinx). GCC converts float args with fcvt.h.s. Wrappers MaxF16/Maxf16/Clipf16 etc. (FloatDefines.h:74-99).",
+   "sdk": {
+    "wrappers": [
+     "SqrtF16",
+     "Sqrtf16"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 2,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:99: #define Sqrtf16(a) __builtin_pulp_f16sqrt(a)"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f32abs",
+   "batch": "A",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float(float)",
+    "test_file": "gcc/f32abs.c",
+    "asm_file": "gcc/f32abs.s",
+    "asm": [
+     "t_f32abs: fabs.s a0,a0",
+     "t_f32abs: ret",
+     "t_f32abs_const: lui a5,%hi(.LC0)",
+     "t_f32abs_const: lw a0,%lo(.LC0)(a5)",
+     "t_f32abs_const: ret"
+    ],
+    "encodings": {
+     "fabs.s a0,a0": {
+      "gcc_encoding": "20a52553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "20a52553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fabs.s\ta0, a0",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fabs.s\tfa0, fa0"
+      }
+     }
+    }
+   },
+   "clang_prototype": "float(float)",
+   "semantics": "|a|: clears the sign bit (fsgnjx.s rd,rs,rs; assembler alias fabs.s). NaN payload kept.",
+   "emitted_instruction": "fabs.s rd,rs1 (= fsgnjx.s)",
+   "fork_has_instruction": "yes: FSGNJX_S_INX / FSGNJX_S",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "standard F",
+   "suggested_lowering": "ISD::FABS",
+   "notes": "GCC constant-folds. Wrappers Absf32, gap_f32abs.",
+   "sdk": {
+    "wrappers": [
+     "Absf32",
+     "gap_f32abs"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 3,
+    "files_failing_on_it": 7,
+    "files_blocked": [
+     "examples/gap9/libs/fastmath/main.c",
+     "examples/gap9/libs/fastmath/utils.c",
+     "nn_menu/object_detection/yolox_people_detection/gap_functions/detection/decoding.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf32.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16a.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf32.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:253: #define gap_f32abs(a) __builtin_pulp_f32abs((a))",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:95: #define Absf32(a) __builtin_pulp_f32abs((a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f32max",
+   "batch": "A",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float(float, float)",
+    "test_file": "gcc/f32max.c",
+    "asm_file": "gcc/f32max.s",
+    "asm": [
+     "t_f32max: fmax.s a0,a0,a1",
+     "t_f32max: ret",
+     "t_f32max_const: lui a5,%hi(.LC0)",
+     "t_f32max_const: lw a0,%lo(.LC0)(a5)",
+     "t_f32max_const: ret"
+    ],
+    "encodings": {
+     "fmax.s a0,a0,a1": {
+      "gcc_encoding": "28b51553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "28b51553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fmax.s\ta0, a0, a1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fmax.s\tfa0, fa0, fa1"
+      }
+     }
+    }
+   },
+   "clang_prototype": "float(float, float)",
+   "semantics": "IEEE 754-2019 maximumNumber of a and b (fmax.s): a NaN operand is ignored, -0 < +0.",
+   "emitted_instruction": "fmax.s rd,rs1,rs2",
+   "fork_has_instruction": "yes: FMAX_S_INX (Zfinx) / FMAX_S (F), upstream",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "isa_riscv_gen.py fmax.s (standard F)",
+   "suggested_lowering": "llvm.maximumnum.f32 semantics: ISD::FMAXIMUMNUM (Legal for F/Zfinx in LLVM 20, selects FMAX_S); ISD::FMAXNUM also selects fmax.s but leaves signed-zero order unspecified.",
+   "notes": "GCC constant-folds it (f32max(2.5,-3.5) -> 2.5, f32max(NaN,1) -> 1). Int args are converted to float (fcvt.s.w), double args truncated. SDK wrappers Maxf32/Clipf32 (FloatDefines.h:96), gap_f32max (GapBuiltins.h:251).",
+   "sdk": {
+    "wrappers": [
+     "Clipf32",
+     "Maxf32",
+     "gap_f32max"
+    ],
+    "c_files_calling": 8,
+    "call_sites": 88,
+    "files_failing_on_it": 15,
+    "files_blocked": [
+     "examples/gap9/libs/fastmath/main.c",
+     "nn_menu/object_detection/yolox_people_detection/gap_functions/detection/decoding.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_SoftMax_SQ8.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Bias_Linear_Activation_fp32.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_MatAlgebra_fp32.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Pooling_fp32.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_SoftMax_fp32.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16a.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf32.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16a.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf32.c",
+     "tools/autotiler_v3/BasicKernels/Transformers_Libraries/FlashAttention.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:251: #define gap_f32max(a,b) __builtin_pulp_f32max((a), (b))",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:96: #define Maxf32(a, b) __builtin_pulp_f32max((a), (b))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f32min",
+   "batch": "A",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float(float, float)",
+    "test_file": "gcc/f32min.c",
+    "asm_file": "gcc/f32min.s",
+    "asm": [
+     "t_f32min: fmin.s a0,a0,a1",
+     "t_f32min: ret",
+     "t_f32min_const: lui a5,%hi(.LC1)",
+     "t_f32min_const: lw a0,%lo(.LC1)(a5)",
+     "t_f32min_const: ret"
+    ],
+    "encodings": {
+     "fmin.s a0,a0,a1": {
+      "gcc_encoding": "28b50553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "28b50553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fmin.s\ta0, a0, a1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fmin.s\tfa0, fa0, fa1"
+      }
+     }
+    }
+   },
+   "clang_prototype": "float(float, float)",
+   "semantics": "IEEE 754-2019 minimumNumber (fmin.s).",
+   "emitted_instruction": "fmin.s rd,rs1,rs2",
+   "fork_has_instruction": "yes: FMIN_S_INX / FMIN_S",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "isa_riscv_gen.py fmin.s",
+   "suggested_lowering": "ISD::FMINIMUMNUM",
+   "notes": "GCC constant-folds. Wrappers Minf32, Clipf32, gap_f32min.",
+   "sdk": {
+    "wrappers": [
+     "Clipf32",
+     "Minf32",
+     "gap_f32min"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 9,
+    "files_failing_on_it": 9,
+    "files_blocked": [
+     "examples/gap9/libs/fastmath/main.c",
+     "nn_menu/object_detection/yolox_people_detection/gap_functions/detection/decoding.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Bias_Linear_Activation_fp32.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_MatAlgebra_fp32.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf32.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16a.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf32.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:250: #define gap_f32min(a,b) __builtin_pulp_f32min((a), (b))",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:97: #define Minf32(a, b) __builtin_pulp_f32min((a), (b))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_f32sqrt",
+   "batch": "A",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "float(float)",
+    "test_file": "gcc/f32sqrt.c",
+    "asm_file": "gcc/f32sqrt.s",
+    "asm": [
+     "t_f32sqrt: fsqrt.s a0,a0",
+     "t_f32sqrt: ret",
+     "t_f32sqrt_const: lui a5,%hi(.LC0)",
+     "t_f32sqrt_const: lw a0,%lo(.LC0)(a5)",
+     "t_f32sqrt_const: fsqrt.s a0,a0",
+     "t_f32sqrt_const: ret"
+    ],
+    "encodings": {
+     "fsqrt.s a0,a0": {
+      "gcc_encoding": "58057553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "58057553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fsqrt.s\ta0, a0",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fsqrt.s\tfa0, fa0"
+      }
+     }
+    }
+   },
+   "clang_prototype": "float(float)",
+   "semantics": "IEEE square root, dynamic rounding mode (encoding rm=111).",
+   "emitted_instruction": "fsqrt.s rd,rs1",
+   "fork_has_instruction": "yes: FSQRT_S_INX / FSQRT_S",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "standard F",
+   "suggested_lowering": "ISD::FSQRT (LLVM may constant-fold; harmless)",
+   "notes": "GCC does NOT constant-fold it (keeps fsqrt.s on a constant). Wrappers Sqrtf32, gap_f32sqrt, FN_1 (CmplxFunctionsf32.c).",
+   "sdk": {
+    "wrappers": [
+     "FN_1",
+     "Sqrtf32",
+     "gap_f32sqrt"
+    ],
+    "c_files_calling": 6,
+    "call_sites": 14,
+    "files_failing_on_it": 5,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16a.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Pooling_BasicKernels_fp16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Pooling_fp32.c",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf32.c"
+    ],
+    "source_lines": [
+     "examples/gap9/libs/fastmath/main.c:15: #define FN_1(x) (__builtin_pulp_f32sqrt(x))",
+     "examples/gap9/libs/fastmath/main.c:20: #define FN_1(x) (1 / __builtin_pulp_f32sqrt(x))",
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:252: #define gap_f32sqrt(a) __builtin_pulp_f32sqrt((a))",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:101: #define Sqrtf32(a) __builtin_pulp_f32sqrt(a)"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_macfs",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int, int)",
+    "test_file": "gcc/macfs.c",
+    "asm_file": "gcc/macfs.s",
+    "asm": [
+     "t_macfs: p.macs a0,a0,a1,a2",
+     "t_macfs: ret"
+    ],
+    "encodings": {
+     "p.macs a0,a0,a1,a2": {
+      "gcc_encoding": null,
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {}
+     }
+    }
+   },
+   "clang_prototype": "int(int, int, int)",
+   "semantics": "acc + (int16)x * (int16)y, argument order (x, y, acc). Identical to __builtin_pulp_macs.",
+   "emitted_instruction": "GCC prints p.macs rd,rs1,rs2,rs3 (4 operands), which GAP9 gas REJECTS (\"illegal operands\"): GCC bug. Correct output = __builtin_pulp_macs: p.macs rdacc,rs1,rs2",
+   "fork_has_instruction": "yes: P_MACS",
+   "fork_ir_intrinsic": "int_riscv_pulp_macs exists (for __builtin_pulp_macs); none for macfs",
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.muls/p.mac* (existing)",
+   "suggested_lowering": "Alias of __builtin_pulp_macs: new intrinsic via the existing multiclass (IntrinsicsRISCVXpulp.td; e.g. `defm fs : mul_mac_N_RN;` gives mulfsN/mulfsRN/macfsN/macfsRN) plus the existing pattern multiclass (`defm : int_mul_mac_N_RN<\"fs\", \"S\">;`, RISCVInstrInfoXpulp.td:1150); add the builtin IDs to the same Sema N/RN case lists (SemaRISCV.cpp:1403-1427).",
+   "notes": "GAP9 GCC emits exactly the instruction of __builtin_pulp_macs (verified side by side in gcc/*.s). Wrapper gap_macfs (GapBuiltins.h:76-109). No SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_macfs"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:76: #define gap_macfs(Acc, x, y) __builtin_pulp_macfs((x), (y), (Acc))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_macfsN",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int, int, int)",
+    "test_file": "gcc/macfsN.c",
+    "asm_file": "gcc/macfsN.s",
+    "asm": [
+     "t_macfsN_n1: p.macsN a2,a0,a1,1",
+     "t_macfsN_n1: mv a0,a2",
+     "t_macfsN_n1: ret",
+     "t_macfsN_n5: p.macsN a2,a0,a1,5",
+     "t_macfsN_n5: mv a0,a2",
+     "t_macfsN_n5: ret",
+     "t_macfsN_n11: p.macsN a2,a0,a1,11",
+     "t_macfsN_n11: mv a0,a2",
+     "t_macfsN_n11: ret",
+     "t_macfsN_n15: p.macsN a2,a0,a1,15",
+     "t_macfsN_n15: mv a0,a2",
+     "t_macfsN_n15: ret",
+     "t_macfsN_n16: p.macsN a2,a0,a1,16",
+     "t_macfsN_n16: mv a0,a2",
+     "t_macfsN_n16: ret",
+     "t_macfsN_n31: p.macsN a2,a0,a1,31",
+     "t_macfsN_n31: mv a0,a2",
+     "t_macfsN_n31: ret"
+    ],
+    "encodings": {
+     "p.macsN a2,a0,a1,1": {
+      "gcc_encoding": "82b5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "82b5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "82b5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "82b5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 1",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 1"
+      }
+     },
+     "p.macsN a2,a0,a1,5": {
+      "gcc_encoding": "8ab5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "8ab5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "8ab5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "8ab5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 5",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 5",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 5"
+      }
+     },
+     "p.macsN a2,a0,a1,11": {
+      "gcc_encoding": "96b5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "96b5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "96b5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "96b5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 11",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 11",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 11"
+      }
+     },
+     "p.macsN a2,a0,a1,15": {
+      "gcc_encoding": "9eb5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "9eb5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "9eb5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "9eb5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 15",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 15",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 15"
+      }
+     },
+     "p.macsN a2,a0,a1,16": {
+      "gcc_encoding": "a0b5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "a0b5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "a0b5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "a0b5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 16",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 16",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 16"
+      }
+     },
+     "p.macsN a2,a0,a1,31": {
+      "gcc_encoding": "beb5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "beb5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "beb5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "beb5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 31",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 31",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 31"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int, int, unsigned _Constant int)",
+   "semantics": "(acc + (int16)x*(int16)y) >>a N, order (x, y, acc, N). Identical to __builtin_pulp_macsN.",
+   "emitted_instruction": "p.macsN rdacc,rs1,rs2,N",
+   "fork_has_instruction": "yes: P_MACSN",
+   "fork_ir_intrinsic": "int_riscv_pulp_macsN exists (for __builtin_pulp_macsN); none for macfsN",
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.muls/p.mac* (existing)",
+   "suggested_lowering": "Alias of __builtin_pulp_macsN: new intrinsic via the existing multiclass (IntrinsicsRISCVXpulp.td; e.g. `defm fs : mul_mac_N_RN;` gives mulfsN/mulfsRN/macfsN/macfsRN) plus the existing pattern multiclass (`defm : int_mul_mac_N_RN<\"fs\", \"S\">;`, RISCVInstrInfoXpulp.td:1150); add the builtin IDs to the same Sema N/RN case lists (SemaRISCV.cpp:1403-1427).",
+   "notes": "GAP9 GCC emits exactly the instruction of __builtin_pulp_macsN (verified side by side in gcc/*.s). Wrapper gap_macfsN (GapBuiltins.h:76-109). No SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_macfsN"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:83: #define gap_macfsN(Acc, x, y, n) __builtin_pulp_macfsN((x), (y), (Acc), (n))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_macfsRN",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int, int, int, int)",
+    "test_file": "gcc/macfsRN.c",
+    "asm_file": "gcc/macfsRN.s",
+    "asm": [
+     "t_macfsRN_n1: p.macsRN a2,a0,a1,1",
+     "t_macfsRN_n1: mv a0,a2",
+     "t_macfsRN_n1: ret",
+     "t_macfsRN_n5: p.macsRN a2,a0,a1,5",
+     "t_macfsRN_n5: mv a0,a2",
+     "t_macfsRN_n5: ret",
+     "t_macfsRN_n11: p.macsRN a2,a0,a1,11",
+     "t_macfsRN_n11: mv a0,a2",
+     "t_macfsRN_n11: ret",
+     "t_macfsRN_n15: p.macsRN a2,a0,a1,15",
+     "t_macfsRN_n15: mv a0,a2",
+     "t_macfsRN_n15: ret",
+     "t_macfsRN_n16: p.macsRN a2,a0,a1,16",
+     "t_macfsRN_n16: mv a0,a2",
+     "t_macfsRN_n16: ret",
+     "t_macfsRN_n31: p.macsRN a2,a0,a1,31",
+     "t_macfsRN_n31: mv a0,a2",
+     "t_macfsRN_n31: ret"
+    ],
+    "encodings": {
+     "p.macsRN a2,a0,a1,1": {
+      "gcc_encoding": "82b5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "82b5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "82b5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "82b5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 1",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 1"
+      }
+     },
+     "p.macsRN a2,a0,a1,5": {
+      "gcc_encoding": "8ab5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "8ab5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "8ab5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "8ab5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 5",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 5",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 5"
+      }
+     },
+     "p.macsRN a2,a0,a1,11": {
+      "gcc_encoding": "96b5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "96b5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "96b5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "96b5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 11",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 11",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 11"
+      }
+     },
+     "p.macsRN a2,a0,a1,15": {
+      "gcc_encoding": "9eb5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "9eb5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "9eb5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "9eb5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 15",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 15",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 15"
+      }
+     },
+     "p.macsRN a2,a0,a1,16": {
+      "gcc_encoding": "a0b5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "a0b5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "a0b5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "a0b5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 16",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 16",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 16"
+      }
+     },
+     "p.macsRN a2,a0,a1,31": {
+      "gcc_encoding": "beb5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "beb5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "beb5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "beb5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 31",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 31",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 31"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int, int, unsigned _Constant int, unsigned _Constant int)",
+   "semantics": "(acc + (int16)x*(int16)y + 2^(N-1)) >>a N. Identical to __builtin_pulp_macsRN.",
+   "emitted_instruction": "p.macsRN rdacc,rs1,rs2,N",
+   "fork_has_instruction": "yes: P_MACSRN",
+   "fork_ir_intrinsic": "int_riscv_pulp_macsRN exists (for __builtin_pulp_macsRN); none for macfsRN",
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.muls/p.mac* (existing)",
+   "suggested_lowering": "Alias of __builtin_pulp_macsRN: new intrinsic via the existing multiclass (IntrinsicsRISCVXpulp.td; e.g. `defm fs : mul_mac_N_RN;` gives mulfsN/mulfsRN/macfsN/macfsRN) plus the existing pattern multiclass (`defm : int_mul_mac_N_RN<\"fs\", \"S\">;`, RISCVInstrInfoXpulp.td:1150); add the builtin IDs to the same Sema N/RN case lists (SemaRISCV.cpp:1403-1427).",
+   "notes": "GAP9 GCC emits exactly the instruction of __builtin_pulp_macsRN (verified side by side in gcc/*.s). Wrapper gap_macfsRN (GapBuiltins.h:76-109). No SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_macfsRN"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:87: #define gap_macfsRN(Acc, x, y, n) __builtin_pulp_macfsRN((x), (y), (Acc), (n), (1<<((n)-1)))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_macfu",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int, int)",
+    "test_file": "gcc/macfu.c",
+    "asm_file": "gcc/macfu.s",
+    "asm": [
+     "t_macfu: p.macu a0,a0,a1,a2",
+     "t_macfu: ret"
+    ],
+    "encodings": {
+     "p.macu a0,a0,a1,a2": {
+      "gcc_encoding": null,
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {}
+     }
+    }
+   },
+   "clang_prototype": "int(int, int, int)",
+   "semantics": "acc + (uint16)x*(uint16)y. Identical to __builtin_pulp_macu.",
+   "emitted_instruction": "GCC prints the rejected 4-operand p.macu (GCC bug); correct = p.macu rdacc,rs1,rs2",
+   "fork_has_instruction": "yes: P_MACU",
+   "fork_ir_intrinsic": "int_riscv_pulp_macu exists (for __builtin_pulp_macu); none for macfu",
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.muls/p.mac* (existing)",
+   "suggested_lowering": "Alias of __builtin_pulp_macu: new intrinsic via the existing multiclass (IntrinsicsRISCVXpulp.td; e.g. `defm fs : mul_mac_N_RN;` gives mulfsN/mulfsRN/macfsN/macfsRN) plus the existing pattern multiclass (`defm : int_mul_mac_N_RN<\"fs\", \"S\">;`, RISCVInstrInfoXpulp.td:1150); add the builtin IDs to the same Sema N/RN case lists (SemaRISCV.cpp:1403-1427).",
+   "notes": "GAP9 GCC emits exactly the instruction of __builtin_pulp_macu (verified side by side in gcc/*.s). Wrapper gap_macfu (GapBuiltins.h:76-109). No SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_macfu"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:79: #define gap_macfu(Acc, x, y) __builtin_pulp_macfu((x), (y), (Acc))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_macfuN",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int, int, int)",
+    "test_file": "gcc/macfuN.c",
+    "asm_file": "gcc/macfuN.s",
+    "asm": [
+     "t_macfuN_n1: p.macuN a2,a0,a1,1",
+     "t_macfuN_n1: mv a0,a2",
+     "t_macfuN_n1: ret",
+     "t_macfuN_n5: p.macuN a2,a0,a1,5",
+     "t_macfuN_n5: mv a0,a2",
+     "t_macfuN_n5: ret",
+     "t_macfuN_n11: p.macuN a2,a0,a1,11",
+     "t_macfuN_n11: mv a0,a2",
+     "t_macfuN_n11: ret",
+     "t_macfuN_n15: p.macuN a2,a0,a1,15",
+     "t_macfuN_n15: mv a0,a2",
+     "t_macfuN_n15: ret",
+     "t_macfuN_n16: p.macuN a2,a0,a1,16",
+     "t_macfuN_n16: mv a0,a2",
+     "t_macfuN_n16: ret",
+     "t_macfuN_n31: p.macuN a2,a0,a1,31",
+     "t_macfuN_n31: mv a0,a2",
+     "t_macfuN_n31: ret"
+    ],
+    "encodings": {
+     "p.macuN a2,a0,a1,1": {
+      "gcc_encoding": "02b5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "02b5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "02b5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "02b5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 1",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 1"
+      }
+     },
+     "p.macuN a2,a0,a1,5": {
+      "gcc_encoding": "0ab5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "0ab5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "0ab5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "0ab5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 5",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 5",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 5"
+      }
+     },
+     "p.macuN a2,a0,a1,11": {
+      "gcc_encoding": "16b5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "16b5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "16b5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "16b5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 11",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 11",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 11"
+      }
+     },
+     "p.macuN a2,a0,a1,15": {
+      "gcc_encoding": "1eb5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "1eb5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "1eb5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "1eb5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 15",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 15",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 15"
+      }
+     },
+     "p.macuN a2,a0,a1,16": {
+      "gcc_encoding": "20b5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "20b5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "20b5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "20b5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 16",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 16",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 16"
+      }
+     },
+     "p.macuN a2,a0,a1,31": {
+      "gcc_encoding": "3eb5165b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "3eb5165b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "3eb5165b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "3eb5165b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 31",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 31",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 31"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int, int, unsigned _Constant int)",
+   "semantics": "(acc + (uint16)x*(uint16)y) >>l N. Identical to __builtin_pulp_macuN.",
+   "emitted_instruction": "p.macuN rdacc,rs1,rs2,N",
+   "fork_has_instruction": "yes: P_MACUN",
+   "fork_ir_intrinsic": "int_riscv_pulp_macuN exists (for __builtin_pulp_macuN); none for macfuN",
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.muls/p.mac* (existing)",
+   "suggested_lowering": "Alias of __builtin_pulp_macuN: new intrinsic via the existing multiclass (IntrinsicsRISCVXpulp.td; e.g. `defm fs : mul_mac_N_RN;` gives mulfsN/mulfsRN/macfsN/macfsRN) plus the existing pattern multiclass (`defm : int_mul_mac_N_RN<\"fs\", \"S\">;`, RISCVInstrInfoXpulp.td:1150); add the builtin IDs to the same Sema N/RN case lists (SemaRISCV.cpp:1403-1427).",
+   "notes": "GAP9 GCC emits exactly the instruction of __builtin_pulp_macuN (verified side by side in gcc/*.s). Wrapper gap_macfuN (GapBuiltins.h:76-109). No SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_macfuN"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:85: #define gap_macfuN(Acc, x, y, n) __builtin_pulp_macfuN((x), (y), (Acc), (n))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_macfuRN",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int, int, int, int)",
+    "test_file": "gcc/macfuRN.c",
+    "asm_file": "gcc/macfuRN.s",
+    "asm": [
+     "t_macfuRN_n1: p.macuRN a2,a0,a1,1",
+     "t_macfuRN_n1: mv a0,a2",
+     "t_macfuRN_n1: ret",
+     "t_macfuRN_n5: p.macuRN a2,a0,a1,5",
+     "t_macfuRN_n5: mv a0,a2",
+     "t_macfuRN_n5: ret",
+     "t_macfuRN_n11: p.macuRN a2,a0,a1,11",
+     "t_macfuRN_n11: mv a0,a2",
+     "t_macfuRN_n11: ret",
+     "t_macfuRN_n15: p.macuRN a2,a0,a1,15",
+     "t_macfuRN_n15: mv a0,a2",
+     "t_macfuRN_n15: ret",
+     "t_macfuRN_n16: p.macuRN a2,a0,a1,16",
+     "t_macfuRN_n16: mv a0,a2",
+     "t_macfuRN_n16: ret",
+     "t_macfuRN_n31: p.macuRN a2,a0,a1,31",
+     "t_macfuRN_n31: mv a0,a2",
+     "t_macfuRN_n31: ret"
+    ],
+    "encodings": {
+     "p.macuRN a2,a0,a1,1": {
+      "gcc_encoding": "02b5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "02b5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "02b5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "02b5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 1",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 1"
+      }
+     },
+     "p.macuRN a2,a0,a1,5": {
+      "gcc_encoding": "0ab5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "0ab5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "0ab5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "0ab5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 5",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 5",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 5"
+      }
+     },
+     "p.macuRN a2,a0,a1,11": {
+      "gcc_encoding": "16b5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "16b5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "16b5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "16b5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 11",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 11",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 11"
+      }
+     },
+     "p.macuRN a2,a0,a1,15": {
+      "gcc_encoding": "1eb5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "1eb5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "1eb5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "1eb5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 15",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 15",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 15"
+      }
+     },
+     "p.macuRN a2,a0,a1,16": {
+      "gcc_encoding": "20b5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "20b5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "20b5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "20b5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 16",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 16",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 16"
+      }
+     },
+     "p.macuRN a2,a0,a1,31": {
+      "gcc_encoding": "3eb5565b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "3eb5565b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "3eb5565b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "3eb5565b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 31",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 31",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 31"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int, int, unsigned _Constant int, unsigned _Constant int)",
+   "semantics": "(acc + (uint16)x*(uint16)y + 2^(N-1)) >>l N. Identical to __builtin_pulp_macuRN.",
+   "emitted_instruction": "p.macuRN rdacc,rs1,rs2,N",
+   "fork_has_instruction": "yes: P_MACURN",
+   "fork_ir_intrinsic": "int_riscv_pulp_macuRN exists (for __builtin_pulp_macuRN); none for macfuRN",
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.muls/p.mac* (existing)",
+   "suggested_lowering": "Alias of __builtin_pulp_macuRN: new intrinsic via the existing multiclass (IntrinsicsRISCVXpulp.td; e.g. `defm fs : mul_mac_N_RN;` gives mulfsN/mulfsRN/macfsN/macfsRN) plus the existing pattern multiclass (`defm : int_mul_mac_N_RN<\"fs\", \"S\">;`, RISCVInstrInfoXpulp.td:1150); add the builtin IDs to the same Sema N/RN case lists (SemaRISCV.cpp:1403-1427).",
+   "notes": "GAP9 GCC emits exactly the instruction of __builtin_pulp_macuRN (verified side by side in gcc/*.s). Wrapper gap_macfuRN (GapBuiltins.h:76-109). No SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_macfuRN"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:89: #define gap_macfuRN(Acc, x, y, n) __builtin_pulp_macfuRN((x), (y), (Acc), (n), (1<<((n)-1)))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_mul64hs",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int)",
+    "test_file": "gcc/mul64hs.c",
+    "asm_file": "gcc/mul64hs.s",
+    "asm": [
+     "t_mul64hs: p.mulh a0,a0,a1",
+     "t_mul64hs: ret",
+     "t_mul64hs_const: li a0,-1",
+     "t_mul64hs_const: ret"
+    ],
+    "encodings": {
+     "p.mulh a0,a0,a1": {
+      "gcc_encoding": "02b51533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulh, p.lh, p.mulhhs, p.mulhhu, p.muls, p.mulu?",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulh, p.lh, p.mulhhs, p.mulhhu, p.muls, p.mulu?",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulh, p.lh, p.mulhhs, p.mulhhu, p.muls, p.mulu?"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "mulh\ta0, a0, a1",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "mulh\ta0, a0, a1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "mulh\ta0, a0, a1"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int)",
+   "semantics": "(int)(((int64)x * (int64)y) >> 32): high word of the signed 64-bit product.",
+   "emitted_instruction": "mulh rd,rs1,rs2 (GCC prints \"p.mulh\"; encoding 02b51533 = standard M mulh)",
+   "fork_has_instruction": "yes: MULH (M extension)",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "standard M",
+   "suggested_lowering": "generic IR (sext, mul i64, lshr 32, trunc) or ISD::MULHS; int-20 llc already selects mulh",
+   "notes": "Wrapper gap_mul64h; no SDK call site. GCC constant-folds.",
+   "sdk": {
+    "wrappers": [
+     "gap_mul64h"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:117: #define gap_mul64h(x, y) __builtin_pulp_mul64hs((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_mul64hu",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int)",
+    "test_file": "gcc/mul64hu.c",
+    "asm_file": "gcc/mul64hu.s",
+    "asm": [
+     "t_mul64hu: p.mulhu a0,a0,a1",
+     "t_mul64hu: ret",
+     "t_mul64hu_const: li a0,305418240",
+     "t_mul64hu_const: add a0,a0,1655",
+     "t_mul64hu_const: ret"
+    ],
+    "encodings": {
+     "p.mulhu a0,a0,a1": {
+      "gcc_encoding": "02b53533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhu, p.lhu, p.mulhhu, p.mulhhun, p.mulu, p.mulun?",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhu, p.lhu, p.mulhhu, p.mulhhun, p.mulu, p.mulun?",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhu, p.lhu, p.mulhhu, p.mulhhun, p.mulu, p.mulun?"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "mulhu\ta0, a0, a1",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "mulhu\ta0, a0, a1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "mulhu\ta0, a0, a1"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int)",
+   "semantics": "(int)(((uint64)(uint32)x * (uint32)y) >> 32): high word of the unsigned product (GCC types are int).",
+   "emitted_instruction": "mulhu rd,rs1,rs2 (GCC \"p.mulhu\", encoding 02b53533 = standard M)",
+   "fork_has_instruction": "yes: MULHU",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "standard M",
+   "suggested_lowering": "ISD::MULHU; int-20 llc selects mulhu",
+   "notes": "Wrapper gap_mul64uh; used 4x in FastFixedApprox.h (included by MathFuncsFix.c). GCC constant-folds (0x12345678 * 0xfffffff9 -> 0x12345677).",
+   "sdk": {
+    "wrappers": [
+     "gap_mul64uh"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 4,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/MathFuncsFix.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:118: #define gap_mul64uh(x, y) __builtin_pulp_mul64hu((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_mul64hus",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int)",
+    "test_file": "gcc/mul64hus.c",
+    "asm_file": "gcc/mul64hus.s",
+    "asm": [
+     "t_mul64hus: p.mulhsu a0,a1,a0",
+     "t_mul64hus: ret",
+     "t_mul64hus_const: li a0,-1",
+     "t_mul64hus_const: ret"
+    ],
+    "encodings": {
+     "p.mulhsu a0,a1,a0": {
+      "gcc_encoding": "02a5a533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhsu, p.mulhhs, p.mulhhu, p.muls, p.mulu?",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhsu, p.mulhhs, p.mulhhu, p.muls, p.mulu?",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhsu, p.mulhhs, p.mulhhu, p.muls, p.mulu?"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "mulhsu\ta0, a1, a0",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "mulhsu\ta0, a1, a0",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "mulhsu\ta0, a1, a0"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int)",
+   "semantics": "(int)(((int64)(uint32)x * (int64)(int32)y) >> 32): x unsigned, y signed.",
+   "emitted_instruction": "mulhsu rd, rs1=y, rs2=x (GCC: \"p.mulhsu a0,a1,a0\"; standard M mulhsu, signed operand is rs1)",
+   "fork_has_instruction": "yes: MULHSU",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "standard M",
+   "suggested_lowering": "generic IR zext(x)*sext(y) >> 32; int-20 llc selects mulhsu a0,a1,a0 (matches GCC)",
+   "notes": "Wrapper gap_mul64ush; no SDK call site. Operand order matters: signed y goes to rs1.",
+   "sdk": {
+    "wrappers": [
+     "gap_mul64ush"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:119: #define gap_mul64ush(x, y) __builtin_pulp_mul64hus((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_mulfs",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int)",
+    "test_file": "gcc/mulfs.c",
+    "asm_file": "gcc/mulfs.s",
+    "asm": [
+     "t_mulfs: p.muls a0,a0,a1",
+     "t_mulfs: ret"
+    ],
+    "encodings": {
+     "p.muls a0,a0,a1": {
+      "gcc_encoding": "80b5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "80b5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "80b5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "80b5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.muls\ta0, a0, a1",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.muls\ta0, a0, a1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.muls\ta0, a0, a1"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int)",
+   "semantics": "(int16)x * (int16)y (signed 16x16 -> 32 on the low halves). Identical to __builtin_pulp_muls.",
+   "emitted_instruction": "p.muls rd,rs1,rs2",
+   "fork_has_instruction": "yes: P_MULS",
+   "fork_ir_intrinsic": "int_riscv_pulp_muls exists (for __builtin_pulp_muls); none for mulfs",
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.muls/p.mac* (existing)",
+   "suggested_lowering": "Alias of __builtin_pulp_muls: new intrinsic via the existing multiclass (IntrinsicsRISCVXpulp.td; e.g. `defm fs : mul_mac_N_RN;` gives mulfsN/mulfsRN/macfsN/macfsRN) plus the existing pattern multiclass (`defm : int_mul_mac_N_RN<\"fs\", \"S\">;`, RISCVInstrInfoXpulp.td:1150); add the builtin IDs to the same Sema N/RN case lists (SemaRISCV.cpp:1403-1427).",
+   "notes": "GAP9 GCC emits exactly the instruction of __builtin_pulp_muls (verified side by side in gcc/*.s). Wrapper gap_mulfs (GapBuiltins.h:76-109). No SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_mulfs"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:98: #define gap_mulfs(x, y) __builtin_pulp_mulfs((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_mulfsN",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int, int)",
+    "test_file": "gcc/mulfsN.c",
+    "asm_file": "gcc/mulfsN.s",
+    "asm": [
+     "t_mulfsN_n1: p.mulsN a0,a0,a1,1",
+     "t_mulfsN_n1: ret",
+     "t_mulfsN_n5: p.mulsN a0,a0,a1,5",
+     "t_mulfsN_n5: ret",
+     "t_mulfsN_n11: p.mulsN a0,a0,a1,11",
+     "t_mulfsN_n11: ret",
+     "t_mulfsN_n15: p.mulsN a0,a0,a1,15",
+     "t_mulfsN_n15: ret",
+     "t_mulfsN_n16: p.mulsN a0,a0,a1,16",
+     "t_mulfsN_n16: ret",
+     "t_mulfsN_n31: p.mulsN a0,a0,a1,31",
+     "t_mulfsN_n31: ret"
+    ],
+    "encodings": {
+     "p.mulsN a0,a0,a1,1": {
+      "gcc_encoding": "82b5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "82b5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "82b5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "82b5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 1",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 1"
+      }
+     },
+     "p.mulsN a0,a0,a1,5": {
+      "gcc_encoding": "8ab5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "8ab5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "8ab5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "8ab5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 5",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 5",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 5"
+      }
+     },
+     "p.mulsN a0,a0,a1,11": {
+      "gcc_encoding": "96b5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "96b5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "96b5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "96b5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 11",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 11",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 11"
+      }
+     },
+     "p.mulsN a0,a0,a1,15": {
+      "gcc_encoding": "9eb5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "9eb5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "9eb5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "9eb5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 15",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 15",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 15"
+      }
+     },
+     "p.mulsN a0,a0,a1,16": {
+      "gcc_encoding": "a0b5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "a0b5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "a0b5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "a0b5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 16",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 16",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 16"
+      }
+     },
+     "p.mulsN a0,a0,a1,31": {
+      "gcc_encoding": "beb5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "beb5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "beb5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "beb5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 31",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 31",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 31"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int, unsigned _Constant int)",
+   "semantics": "((int16)x * (int16)y) >>a N. Identical to __builtin_pulp_mulsN.",
+   "emitted_instruction": "p.mulsN rd,rs1,rs2,N",
+   "fork_has_instruction": "yes: P_MULSN",
+   "fork_ir_intrinsic": "int_riscv_pulp_mulsN exists (for __builtin_pulp_mulsN); none for mulfsN",
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.muls/p.mac* (existing)",
+   "suggested_lowering": "Alias of __builtin_pulp_mulsN: new intrinsic via the existing multiclass (IntrinsicsRISCVXpulp.td; e.g. `defm fs : mul_mac_N_RN;` gives mulfsN/mulfsRN/macfsN/macfsRN) plus the existing pattern multiclass (`defm : int_mul_mac_N_RN<\"fs\", \"S\">;`, RISCVInstrInfoXpulp.td:1150); add the builtin IDs to the same Sema N/RN case lists (SemaRISCV.cpp:1403-1427).",
+   "notes": "GAP9 GCC emits exactly the instruction of __builtin_pulp_mulsN (verified side by side in gcc/*.s). Wrapper gap_mulfsN (GapBuiltins.h:76-109). Used in libs/gap_lib/jpeg/dct.c (11 calls, constant N=Q11).",
+   "sdk": {
+    "wrappers": [
+     "gap_mulfsN"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 11,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "libs/gap_lib/jpeg/dct.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:105: #define gap_mulfsN(x, y, n) __builtin_pulp_mulfsN((x), (y), (n))",
+     "libs/gap_lib/jpeg/dct.c:62: z1 = __builtin_pulp_mulfsN(tmp12 + tmp13, FP2FIX(0.707106781f, Q11), Q11);",
+     "libs/gap_lib/jpeg/dct.c:72: z5 = __builtin_pulp_mulfsN(tmp10 - tmp12, FP2FIX(0.382683433f, Q11), Q11); /* c6 */",
+     "libs/gap_lib/jpeg/dct.c:73: z2 = __builtin_pulp_mulfsN(tmp10, FP2FIX(0.541196100f, Q11), Q11) + z5; /* c2-c6 */",
+     "libs/gap_lib/jpeg/dct.c:74: z4 = __builtin_pulp_mulfsN(tmp12, FP2FIX(1.306562965f, Q11), Q11) + z5; /* c2+c6 */",
+     "libs/gap_lib/jpeg/dct.c:75: z3 = __builtin_pulp_mulfsN(tmp11, FP2FIX(0.707106781f, Q11), Q11); /* c4 */",
+     "libs/gap_lib/jpeg/dct.c:110: z1 = __builtin_pulp_mulfsN(tmp12 + tmp13, FP2FIX(0.707106781f, Q11), Q11); /* c4 */",
+     "libs/gap_lib/jpeg/dct.c:120: z5 = __builtin_pulp_mulfsN(tmp10 - tmp12, FP2FIX(0.382683433f, Q11), Q11); /* c6 */",
+     "libs/gap_lib/jpeg/dct.c:121: z2 = __builtin_pulp_mulfsN(tmp10, FP2FIX(0.541196100f, Q11), Q11) + z5; /* c2-c6 */",
+     "libs/gap_lib/jpeg/dct.c:122: z4 = __builtin_pulp_mulfsN(tmp12, FP2FIX(1.306562965f, Q11), Q11) + z5; /* c2+c6 */",
+     "libs/gap_lib/jpeg/dct.c:123: z3 = __builtin_pulp_mulfsN(tmp11, FP2FIX(0.707106781f, Q11), Q11); /* c4 */",
+     "libs/gap_lib/jpeg/dct.c:136: for (ctr = 0; ctr < 64; ctr++) data[ctr] = __builtin_pulp_mulfsN(data[ctr], ftab[ctr], Q11 + 1);"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_mulfsRN",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int, int, int)",
+    "test_file": "gcc/mulfsRN.c",
+    "asm_file": "gcc/mulfsRN.s",
+    "asm": [
+     "t_mulfsRN_n1: p.mulsRN a0,a0,a1,1",
+     "t_mulfsRN_n1: ret",
+     "t_mulfsRN_n5: p.mulsRN a0,a0,a1,5",
+     "t_mulfsRN_n5: ret",
+     "t_mulfsRN_n11: p.mulsRN a0,a0,a1,11",
+     "t_mulfsRN_n11: ret",
+     "t_mulfsRN_n15: p.mulsRN a0,a0,a1,15",
+     "t_mulfsRN_n15: ret",
+     "t_mulfsRN_n16: p.mulsRN a0,a0,a1,16",
+     "t_mulfsRN_n16: ret",
+     "t_mulfsRN_n31: p.mulsRN a0,a0,a1,31",
+     "t_mulfsRN_n31: ret"
+    ],
+    "encodings": {
+     "p.mulsRN a0,a0,a1,1": {
+      "gcc_encoding": "82b5455b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "82b5455b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "82b5455b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "82b5455b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 1",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 1"
+      }
+     },
+     "p.mulsRN a0,a0,a1,5": {
+      "gcc_encoding": "8ab5455b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "8ab5455b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "8ab5455b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "8ab5455b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 5",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 5",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 5"
+      }
+     },
+     "p.mulsRN a0,a0,a1,11": {
+      "gcc_encoding": "96b5455b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "96b5455b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "96b5455b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "96b5455b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 11",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 11",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 11"
+      }
+     },
+     "p.mulsRN a0,a0,a1,15": {
+      "gcc_encoding": "9eb5455b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "9eb5455b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "9eb5455b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "9eb5455b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 15",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 15",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 15"
+      }
+     },
+     "p.mulsRN a0,a0,a1,16": {
+      "gcc_encoding": "a0b5455b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "a0b5455b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "a0b5455b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "a0b5455b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 16",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 16",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 16"
+      }
+     },
+     "p.mulsRN a0,a0,a1,31": {
+      "gcc_encoding": "beb5455b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "beb5455b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "beb5455b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "beb5455b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 31",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 31",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 31"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int, unsigned _Constant int, unsigned _Constant int)",
+   "semantics": "((int16)x * (int16)y + 2^(N-1)) >>a N. Identical to __builtin_pulp_mulsRN.",
+   "emitted_instruction": "p.mulsRN rd,rs1,rs2,N",
+   "fork_has_instruction": "yes: P_MULSRN",
+   "fork_ir_intrinsic": "int_riscv_pulp_mulsRN exists (for __builtin_pulp_mulsRN); none for mulfsRN",
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.muls/p.mac* (existing)",
+   "suggested_lowering": "Alias of __builtin_pulp_mulsRN: new intrinsic via the existing multiclass (IntrinsicsRISCVXpulp.td; e.g. `defm fs : mul_mac_N_RN;` gives mulfsN/mulfsRN/macfsN/macfsRN) plus the existing pattern multiclass (`defm : int_mul_mac_N_RN<\"fs\", \"S\">;`, RISCVInstrInfoXpulp.td:1150); add the builtin IDs to the same Sema N/RN case lists (SemaRISCV.cpp:1403-1427).",
+   "notes": "GAP9 GCC emits exactly the instruction of __builtin_pulp_mulsRN (verified side by side in gcc/*.s). Wrapper gap_mulfsRN (GapBuiltins.h:76-109). No SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_mulfsRN"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:107: #define gap_mulfsRN(x, y, n) __builtin_pulp_mulfsRN((x), (y), (n), (1<<((n)-1)))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_mulfu",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int)",
+    "test_file": "gcc/mulfu.c",
+    "asm_file": "gcc/mulfu.s",
+    "asm": [
+     "t_mulfu: p.mulu a0,a0,a1",
+     "t_mulfu: ret"
+    ],
+    "encodings": {
+     "p.mulu a0,a0,a1": {
+      "gcc_encoding": "00b5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "00b5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "00b5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "00b5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulu\ta0, a0, a1",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulu\ta0, a0, a1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulu\ta0, a0, a1"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int)",
+   "semantics": "(uint16)x * (uint16)y. Identical to __builtin_pulp_mulu (GCC types: int).",
+   "emitted_instruction": "p.mulu rd,rs1,rs2",
+   "fork_has_instruction": "yes: P_MULU",
+   "fork_ir_intrinsic": "int_riscv_pulp_mulu exists (for __builtin_pulp_mulu); none for mulfu",
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.muls/p.mac* (existing)",
+   "suggested_lowering": "Alias of __builtin_pulp_mulu: new intrinsic via the existing multiclass (IntrinsicsRISCVXpulp.td; e.g. `defm fs : mul_mac_N_RN;` gives mulfsN/mulfsRN/macfsN/macfsRN) plus the existing pattern multiclass (`defm : int_mul_mac_N_RN<\"fs\", \"S\">;`, RISCVInstrInfoXpulp.td:1150); add the builtin IDs to the same Sema N/RN case lists (SemaRISCV.cpp:1403-1427).",
+   "notes": "GAP9 GCC emits exactly the instruction of __builtin_pulp_mulu (verified side by side in gcc/*.s). Wrapper gap_mulfu (GapBuiltins.h:76-109). No SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_mulfu"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:100: #define gap_mulfu(x, y) __builtin_pulp_mulfu((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_mulfuN",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(int, int, int)",
+    "test_file": "gcc/mulfuN.c",
+    "asm_file": "gcc/mulfuN.s",
+    "asm": [
+     "t_mulfuN_n1: p.muluN a0,a0,a1,1",
+     "t_mulfuN_n1: ret",
+     "t_mulfuN_n5: p.muluN a0,a0,a1,5",
+     "t_mulfuN_n5: ret",
+     "t_mulfuN_n11: p.muluN a0,a0,a1,11",
+     "t_mulfuN_n11: ret",
+     "t_mulfuN_n15: p.muluN a0,a0,a1,15",
+     "t_mulfuN_n15: ret",
+     "t_mulfuN_n16: p.muluN a0,a0,a1,16",
+     "t_mulfuN_n16: ret",
+     "t_mulfuN_n31: p.muluN a0,a0,a1,31",
+     "t_mulfuN_n31: ret"
+    ],
+    "encodings": {
+     "p.muluN a0,a0,a1,1": {
+      "gcc_encoding": "02b5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "02b5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "02b5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "02b5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 1",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 1"
+      }
+     },
+     "p.muluN a0,a0,a1,5": {
+      "gcc_encoding": "0ab5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "0ab5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "0ab5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "0ab5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 5",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 5",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 5"
+      }
+     },
+     "p.muluN a0,a0,a1,11": {
+      "gcc_encoding": "16b5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "16b5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "16b5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "16b5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 11",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 11",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 11"
+      }
+     },
+     "p.muluN a0,a0,a1,15": {
+      "gcc_encoding": "1eb5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "1eb5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "1eb5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "1eb5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 15",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 15",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 15"
+      }
+     },
+     "p.muluN a0,a0,a1,16": {
+      "gcc_encoding": "20b5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "20b5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "20b5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "20b5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 16",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 16",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 16"
+      }
+     },
+     "p.muluN a0,a0,a1,31": {
+      "gcc_encoding": "3eb5055b",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "3eb5055b",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "3eb5055b",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "3eb5055b"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 31",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 31",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 31"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(int, int, unsigned _Constant int)",
+   "semantics": "((uint16)x * (uint16)y) >>l N. Identical to __builtin_pulp_muluN.",
+   "emitted_instruction": "p.muluN rd,rs1,rs2,N",
+   "fork_has_instruction": "yes: P_MULUN",
+   "fork_ir_intrinsic": "int_riscv_pulp_muluN exists (for __builtin_pulp_muluN); none for mulfuN",
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.muls/p.mac* (existing)",
+   "suggested_lowering": "Alias of __builtin_pulp_muluN: new intrinsic via the existing multiclass (IntrinsicsRISCVXpulp.td; e.g. `defm fs : mul_mac_N_RN;` gives mulfsN/mulfsRN/macfsN/macfsRN) plus the existing pattern multiclass (`defm : int_mul_mac_N_RN<\"fs\", \"S\">;`, RISCVInstrInfoXpulp.td:1150); add the builtin IDs to the same Sema N/RN case lists (SemaRISCV.cpp:1403-1427).",
+   "notes": "GAP9 GCC emits exactly the instruction of __builtin_pulp_muluN (verified side by side in gcc/*.s). Wrapper gap_mulfuN (GapBuiltins.h:76-109). No SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_mulfuN"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:109: #define gap_mulfuN(x, y, n) __builtin_pulp_mulfuN((x), (y), (n))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_rdownsf2",
+   "batch": "A",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(float)",
+    "test_file": "gcc/rdownsf2.c",
+    "asm_file": "gcc/rdownsf2.s",
+    "asm": [
+     "t_rdownsf2: fcvt.w.s a0,a0,rdn",
+     "t_rdownsf2: ret",
+     "t_rdownsf2_const: lui a5,%hi(.LC0)",
+     "t_rdownsf2_const: lw a0,%lo(.LC0)(a5)",
+     "t_rdownsf2_const: fcvt.w.s a0,a0,rdn",
+     "t_rdownsf2_const: ret"
+    ],
+    "encodings": {
+     "fcvt.w.s a0,a0,rdn": {
+      "gcc_encoding": "c0052553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "c0052553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fcvt.w.s\ta0, a0, rdn",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fcvt.w.s\ta0, fa0, rdn"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(float)",
+   "semantics": "float -> int32, round toward -inf (rdn), saturating.",
+   "emitted_instruction": "fcvt.w.s rd,rs1,rdn",
+   "fork_has_instruction": "yes",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "standard F",
+   "suggested_lowering": "RISCVISD::FCVT_X, RISCVFPRndMode::RDN",
+   "notes": "Wrapper gap_f32rdn; no SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_f32rdn"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:255: #define gap_f32rdn(a) __builtin_pulp_rdownsf2((a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_rintsf2",
+   "batch": "A",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(float)",
+    "test_file": "gcc/rintsf2.c",
+    "asm_file": "gcc/rintsf2.s",
+    "asm": [
+     "t_rintsf2: fcvt.w.s a0,a0,rmm",
+     "t_rintsf2: ret",
+     "t_rintsf2_const: lui a5,%hi(.LC0)",
+     "t_rintsf2_const: lw a0,%lo(.LC0)(a5)",
+     "t_rintsf2_const: fcvt.w.s a0,a0,rmm",
+     "t_rintsf2_const: ret",
+     "t_rintsf2_scale: fmul.s a0,a0,a1",
+     "t_rintsf2_scale: fcvt.w.s a0,a0,rmm",
+     "t_rintsf2_scale: ret"
+    ],
+    "encodings": {
+     "fcvt.w.s a0,a0,rmm": {
+      "gcc_encoding": "c0054553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "c0054553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fcvt.w.s\ta0, a0, rmm",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fcvt.w.s\ta0, fa0, rmm"
+      }
+     },
+     "fmul.s a0,a0,a1": {
+      "gcc_encoding": "10b57553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "10b57553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fmul.s\ta0, a0, a1",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fmul.s\tfa0, fa0, fa1"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(float)",
+   "semantics": "float -> int32, round to nearest, ties away from zero (RISC-V rmm); saturating as fcvt.w.s (NaN -> 0x7fffffff, overflow clamps).",
+   "emitted_instruction": "fcvt.w.s rd,rs1,rmm",
+   "fork_has_instruction": "yes: FCVT_W_S_INX / FCVT_W_S with frm operand",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "standard F fcvt.w.s",
+   "suggested_lowering": "RISCVISD::FCVT_X with rounding-mode operand RISCVFPRndMode::RMM (exact saturating semantics). fptosi(llvm.round) / llvm.lround give the same instruction in int-20 llc but are poison/undefined out of range.",
+   "notes": "Wrappers gap_f32rmm (GapBuiltins.h:254), AT_SCALEF (at_api.h:126: (int) gap_f32rmm((X)*(Scale))). Not folded by GCC.",
+   "sdk": {
+    "wrappers": [
+     "AT_SCALEF",
+     "gap_f32rmm"
+    ],
+    "c_files_calling": 2,
+    "call_sites": 32,
+    "files_failing_on_it": 2,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/RNN_BasicKernelsFScale_NE16.c",
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Activation_SQ8.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:254: #define gap_f32rmm(a) __builtin_pulp_rintsf2((a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_rupsf2",
+   "batch": "A",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "int(float)",
+    "test_file": "gcc/rupsf2.c",
+    "asm_file": "gcc/rupsf2.s",
+    "asm": [
+     "t_rupsf2: fcvt.w.s a0,a0,rup",
+     "t_rupsf2: ret",
+     "t_rupsf2_const: lui a5,%hi(.LC0)",
+     "t_rupsf2_const: lw a0,%lo(.LC0)(a5)",
+     "t_rupsf2_const: fcvt.w.s a0,a0,rup",
+     "t_rupsf2_const: ret"
+    ],
+    "encodings": {
+     "fcvt.w.s a0,a0,rup": {
+      "gcc_encoding": "c0053553",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "c0053553",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "fcvt.w.s\ta0, a0, rup",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fcvt.w.s\ta0, fa0, rup"
+      }
+     }
+    }
+   },
+   "clang_prototype": "int(float)",
+   "semantics": "float -> int32, round toward +inf (rup), saturating.",
+   "emitted_instruction": "fcvt.w.s rd,rs1,rup",
+   "fork_has_instruction": "yes",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "standard F",
+   "suggested_lowering": "RISCVISD::FCVT_X, RISCVFPRndMode::RUP",
+   "notes": "Wrapper gap_f32rup; no SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_f32rup"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:256: #define gap_f32rup(a) __builtin_pulp_rupsf2((a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_sub2div2",
+   "batch": "B",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/sub2div2.c",
+    "asm_file": "gcc/sub2div2.s",
+    "asm": [
+     "t_sub2div2: pv.sub.h.div2 a0,a0,a1",
+     "t_sub2div2: ret"
+    ],
+    "encodings": {
+     "pv.sub.h.div2 a0,a0,a1": {
+      "gcc_encoding": "64b52557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)",
+   "semantics": "r[i] = (int16)(a[i] - b[i]) >> 1.",
+   "emitted_instruction": "pv.sub.h.div2 (funct7 0110010, funct3 010)",
+   "fork_has_instruction": "NO",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/gap9/models/ips/gap/cpu/gap9_isa.py:96 / /home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/include/isa_lib/int.h:741",
+   "suggested_lowering": "-> PV_SUB_H_DIV2",
+   "notes": "Wrappers __SUB2DIV2, __SUB2_DIV2, gap_sub2div2. FftLibraryFix.c.",
+   "sdk": {
+    "wrappers": [
+     "__SUB2DIV2",
+     "__SUB2_DIV2",
+     "gap_sub2div2"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 2,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:178: #define gap_sub2div2(x, y) __builtin_pulp_sub2div2((x), (y))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:611: #define __SUB2_DIV2(x, y) __builtin_pulp_sub2div2(x, y)",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:220: #define __SUB2DIV2(x, y) __builtin_pulp_sub2div2((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_sub2div4",
+   "batch": "B",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/sub2div4.c",
+    "asm_file": "gcc/sub2div4.s",
+    "asm": [
+     "t_sub2div4: pv.sub.h.div4 a0,a0,a1",
+     "t_sub2div4: ret"
+    ],
+    "encodings": {
+     "pv.sub.h.div4 a0,a0,a1": {
+      "gcc_encoding": "64b54557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)",
+   "semantics": "r[i] = (int16)(a[i] - b[i]) >> 2.",
+   "emitted_instruction": "pv.sub.h.div4 (funct7 0110010, funct3 100)",
+   "fork_has_instruction": "NO",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/gap9/models/ips/gap/cpu/gap9_isa.py:97 / /home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/include/isa_lib/int.h:742",
+   "suggested_lowering": "-> PV_SUB_H_DIV4",
+   "notes": "Wrappers __SUB2DIV4, __SUB2_DIV4, gap_sub2div4; no SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "__SUB2DIV4",
+     "__SUB2_DIV4",
+     "gap_sub2div4"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:179: #define gap_sub2div4(x, y) __builtin_pulp_sub2div4((x), (y))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:612: #define __SUB2_DIV4(x, y) __builtin_pulp_sub2div4(x, y)",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:221: #define __SUB2DIV4(x, y) __builtin_pulp_sub2div4((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_sub2rotmj",
+   "batch": "B",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/sub2rotmj.c",
+    "asm_file": "gcc/sub2rotmj.s",
+    "asm": [
+     "t_sub2rotmj: pv.subrotmj.h a0,a0,a1",
+     "t_sub2rotmj: ret"
+    ],
+    "encodings": {
+     "pv.subrotmj.h a0,a0,a1": {
+      "gcc_encoding": "6cb50557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)",
+   "semantics": "(a - b) * (-j), element 0 = bits 15:0 = real part, element 1 = bits 31:16 = imaginary part: r.re = (int16)(a.im - b.im); r.im = (int16)(b.re - a.re). No scaling.",
+   "emitted_instruction": "pv.subrotmj.h rd,rs1,rs2 (funct7 0110110, funct3 000)",
+   "fork_has_instruction": "NO",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/gap9/models/ips/gap/cpu/gap9_isa.py:85 gap9_VEC_ADD_16_ROTMJ -> /home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/include/isa_lib/int.h:1370 lib_VEC_ADD_16_ROTMJ",
+   "suggested_lowering": "-> PV_SUBROTMJ_H",
+   "notes": "Wrappers __SUB2ROTMJ, __SUB2_ROTMJ, gap_sub2rotmj. FftLibraryFix.c (radix-4 butterflies). GCC accepts unsigned-short vectors. Upstream ref CV_SUBROTMJ (RISCVInstrInfoXCV.td:480).",
+   "sdk": {
+    "wrappers": [
+     "__SUB2ROTMJ",
+     "__SUB2_ROTMJ",
+     "gap_sub2rotmj"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 6,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:171: #define gap_sub2rotmj(x, y) __builtin_pulp_sub2rotmj((x), (y))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:604: #define __SUB2_ROTMJ(x, y) __builtin_pulp_sub2rotmj(x, y)",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:210: #define __SUB2ROTMJ(x, y) __builtin_pulp_sub2rotmj((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_sub4div2",
+   "batch": "X",
+   "gcc": {
+    "gap9_known": false,
+    "gap8_known": true,
+    "signature": "__vector(4) signed char(__vector(4) signed char, __vector(4) signed char)",
+    "test_file": "gcc/sub4div2.c",
+    "asm_file": "gcc/sub4div2.s",
+    "asm": [
+     "t_sub4div2: pv.sub.b.div2 a0,a0,a1",
+     "t_sub4div2: ret"
+    ],
+    "encodings": {
+     "pv.sub.b.div2 a0,a0,a1": {
+      "gcc_encoding": "08b53557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": null,
+   "semantics": null,
+   "emitted_instruction": null,
+   "fork_has_instruction": "no",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": null,
+   "suggested_lowering": "Do not implement for GAP9 (GCC parity does not require it).",
+   "notes": "GAP8 only (pv.sub.b.div2).",
+   "sdk": {
+    "wrappers": [
+     "__SUB4DIV2"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:223: #define __SUB4DIV2(x, y) __builtin_pulp_sub4div2((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_sub4div4",
+   "batch": "X",
+   "gcc": {
+    "gap9_known": false,
+    "gap8_known": true,
+    "signature": "__vector(4) signed char(__vector(4) signed char, __vector(4) signed char)",
+    "test_file": "gcc/sub4div4.c",
+    "asm_file": "gcc/sub4div4.s",
+    "asm": [
+     "t_sub4div4: pv.sub.b.div4 a0,a0,a1",
+     "t_sub4div4: ret"
+    ],
+    "encodings": {
+     "pv.sub.b.div4 a0,a0,a1": {
+      "gcc_encoding": "0ab53557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": null,
+   "semantics": null,
+   "emitted_instruction": null,
+   "fork_has_instruction": "no",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": null,
+   "suggested_lowering": "Do not implement for GAP9 (GCC parity does not require it).",
+   "notes": "GAP8 only (pv.sub.b.div4).",
+   "sdk": {
+    "wrappers": [
+     "__SUB4DIV4"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:224: #define __SUB4DIV4(x, y) __builtin_pulp_sub4div4((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_truncb",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "char(int)",
+    "test_file": "gcc/truncb.c",
+    "asm_file": "gcc/truncb.s",
+    "asm": [
+     "t_truncb: and a0,a0,0xff",
+     "t_truncb: ret",
+     "t_truncb_const: li a0,305418240",
+     "t_truncb_const: add a0,a0,1656",
+     "t_truncb_const: and a0,a0,0xff",
+     "t_truncb_const: ret"
+    ],
+    "encodings": {}
+   },
+   "clang_prototype": "char(int)",
+   "semantics": "(char)x: low 8 bits. Plain char is UNSIGNED on RISC-V, so as int it is zero-extended (GCC: andi 0xff). NB: the SDK emulation fallback (GapBuiltins.h:463) uses signed char; follow GCC.",
+   "emitted_instruction": "andi rd,rs1,0xff (or sb when stored)",
+   "fork_has_instruction": "yes: ANDI / p.extbz",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "-",
+   "suggested_lowering": "generic IR trunc i32->i8",
+   "notes": "Wrapper gap_trunb; no SDK call site.",
+   "sdk": {
+    "wrappers": [
+     "gap_trunb"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:72: #define gap_trunb(x) __builtin_pulp_truncb((x))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_trunch",
+   "batch": "C",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "short int(int)",
+    "test_file": "gcc/trunch.c",
+    "asm_file": "gcc/trunch.s",
+    "asm": [
+     "t_trunch: p.exths a0,a0",
+     "t_trunch: ret",
+     "t_trunch_const: li a0,305418240",
+     "t_trunch_const: add a0,a0,1656",
+     "t_trunch_const: p.exths a0,a0",
+     "t_trunch_const: ret",
+     "t_trunch_store: add a5,a1,a2",
+     "t_trunch_store: sub a1,a1,a2",
+     "t_trunch_store: sh a5,0(a0)",
+     "t_trunch_store: sh a1,8(a0)",
+     "t_trunch_store: ret"
+    ],
+    "encodings": {
+     "p.exths a0,a0": {
+      "gcc_encoding": "10054533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "10054533",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "10054533",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "10054533"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "p.exths\ta0, a0",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "p.exths\ta0, a0",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.exths\ta0, a0"
+      }
+     }
+    }
+   },
+   "clang_prototype": "short(int)",
+   "semantics": "(short)x: low 16 bits, sign-extended to int when used as int.",
+   "emitted_instruction": "p.exths rd,rs1 (or folded into sh when stored)",
+   "fork_has_instruction": "yes: P_EXTHS (pattern sext_inreg i16)",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": "pulp_v2 p.exths",
+   "suggested_lowering": "generic IR trunc i32->i16 (+sext by C return promotion); XCV reference: cv_alu_exths is emitted as sext(trunc) in CGBuiltin.cpp:23441",
+   "notes": "Wrapper gap_trunh; used 16x in libs/gap_lib/jpeg/dct.c (stored into short arrays; GCC folds into sh). GCC accepts long long / pointer args (int-conversion warning).",
+   "sdk": {
+    "wrappers": [
+     "gap_trunh"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 16,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "libs/gap_lib/jpeg/dct.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:71: #define gap_trunh(x) __builtin_pulp_trunch((x))",
+     "libs/gap_lib/jpeg/dct.c:59: dataptr[0] = __builtin_pulp_trunch(tmp10 + tmp11); /* phase 3 */",
+     "libs/gap_lib/jpeg/dct.c:60: dataptr[4] = __builtin_pulp_trunch(tmp10 - tmp11);",
+     "libs/gap_lib/jpeg/dct.c:63: dataptr[2] = __builtin_pulp_trunch(tmp13 + z1); /* phase 5 */",
+     "libs/gap_lib/jpeg/dct.c:64: dataptr[6] = __builtin_pulp_trunch(tmp13 - z1);",
+     "libs/gap_lib/jpeg/dct.c:80: dataptr[5] = __builtin_pulp_trunch(z13 + z2); /* phase 6 */",
+     "libs/gap_lib/jpeg/dct.c:81: dataptr[3] = __builtin_pulp_trunch(z13 - z2);",
+     "libs/gap_lib/jpeg/dct.c:82: dataptr[1] = __builtin_pulp_trunch(z11 + z4);",
+     "libs/gap_lib/jpeg/dct.c:83: dataptr[7] = __builtin_pulp_trunch(z11 - z4);",
+     "libs/gap_lib/jpeg/dct.c:107: dataptr[DCTSIZE * 0] = __builtin_pulp_trunch(tmp10 + tmp11); /* phase 3 */",
+     "libs/gap_lib/jpeg/dct.c:108: dataptr[DCTSIZE * 4] = __builtin_pulp_trunch(tmp10 - tmp11);",
+     "libs/gap_lib/jpeg/dct.c:111: dataptr[DCTSIZE * 2] = __builtin_pulp_trunch(tmp13 + z1); /* phase 5 */",
+     "libs/gap_lib/jpeg/dct.c:112: dataptr[DCTSIZE * 6] = __builtin_pulp_trunch(tmp13 - z1);",
+     "libs/gap_lib/jpeg/dct.c:128: dataptr[DCTSIZE * 5] = __builtin_pulp_trunch(z13 + z2); /* phase 6 */",
+     "libs/gap_lib/jpeg/dct.c:129: dataptr[DCTSIZE * 3] = __builtin_pulp_trunch(z13 - z2);",
+     "libs/gap_lib/jpeg/dct.c:130: dataptr[DCTSIZE * 1] = __builtin_pulp_trunch(z11 + z4);",
+     "libs/gap_lib/jpeg/dct.c:131: dataptr[DCTSIZE * 7] = __builtin_pulp_trunch(z11 - z4);"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_v2hftov2hi",
+   "batch": "E3",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) float16)",
+    "test_file": "gcc/v2hftov2hi.c",
+    "asm_file": "gcc/v2hftov2hi.s",
+    "asm": [
+     "t_v2hftov2hi: vfcvt.x.h a0,a0",
+     "t_v2hftov2hi: ret"
+    ],
+    "encodings": {
+     "vfcvt.x.h a0,a0": {
+      "gcc_encoding": "98252533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:14: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:14: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:14: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfcvt.x.h\ta0, fa0"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(v2h)",
+   "semantics": "per-lane conversion v2h -> v2s (2 lanes). GVSoC rounds with the dynamic frm (rm=7, rv32Xfvec.hpp:347); GCC describes it as fix_trunc (truncation) - the two agree only when frm=RTZ. Match GCC's instruction; do not emulate.",
+   "emitted_instruction": "vfcvt.x.h rd,rs1 (encoding 98252533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "Cvt_v2h_v2s"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 6,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:103: #define Cvt_v2h_v2s(a) ((v2s) __builtin_pulp_v2hftov2hi(a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_v2hftov2hi_u",
+   "batch": "E3",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) float16)",
+    "test_file": "gcc/v2hftov2hi_u.c",
+    "asm_file": "gcc/v2hftov2hi_u.s",
+    "asm": [
+     "t_v2hftov2hi_u: vfcvt.xu.h a0,a0",
+     "t_v2hftov2hi_u: ret"
+    ],
+    "encodings": {
+     "vfcvt.xu.h a0,a0": {
+      "gcc_encoding": "98256533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfcvt.xu.h\ta0, fa0"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(v2h)",
+   "semantics": "per-lane conversion v2h -> v2s (2 lanes). GVSoC rounds with the dynamic frm (rm=7, rv32Xfvec.hpp:347); GCC describes it as fix_trunc (truncation) - the two agree only when frm=RTZ. Match GCC's instruction; do not emulate. Unsigned lanes (GCC types are still v2s).",
+   "emitted_instruction": "vfcvt.xu.h rd,rs1 (encoding 98256533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "Cvt_v2h_v2u"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 1,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:104: #define Cvt_v2h_v2u(a) ((v2u)__builtin_pulp_v2hftov2hi_u(a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_v2hftov2ohf",
+   "batch": "E3",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16alt(__vector(2) float16)",
+    "test_file": "gcc/v2hftov2ohf.c",
+    "asm_file": "gcc/v2hftov2ohf.s",
+    "asm": [
+     "t_v2hftov2ohf: vfcvt.ah.h a0,a0",
+     "t_v2hftov2ohf: ret"
+    ],
+    "encodings": {
+     "vfcvt.ah.h a0,a0": {
+      "gcc_encoding": "98651533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2ah(v2h)",
+   "semantics": "per-lane conversion v2h -> v2ah (2 lanes).",
+   "emitted_instruction": "vfcvt.ah.h rd,rs1 (encoding 98651533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "Cvt_v2h_v2ah"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 9,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:113: #define Cvt_v2h_v2ah(a) ((v2ah)__builtin_pulp_v2hftov2ohf(a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_v2hitov2hf",
+   "batch": "E3",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16(__vector(2) short int)",
+    "test_file": "gcc/v2hitov2hf.c",
+    "asm_file": "gcc/v2hitov2hf.s",
+    "asm": [
+     "t_v2hitov2hf: vfcvt.h.x a0,a0",
+     "t_v2hitov2hf: ret"
+    ],
+    "encodings": {
+     "vfcvt.h.x a0,a0": {
+      "gcc_encoding": "98352533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:11: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:11: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:11: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfcvt.h.x\tfa0, a0"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2h(_Vector<2, short>)",
+   "semantics": "per-lane conversion v2s -> v2h (2 lanes).",
+   "emitted_instruction": "vfcvt.h.x rd,rs1 (encoding 98352533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "Cvt_v2s_v2h"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 1,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:108: #define Cvt_v2s_v2h(a) ((v2h)__builtin_pulp_v2hitov2hf(a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_v2hitov2hf_u",
+   "batch": "E3",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16(__vector(2) short int)",
+    "test_file": "gcc/v2hitov2hf_u.c",
+    "asm_file": "gcc/v2hitov2hf_u.s",
+    "asm": [
+     "t_v2hitov2hf_u: vfcvt.h.xu a0,a0",
+     "t_v2hitov2hf_u: ret"
+    ],
+    "encodings": {
+     "vfcvt.h.xu a0,a0": {
+      "gcc_encoding": "98356533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfcvt.h.xu\tfa0, a0"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2h(_Vector<2, short>)",
+   "semantics": "per-lane conversion v2s -> v2h (2 lanes). Unsigned lanes (GCC types are still v2s).",
+   "emitted_instruction": "vfcvt.h.xu rd,rs1 (encoding 98356533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "Cvt_v2u_v2h"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 3,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:109: #define Cvt_v2u_v2h(a) ((v2h)__builtin_pulp_v2hitov2hf_u(a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_v2hitov2ohf",
+   "batch": "E3",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16alt(__vector(2) short int)",
+    "test_file": "gcc/v2hitov2ohf.c",
+    "asm_file": "gcc/v2hitov2ohf.s",
+    "asm": [
+     "t_v2hitov2ohf: vfcvt.ah.x a0,a0",
+     "t_v2hitov2ohf: ret"
+    ],
+    "encodings": {
+     "vfcvt.ah.x a0,a0": {
+      "gcc_encoding": "98351533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2ah(_Vector<2, short>)",
+   "semantics": "per-lane conversion v2s -> v2ah (2 lanes).",
+   "emitted_instruction": "vfcvt.ah.x rd,rs1 (encoding 98351533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "Cvt_v2s_v2ah"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:110: #define Cvt_v2s_v2ah(a) ((v2ah)__builtin_pulp_v2hitov2ohf(a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_v2hitov2ohf_u",
+   "batch": "E3",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16alt(__vector(2) short int)",
+    "test_file": "gcc/v2hitov2ohf_u.c",
+    "asm_file": "gcc/v2hitov2ohf_u.s",
+    "asm": [
+     "t_v2hitov2ohf_u: vfcvt.ah.xu a0,a0",
+     "t_v2hitov2ohf_u: ret"
+    ],
+    "encodings": {
+     "vfcvt.ah.xu a0,a0": {
+      "gcc_encoding": "98355533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2ah(_Vector<2, short>)",
+   "semantics": "per-lane conversion v2s -> v2ah (2 lanes). Unsigned lanes (GCC types are still v2s).",
+   "emitted_instruction": "vfcvt.ah.xu rd,rs1 (encoding 98355533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "Cvt_v2u_v2ah"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:111: #define Cvt_v2u_v2ah(a) ((v2ah)__builtin_pulp_v2hitov2ohf_u(a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_v2ohftov2hf",
+   "batch": "E3",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) float16(__vector(2) float16alt)",
+    "test_file": "gcc/v2ohftov2hf.c",
+    "asm_file": "gcc/v2ohftov2hf.s",
+    "asm": [
+     "t_v2ohftov2hf: vfcvt.h.ah a0,a0",
+     "t_v2ohftov2hf: ret"
+    ],
+    "encodings": {
+     "vfcvt.h.ah a0,a0": {
+      "gcc_encoding": "98552533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "v2h(v2ah)",
+   "semantics": "per-lane conversion v2ah -> v2h (2 lanes).",
+   "emitted_instruction": "vfcvt.h.ah rd,rs1 (encoding 98552533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "Cvt_v2ah_v2h",
+     "PULP_V2OHFTOV2HF"
+    ],
+    "c_files_calling": 1,
+    "call_sites": 6,
+    "files_failing_on_it": 1,
+    "files_blocked": [
+     "tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c"
+    ],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:477: v2h res_v2h = ((v2h)__builtin_pulp_v2ohftov2hf(x)) * ((v2h){BF16_FACA, BF16_FACA}) + ((v2h){BF16_FACB, BF16_FACB});",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/FastFloatApprox16.h:507: #define PULP_V2OHFTOV2HF(__x) __builtin_pulp_v2ohftov2hf(__x)",
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:114: #define Cvt_v2ah_v2h(a) ((v2h)__builtin_pulp_v2ohftov2hf(a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_v2ohftov2hi",
+   "batch": "E3",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) float16alt)",
+    "test_file": "gcc/v2ohftov2hi.c",
+    "asm_file": "gcc/v2ohftov2hi.s",
+    "asm": [
+     "t_v2ohftov2hi: vfcvt.x.ah a0,a0",
+     "t_v2ohftov2hi: ret"
+    ],
+    "encodings": {
+     "vfcvt.x.ah a0,a0": {
+      "gcc_encoding": "98251533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(v2ah)",
+   "semantics": "per-lane conversion v2ah -> v2s (2 lanes). GVSoC rounds with the dynamic frm (rm=7, rv32Xfvec.hpp:347); GCC describes it as fix_trunc (truncation) - the two agree only when frm=RTZ. Match GCC's instruction; do not emulate.",
+   "emitted_instruction": "vfcvt.x.ah rd,rs1 (encoding 98251533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "Cvt_v2ah_v2s"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:105: #define Cvt_v2ah_v2s(a) ((v2s)__builtin_pulp_v2ohftov2hi(a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_v2ohftov2hi_u",
+   "batch": "E3",
+   "gcc": {
+    "gap9_known": true,
+    "gap8_known": null,
+    "signature": "__vector(2) short int(__vector(2) float16alt)",
+    "test_file": "gcc/v2ohftov2hi_u.c",
+    "asm_file": "gcc/v2ohftov2hi_u.s",
+    "asm": [
+     "t_v2ohftov2hi_u: vfcvt.xu.ah a0,a0",
+     "t_v2ohftov2hi_u: ret"
+    ],
+    "encodings": {
+     "vfcvt.xu.ah a0,a0": {
+      "gcc_encoding": "98255533",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:16: error: invalid operand for instruction",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:16: error: invalid operand for instruction",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:16: error: invalid operand for instruction"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": "_Vector<2, short>(v2ah)",
+   "semantics": "per-lane conversion v2ah -> v2s (2 lanes). GVSoC rounds with the dynamic frm (rm=7, rv32Xfvec.hpp:347); GCC describes it as fix_trunc (truncation) - the two agree only when frm=RTZ. Match GCC's instruction; do not emulate. Unsigned lanes (GCC types are still v2s).",
+   "emitted_instruction": "vfcvt.xu.ah rd,rs1 (encoding 98255533)",
+   "fork_has_instruction": "NO: GAP9 keeps these in GPRs; the fork's Xfalthalf/Xfvechalf (Snitch) use FPRs, and its fmax.ah assembles to the fmax.h encoding (Snitch selects alt-half by CSR, GAP9 by funct3=101). ",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": true,
+   "gvsoc": "/home/ubuntu/gap_sdk_release/gvsoc2/core/models/cpu/iss/isa_gen/isa_smallfloats.py",
+   "suggested_lowering": "after B90: pattern on the new instruction defs",
+   "notes": "Blocked on B90 (float16alt type, v2h/v2ah vector types) AND new GPR-based GAP9 smallfloat instruction definitions.",
+   "sdk": {
+    "wrappers": [
+     "Cvt_v2ah_v2u"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/BasicKernels/DSP_Libraries/FloatDefines.h:106: #define Cvt_v2ah_v2u(a) ((v2u)__builtin_pulp_v2ohftov2hi_u(a))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_vitmax2",
+   "batch": "X",
+   "gcc": {
+    "gap9_known": false,
+    "gap8_known": true,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/vitmax2.c",
+    "asm_file": "gcc/vitmax2.s",
+    "asm": [
+     "t_vitmax2: pv.vitop.max a0,a0,a1",
+     "t_vitmax2: ret"
+    ],
+    "encodings": {
+     "pv.vitop.max a0,a0,a1": {
+      "gcc_encoding": "64b51557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": null,
+   "semantics": null,
+   "emitted_instruction": null,
+   "fork_has_instruction": "no",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": null,
+   "suggested_lowering": "Do not implement for GAP9 (GCC parity does not require it).",
+   "notes": "GAP8 only (pv.vitop.max); SDK wrapper gap_vitmax guarded by __gap8__.",
+   "sdk": {
+    "wrappers": [
+     "__VITMAX",
+     "__VIT_MAX",
+     "gap_vitmax"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:183: #define gap_vitmax(x, y) __builtin_pulp_vitmax2((x), (y))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:615: #define __VIT_MAX(x, y) __builtin_pulp_vitmax2(x, y)",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:227: #define __VITMAX(x, y) __builtin_pulp_vitmax2((x), (y))"
+    ]
+   }
+  },
+  {
+   "name": "__builtin_pulp_vitsel2",
+   "batch": "X",
+   "gcc": {
+    "gap9_known": false,
+    "gap8_known": true,
+    "signature": "__vector(2) short int(__vector(2) short int, __vector(2) short int)",
+    "test_file": "gcc/vitsel2.c",
+    "asm_file": "gcc/vitsel2.s",
+    "asm": [
+     "t_vitsel2: pv.vitop.sel a0,a0,a1",
+     "t_vitsel2: ret"
+    ],
+    "encodings": {
+     "pv.vitop.sel a0,a0,a1": {
+      "gcc_encoding": "64b50557",
+      "llvm_mc_int20": {
+       "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+      },
+      "llvm_disasm_of_gcc_encoding": {
+       "+m,+c,+xpulpv": "invalid",
+       "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+       "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+      }
+     }
+    }
+   },
+   "clang_prototype": null,
+   "semantics": null,
+   "emitted_instruction": null,
+   "fork_has_instruction": "no",
+   "fork_ir_intrinsic": null,
+   "blocked_on_fp16": false,
+   "gvsoc": null,
+   "suggested_lowering": "Do not implement for GAP9 (GCC parity does not require it).",
+   "notes": "GAP8 only (pv.vitop.sel).",
+   "sdk": {
+    "wrappers": [
+     "__VITSEL",
+     "__VIT_SEL",
+     "gap_vitsel"
+    ],
+    "c_files_calling": 0,
+    "call_sites": 0,
+    "files_failing_on_it": 0,
+    "files_blocked": [],
+    "source_lines": [
+     "tools/autotiler_v3/Emulation/GapBuiltins.h:184: #define gap_vitsel(x, y) __builtin_pulp_vitsel2((x), (y))",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/pmsis_gcc.h:616: #define __VIT_SEL(x, y) __builtin_pulp_vitsel2(x, y)",
+     "rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/pmsis/include/cores/TARGET_RISCV_32/builtins_gap9.h:228: #define __VITSEL(x, y) __builtin_pulp_vitsel2((x), (y))"
+    ]
+   }
+  }
+ ]
+}

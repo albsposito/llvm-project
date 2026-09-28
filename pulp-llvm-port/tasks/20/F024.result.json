@@ -1,0 +1,50 @@
+{
+ "status": "done",
+ "branch": "work/20/F024",
+ "commits": [
+  "952879d82dfa"
+ ],
+ "note": "notes/20/F024.md",
+ "signature_gone": true,
+ "fix_summary": "Added FeatureStdExtI after Feature32Bit to the only two fork processors, MEMPOOL (mempool-rv32) and SNITCH (snitch), in llvm/lib/Target/RISCV/RISCVProcessors.td (registration cluster). Generated RISCVTargetParserDef.inc now has rv32i2p1_m2p0_a2p1_xmempool0p1 and rv32i2p1_m2p0_a2p1_f2p2_d2p2_zfh1p0_x... instead of rv32m2p0_...",
+ "rule8": "Cause: b64e483785bf '[RISCV][TableGen] Generate RISCVTargetParserDef.inc from the new RISCVExtension tblgen information. (#89335)' (llvmorg-18.1.8..llvmorg-19.1.7): the -mcpu march string is printed verbatim from the processor feature list instead of via RISCVISAInfo::parseFeatures, which used to imply 'i'. Upstream's own fix for its processors: 65b0cc610f80 '[RISCV] Add FeatureStdExtI to all CPUs in RISCVProcessors.td. NFC (#88805)'. Reference: RISCVProcessors.td:124 ROCKET_RV32 / :145 SIFIVE_E20 at llvmorg-20.1.8.",
+ "audit_table": {
+  "fork_processors": "Only MEMPOOL and SNITCH (processor list = upstream 20.1.8 + these two; same at ref-18). No PULP/GAP processor exists in the fork.",
+  "rows": [
+   {
+    "cpu": "snitch",
+    "ref-18 clang": "ok",
+    "ref-18 llc": "ok",
+    "int-20 clang": "FAIL invalid arch name 'rv32m2p0_a2p1_f2p2_...'",
+    "int-20 llc": "ok",
+    "20-F024 clang": "ok",
+    "20-F024 llc": "ok (byte-identical to int-20)"
+   },
+   {
+    "cpu": "mempool-rv32",
+    "ref-18 clang": "ok",
+    "ref-18 llc": "ok",
+    "int-20 clang": "FAIL invalid arch name 'rv32m2p0_a2p1_xmempool0p1'",
+    "int-20 llc": "ok",
+    "20-F024 clang": "ok",
+    "20-F024 llc": "ok (byte-identical to int-20)"
+   }
+  ],
+  "implied_march": "clang -### -target-feature set on 20-F024 equals ref-18 for both CPUs except +zmmul +zaamo +zalrsc, which LLVM 19+ implies from m/a for every target (-march=rv32ima on the same build gives the same three). --print-enabled-extensions (20-F024): snitch = i m a f d zicsr zmmul zaamo zalrsc zfh zfhmin + all 27 Snitch x* exts; mempool-rv32 = i m a zmmul zaamo zalrsc xmempool (ref-18 lacks --print-enabled-extensions). Build attribute string for snitch: rv32i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zmmul1p0_zaamo1p0_zalrsc1p0_zfh1p0_zfhmin1p0_x...; ref-18 same minus zmmul/zaamo/zalrsc."
+ },
+ "evidence_logs": {
+  "repro": "logs/20-F024.repro.log",
+  "verify": "logs/20-F024.verify.log",
+  "build": "logs/20-F024.build2.log (clang llc; cluster_errors.py: 0 clusters)",
+  "lit": "logs/20-F024.lit.log: LIT_PATHS + clang/test/Driver/riscv* + llvm/test/TableGen/riscv-target-def.td, 4750 tests, 1 fail = known CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (B41/20/T002)",
+  "unit": "logs/20-F024.unit.log: TargetParserTests 583 passed",
+  "policy_check": "fail 0, warn 0",
+  "gap9_sweep_fuzz_gvsoc": "Not run: the change only alters the clang -mcpu -> -march table for mempool-rv32/snitch; llc output for these CPUs is byte-identical to int-20 and GAP9 kernels do not use -mcpu=snitch/mempool-rv32, so no GAP9 code can change."
+ },
+ "proposed_test": "clang/test/Driver/riscv-cpus.c: RUN: %clang --target=riscv32 -### -c %s 2>&1 -mcpu=snitch | FileCheck -check-prefix=MCPU-SNITCH %s, CHECK: \"-target-cpu\" \"snitch\", \"-target-feature\" \"+m\", \"+a\", \"+f\", \"+d\", \"+zfh\", \"+xfrep\", \"+xssr\", \"+xdma\"; same for -mcpu=mempool-rv32 (+m +a +xmempool). Also -mcpu=<cpu> --print-enabled-extensions checks.",
+ "unmapped_files": [],
+ "other_errors_seen": [
+  "B76 (report only): no spelling of '#pragma frep' works in ref-18, int-20 or 20-F024. The fork parser (clang/lib/Parse/ParsePragma.cpp PragmaFrepHandler::HandlePragma ~1653) accepts exactly '#pragma frep infer' (identifier 'infer' is the only valid option; anything else, e.g. 'frep(infer)', prints 'Error, not a identifier token...' / 'option not recognized' via printf and drops the pragma). So the README spelling IS the intended one. It is then rejected in Sema: ParseStmt.cpp ParsePragmaFrep builds the ParsedAttr with 2 args (pragma name + option), but the Frep attr in clang/include/clang/Basic/Attr.td (~4371) declares 1 EnumArgument and no HasCustomParsing, so Sema::checkCommonAttributeFeatures (SemaAttr.cpp ~1544) reports \"'frep' attribute takes one argument\". LoopHint (same pattern, 3 declared args, parser passes 4) avoids this with an explicit let HasCustomParsing = 1 in its Attr.td def. Fix belongs in clang-frep-pragma (Attr.td: let HasCustomParsing = 1, or consistent arg count), not in the README. '#pragma clang frep infer' is silently ignored (unknown pragma). Workaround today: --snitch-frep-inference (llc) / -mllvm -snitch-frep-inference.",
+  "The fork pragma parser reports errors with printf instead of diagnostics (ParsePragma.cpp 1660/1670/1688, ParseStmt.cpp ParsePragmaFrep, SemaStmtAttr.cpp handleFrepAttr)."
+ ]
+}

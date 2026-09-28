@@ -1,0 +1,42 @@
+{
+  "status": "done",
+  "branch": "work/20/F017",
+  "integration_head": "e21026f4903f1dfc75f7c78ee1d4f4960f873693",
+  "commits": [
+    "36d959d1705ed52850c77bfb768179938324ac9a",
+    "33ab3b28c31bfe9787fce2e25c4993ea882eedbe",
+    "fc51c70eec1fd59d24992f2429acdd43552a2dff",
+    "c78f25822cffdf5d0bec1006e4210838147e5a0a"
+  ],
+  "commit_roles": {
+    "36d959d1705e": "clang-driver: __pulp__ __pulp _pulp __riscv__ _riscv when Xpulpv is enabled",
+    "33ab3b28c31b": "registration: FeatureVendorXgap9 (name xgap, version 9.0, so -march=..._xgap9 parses), implies xpulpv + zfinx, predicate HasVendorXgap9; no instructions",
+    "fc51c70eec1f": "clang-driver: __gap9__ when xgap is enabled",
+    "c78f25822cff": "registration unit test: one line 'xgap 9.0' in RISCVISAInfoTest CheckExtensions (Test-Regen: notes/20/F017-regen.md; owner approval in notes/20/owner-test-exceptions.md 'F017 xgap9')"
+  },
+  "note": "notes/20/F017.md",
+  "signature_gone": true,
+  "owner_decision": "2026-09-28: xgap9 extension route. The spelling (xgap v9.0) and the implied set (xpulpv + zfinx, no fp16 yet) were accepted for review by the conductor.",
+  "verification": {
+    "macros": "clang --target=riscv32-unknown-elf -march=rv32imc_xgap9 -dM -E: __gap9__ __pulp__ __pulp _pulp __riscv__ _riscv, plus __riscv_xgap 9000000, __riscv_xpulpv, __riscv_zfinx. Plain rv32imc and rv64gc are unchanged. xgap8 is rejected (unsupported version). rv32imfc_xgap9 is rejected (F and Zfinx are incompatible).",
+    "arch_attribute": "rv32i2p1_m2p0_c2p0_zicsr2p0_zmmul1p0_zfinx1p0_xgap9p0_xpulpv2p0",
+    "unit_tests": "TargetParserTests: 583 passed",
+    "lit": "logs/20-F017-lit2.log: llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, clang/test/CodeGen/RISCV, clang/test/Driver/riscv*, clang/test/Sema, clang/test/Preprocessor, clang/test/Misc/target-invalid-cpu-note, riscv-nofdiv.c: 6060 passed, 135 unsupported, 1 failed (known vsetvli-insert-zve64f.mir, B41)",
+    "gap9_sweep": "rv32imc_xgap9 vs rv32imc_zfinx_xpulpv2 with this build: 54/54 disassemblies identical (logs/20-F017-survey/sweep2.log). Earlier, macros commit vs int-20 (then equal to the integration head): 54/54 identical.",
+    "survey": "strict, -march=rv32imc_xgap9, NO macro shim, all 617 GCC-ok files: 209/617, the same as rv32imc_zfinx_xpulpv2 with the shim. Error sets are identical and all 209 objects have identical disassembly and relocations; only the arch attribute differs. Compared with the integration head without the shim: 131 already-failing files change error set (float16/float16alt types and f16 builtins now exposed, because __gap9__ switches Emulation/Gap.h off the emulation path). No file is unblocked and no success is lost. Logs: logs/20-F017-survey/cmp-xgap9.txt, xgap9_compile_nodefsall.json, survey_xgap9.py.",
+    "policy_check": "e21026f4903f..work/20/F017: 0 FAIL. Two WARNs: 'commented-code', a false positive on prose in the .td comment; and the expected test-edit warning for the approved unit-test line."
+  },
+  "new_failure_buckets": [
+    "With __gap9__ defined (now via xgap9), 131 fp16-dependent files fail on the missing GAP9 float16/float16alt/v2h/v2ah types and the f16/f16alt builtins (B90 plus the builtin backlog) instead of silently compiling the emulation path."
+  ],
+  "other_errors_seen": [
+    "clang/test/Driver/print-supported-extensions-riscv.c already fails without this change: it lists none of the fork's extensions (xpulpv, xfrep, xmempool, ...). It is not in LIT_PATHS. I did not add xgap to it.",
+    "GAP9 GCC defines __riscv_flen 32, __riscv_fdiv, __riscv_fsqrt and __FP_FAST_FMAF for xgap9; clang with Zfinx does not (upstream Zfinx behaviour). The SDK outside gvsoc does not use them.",
+    "GCC-only: -mPE=N adds no macro, but GCC folds __builtin_pulp_CoreCount() to N (68 CNN files, already in the survey report).",
+    "xgap9 does not imply fp16 yet (TODO B90, recorded in RISCVFeatures.td and the change note). The GAP9-only instructions are not yet gated on HasVendorXgap9 (a later task).",
+    "The SDK's cmake passes -D__GAP9__ (uppercase) itself; Gap.h and DspFloatType.h test lowercase __gap9__. GCC defines no __GAP9__, so clang does not either.",
+    "Incident, 2026-09-28: during this task I deleted the harness build/ directory (a failed cd followed by rm -rf build). It was reported at once, and AGENT_RULES 13c was added. build/20-F017 has been rebuilt; the conductor is rebuilding int-20."
+  ],
+  "proposed_test": "clang/test/Preprocessor/riscv-pulp-macros.c. RUN -march=rv32imc_xpulpv2 -E -dM, PULP prefix: CHECK-DAG __pulp__ / __pulp / _pulp / __riscv__ / _riscv = 1, and CHECK-NOT __gap9__. RUN -march=rv32imc_xgap9, GAP9 prefix: CHECK-DAG the same macros plus __gap9__ 1, __riscv_xgap 9000000, __riscv_xpulpv 2000000, __riscv_zfinx 1000000. RUN -march=rv32imc and riscv64 -march=rv64gc, NOPULP prefix: CHECK-NOT for all of them. Also clang/test/Driver/riscv-arch-xgap9.c: -march=rv32imc_xgap8 is rejected with 'unsupported version number 8', and llc -mattr=+xgap -mtriple=riscv32 emits the arch attribute ..._zfinx1p0_xgap9p0_xpulpv2p0.",
+  "unmapped_files": []
+}

@@ -1,0 +1,65 @@
+basic/bsp/adc/tlv320/analog_mems_mics/stream_to_ssm6515_pcm	build FAIL	n/a	n/a	build FAIL	build FAIL
+basic/bsp/adc/tlv320/analog_single_ended_mics/stream_to_ssm6515_pcm	build FAIL	n/a	n/a	build FAIL	build FAIL
+basic/bsp/blink_led	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/bsp/custom_bsp	run rc=0	n/a	n/a	run rc=0 same-as-gcc	n/a
+basic/bsp/display/ili9341/basic	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/bsp/display/ili9341/image	run rc=1	n/a	n/a	build FAIL	build FAIL
+basic/bsp/filesystem/hostfs	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 DIFFERS
+basic/bsp/filesystem/little_fs	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/bsp/filesystem/partition_reinit	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/bsp/filesystem/readfs	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/bsp/filesystem/vfs	run rc=1	n/a	n/a	n/a	n/a
+basic/chip_identification	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/first_app/first_app1	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/first_app/first_app2	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/first_app/first_app3	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/first_app/first_app4	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/full_custom_ld	run rc=0	n/a	n/a	run rc=1 DIFFERS	run rc=1 DIFFERS
+basic/getting_started	run rc=0	n/a	n/a	build FAIL	build FAIL
+basic/gvsoc/mem_access	run rc=124	n/a	n/a	run rc=124 same-as-gcc	run rc=124 same-as-gcc
+basic/gvsoc/memcheck	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/gvsoc/pcer	run rc=1	build FAIL	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/gvsoc/proxy	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/gvsoc/trace_control	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/gvsoc/user_vcd	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/helloworld	run rc=0	build FAIL	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/helloworld_cxx	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/jpeg_compression	run rc=124	n/a	n/a	build FAIL	build FAIL
+basic/lazy_memory_load	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/malloc	run rc=1	build FAIL	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/mem_slab	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/counting_semaphore	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/debug_semaphore	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/eventgroup	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/multi_threads	run rc=1	build FAIL	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/os/kernel/multi_threads_vs_multi_tasks	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/mutex	run rc=124	n/a	n/a	run rc=0 DIFFERS	run rc=0 DIFFERS
+basic/os/kernel/notification	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/queue	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/queue_pi	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/sem_pi	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/semaphore	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/sw_irq	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/sw_timer	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/os/kernel/thread_vs_callback	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/perf	run rc=0	build FAIL	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/precompiled_library	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/stack/stack_usage	run rc=0	n/a	n/a	run rc=0 DIFFERS	run rc=0 DIFFERS
+basic/timer	run rc=1	n/a	n/a	run rc=1 same-as-gcc	run rc=1 same-as-gcc
+basic/watchdog/auto_rearm	run rc=124	n/a	n/a	run rc=124 same-as-gcc	run rc=0 DIFFERS
+basic/watchdog/simple	run rc=0	n/a	n/a	run rc=0 same-as-gcc	run rc=0 same-as-gcc
+basic/wrench	run rc=0	n/a	n/a	build FAIL	build FAIL
+dsp/autotiler/DotProd	run rc=1	build FAIL	build FAIL	build FAIL	build FAIL
+dsp/autotiler/MatAdd	run rc=1	build FAIL	build FAIL	build FAIL	build FAIL
+dsp/autotiler/MatMul	run rc=1	build FAIL	build FAIL	build FAIL	build FAIL
+dsp/benchmarks/DftSimple	run rc=1	build FAIL	build FAIL	build FAIL	build FAIL
+dsp/benchmarks/FFTL1	run rc=1	build FAIL	build FAIL	build FAIL	build FAIL
+dsp/benchmarks/Fir	run rc=1	build FAIL	run rc=1 same-as-gcc	build FAIL	build FAIL
+dsp/benchmarks/MatMul	run rc=1	build FAIL	build FAIL	build FAIL	build FAIL
+nn/autotiler/MnistGraph	run rc=1	build FAIL	build FAIL	build FAIL	build FAIL
+
+gcc                                           build FAIL: 2, run rc=0: 28, run rc=1: 25, run rc=124: 4
+clang                                         build FAIL: 13, n/a: 46
+clang-compat-fp16probe-nowerror-gnuas-gnuld   build FAIL: 7, n/a: 51, run rc=1 same-as-gcc: 1
+clang-compat-nowerror-gnuas-gnuld             build FAIL: 14, n/a: 1, run rc=0 DIFFERS: 2, run rc=0 same-as-gcc: 24, run rc=1 DIFFERS: 1, run rc=1 same-as-gcc: 15, run rc=124 same-as-gcc: 2
+clang-compat-nowerror-sdkp                    build FAIL: 14, n/a: 2, run rc=0 DIFFERS: 4, run rc=0 same-as-gcc: 22, run rc=1 DIFFERS: 1, run rc=1 same-as-gcc: 15, run rc=124 same-as-gcc: 1

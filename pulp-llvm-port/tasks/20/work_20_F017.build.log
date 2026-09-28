@@ -1,0 +1,108 @@
+ninja: Entering directory `/work/build'
+[1/107] Generating VCSRevision.h
+[2/107] Building RISCVTargetParserDef.inc...
+[3/107] Building CXX object lib/CodeGen/AsmPrinter/CMakeFiles/LLVMAsmPrinter.dir/AsmPrinter.cpp.o
+[4/107] Building CXX object lib/LTO/CMakeFiles/LLVMLTO.dir/LTO.cpp.o
+[5/107] Building CXX object lib/Object/CMakeFiles/LLVMObject.dir/IRSymtab.cpp.o
+[6/107] Building RISCVGenAsmMatcher.inc...
+[7/107] Building RISCVGenAsmWriter.inc...
+[8/107] Building RISCVGenCompressInstEmitter.inc...
+[9/107] Building RISCVGenDAGISel.inc...
+[10/107] Building RISCVGenDisassemblerTables.inc...
+[11/107] Building RISCVGenExegesis.inc...
+[12/107] Building RISCVGenGlobalISel.inc...
+[13/107] Building RISCVGenInstrInfo.inc...
+[14/107] Building RISCVGenMCCodeEmitter.inc...
+[15/107] Building RISCVGenMCPseudoLowering.inc...
+[16/107] Building RISCVGenMacroFusion.inc...
+[17/107] Building RISCVGenO0PreLegalizeGICombiner.inc...
+[18/107] Building RISCVGenPostLegalizeGICombiner.inc...
+[19/107] Building RISCVGenPreLegalizeGICombiner.inc...
+[20/107] Building RISCVGenRegisterBank.inc...
+[21/107] Building RISCVGenRegisterInfo.inc...
+[22/107] Building RISCVGenSearchableTables.inc...
+[23/107] Building RISCVGenSubtargetInfo.inc...
+[24/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPHardwareLoops.cpp.o
+[25/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULP/PULPFixupHwLoops.cpp.o
+[26/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVAsmPrinter.cpp.o
+[27/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVCallingConv.cpp.o
+[28/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVCodeGenPrepare.cpp.o
+[29/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVDeadRegisterDefinitions.cpp.o
+[30/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMakeCompressible.cpp.o
+[31/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandAtomicPseudoInsts.cpp.o
+[32/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandPseudoInsts.cpp.o
+[33/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSSRInsts.cpp.o
+[34/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVExpandSDMAInsts.cpp.o
+[35/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVFrameLowering.cpp.o
+[36/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVGatherScatterLowering.cpp.o
+[37/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVIndirectBranchTracking.cpp.o
+[38/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInsertVSETVLI.cpp.o
+[39/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInsertReadWriteCSR.cpp.o
+[40/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInsertWriteVXRM.cpp.o
+[41/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVInstrInfo.cpp.o
+[42/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelDAGToDAG.cpp.o
+[43/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVISelLowering.cpp.o
+[44/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVLandingPadSetup.cpp.o
+[45/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMachineFunctionInfo.cpp.o
+[46/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMergeBaseOffset.cpp.o
+[47/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVOptWInstrs.cpp.o
+[48/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVPostRAExpandPseudoInsts.cpp.o
+[49/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVRedundantCopyElimination.cpp.o
+[50/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVMoveMerger.cpp.o
+[51/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVPushPopOptimizer.cpp.o
+[52/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVRegisterInfo.cpp.o
+[53/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVSelectionDAGInfo.cpp.o
+[54/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVSubtarget.cpp.o
+[55/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetMachine.cpp.o
+[56/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetObjectFile.cpp.o
+[57/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVTargetTransformInfo.cpp.o
+[58/107] Building CXX object lib/TargetParser/CMakeFiles/LLVMTargetParser.dir/RISCVISAInfo.cpp.o
+[59/107] Building CXX object lib/TargetParser/CMakeFiles/LLVMTargetParser.dir/RISCVTargetParser.cpp.o
+[60/107] Generating VCSVersion.inc
+[61/107] Linking CXX static library lib/libLLVMTargetParser.a
+[62/107] Building CXX object tools/clang/lib/Basic/CMakeFiles/obj.clangBasic.dir/Targets/RISCV.cpp.o
+[63/107] Linking CXX static library lib/libLLVMObject.a
+[64/107] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCCodeEmitter.cpp.o
+[65/107] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVInstPrinter.cpp.o
+[66/107] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVTargetStreamer.cpp.o
+[67/107] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMatInt.cpp.o
+[68/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVLegalizerInfo.cpp.o
+[69/107] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVELFObjectWriter.cpp.o
+[70/107] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVBaseInfo.cpp.o
+[71/107] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCExpr.cpp.o
+[72/107] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCObjectFileInfo.cpp.o
+[73/107] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVELFStreamer.cpp.o
+[74/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVCallLowering.cpp.o
+[75/107] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVAsmBackend.cpp.o
+[76/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVZacasABIFix.cpp.o
+[77/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVPostLegalizerCombiner.cpp.o
+[78/107] Building CXX object lib/Target/RISCV/Disassembler/CMakeFiles/LLVMRISCVDisassembler.dir/RISCVDisassembler.cpp.o
+[79/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/Snitch/SNITCHFrepLoops.cpp.o
+[80/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVRegisterBankInfo.cpp.o
+[81/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVVectorPeephole.cpp.o
+[82/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVVectorMaskDAGMutation.cpp.o
+[83/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVO0PreLegalizerCombiner.cpp.o
+[84/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/PULPExpandPseudoInsts.cpp.o
+[85/107] Building CXX object lib/Target/RISCV/AsmParser/CMakeFiles/LLVMRISCVAsmParser.dir/RISCVAsmParser.cpp.o
+[86/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVPreLegalizerCombiner.cpp.o
+[87/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/RISCVVLOptimizer.cpp.o
+[88/107] Building CXX object tools/clang/lib/Basic/CMakeFiles/obj.clangBasic.dir/Version.cpp.o
+[89/107] Building CXX object lib/Target/RISCV/MCTargetDesc/CMakeFiles/LLVMRISCVDesc.dir/RISCVMCTargetDesc.cpp.o
+[90/107] Building CXX object lib/Target/RISCV/CMakeFiles/LLVMRISCVCodeGen.dir/GISel/RISCVInstructionSelector.cpp.o
+[91/107] Linking CXX static library lib/libLLVMAsmPrinter.a
+[92/107] Linking CXX static library lib/libLLVMLTO.a
+[93/107] Linking CXX static library lib/libLLVMRISCVDesc.a
+[94/107] Linking CXX static library lib/libLLVMRISCVCodeGen.a
+[95/107] Linking CXX static library lib/libLLVMRISCVAsmParser.a
+[96/107] Linking CXX static library lib/libLLVMRISCVDisassembler.a
+[97/107] Generating VCSVersion.inc
+[98/107] Building CXX object tools/lld/Common/CMakeFiles/lldCommon.dir/Version.cpp.o
+[99/107] Linking CXX static library lib/liblldCommon.a
+[100/107] Linking CXX executable bin/lld
+[101/107] Linking CXX static library lib/libclangBasic.a
+[102/107] Linking CXX executable bin/clang-20
+[103/107] Creating executable symlink bin/clang
+[104/107] Linking CXX executable bin/llc
+[105/107] Linking CXX executable bin/llvm-mc
+[106/107] Linking CXX executable bin/llvm-objdump
+[107/107] Linking CXX executable bin/opt

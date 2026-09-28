@@ -1,0 +1,4 @@
+== seeds 1-400 REF=host: 400 lines
+   MISMATCH (clang != reference): 1 seeds: 27 
+   REFDISAGREE (host gcc -O0 != GAP9 GCC -mnohwloop): 0 seeds: 
+   NEWFAIL/OBJFAIL (clang crash): 0   REFFAIL/GCCFAIL/XCHECKFAIL: 0

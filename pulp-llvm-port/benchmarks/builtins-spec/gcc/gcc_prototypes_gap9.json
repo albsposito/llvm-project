@@ -1,0 +1,601 @@
+{
+ "__builtin_pulp_CoreCount_m1": {
+  "known": true,
+  "arity": 0,
+  "args": [],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_add2div2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_add2div4": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_add4div2": {
+  "known": false
+ },
+ "__builtin_pulp_add4div4": {
+  "known": false
+ },
+ "__builtin_pulp_cplx_conj": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_cplxmjrot2": {
+  "known": false
+ },
+ "__builtin_pulp_cplxmuls": {
+  "known": false
+ },
+ "__builtin_pulp_cplxmuls2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_cplxmuls2div2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_cplxmuls2div4": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_cplxmuls2div8": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_cplxmulsdiv2": {
+  "known": false
+ },
+ "__builtin_pulp_cplxmulsdiv4": {
+  "known": false
+ },
+ "__builtin_pulp_f16abs": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "float16"
+  ],
+  "ret": "float16",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16abs2": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) float16"
+  ],
+  "ret": "__vector(2) float16",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16altabs": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "float16alt"
+  ],
+  "ret": "float16alt",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16altabs2": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) float16alt"
+  ],
+  "ret": "__vector(2) float16alt",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16altmax": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "float16alt",
+   "float16alt"
+  ],
+  "ret": "float16alt",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16altmax2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) float16alt",
+   "__vector(2) float16alt"
+  ],
+  "ret": "__vector(2) float16alt",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16altmin": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "float16alt",
+   "float16alt"
+  ],
+  "ret": "float16alt",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16altmin2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) float16alt",
+   "__vector(2) float16alt"
+  ],
+  "ret": "__vector(2) float16alt",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16altsqrt": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "float16alt"
+  ],
+  "ret": "float16alt",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16max": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "float16",
+   "float16"
+  ],
+  "ret": "float16",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16max2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) float16",
+   "__vector(2) float16"
+  ],
+  "ret": "__vector(2) float16",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16min": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "float16",
+   "float16"
+  ],
+  "ret": "float16",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16min2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) float16",
+   "__vector(2) float16"
+  ],
+  "ret": "__vector(2) float16",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f16sqrt": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "float16"
+  ],
+  "ret": "float16",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f32abs": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "float"
+  ],
+  "ret": "float",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f32max": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "float",
+   "float"
+  ],
+  "ret": "float",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f32min": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "float",
+   "float"
+  ],
+  "ret": "float",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_f32sqrt": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "float"
+  ],
+  "ret": "float",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_macfs": {
+  "known": true,
+  "arity": 3,
+  "args": [
+   "int",
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_macfsN": {
+  "known": true,
+  "arity": 4,
+  "args": [
+   "int",
+   "int",
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_macfsRN": {
+  "known": true,
+  "arity": 5,
+  "args": [
+   "int",
+   "int",
+   "int",
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_macfu": {
+  "known": true,
+  "arity": 3,
+  "args": [
+   "int",
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_macfuN": {
+  "known": true,
+  "arity": 4,
+  "args": [
+   "int",
+   "int",
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_macfuRN": {
+  "known": true,
+  "arity": 5,
+  "args": [
+   "int",
+   "int",
+   "int",
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_mul64hs": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_mul64hu": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_mul64hus": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_mulfs": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_mulfsN": {
+  "known": true,
+  "arity": 3,
+  "args": [
+   "int",
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_mulfsRN": {
+  "known": true,
+  "arity": 4,
+  "args": [
+   "int",
+   "int",
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_mulfu": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_mulfuN": {
+  "known": true,
+  "arity": 3,
+  "args": [
+   "int",
+   "int",
+   "int"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_rdownsf2": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "float"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_rintsf2": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "float"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_rupsf2": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "float"
+  ],
+  "ret": "int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_sub2div2": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_sub2div4": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_sub2rotmj": {
+  "known": true,
+  "arity": 2,
+  "args": [
+   "__vector(2) short int",
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_sub4div2": {
+  "known": false
+ },
+ "__builtin_pulp_sub4div4": {
+  "known": false
+ },
+ "__builtin_pulp_truncb": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "int"
+  ],
+  "ret": "char",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_trunch": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "int"
+  ],
+  "ret": "short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_v2hftov2hi": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) float16"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_v2hftov2hi_u": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) float16"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_v2hftov2ohf": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) float16"
+  ],
+  "ret": "__vector(2) float16alt",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_v2hitov2hf": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) float16",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_v2hitov2hf_u": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) float16",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_v2hitov2ohf": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) float16alt",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_v2hitov2ohf_u": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) short int"
+  ],
+  "ret": "__vector(2) float16alt",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_v2ohftov2hf": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) float16alt"
+  ],
+  "ret": "__vector(2) float16",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_v2ohftov2hi": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) float16alt"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_v2ohftov2hi_u": {
+  "known": true,
+  "arity": 1,
+  "args": [
+   "__vector(2) float16alt"
+  ],
+  "ret": "__vector(2) short int",
+  "errors_with_valid_nonconst_args": []
+ },
+ "__builtin_pulp_vitmax2": {
+  "known": false
+ },
+ "__builtin_pulp_vitsel2": {
+  "known": false
+ }
+}

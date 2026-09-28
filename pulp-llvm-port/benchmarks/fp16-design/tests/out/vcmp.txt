@@ -1,0 +1,3 @@
+vflt.h lanes = 0x00000001
+select       = 0x40004000 (want 0x40003c00)
+[run_sim] exit code: 0

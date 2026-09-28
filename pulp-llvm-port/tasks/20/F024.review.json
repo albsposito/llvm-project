@@ -1,0 +1,21 @@
+{
+  "verdict": "APPROVE",
+  "task": "20/F024",
+  "branch": "work/20/F024",
+  "commits_reviewed": ["952879d82dfa"],
+  "reasons": [],
+  "checks": {
+    "diff": "git show 952879d82dfa: two added lines, FeatureStdExtI after Feature32Bit in MEMPOOL (mempool-rv32) and SNITCH (snitch), llvm/lib/Target/RISCV/RISCVProcessors.td:602 and :610. No other change. File already fork-touched (rule 11 n/a). Subject is the exact registration cluster subject; Change-Note trailer present; note has all four sections and names observable symptoms ('invalid arch name', missing Snitch extensions).",
+    "upstream": "65b0cc610f80 '[RISCV] Add FeatureStdExtI to all CPUs in RISCVProcessors.td. NFC (#88805)' and b64e483785bf '[RISCV][TableGen] Generate RISCVTargetParserDef.inc from the new RISCVExtension tblgen information. (#89335)' both exist, are not in llvmorg-18.1.8 and are in llvmorg-19.1.7 (65b0 is an ancestor of b64e). b64e replaced RISCVISAInfo::parseFeatures (which implied i) with a verbatim print of listed extensions; its message states implied extensions are no longer included. 65b0 inserts FeatureStdExtI directly after Feature32Bit/Feature64Bit in every upstream CPU; same placement at llvmorg-20.1.8 (ROCKET_RV32 :124, SIFIVE_E20 :145). The fork fix is the identical pattern.",
+    "processor_audit": "git diff llvmorg-20.1.8..HEAD: the only added ProcessorModel defs are MEMPOOL and SNITCH; no removed ProcessorModel lines. llc -mtriple=riscv32 -mcpu=help: every CPU in toolchains/ref-18 is present in build/20-F024 (comm -23 empty). No PULP/GAP processor exists.",
+    "generated_inc": "diff build/int-20 vs build/20-F024 RISCVTargetParserDef.inc: exactly two lines change (PROC MEMPOOL -> rv32i2p1_m2p0_a2p1_xmempool0p1; PROC SNITCH -> rv32i2p1_m2p0_a2p1_f2p2_d2p2_zfh1p0_x...), otherwise identical.",
+    "clang": "clang --target=riscv32-unknown-elf -mcpu=<cpu> -c -x c /dev/null: ref-18 ok, int-20 'invalid arch name', 20-F024 ok, for both CPUs. Positive -target-feature set (-###) 20-F024 vs ref-18: identical except +zaamo +zalrsc +zmmul (snitch 35 features, mempool-rv32 7), the upstream-implied extensions of m/a. -O2 compile of a C file with -mcpu=snitch succeeds.",
+    "llc": "llc -mtriple=riscv32 -mcpu={snitch,mempool-rv32} -O2 on a float-loop + atomic IR: .s and .o byte-identical between build/int-20 and build/20-F024.",
+    "lit": "scripts/wlit.sh on clang/test/Driver/riscv* (all), clang/test/Misc/target-invalid-cpu-note/riscv.c, llvm/test/TableGen/riscv-target-def.td, clang/test/Preprocessor/riscv-target-features.c, riscv-nofdiv.c, and the four CodeGen/RISCV tests using -mcpu=snitch (freploop, freploop-nested, ssr-register-reserving, sdma-intrinsics): 27/27 passed. Worker's broader log (logs/20-F024.lit.log, 4750 tests) shows the single known failure vsetvli-insert-zve64f.mir (B41, data/known-failures.txt).",
+    "unit": "build/20-F024 TargetParserTests (built after the regenerated .inc): 583 passed, 4 skipped, 0 failed.",
+    "oracle_cheating": "None: no tests touched, no fork logic removed, no early returns/stubs; change is additive and mirrors upstream."
+  },
+  "warnings_checked": [],
+  "policy_check": "scripts/policy_check.py --repo wt/20-F024 --range 7459255b6120..952879d82dfa --notes-root notes --stack-base llvmorg-20.1.8: fail 0, warn 0 (no WARNs to examine).",
+  "notes": "No lit test covers -mcpu=snitch/mempool-rv32 through the clang driver; the worker's proposed_test (clang/test/Driver/riscv-cpus.c RUN lines) should be picked up by a test-regen/test-add task. B76 findings in other_errors_seen are report-only and not part of this change."
+}

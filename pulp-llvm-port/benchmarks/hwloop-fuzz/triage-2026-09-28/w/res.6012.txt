@@ -1,0 +1,1 @@
+6012 ref=[RES 0xba0be6dc 0x328ffe39] O0:lp0:BAD[RES 0xb1ae795c 0xa7f363b3] O1:lp5:BAD[RES 0xb1ae795c 0xa7f363b3] O2:lp5:BAD[RES 0xb1ae795c 0xa7f363b3] O3:lp8:BAD[RES 0xb1ae795c 0xa7f363b3] Os:lp5:BAD[RES 0xb1ae795c 0xa7f363b3] Oz:lp0:BAD[RES 0xb1ae795c 0xa7f363b3]

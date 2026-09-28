@@ -1,0 +1,59 @@
+{
+ "status": "done",
+ "branch": "work/20/F022",
+ "commits": [
+  "dcca3059eed5",
+  "15d5bff0e632"
+ ],
+ "commit_clusters": {
+  "dcca3059eed5": "insn-tablegen (RISCVInstrInfoXssr.td: SPseudoPush mayLoad 0->1, SPseudoPop mayStore 0->1; required by TableGen pattern inference once the intrinsics have unknown memory effects; builds on its own)",
+  "15d5bff0e632": "intrinsics (IntrinsicsRISCVXsnitch.td: drop IntrReadMem from int_riscv_ssr_pop, IntrWriteMem from int_riscv_ssr_push)"
+ },
+ "note": "notes/20/F022.md",
+ "signature_gone": true,
+ "root_cause": "Upstream e5c7cde5c812 '[NFC][TableGen] Refactor getIntrinsicFnAttributeSet (#106587)' replaced the fn-attribute gate '(ME != unknown && !hasSideEffects) || !canThrow || ...' (llvmorg-19.1.7 IntrinsicEmitter.cpp:595) with hasFnAttributes() using getEffectiveME(Int) != unknown. Intrinsics with IntrReadMem/IntrWriteMem + IntrHasSideEffects + Throws previously got no attributes; since 20 they get memory(read)/memory(write). IR passes ignore IntrHasSideEffects. Fork code relying on the old behaviour: 97efefdcc54e 'Move our own intrinsics to dedicated td files' (comment: Throws keeps push/pop in loops).",
+ "fix_summary": "ssr.pop/ssr.push now have unknown memory effects (no memory property), like upstream int_xcore_in/int_xcore_out (IntrinsicsXCore.td:42,47 @ llvmorg-20.1.8). Their IR attributes are again identical to ref-18/port-19 (none). Pseudos get mayLoad=mayStore=1 as TableGen infers for XCore IN_2r/OUT_2r; hasSideEffects=1 was already set so machine code is unchanged.",
+ "attribute_audit": {
+  "method": "All 179 fork intrinsics (IntrinsicsRISCVXpulp.td + IntrinsicsRISCVXsnitch.td, from llvm-tblgen --dump-json) declared in logs/20-F022/decls.ll, printed with opt -S of each toolchain, compared with logs/20-F022/cmp.py (fn attrs + param attrs).",
+  "ref18_vs_int20_differences": [
+   {
+    "intrinsic": "llvm.riscv.ssr.pop",
+    "ref-18": "none (param immarg)",
+    "port-19": "none",
+    "int-20": "memory(read)",
+    "after": "none",
+    "semantics_require_fix": true,
+    "why": "each pop advances the input stream; memory(read) let LICM hoist and EarlyCSE merge pops"
+   },
+   {
+    "intrinsic": "llvm.riscv.ssr.push",
+    "ref-18": "none (param immarg)",
+    "port-19": "none",
+    "int-20": "memory(write)",
+    "after": "none",
+    "semantics_require_fix": true,
+    "why": "each push advances the output stream and its target address depends on stream state set by ssr setup; memory(write) claims the effect is independent of state. No miscompile was observed for push at O2 (not hoisted/merged since writes stay ordered), fixed together with pop to restore the ref-18 model and because the pseudo flags are shared in shape; report-only alternative would have been to keep IntrWriteMem."
+   }
+  ],
+  "unchanged": "the other 177 fork intrinsics have identical attributes in ref-18, port-19, int-20 and after this change (0 differences). Those with IntrNoMem+IntrHasSideEffects (SSR setup/read/write/enable/disable/barrier, SDMA start/stat/wait, Xpulp side-effecting builtins) still map to unknown memory in the emitter (getEffectiveME), so they are unaffected.",
+  "after_vs_ref18_and_port19": "0 of 179 differ (logs/20-F022/attrs-20-F022.ll)"
+ },
+ "evidence_logs": {
+  "repro": "logs/20-F022.repro.log (baseline build of integration head), logs/20-F022/repro.txt: clang -O2 on logs/20-F022/frep-indep.c: ref-18/port-19 keep ssr.pop in the loops, int-20 and integration head hoist them to the preheader (frep-indep.*.ll).",
+  "ir_passes": "logs/20-F022/ssr-ir.ll with opt -passes='default<O2>': before (ssr-ir.before.txt) the integration head merges two pop(0) into one (cse_pop) and marks callers nofree memory(read); after (ssr-ir.after.txt) identical to ref-18/port-19: both pops kept, no attributes.",
+  "clang_O2_after": "logs/20-F022/frep-indep.20-F022.ll matches port-19 IR except upstream 'getelementptr inbounds nuw' spelling; asm frep-indep.20-F022_mine-wrap.s keeps 'fdiv.d fa4, ft0, ft1' in each inner loop like frep-indep.port-19_bin.s; baseline frep-indep.20-F022_base.s reads ft0/ft1 once outside the loops, partly after ssr_disable.",
+  "llc_identical": "logs/20-F022/llc-cmp/summary.txt and summary2.txt: fork tests freploop.ll, freploop-nested.ll, ssr-register-reserving.ll and the F014 reproducers x3 flag sets x O0-O3: 219 runs byte-identical base vs mine; 33 runs crash in both (pre-existing, differ-are-crashes.txt: rc=-6 in both).",
+  "build": "logs/20-F022.build.log (llc opt clang; cluster_errors.py: 0 clusters). First attempt with only the intrinsics change failed TableGen: logs/20-F022-build2.log 'Pattern doesn't match mayLoad = 0 / mayStore = 0' at RISCVInstrInfoXssr.td:189/191, hence the insn-tablegen commit.",
+  "lit": "logs/20-F022.lit.log: LIT_PATHS 4730 tests, 4729 pass, 1 fail = known CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (B41/20/T002)",
+  "gap9_sweep": "logs/20-F022/sweeproot/b/gap9-sweep (base = integration-head clang logs/20-F022/base/clang-wrap, mine = build/20-F022): 54/54 kernel objects raw byte-identical (gap9-compare.txt)",
+  "fuzz": "not run: the change only alters attributes of llvm.riscv.ssr.pop/push and flags of their Snitch-only pseudos; no hardware-loop or general codegen path is touched, and the GAP9 sweep is byte-identical.",
+  "gvsoc": "not possible: built GVSoC target is RI5CY/GAP9 without SSR; verified in IR/asm.",
+  "policy_check": "logs/20-F022.policy.json: fail 0, warn 0"
+ },
+ "unmapped_files": [],
+ "proposed_test": "llvm/test/Transforms/LICM (or CodeGen/RISCV) ssr-pop-side-effects.ll from logs/20-F022/ssr-ir.ll: RUN: opt -S -passes='default<O2>' -mtriple=riscv32 ; CHECK in cse_pop two calls to @llvm.riscv.ssr.pop(i32 0); CHECK dead_pop keeps the call; licm_pop CHECK the pop stays in the loop block; CHECK-NOT: memory(read) on the declaration. Plus clang/test/CodeGen/RISCV test from logs/20-F022/frep-indep.c at -O2 checking ssr.pop inside for.body4. Generate CHECK lines with update_test_checks.py / update_cc_test_checks.py.",
+ "other_errors_seen": [
+  "Pre-existing crashes seen while comparing (identical before/after): llc --ssr-noregmerge -mattr=+d,+xssr on logs/20-F014/repro/{body-lat,nested-lat,nested-lat2}.ll -> 'Cannot yet select' (inputs need xfrep; likely invalid flag combination, not a bug); llc -O0 on logs/20-F014-review/split*.ll and llc -O0..O3 on reord2-e76.ll -> MachineBasicBlock::removeSuccessor assert in the frep pass (already reported by F014 / B77 family).",
+  "The TODO in upstream getEffectiveME ('IntrHasSideEffects should affect not only readnone intrinsics') means any future fork intrinsic declared IntrReadMem/IntrWriteMem + IntrHasSideEffects will again be optimisable at IR level; worth a note in the fork README / review checklist."
+ ]
+}

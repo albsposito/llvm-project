@@ -1,0 +1,13 @@
+kernel        gcc-f16     gcc-f16-nocontract  cl-f16      cl-f16-fast  gcc-f16alt  gcc-f16alt-nocontract  cl-bf16     cl-bf16-none  cl-bf16-none-fast
+expr          0xc99577d9  0xb2486732          0xc99577d9  0xc99577d9   0x676d8c08  0x9443f78d             0x9ab74ce8  0x9443f78d    0x9443f78d
+div           0x0a273cc2  0x3d8aec32          0x0a273cc2  0x0a273cc2   0x40948dbe  0x5ffbddba             0xda3b245f  0x5ffbddba    0x5ffbddba
+dot           0x00005432  0x00005431          0x00005432  0x00005432   0x000042c7  0x000042c8             0x000042c7  0x000042c8    0x000042c8
+dot_sep       0x00005432  0x00005431          0x00005431  0x00005432   0x000042c7  0x000042c8             0x000042c8  0x000042c8    0x000042c8
+toint         0x5437ab32  0x5437ab32          0x5437ab32  0x5437ab32   0x5ad0dbb3  0x5ad0dbb3             0x6349826d  0x6349826d    0x6349826d
+fromf         0xa41c2a74  0xa41c2a74          0xa41c2a74  0xa41c2a74   0x57d8d5f6  0x57d8d5f6             0x57d8d5f6  0x57d8d5f6    0x57d8d5f6
+fromi         0x2b7eef91  0x2b7eef91          0x2b7eef91  0x2b7eef91   0x41664580  0x41664580             0x41664580  0x41664580    0x41664580
+tof           0x8a3c9bb0  0x8a3c9bb0          0x8a3c9bb0  0x8a3c9bb0   0xedf18600  0xedf18600             0xedf18600  0xedf18600    0xedf18600
+cmp           138         138                 138         138          136         136                    136         136           136
+toint(2.75)   2           2                   2           2            3           3                      2           2             2
+toint(-2.75)  -2          -2                  -2          -2           -3          -3                     -2          -2            -2
+toint(2.5)    2           2                   2           2            2           2                      2           2             2

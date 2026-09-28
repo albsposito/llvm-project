@@ -1,0 +1,1464 @@
+{
+ "fabs.ah a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "24a56553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "fabs.h a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "24a52553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zhinx' (Half Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "24a52553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fabs.h\ta0, a0",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fabs.h\tfa0, fa0"
+  }
+ },
+ "fabs.s a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "20a52553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "20a52553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fabs.s\ta0, a0",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fabs.s\tfa0, fa0"
+  }
+ },
+ "fcvt.w.s a0,a0,rdn": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "c0052553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "c0052553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fcvt.w.s\ta0, a0, rdn",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fcvt.w.s\ta0, fa0, rdn"
+  }
+ },
+ "fcvt.w.s a0,a0,rmm": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "c0054553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "c0054553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fcvt.w.s\ta0, a0, rmm",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fcvt.w.s\ta0, fa0, rmm"
+  }
+ },
+ "fcvt.w.s a0,a0,rup": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "c0053553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "c0053553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fcvt.w.s\ta0, a0, rup",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fcvt.w.s\ta0, fa0, rup"
+  }
+ },
+ "fmax.ah a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "2cb55553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "fmax.h a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "2cb51553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zhinx' (Half Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "2cb51553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fmax.h\ta0, a0, a1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fmax.h\tfa0, fa0, fa1"
+  }
+ },
+ "fmax.s a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "28b51553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "28b51553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fmax.s\ta0, a0, a1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fmax.s\tfa0, fa0, fa1"
+  }
+ },
+ "fmin.ah a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "2cb54553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "fmin.h a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "2cb50553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zhinx' (Half Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "2cb50553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fmin.h\ta0, a0, a1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fmin.h\tfa0, fa0, fa1"
+  }
+ },
+ "fmin.s a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "28b50553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "28b50553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fmin.s\ta0, a0, a1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fmin.s\tfa0, fa0, fa1"
+  }
+ },
+ "fmul.s a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "10b57553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "10b57553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:8: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fmul.s\ta0, a0, a1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fmul.s\tfa0, fa0, fa1"
+  }
+ },
+ "fsqrt.ah a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "5c055553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "fsqrt.h a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "5c057553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zhinx' (Half Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "5c057553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fsqrt.h\ta0, a0",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fsqrt.h\tfa0, fa0"
+  }
+ },
+ "fsqrt.s a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "58057553",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: instruction requires the following: 'Zfinx' (Float in Integer)",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "58057553",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "fsqrt.s\ta0, a0",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "fsqrt.s\tfa0, fa0"
+  }
+ },
+ "p.exths a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "10054533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "10054533",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "10054533",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "10054533"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.exths\ta0, a0",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.exths\ta0, a0",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.exths\ta0, a0"
+  }
+ },
+ "p.macs a0,a0,a1,a2": {
+  "gas_march": null,
+  "gcc_enc": null,
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {}
+ },
+ "p.macsN a2,a0,a1,1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "82b5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "82b5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "82b5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "82b5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 1",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 1"
+  }
+ },
+ "p.macsN a2,a0,a1,11": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "96b5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "96b5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "96b5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "96b5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 11",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 11",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 11"
+  }
+ },
+ "p.macsN a2,a0,a1,15": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "9eb5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "9eb5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "9eb5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "9eb5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 15",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 15",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 15"
+  }
+ },
+ "p.macsN a2,a0,a1,16": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "a0b5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "a0b5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "a0b5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "a0b5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 16",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 16",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 16"
+  }
+ },
+ "p.macsN a2,a0,a1,31": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "beb5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "beb5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "beb5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "beb5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 31",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 31",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 31"
+  }
+ },
+ "p.macsN a2,a0,a1,5": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "8ab5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "8ab5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "8ab5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "8ab5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsn\ta2, a0, a1, 5",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsn\ta2, a0, a1, 5",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsn\ta2, a0, a1, 5"
+  }
+ },
+ "p.macsRN a2,a0,a1,1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "82b5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "82b5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "82b5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "82b5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 1",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 1"
+  }
+ },
+ "p.macsRN a2,a0,a1,11": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "96b5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "96b5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "96b5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "96b5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 11",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 11",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 11"
+  }
+ },
+ "p.macsRN a2,a0,a1,15": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "9eb5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "9eb5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "9eb5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "9eb5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 15",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 15",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 15"
+  }
+ },
+ "p.macsRN a2,a0,a1,16": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "a0b5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "a0b5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "a0b5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "a0b5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 16",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 16",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 16"
+  }
+ },
+ "p.macsRN a2,a0,a1,31": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "beb5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "beb5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "beb5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "beb5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 31",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 31",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 31"
+  }
+ },
+ "p.macsRN a2,a0,a1,5": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "8ab5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "8ab5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "8ab5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "8ab5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macsrn\ta2, a0, a1, 5",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macsrn\ta2, a0, a1, 5",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macsrn\ta2, a0, a1, 5"
+  }
+ },
+ "p.macu a0,a0,a1,a2": {
+  "gas_march": null,
+  "gcc_enc": null,
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:17: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {}
+ },
+ "p.macuN a2,a0,a1,1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "02b5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "02b5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "02b5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "02b5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 1",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 1"
+  }
+ },
+ "p.macuN a2,a0,a1,11": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "16b5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "16b5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "16b5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "16b5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 11",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 11",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 11"
+  }
+ },
+ "p.macuN a2,a0,a1,15": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "1eb5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "1eb5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "1eb5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "1eb5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 15",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 15",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 15"
+  }
+ },
+ "p.macuN a2,a0,a1,16": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "20b5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "20b5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "20b5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "20b5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 16",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 16",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 16"
+  }
+ },
+ "p.macuN a2,a0,a1,31": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "3eb5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "3eb5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "3eb5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "3eb5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 31",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 31",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 31"
+  }
+ },
+ "p.macuN a2,a0,a1,5": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "0ab5165b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "0ab5165b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "0ab5165b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "0ab5165b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macun\ta2, a0, a1, 5",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macun\ta2, a0, a1, 5",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macun\ta2, a0, a1, 5"
+  }
+ },
+ "p.macuRN a2,a0,a1,1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "02b5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "02b5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "02b5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "02b5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 1",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 1"
+  }
+ },
+ "p.macuRN a2,a0,a1,11": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "16b5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "16b5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "16b5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "16b5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 11",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 11",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 11"
+  }
+ },
+ "p.macuRN a2,a0,a1,15": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "1eb5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "1eb5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "1eb5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "1eb5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 15",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 15",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 15"
+  }
+ },
+ "p.macuRN a2,a0,a1,16": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "20b5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "20b5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "20b5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "20b5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 16",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 16",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 16"
+  }
+ },
+ "p.macuRN a2,a0,a1,31": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "3eb5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "3eb5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "3eb5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "3eb5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 31",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 31",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 31"
+  }
+ },
+ "p.macuRN a2,a0,a1,5": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "0ab5565b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "0ab5565b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "0ab5565b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "0ab5565b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.macurn\ta2, a0, a1, 5",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.macurn\ta2, a0, a1, 5",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.macurn\ta2, a0, a1, 5"
+  }
+ },
+ "p.mulh a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "02b51533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulh, p.lh, p.mulhhs, p.mulhhu, p.muls, p.mulu?",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulh, p.lh, p.mulhhs, p.mulhhu, p.muls, p.mulu?",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulh, p.lh, p.mulhhs, p.mulhhu, p.muls, p.mulu?"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "mulh\ta0, a0, a1",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "mulh\ta0, a0, a1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "mulh\ta0, a0, a1"
+  }
+ },
+ "p.mulhsu a0,a1,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "02a5a533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhsu, p.mulhhs, p.mulhhu, p.muls, p.mulu?",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhsu, p.mulhhs, p.mulhhu, p.muls, p.mulu?",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhsu, p.mulhhs, p.mulhhu, p.muls, p.mulu?"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "mulhsu\ta0, a1, a0",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "mulhsu\ta0, a1, a0",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "mulhsu\ta0, a1, a0"
+  }
+ },
+ "p.mulhu a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "02b53533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhu, p.lhu, p.mulhhu, p.mulhhun, p.mulu, p.mulun?",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhu, p.lhu, p.mulhhu, p.mulhhun, p.mulu, p.mulun?",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: mulhu, p.lhu, p.mulhhu, p.mulhhun, p.mulu, p.mulun?"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "mulhu\ta0, a0, a1",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "mulhu\ta0, a0, a1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "mulhu\ta0, a0, a1"
+  }
+ },
+ "p.muls a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "80b5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "80b5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "80b5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "80b5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.muls\ta0, a0, a1",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.muls\ta0, a0, a1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.muls\ta0, a0, a1"
+  }
+ },
+ "p.mulsN a0,a0,a1,1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "82b5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "82b5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "82b5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "82b5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 1",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 1"
+  }
+ },
+ "p.mulsN a0,a0,a1,11": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "96b5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "96b5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "96b5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "96b5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 11",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 11",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 11"
+  }
+ },
+ "p.mulsN a0,a0,a1,15": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "9eb5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "9eb5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "9eb5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "9eb5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 15",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 15",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 15"
+  }
+ },
+ "p.mulsN a0,a0,a1,16": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "a0b5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "a0b5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "a0b5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "a0b5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 16",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 16",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 16"
+  }
+ },
+ "p.mulsN a0,a0,a1,31": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "beb5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "beb5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "beb5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "beb5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 31",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 31",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 31"
+  }
+ },
+ "p.mulsN a0,a0,a1,5": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "8ab5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "8ab5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "8ab5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "8ab5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsn\ta0, a0, a1, 5",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsn\ta0, a0, a1, 5",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsn\ta0, a0, a1, 5"
+  }
+ },
+ "p.mulsRN a0,a0,a1,1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "82b5455b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "82b5455b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "82b5455b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "82b5455b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 1",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 1"
+  }
+ },
+ "p.mulsRN a0,a0,a1,11": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "96b5455b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "96b5455b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "96b5455b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "96b5455b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 11",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 11",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 11"
+  }
+ },
+ "p.mulsRN a0,a0,a1,15": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "9eb5455b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "9eb5455b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "9eb5455b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "9eb5455b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 15",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 15",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 15"
+  }
+ },
+ "p.mulsRN a0,a0,a1,16": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "a0b5455b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "a0b5455b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "a0b5455b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "a0b5455b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 16",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 16",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 16"
+  }
+ },
+ "p.mulsRN a0,a0,a1,31": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "beb5455b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "beb5455b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "beb5455b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "beb5455b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 31",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 31",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 31"
+  }
+ },
+ "p.mulsRN a0,a0,a1,5": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "8ab5455b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "8ab5455b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "8ab5455b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "8ab5455b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulsrn\ta0, a0, a1, 5",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulsrn\ta0, a0, a1, 5",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulsrn\ta0, a0, a1, 5"
+  }
+ },
+ "p.mulu a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "00b5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "00b5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "00b5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "00b5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulu\ta0, a0, a1",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulu\ta0, a0, a1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulu\ta0, a0, a1"
+  }
+ },
+ "p.muluN a0,a0,a1,1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "02b5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "02b5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "02b5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "02b5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 1",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 1",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 1"
+  }
+ },
+ "p.muluN a0,a0,a1,11": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "16b5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "16b5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "16b5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "16b5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 11",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 11",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 11"
+  }
+ },
+ "p.muluN a0,a0,a1,15": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "1eb5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "1eb5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "1eb5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "1eb5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 15",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 15",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 15"
+  }
+ },
+ "p.muluN a0,a0,a1,16": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "20b5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "20b5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "20b5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "20b5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 16",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 16",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 16"
+  }
+ },
+ "p.muluN a0,a0,a1,31": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "3eb5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "3eb5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "3eb5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "3eb5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 31",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 31",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 31"
+  }
+ },
+ "p.muluN a0,a0,a1,5": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "0ab5055b",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "0ab5055b",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "0ab5055b",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "0ab5055b"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "p.mulun\ta0, a0, a1, 5",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "p.mulun\ta0, a0, a1, 5",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "p.mulun\ta0, a0, a1, 5"
+  }
+ },
+ "pv.add.b.div2 a0,a0,a1": {
+  "gas_march": "rv32imcxgap8",
+  "gcc_enc": "00b53557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.add.b.div4 a0,a0,a1": {
+  "gas_march": "rv32imcxgap8",
+  "gcc_enc": "02b53557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.add.h.div2 a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "74b52557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.add.h.div4 a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "74b54557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxconj.h a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "5c050557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxmul.h.i a5,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "56b507d7",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxmul.h.i.div2 a5,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "56b527d7",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxmul.h.i.div4 a5,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "56b547d7",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxmul.h.i.div8 a5,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "56b567d7",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxmul.h.r a5,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "54b507d7",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxmul.h.r.div2 a5,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "54b527d7",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxmul.h.r.div4 a5,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "54b547d7",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxmul.h.r.div8 a5,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "54b567d7",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxmul.s a0,a0,a1": {
+  "gas_march": "rv32imcxgap8",
+  "gcc_enc": "54b50557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxmul.s.div2 a0,a0,a1": {
+  "gas_march": "rv32imcxgap8",
+  "gcc_enc": "54b52557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.cplxmul.s.div4 a0,a0,a1": {
+  "gas_march": "rv32imcxgap8",
+  "gcc_enc": "56b52557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.sub.b.div2 a0,a0,a1": {
+  "gas_march": "rv32imcxgap8",
+  "gcc_enc": "08b53557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.sub.b.div4 a0,a0,a1": {
+  "gas_march": "rv32imcxgap8",
+  "gcc_enc": "0ab53557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.sub.h.div2 a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "64b52557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.sub.h.div4 a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "64b54557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.subrotmj.h a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "6cb50557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.vitop.max a0,a0,a1": {
+  "gas_march": "rv32imcxgap8",
+  "gcc_enc": "64b51557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "pv.vitop.sel a0,a0,a1": {
+  "gas_march": "rv32imcxgap8",
+  "gcc_enc": "64b50557",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "vfabs.ah a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "9ea51533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: fabs.h?",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: fabs.ah, fabs.h?"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "vfabs.h a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "9ea52533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: fabs.h?",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:1: error: unrecognized instruction mnemonic, did you mean: fabs.ah, fabs.h?"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfsgnjx.h\tfa0, fa0, fa0"
+  }
+ },
+ "vfcvt.ah.h a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "98651533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "vfcvt.ah.x a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "98351533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "vfcvt.ah.xu a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "98355533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:13: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "vfcvt.h.ah a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "98552533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "vfcvt.h.x a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "98352533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:11: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:11: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:11: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfcvt.h.x\tfa0, a0"
+  }
+ },
+ "vfcvt.h.xu a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "98356533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:12: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfcvt.h.xu\tfa0, a0"
+  }
+ },
+ "vfcvt.x.ah a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "98251533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "vfcvt.x.h a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "98252533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:14: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:14: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:14: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfcvt.x.h\ta0, fa0"
+  }
+ },
+ "vfcvt.xu.ah a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "98255533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:16: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:16: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:16: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "vfcvt.xu.h a0,a0": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "98256533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:15: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfcvt.xu.h\ta0, fa0"
+  }
+ },
+ "vfmax.ah a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "8cb51533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "vfmax.h a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "8cb52533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfmax.h\tfa0, fa0, fa1"
+  }
+ },
+ "vfmin.ah a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "8ab51533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:10: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "invalid"
+  }
+ },
+ "vfmin.h a0,a0,a1": {
+  "gas_march": "rv32imcxgap9",
+  "gcc_enc": "8ab52533",
+  "llvm_asm": {
+   "+m,+c,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "ERR: <stdin>:1:9: error: invalid operand for instruction"
+  },
+  "llvm_disasm_of_gcc_enc": {
+   "+m,+c,+xpulpv": "invalid",
+   "+m,+c,+zfinx,+zhinx,+xpulpv": "invalid",
+   "+m,+c,+f,+d,+zfh,+xfalthalf,+xfvechalf,+xfvecalthalf,+xfauxhalf,+xfauxalthalf,+xpulpv": "vfmin.h\tfa0, fa0, fa1"
+  }
+ }
+}

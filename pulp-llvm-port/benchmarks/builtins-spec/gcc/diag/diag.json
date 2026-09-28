@@ -1,0 +1,247 @@
+{
+ "f32max_int": {
+  "rc": 0,
+  "diag": [],
+  "asm": "fcvt.s.w a1,a1; fcvt.s.w a0,a0; fmax.s a0,a0,a1; ret"
+ },
+ "f32max_double": {
+  "rc": 0,
+  "diag": [],
+  "asm": "add sp,sp,-16; sw ra,12(sp); sw s0,8(sp); sw s2,4(sp); sw s3,0(sp); mv s2,a2; mv s3,a3; call __truncdfsf2; mv s0,a0; mv a1,s3; mv a0,s2; call __truncdfsf2; fmax.s a0,s0,a0; lw ra,12(sp); lw s0,8(sp); lw s2,4(sp); lw s3,0(sp); add sp,sp,16; jr ra"
+ },
+ "f32max_ptr": {
+  "rc": 1,
+  "diag": [
+   "error: incompatible type for argument 1 of '__builtin_pulp_f32max'",
+   "note: expected 'float' but argument is of type 'float *'",
+   "warning: control reaches end of non-void function [-Wreturn-type]"
+  ],
+  "asm": ""
+ },
+ "f32max_v2s": {
+  "rc": 1,
+  "diag": [
+   "error: incompatible type for argument 1 of '__builtin_pulp_f32max'",
+   "note: expected 'float' but argument is of type 'v2s {aka __vector(2) short int}'",
+   "warning: control reaches end of non-void function [-Wreturn-type]"
+  ],
+  "asm": ""
+ },
+ "f32max_fold": {
+  "rc": 0,
+  "diag": [],
+  "asm": "lui a5,%hi(.LC0); lw a0,%lo(.LC0)(a5); ret"
+ },
+ "f32min_nan": {
+  "rc": 0,
+  "diag": [],
+  "asm": "lui a5,%hi(.LC0); lw a5,%lo(.LC0)(a5); fmin.s a0,a0,a5; ret"
+ },
+ "f32sqrt_int": {
+  "rc": 0,
+  "diag": [],
+  "asm": "fcvt.s.w a0,a0; fsqrt.s a0,a0; ret"
+ },
+ "f32sqrt_static_init": {
+  "rc": 1,
+  "diag": [
+   "error: initializer element is not constant"
+  ],
+  "asm": ""
+ },
+ "rintsf2_int": {
+  "rc": 0,
+  "diag": [],
+  "asm": "fcvt.s.w a0,a0; fcvt.w.s a0,a0,rmm; ret"
+ },
+ "rintsf2_double": {
+  "rc": 0,
+  "diag": [],
+  "asm": "add sp,sp,-16; sw ra,12(sp); call __truncdfsf2; lw ra,12(sp); fcvt.w.s a0,a0,rmm; add sp,sp,16; jr ra"
+ },
+ "add2div2_int": {
+  "rc": 1,
+  "diag": [
+   "error: incompatible type for argument 1 of '__builtin_pulp_add2div2'",
+   "note: expected '__vector(2) short int' but argument is of type 'int'",
+   "error: incompatible type for argument 2 of '__builtin_pulp_add2div2'",
+   "note: expected '__vector(2) short int' but argument is of type 'int'",
+   "warning: control reaches end of non-void function [-Wreturn-type]"
+  ],
+  "asm": ""
+ },
+ "add2div2_v4s": {
+  "rc": 0,
+  "diag": [],
+  "asm": "pv.add.h.div2  a0,a0,a1  # Add2>>1 Op Vect; ret"
+ },
+ "add2div2_const": {
+  "rc": 0,
+  "diag": [],
+  "asm": "lui a5,%hi(.LC0); lw a0,%lo(.LC0)(a5); lui a5,%hi(.LC1); lw a5,%lo(.LC1)(a5); pv.add.h.div2  a0,a0,a5  # Add2>>1 Op Vect; ret"
+ },
+ "cplxmuls2_int": {
+  "rc": 1,
+  "diag": [
+   "error: incompatible type for argument 1 of '__builtin_pulp_cplxmuls2'",
+   "note: expected '__vector(2) short int' but argument is of type 'int'",
+   "error: incompatible type for argument 2 of '__builtin_pulp_cplxmuls2'",
+   "note: expected '__vector(2) short int' but argument is of type 'int'",
+   "warning: control reaches end of non-void function [-Wreturn-type]"
+  ],
+  "asm": ""
+ },
+ "cplxmuls2_const": {
+  "rc": 0,
+  "diag": [],
+  "asm": "lui a5,%hi(.LC0); lw a4,%lo(.LC0)(a5); lui a5,%hi(.LC1); lw a5,%lo(.LC1)(a5); pv.cplxmul.h.r  a0,a4,a5  # Vect/Vect Cplx signed multiply, real part; pv.cplxmul.h.i  a0,a4,a5  # Vect/Vect Cplx signed multiply, imaginary part; ret"
+ },
+ "cplx_conj_v4s": {
+  "rc": 0,
+  "diag": [],
+  "asm": "pv.cplxconj.h  a0,a0  # Complex conjugate; ret"
+ },
+ "sub2rotmj_unsigned": {
+  "rc": 0,
+  "diag": [],
+  "asm": "pv.subrotmj.h  a0,a0,a1; ret"
+ },
+ "mulfsN_nonconst": {
+  "rc": 1,
+  "diag": [
+   "error: invalid argument to built-in function on arg 3, builtin arg mode: SI, actual arg mode: SI"
+  ],
+  "asm": ""
+ },
+ "mulfsN_32": {
+  "rc": 1,
+  "diag": [
+   "error: unrecognizable insn:",
+   "internal compiler error: in extract_insn, at recog.c:2311"
+  ],
+  "asm": ""
+ },
+ "mulfsN_neg": {
+  "rc": 1,
+  "diag": [
+   "error: unrecognizable insn:",
+   "internal compiler error: in extract_insn, at recog.c:2311"
+  ],
+  "asm": ""
+ },
+ "mulfsN_0": {
+  "rc": 0,
+  "diag": [],
+  "asm": "p.mulsN  a0,a0,a1,0; ret"
+ },
+ "mulsN_nonconst_existing": {
+  "rc": 1,
+  "diag": [
+   "error: invalid argument to built-in function on arg 3, builtin arg mode: SI, actual arg mode: SI"
+  ],
+  "asm": ""
+ },
+ "mulfsRN_badround": {
+  "rc": 0,
+  "diag": [],
+  "asm": "p.mulsRN  a0,a0,a1,4; ret"
+ },
+ "mulfsRN_nonconst_round": {
+  "rc": 1,
+  "diag": [
+   "error: invalid argument to built-in function on arg 4, builtin arg mode: SI, actual arg mode: SI"
+  ],
+  "asm": ""
+ },
+ "mulfsRN_nonconst_both": {
+  "rc": 1,
+  "diag": [
+   "error: invalid argument to built-in function on arg 3, builtin arg mode: SI, actual arg mode: SI",
+   "error: invalid argument to built-in function on arg 4, builtin arg mode: SI, actual arg mode: SI"
+  ],
+  "asm": ""
+ },
+ "macfsN_nonconst": {
+  "rc": 1,
+  "diag": [
+   "error: invalid argument to built-in function on arg 4, builtin arg mode: SI, actual arg mode: SI"
+  ],
+  "asm": ""
+ },
+ "macfuRN_nonconst": {
+  "rc": 1,
+  "diag": [
+   "error: invalid argument to built-in function on arg 4, builtin arg mode: SI, actual arg mode: SI",
+   "error: invalid argument to built-in function on arg 5, builtin arg mode: SI, actual arg mode: SI"
+  ],
+  "asm": ""
+ },
+ "macfs_asm": {
+  "rc": 0,
+  "diag": [],
+  "asm": "p.macs  a0,a0,a1,a2; ret"
+ },
+ "mul64hu_ptr": {
+  "rc": 0,
+  "diag": [
+   "warning: passing argument 1 of '__builtin_pulp_mul64hu' makes integer from pointer without a cast [-Wint-conversion]",
+   "note: expected 'int' but argument is of type 'int *'"
+  ],
+  "asm": "p.mulhu a0,a0,a1; ret"
+ },
+ "mul64hu_ll": {
+  "rc": 0,
+  "diag": [],
+  "asm": "p.mulhu a0,a0,a2; ret"
+ },
+ "trunch_ll": {
+  "rc": 0,
+  "diag": [],
+  "asm": "p.exths a0,a0; ret"
+ },
+ "trunch_ptr": {
+  "rc": 0,
+  "diag": [
+   "warning: passing argument 1 of '__builtin_pulp_trunch' makes integer from pointer without a cast [-Wint-conversion]",
+   "note: expected 'int' but argument is of type 'short int *'"
+  ],
+  "asm": "p.exths a0,a0; ret"
+ },
+ "truncb_sign": {
+  "rc": 0,
+  "diag": [],
+  "asm": "and a0,a0,0xff; ret"
+ },
+ "f16max_float": {
+  "rc": 0,
+  "diag": [],
+  "asm": "fcvt.h.s a1,a1; fcvt.h.s a0,a0; fmax.h a0,a0,a1; ret"
+ },
+ "f16altmax_f16": {
+  "rc": 0,
+  "diag": [],
+  "asm": "fcvt.ah.h a1,a1; fcvt.ah.h a0,a0; fmax.ah a0,a0,a1; ret"
+ },
+ "f16max2_v2ah": {
+  "rc": 0,
+  "diag": [],
+  "asm": "vfmax.h  a0,a0,a1  # FVect Op FVect; ret"
+ },
+ "v2hftov2ohf_v2s": {
+  "rc": 0,
+  "diag": [],
+  "asm": "vfcvt.ah.h a0,a0; ret"
+ },
+ "v2hitov2hf_v2h": {
+  "rc": 0,
+  "diag": [],
+  "asm": "vfcvt.h.x a0,a0 # f16 Vect to short int vect; ret"
+ },
+ "CoreCount_m1_arg": {
+  "rc": 1,
+  "diag": [
+   "error: too many arguments to function '__builtin_pulp_CoreCount_m1'"
+  ],
+  "asm": ""
+ }
+}

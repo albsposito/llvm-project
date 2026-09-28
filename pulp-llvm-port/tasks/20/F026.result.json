@@ -1,0 +1,35 @@
+{
+ "status": "done",
+ "branch": "work/20/F026",
+ "commits": [
+  "4e8a20276f2d706ca1665d814256fb1c04bcf391",
+  "00f96bf3547560b10ef96bbc3265d3ced5c53e05"
+ ],
+ "note": "notes/20/F026.md",
+ "signature_gone": true,
+ "summary": "Plain-C contiguous-field clears/sets (x & ~field, x | field) now select p.bclr/p.bset with GCC-identical immediates and encodings. Root cause: the fork's plain-C patterns (fork commit f1b7aebff8c2) check the constant with TImmLeaf shiftedFlippedMask/shiftedMask, which never matches an ordinary Constant. Fix: ImmLeaf twins with an upstream-Zbs-style !isInt<12> guard, so andi/ori stay; 0xffff stays p.exthz (insn-tablegen commit). Second commit (codegen-core): TTI getIntImmCostInst reports these masks as free on PULP RV32, as upstream does for Zbs bclri/bseti, so constant hoisting no longer hides a mask used several times.",
+ "commits_by_cluster": {
+  "insn-tablegen": "4e8a20276f2d",
+  "codegen-core": "00f96bf35475"
+ },
+ "semantics": "p.bclr rD,rs1,Is3,Is2 = rs1 & ~(((1<<(Is3+1))-1)<<Is2); p.bset = rs1 | same (GVSoC pulp_v2.hpp:1967 p_bclri_exec, :2041 p_bseti_exec; isa_lib/int.h:406-414)",
+ "gcc_behaviour": "GAP9 GCC emits p.bclr/p.bset for every contiguous mask, single bits included and also masks that fit andi/ori (p.bclr 0,3 for x&~8). We keep andi/ori for those, as the task requires. GCC uses p.exthz for x&0xffff, and so do we.",
+ "evidence": {
+  "repro": "logs/20-F026.repro.log (int-20: 0 p.bclr/p.bset on logs/20-F026/idioms.c)",
+  "idioms": "logs/20-F026/idioms.{before,after,gcc}.s; encodings logs/20-F026/enc.{after,gcc}.txt (identical words for every wide mask)",
+  "gvsoc": "logs/20-F026/sim/: 2142 functions (every width 1..32 x every offset, 4 C spellings incl. volatile RMW and loops) x 16 inputs = 34272 checks against a host-gcc table that is cross-checked against Python; 0 mismatches for mine, int-20 and GAP9 GCC. bits.o is 4501 instructions (int-20 7629, GCC 4516); no function is longer than int-20 or GCC (sim/perfunc.txt)",
+  "sdk_spot_check": "logs/20-F026/spotcheck.txt, 209 objects. p.bclr 0 -> 26, p.bset 0 -> 18 (GCC 560/71, of which only 29/16 have masks too wide for andi/ori). p.exthz +10. Total instructions 78101 -> 78038 (-63); 12 objects changed, none grew. Patterns-only commit: 23/18, -53 (spotcheck.patterns-only.txt)",
+  "gap9_sweep": "logs/20-F026/sweep/official_sweep_compare.txt: 54/54 kernel disassemblies byte-identical to int-20, so there is no cycle effect and nothing for the runtime harness to measure. sweep_compare.txt (O2/O3/Os per TU) is also identical",
+  "hwloop_fuzz": "logs/20-F026/fuzz/res.txt: seeds 26000-26399 x O2/O3/Os, 1200 compilations identical to int-20, all correct on GVSoC; no crash, hang or wrong result",
+  "lit": "logs/20-F026.lit.log: 4730 tests in LIT_PATHS, the only failure is the known rvv/vsetvli-insert-zve64f.mir (data/known-failures.txt)",
+  "verifier": "-verify-machineinstrs clean at O0/O1/O2/O3/Os/Oz on idioms.c, hoist.c, sim/bits.c"
+ },
+ "upstream_reference": "RISCVInstrInfoZb.td:61-72 (BCLRMask/SingleBitSetMask ImmLeaf with !isInt<12>), :526-529; RISCVTargetTransformInfo.cpp:212,:225 (bclri/bseti free immediates); RISCVInstrInfoXCV.td:730-741 (cv.bclr/cv.bset have intrinsic patterns only, no plain-C patterns) at llvmorg-20.1.8",
+ "other_errors_seen": [
+  "GCC emits p.bclr/p.bset for masks that fit andi/ori too: 531 of GCC's 560 p.bclr and 55 of its 71 p.bset in the SDK spot check. We keep andi/ori there on purpose (same cycles, compressible), so the raw count gap vs GCC stays large. This is a policy choice, not a defect",
+  "(and x, 0xff) selects p.extbz where GCC uses andi 255 (survey: p.extbz 284 vs 0). This is a pre-existing pattern at RISCVInstrInfoXpulp.td (P_EXTBZ), not touched here; andi is compressible (c.andi cannot hold 255, so the size is equal) and the cycles are the same",
+  "The fork's register-operand bclr/bset/insert/extract patterns (widthMinus1 immediate / shift immediate forms) and the plain-C p.extractu/p.insert immediate patterns still use TImmLeaf mask/shiftedMask/flippedMask, so they are dead for plain C in the same way (the extract/insert parts belong to B94's other items; the task said not to touch the clip/extract patterns)"
+ ],
+ "unmapped_files": [],
+ "proposed_test": "llvm/test/CodeGen/RISCV/xpulp-bclr-bset.ll (llc -mtriple=riscv32 -mattr=+xpulpv2): check `and i32 %x, -65281` -> p.bclr a0, a0, 7, 8; `and i32 %x, 2147483647` -> p.bclr a0, a0, 0, 31; `or i32 %x, 2048` -> p.bset a0, a0, 0, 11; `or i32 %x, -268435456` -> p.bset a0, a0, 3, 28; negative controls: `and i32 %x, -9` -> andi, `or i32 %x, 2047` -> ori, `and i32 %x, 65535` -> p.exthz, non-contiguous `and i32 %x, -65282` -> lui/addi/and; plus an opt -passes=consthoist test showing a repeated 0xffff00ff mask is not hoisted with +xpulpv2"
+}

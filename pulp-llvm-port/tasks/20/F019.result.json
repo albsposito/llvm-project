@@ -1,0 +1,60 @@
+{
+ "status": "done",
+ "branch": "work/20/F019",
+ "integration_head_used": "7459255b6120075684cf3aef0b310567d60b5f80 (integration moved to a2a00a7be7a8 during the task; the 7 landed commits touch none of this task's files; not rebased)",
+ "commits": [
+  "3230522cc545b66a58127756c05166b1360b9124",
+  "6ca9a01e675c9435196e63cc67901063f70216e0"
+ ],
+ "commit_clusters": {
+  "3230522cc545b66a58127756c05166b1360b9124": "codegen-core (llvm/lib/Target/RISCV/RISCVISelDAGToDAG.cpp)",
+  "6ca9a01e675c9435196e63cc67901063f70216e0": "clang-builtins (BuiltinsRISCVXpulp.td, DiagnosticSemaKinds.td, SemaRISCV.cpp, CGBuiltin.cpp)"
+ },
+ "note": "notes/20/F019.md",
+ "signature_gone": true,
+ "unmapped_files": [
+  "clang/lib/CodeGen/CGBuiltin.cpp"
+ ],
+ "upstream_file_edit": "clang/lib/CodeGen/CGBuiltin.cpp: static EmitPULPBuiltinShuffle + 2-line dispatch at the top of EmitRISCVBuiltinExpr (same place upstream lowers its CustomTypeChecking RISC-V builtins ntl_load/ntl_store)",
+ "design": "__builtin_shuffle is a PULP target builtin (BuiltinsRISCVXpulp.td, CustomTypeChecking, no feature requirement) checked with GCC's rules in SemaRISCV.cpp (new diag err_riscv_builtin_shuffle_operands). CodeGen: constant mask -> shufflevector (indices mod N/2N); run-time mask + Xpulpv + 4x8/2x16-bit -> llvm.riscv.pulp.shuffleb/shuffleh/shuffle4b/shuffle2h; otherwise generic extract/insert per lane (chosen over an error so every RISC-V config behaves like GCC). ISel: two-vector tryPulpVectorShuffle branch fixed (asserted on every input in ref-18 and int-20).",
+ "sdk_classification": {
+  "constant compound-literal masks": 1039,
+  "of which two-vector": 975,
+  "of which one-vector": 64,
+  "masks from a local 'v4s/v2s Mask = {...}' variable (3-arg)": 219,
+  "true run-time masks": 0,
+  "types": "v4s/v4u (4x8), v2s (2x16), v2h/v2ah (fp16 kernels)"
+ },
+ "sdk_survey": {
+  "strict_ok_base_int20_7459255": 209,
+  "strict_ok_mine": 209,
+  "files_with_builtin_shuffle_errors_before": 26,
+  "files_unblocked_in_strict": 0,
+  "why": "every shuffle file is also blocked by PMSIS builtins / float16 types / other missing builtins; no __builtin_shuffle error remains except 12 fp16 files where float16 itself is unknown ('mask ... (2 vs 1)')",
+  "fp16probe_newly_compiling": [
+   "DSP_Libraries/TransformFunctions/FftLibraryf16.c",
+   "DSP_Libraries/TransformFunctions/FftLibraryf16a.c",
+   "audio-framework/.../gap9_cluster_fft.c",
+   "audio-framework/.../gap9_fc_fft.c"
+  ],
+  "new_failure_buckets": [],
+  "crashes": [],
+  "evidence": "logs/20-F019-survey/"
+ },
+ "sweep": "54/54 disassemblies identical to build/int-20 (a2a00a7be7a8), same compile set and stderr (logs/20-F019-sweep.log)",
+ "lit": "5728 pass, 2 fail, both failing without this change too: CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (data/known-failures.txt) and Driver/riscv-arch.c (shell 'unexpected EOF', also in logs/20-F015-lit.log, logs/20-F018.lit.log); logs/20-F019-lit.log",
+ "gvsoc": "logs/20-F019-sim/: 30 groups x {Xpulpv, generic} x {-O2,-O0}, scalar reference on the simulator. On a privately patched GVSoC (pv.shuffle2 operand order fixed, gvsoc-riscv-branch.patch) clang passes 30/30 in all 4 configs and matches GCC hashes wherever GCC is correct. On the stock SDK GVSoC, two-vector pv.shuffle2 results are wrong for GCC and clang alike (simulator defect below).",
+ "other_errors_seen": [
+  "PRE-EXISTING MISCOMPILE (codegen-core, Xpulpv, reproduced with int-20 without __builtin_shuffle): comparing vector lanes of v4i8 selects pv.extract.b (sign-extending) for one side and p.extbz for the other, so lanes >= 0x80 compare unequal. logs/20-F019-sim/gat.c count(): 'pv.extract.b a2,a0,0' vs 'pv.shuffle.b ... ; p.extbz a3,a3; xor'. GVSoC: logs/20-F019-sim/ckonly.c, int-20 bad=796, GCC bad=0.",
+  "GVSoC (SDK gvsoc2, iss_v2 core used by ri5ky_testbench) swaps the two sources of pv.shuffle2.b/.h: lib_VEC_SHUFFLE2_8/16 in core/models/cpu/iss/include/isa_lib/int.h use their '#else' branch because iss_v2/riscv.py does not pass -DRISCV=1 (the old iss does). Selector bit set picks rD instead of rs1 (logs/20-F019-sim/probe.txt). GCC's code fails on it too. Any GVSoC oracle for code that uses pv.shuffle2 is wrong until fixed (not an LLVM problem).",
+  "GAP9 GCC 7.1.1 appears to mis-encode pv.shuffle.sci.h: for a one-vector constant v2s mask it puts the lane-1 selector in immediate bit 4 (e.g. {1,1} -> imm 17), while both GVSoC ISSes and the fork's LLVM read bit 1; GCC fails the reference on the v2s/v2u constant groups on both simulators. Worth confirming on silicon before using GCC as the oracle for halfword sci shuffles.",
+  "Perf: a constant v4i8/v2i16 operand of the PULP shuffle intrinsics (the SDK's local 'Mask' variable form) is materialised with li + pv.packhi.b + pv.packlo.b (5 instructions) instead of lui+addi (build_vector of constants is not turned into an immediate); GCC uses lui+lw.",
+  "fp16 (future float16 support): with float16=_Float16 (+zhinx) the SDK's v2h shuffles compile but not to pv.shuffle.sci.h/pv.shuffle2.h as GCC does (<2 x half> is not a PULP packed type), so the f16 FFT/MatMul shuffles are scalarised.",
+  "Side effect of the ISel fix: constant shuffles of 8 x 8-bit vectors with Xpulpv (split into two v4i8 pv.shuffle2) used to crash llc and now compile (verified on the patched GVSoC, groups c1/c2/m1/m2 v8s)."
+ ],
+ "proposed_test": [
+  "clang/test/CodeGen/RISCV/riscv-xpulpv2-builtin-shuffle.c: %clang_cc1 -triple riscv32 -target-feature +xpulpv -emit-llvm (and a run without +xpulpv): constant masks (one/two vectors, out-of-range and negative indices) -> 'shufflevector ... <i32 1, i32 7, i32 7, i32 6>' for (v4s){9,-1,15,6}; run-time masks -> llvm.riscv.pulp.shuffleb/shuffleh/shuffle4b/shuffle2h with bitcasts; without xpulpv and for an 8 x 8-bit vector -> extractelement/and/insertelement sequence; -O0 compound-literal mask still a shufflevector.",
+  "clang/test/Sema/riscv-builtin-shuffle.c (-verify): the 8 error shapes of logs/20-F019-sim/diag.c (non-vector, different vector types, non-integer mask, lane count, lane size, 1 and 4 arguments, float mask) and the 3 valid ones (result type = type of first vector).",
+  "llvm/test/CodeGen/RISCV/xpulp-shufflevector.ll: llc -mattr=+xpulpv on two-vector shufflevector of <4 x i8> (<0,4,1,5> -> lui/addi 0x05010400 + pv.shuffle2.b a0,a1,..) and <2 x i16> (<1,2> -> 0x00020001 + pv.shuffle2.h), one-vector sci forms, and <8 x i8>; -verify-machineinstrs."
+ ]
+}

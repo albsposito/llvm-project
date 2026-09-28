@@ -1,0 +1,34 @@
+{
+  "task": "20/F017",
+  "branch": "work/20/F017",
+  "range": "e21026f4903f..c78f25822cff",
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [
+    {
+      "commit": "33ab3b28c31b",
+      "rule": "commented-code",
+      "judgement": "False positive. llvm/lib/Target/RISCV/RISCVFeatures.td:1489-1496 (the hit is at :1492) is a prose comment explaining why the extension is named 'xgap' with version 9.0. It is not disabled code. Nothing was commented out."
+    },
+    {
+      "commit": "c78f25822cff",
+      "rule": "test-edit",
+      "judgement": "Acceptable under the owner exception (notes/20/owner-test-exceptions.md 'F017 xgap9', PROGRESS.md D5). The range touches exactly one test file, llvm/unittests/TargetParser/RISCVISAInfoTest.cpp:1117. The edit is one added row, 'xgap                 9.0', placed alphabetically. No row is removed or changed. It sits in its own commit with a Test-Regen trailer, and the regen report notes/20/F017-regen.md classifies it correctly (a list entry, no instructions). No LLVM update script covers gtest expected strings, so the owner approval covers the hand edit. No lit test was touched. print-supported-extensions-riscv.c was left alone, and it fails the same way on build/int-20 (checked)."
+    }
+  ],
+  "checks": {
+    "diff": "3 files, +36/-0: clang/lib/Basic/Targets/RISCV.cpp (two hasExtension-keyed macro blocks), RISCVFeatures.td (FeatureVendorXgap9 plus the HasVendorXgap9 predicate), and the one unit-test line. No fork logic removed, no early returns or stubs, and no unrelated edits. Fixup subjects match the owning clusters. policy_check: 0 FAIL, 2 WARN (judged above).",
+    "upstream_claim": "No upstream commit caused this: it is a gap the fork already had. The cited fork commits d9510d4f257d and f1b7aebff8c2 exist and are in pulp/integer_SIMD_fix. dee058f9e3ae is in llvmorg-19.1.7..llvmorg-20.1.8. The reference lines at llvmorg-20.1.8 check out: RISCV.cpp:148 __riscv, the extension loop at 179 and the hasExtension checks. RISCVFeatures.td:1225 FeatureVendorXCVbi. No '__riscv__' in clang/lib or clang/test/Preprocessor at llvmorg-20.1.8. The pattern follows CORE-V and the fork's existing xpulpv record (Name/Desc override).",
+    "gcc_macros": "Checked GAP9 GCC 7.1.1. Going from -march=rv32imc to rv32imcxgap9 -mPE=8 -mFC=1 adds __gap9__, __pulp__, __pulp and _pulp, plus __riscv_flen 32, __riscv_fdiv, __riscv_fsqrt and __FP_FAST_FMAF. GCC defines __riscv__ and _riscv even for plain rv32imc. xgap8 and xgap10 give __gap8__ and __gap10__ respectively. The clang branch with rv32imc_xgap9 defines __gap9__, __pulp__, __pulp, _pulp, __riscv__ and _riscv, plus __riscv_xgap 9000000. None of __riscv_flen, __riscv_fdiv, __riscv_fsqrt or __FP_FAST_FMAF appears in SDK .c/.h files outside gvsoc (grep), so leaving them out is harmless. GCC defines no __GAP9__, and clang matches.",
+    "no_upstream_change": "The -dM output of build/20-F017 and build/int-20 is identical, apart from the __VERSION__/__clang_version__ hash, for rv32imc, rv32gc, rv64gc, riscv64-linux rv64gcv and rv32imc_xcvalu. With rv32imc_zfinx_xpulpv2 the only additions are __pulp__, __pulp, _pulp, __riscv__ and _riscv. rv32imc_xgap9 adds __gap9__ and __riscv_xgap on top of that.",
+    "xgap_naming": "These all parse and give the arch attribute rv32i2p1_m2p0_c2p0_zicsr2p0_zmmul1p0_zfinx1p0_xgap9p0_xpulpv2p0: rv32imc_xgap9, rv32imc_xgap (a bare xgap means 9), rv32imc_xgap9p0, rv32imc_xgap9_xpulpv2, rv32imc_xpulpv2_xgap9, rv32imc_xgap9_xpulpv, rv32imc_zfinx_xgap9, and rv32imcxgap9 without the underscore (which the base already accepted for xpulpv2). Explicit duplicates get no error and no double entry. Rejected: xgap8 and xgap10 (unsupported version number), xgap9_xgap9 (duplicated), and rv32imfc_xgap9 (F and zfinx are incompatible; GCC accepts it, and the note documents this). The round trip works: the canonical string passed back as -march gives the same macros, and llvm-mc with .attribute arch plus llvm-objdump without --mattr decodes p.abs and fadd.s. The llc feature is -mattr=+xgap, while +xgap9 is 'not a recognized feature'. That matches the fork convention (+xpulpv, not +xpulpv2), so it is not a defect.",
+    "implied_set": "GAP9 GCC keeps float in GPRs: 'a*b+a' becomes fmadd.s a0,a0,a1,a0 with -mabi=ilp32. The clang xgap9 build produces the same, so the zfinx implication is correct. GCC's xgap9 also has fp16 (float16/float16alt) and the GAP9-only instructions. Both are deferred and documented (a TODO for B90 in RISCVFeatures.td; D6 Q7 decides fp16 is implied later).",
+    "codegen_identity": "Independent rerun over benchmarks/gap9-sweep src/ and build/gen at O2 and O3. Variant A was rv32imc_zfinx_xpulpv2 with -D__gap9__ -D__pulp__. Variant B was rv32imc_xgap9 with no shim. Result: 54/54 objdump -dr identical, and 24 compiles fail for both variants alike (matches sweep2.log's 54 ok).",
+    "survey": "Spot-checked the JSON: xgap9_compile_nodefsall 209/617 rc=0, and base/mine strict and base nodefsall are each 209/617. cmp-xgap9.txt shows that mine-strict vs xgap9-nodefsall has 0 rc and 0 error-set differences, and that base-nodefsall vs xgap9-nodefsall has 131 error-set differences with 0 rc differences, as claimed.",
+    "unit_and_lit": "TargetParserTests (build/20-F017, built after the last commit): 583 passed, 4 skipped. scripts/wlit.sh ran clang/test/Driver/riscv* and clang/test/Preprocessor/riscv*, plus llvm CodeGen/RISCV/attributes.ll, MC/RISCV/attribute-arch*.s and Misc/target-invalid-cpu-note: 41/41 passed."
+  },
+  "non_blocking_notes": [
+    "The commit message of 36d959d1705e says '__gap9__ is not defined here'. That is true for that commit but reads as stale next to fc51c70eec1f. It disappears when the fixups are squashed.",
+    "There is no lit coverage for the new macros or the xgap spelling yet. The worker's proposed tests (clang/test/Preprocessor/riscv-pulp-macros.c and clang/test/Driver/riscv-arch-xgap9.c) should be added by a test-authoring task."
+  ]
+}

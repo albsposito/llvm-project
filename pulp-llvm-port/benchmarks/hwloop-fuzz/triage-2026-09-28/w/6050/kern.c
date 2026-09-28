@@ -1,0 +1,7 @@
+#include <stdint.h>
+__attribute__((noinline)) unsigned kern(unsigned *A, unsigned *B, unsigned *out, unsigned n, unsigned m, unsigned k) {
+unsigned acc = 1, s = 2, t = 3;
+for (unsigned i0 = 0; i0 < n; i0++) { acc += B[((t + 0u) & 63u)]; }
+for (unsigned i0 = 0; i0 < m; i0++) { for (unsigned i1 = 0; i1 < (m&3u); i1++) { for (unsigned i2 = 0; i2 < k; i2++) { out[((i1 + 17u) & 63u)] = B[((i2 + 43u) & 63u)]; } if (((B[((i1 + 5u) & 63u)] ^ acc) ^ s) & 4u) { if ((A[((i1 + 0u) & 63u)] * 4u) & 1u) { for (unsigned i2 = 0; i2 < m; i2++) { t = (t << 1) | (s >> 31); acc += A[((t + 24u) & 63u)]; } s += (((B[((acc + 54u) & 63u)] * 3u) ^ acc) + A[((acc + 13u) & 63u)]); } else { for (unsigned i2 = 0; i2 < n; i2++) { t += ((A[((acc + 24u) & 63u)] ^ acc) ^ t); if ((B[((t + 63u) & 63u)] & 7u) == 0) continue; t = (t << 1) | (s >> 31); } t += (71u * 2u); } t = (t << 1) | (s >> 31); if (((A[((s + 56u) & 63u)] + B[((i0 + 28u) & 63u)]) * 6u) & 8u) { acc += A[((s + 12u) & 63u)]; if ((((A[((t + 21u) & 63u)] + A[((s + 52u) & 63u)]) * 5u) + B[((i1 + 29u) & 63u)]) & 1u) { for (unsigned i2 = 0; i2 < m; i2++) { s += (B[((i2 + 33u) & 63u)] + ((B[((t + 4u) & 63u)] * 7u) + (B[((acc + 57u) & 63u)] * 7u))); } } else { t = (t << 1) | (s >> 31); } } } out[((i1 + 47u) & 63u)] = B[((i0 + 57u) & 63u)]; } s += B[((t + 28u) & 63u)]; }
+for (unsigned i0 = 0; i0 < n; i0++) { out[((s + 22u) & 63u)] = ((A[((i0 + 9u) & 63u)] ^ s) ^ t); }
+return acc ^ s ^ t;}
