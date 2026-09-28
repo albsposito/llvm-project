@@ -184,6 +184,19 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
                         Twine(getVersionValue(ExtInfo.Major, ExtInfo.Minor)));
   }
 
+  // PULP: the GAP/PULP GCC toolchain predefines these whenever it targets a
+  // PULP core (-march=...xgap8/xgap9/xgap10). SDK headers test them to pick
+  // the PULP builtins over portable C. Limited to Xpulpv so that plain RISC-V
+  // keeps upstream's macro set (upstream clang defines neither __riscv__ nor
+  // _riscv).
+  if (ISAInfo->hasExtension("xpulpv")) {
+    Builder.defineMacro("__pulp__");
+    Builder.defineMacro("__pulp");
+    Builder.defineMacro("_pulp");
+    Builder.defineMacro("__riscv__");
+    Builder.defineMacro("_riscv");
+  }
+
   if (ISAInfo->hasExtension("zmmul"))
     Builder.defineMacro("__riscv_mul");
 
