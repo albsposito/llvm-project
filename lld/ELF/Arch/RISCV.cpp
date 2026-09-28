@@ -257,6 +257,34 @@ RelType RISCV::getDynRel(RelType type) const {
                                          : static_cast<RelType>(R_RISCV_NONE);
 }
 
+// PULP hardware-loop relocations (lp.setup, lp.setupi, lp.starti, lp.endi):
+// the forward distance from the instruction to a loop label, in halfwords, in
+// the 12-bit field at bit 20 (5-bit field at bit 15 for lp.setupi). The fork's
+// MC numbers them R_PULPV2_LOOP_SETUP/SETUPI. GNU as of the PULP/GAP9 GCC
+// toolchains (binutils 2.28) emits R_RISCV_REL12 (57) and R_RISCV_RELU5 (58),
+// numbers that the psABI later gave to R_RISCV_32_PCREL and R_RISCV_IRELATIVE.
+// As X86.cpp does for R_386_GOT32X, tell them apart by the instruction they
+// apply to: major opcode 0x7b, funct3 0/1/4 (lp.starti/lp.endi/lp.setup) for
+// the 12-bit field, funct3 5 (lp.setupi) for the 5-bit one. Returns the field
+// width, or 0 if this is not a PULP loop relocation.
+static unsigned pulpLoopFieldBits(RelType type, const uint8_t *loc) {
+  if (type == R_PULPV2_LOOP_SETUP)
+    return 12;
+  if (type == R_PULPV2_LOOP_SETUPI)
+    return 5;
+  if (type != R_RISCV_32_PCREL && type != R_RISCV_IRELATIVE)
+    return 0;
+  uint32_t insn = read32le(loc);
+  if ((insn & 0x7f) != 0x7b)
+    return 0;
+  uint32_t funct3 = (insn >> 12) & 7;
+  if (type == R_RISCV_32_PCREL && (funct3 == 0 || funct3 == 1 || funct3 == 4))
+    return 12;
+  if (type == R_RISCV_IRELATIVE && funct3 == 5)
+    return 5;
+  return 0;
+}
+
 RelExpr RISCV::getRelExpr(const RelType type, const Symbol &s,
                           const uint8_t *loc) const {
   switch (type) {
@@ -321,11 +349,9 @@ RelExpr RISCV::getRelExpr(const RelType type, const Symbol &s,
   case R_RISCV_SET_ULEB128:
   case R_RISCV_SUB_ULEB128:
     return RE_RISCV_LEB128;
-  case R_PULPV2_LOOP_SETUP:
-    return R_NONE;
-  case R_PULPV2_LOOP_SETUPI:
-    return R_NONE;
   default:
+    if (pulpLoopFieldBits(type, loc))
+      return R_PC;
     Err(ctx) << getErrorLoc(ctx, loc) << "unknown relocation (" << type.v
              << ") against symbol " << &s;
     return R_NONE;
@@ -334,6 +360,22 @@ RelExpr RISCV::getRelExpr(const RelType type, const Symbol &s,
 
 void RISCV::relocate(uint8_t *loc, const Relocation &rel, uint64_t val) const {
   const unsigned bits = ctx.arg.wordsize * 8;
+
+  if (unsigned n = pulpLoopFieldBits(rel.type, loc)) {
+    // Checked like R_RISCV_BRANCH below, but unsigned: the label must be
+    // ahead of the instruction. Report it under its PULP name, and a label
+    // behind the instruction as a negative distance.
+    Relocation r = rel;
+    r.type = n == 12 ? R_PULPV2_LOOP_SETUP : R_PULPV2_LOOP_SETUPI;
+    if (!isUIntN(n + 1, val))
+      reportRangeError(ctx, loc, r, Twine(int64_t(val)), 0, maxUIntN(n + 1));
+    checkAlignment(ctx, loc, val, 2, r);
+    uint32_t shift = n == 12 ? 20 : 15;
+    uint32_t mask = ((1u << n) - 1) << shift;
+    uint32_t field = (uint32_t(val >> 1) << shift) & mask;
+    write32le(loc, (read32le(loc) & ~mask) | field);
+    return;
+  }
 
   switch (rel.type) {
   case R_RISCV_32:
