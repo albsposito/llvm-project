@@ -42,8 +42,13 @@ def uimm6_lsb0_pulp : Operand<OtherVT>,
   }];
 }
 
+// End-of-loop / start-of-loop label of the hardware-loop instructions
+// (lp.setup, lp.starti, lp.endi; 12-bit field). The assembler accepts either
+// a bare symbol (encoded through fixup_pulpv2_loop_setup) or a constant that
+// is the raw field value. Like upstream's simm13_lsb0 (SImmAsmOperand<13,
+// "Lsb0">, matched by isBareSimmNLsb0), the parser class accepts both.
 def uimm12pcrel : Operand<XLenVT>, ImmLeaf<XLenVT, [{return isUInt<12>(Imm);}]> {
-  let ParserMatchClass = UImmAsmOperand<12>;
+  let ParserMatchClass = UImmAsmOperand<12, "PCRel">;
   let DecoderMethod = "decodeUImmOperand<12>";
 }
 
@@ -51,8 +56,9 @@ def uimm12pcrel : Operand<XLenVT>, ImmLeaf<XLenVT, [{return isUInt<12>(Imm);}]> 
 // through getImmOpValue and accepts constants only (95c5386ddb8a), so the
 // label needs its own operand, like uimm12pcrel above, whose default encoder
 // (getMachineOpValue) emits fixup_pulpv2_loop_setupi.
+// The assembler accepts a bare symbol or a constant, as for uimm12pcrel.
 def uimm5pcrel : Operand<XLenVT>, ImmLeaf<XLenVT, [{return isUInt<5>(Imm);}]> {
-  let ParserMatchClass = UImmAsmOperand<5>;
+  let ParserMatchClass = UImmAsmOperand<5, "PCRel">;
   let DecoderMethod = "decodeUImmOperand<5>";
   let OperandType = "OPERAND_UIMM5";
   let OperandNamespace = "RISCVOp";
@@ -481,7 +487,7 @@ def LOOP0setupi : Instruction, Sched<[WriteCSR]> {
     let Inst{7} = 0b0;
     let Inst{6-0} = 0b1111011;
 
-    dag InOperandList = (ins uimm5pcrel:$uimmS, uimm12pcrel:$uimmL);
+    dag InOperandList = (ins uimm5pcrel:$uimmS, uimm12:$uimmL);
     dag OutOperandList = (outs);
 
     let AsmString = "lp.setupi\tx0, $uimmL, $uimmS";
@@ -509,7 +515,7 @@ def LOOP1setupi : Instruction, Sched<[WriteCSR]> {
     let Inst{7} = 0b1;
     let Inst{6-0} = 0b1111011;
 
-    dag InOperandList = (ins uimm5pcrel:$uimmS, uimm12pcrel:$uimmL);
+    dag InOperandList = (ins uimm5pcrel:$uimmS, uimm12:$uimmL);
     dag OutOperandList = (outs);
 
     let AsmString = "lp.setupi\tx1, $uimmL, $uimmS";
@@ -644,7 +650,7 @@ def LOOP0counti : Instruction, Sched<[WriteCSR]> {
     let Inst{7} = 0b0;
     let Inst{6-0} = 0b1111011;
 
-    dag InOperandList = (ins uimm12pcrel:$uimmL);
+    dag InOperandList = (ins uimm12:$uimmL);
     dag OutOperandList = (outs);
 
     let AsmString = "lp.counti\tx0, $uimmL";
@@ -671,7 +677,7 @@ def LOOP1counti : Instruction, Sched<[WriteCSR]> {
     let Inst{7} = 0b1;
     let Inst{6-0} = 0b1111011;
 
-    dag InOperandList = (ins uimm12pcrel:$uimmL);
+    dag InOperandList = (ins uimm12:$uimmL);
     dag OutOperandList = (outs);
 
     let AsmString = "lp.counti\tx1, $uimmL";
