@@ -139,7 +139,10 @@ bool RISCVAsmBackend::shouldForceRelocation(const MCAssembler &Asm,
     return true;
   case RISCV::fixup_pulpv2_loop_setup:
   case RISCV::fixup_pulpv2_loop_setupi:
-    return false;
+    // PC-relative loop labels are handled like fixup_riscv_branch: resolved
+    // here without relaxation, but with relaxation the linker may shrink the
+    // loop body, so emit R_PULPV2_LOOP_SETUP(I) and let the linker compute it.
+    break;
   }
 
   return STI->hasFeature(RISCV::FeatureRelax) || ForceRelocs;
