@@ -421,6 +421,17 @@ let hasSideEffects = 1, mayStore = 1 in
 
 // Hardware loops
 
+// The lp.setup / lp.setupi instructions below are marked isNotDuplicable, so
+// tail duplication (and the other passes that honour the flag) never copies
+// them. Otherwise tail duplication could copy the preheader
+// holding the setup into another predecessor, and one loop would be entered
+// by two setups. PULPFixupHwLoops then splits the loop's last block once per
+// setup, and the second split ends that setup's loop one instruction early
+// (wrong code, backlog B03/B82). This follows ARM's low-overhead-loop start
+// instructions (t2WLS, t2DLS, t2DoLoopStart, t2WhileLoopStart*), which are
+// isNotDuplicable in ARMInstrThumb2.td; TailDuplicator::shouldTailDuplicate
+// refuses to duplicate a block containing such an instruction.
+
 def LOOP0setup : Instruction, Sched<[ReadIALU, WriteCSR]> {
 
     bits<32> Inst;
@@ -434,6 +445,7 @@ def LOOP0setup : Instruction, Sched<[ReadIALU, WriteCSR]> {
     let mayStore = 0;
     let Size = 4;
     let isTerminator = 1;
+    let isNotDuplicable = 1;
 
     let Inst{31-20} = uimmL;
     let Inst{19-15} = rs1;
@@ -461,6 +473,7 @@ def LOOP1setup : Instruction, Sched<[ReadIALU, WriteCSR]> {
     let mayStore = 0;
     let Size = 4;
     let isTerminator = 1;
+    let isNotDuplicable = 1;
 
     let Inst{31-20} = uimmL;
     let Inst{19-15} = rs1;
@@ -488,6 +501,7 @@ def LOOP0setupi : Instruction, Sched<[WriteCSR]> {
     let mayStore = 0;
     let Size = 4;
     let isTerminator = 1;
+    let isNotDuplicable = 1;
 
     let Inst{31-20} = uimmL;
     let Inst{19-15} = uimmS;
@@ -516,6 +530,7 @@ def LOOP1setupi : Instruction, Sched<[WriteCSR]> {
     let mayStore = 0;
     let Size = 4;
     let isTerminator = 1;
+    let isNotDuplicable = 1;
 
     let Inst{31-20} = uimmL;
     let Inst{19-15} = uimmS;
