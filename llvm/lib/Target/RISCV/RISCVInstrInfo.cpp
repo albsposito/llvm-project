@@ -3253,29 +3253,48 @@ std::string RISCVInstrInfo::createMIROperandComment(
   return Comment;
 }
 
-// Return true if MI is one of the instructions repeated by an frep.o/frep.i
-// earlier in its block. frep repeats the next N (operand 1) instructions that
-// emit code, so walk back over at most that many real instructions.
+// Return true if MI is one of the instructions repeated by an frep.o/frep.i.
+// frep repeats the next N (operand 1) instructions in program order, so the
+// frep may sit in an earlier block that falls through into MI's block (the
+// frep pass leaves the loop control block address-taken, so branch folding
+// never merges it into the block holding the frep).
+//
+// Only instructions that certainly are part of the body are counted: meta
+// instructions emit nothing, and COPYs and branches are not counted by the
+// frep pass either (pre-RA COPYs may later be coalesced away). Counting fewer
+// instructions than the hardware can only mark extra instructions as
+// boundaries, which costs scheduling freedom but never leaves a body
+// instruction unprotected.
 static bool isInFrepBody(const MachineInstr &MI) {
   // Debug and other meta instructions emit nothing, so they are not part of
   // the repeated body and may be moved freely.
   if (MI.isMetaInstruction())
     return false;
+  auto IsCounted = [](const MachineInstr &I) {
+    return !I.isMetaInstruction() && !I.isCopy() && !I.isBranch();
+  };
   // The frep instruction-count field is 12 bits wide (N - 1 is encoded).
   const unsigned MaxFrepBody = 4096;
-  unsigned Distance = 1; // MI itself is the Distance-th instruction after I.
+  // Counted instructions after the frep up to and including MI.
+  unsigned Distance = IsCounted(MI) ? 1 : 0;
   const MachineBasicBlock *MBB = MI.getParent();
-  for (MachineBasicBlock::const_iterator I = MI.getIterator();
-       I != MBB->begin();) {
-    --I;
-    if (I->isMetaInstruction())
-      continue;
-    if (I->getOpcode() == RISCV::FREP_O || I->getOpcode() == RISCV::FREP_I)
-      return Distance <= static_cast<uint64_t>(I->getOperand(1).getImm());
-    if (++Distance > MaxFrepBody)
+  MachineBasicBlock::const_iterator I = MI.getIterator();
+  while (true) {
+    while (I != MBB->begin()) {
+      --I;
+      if (I->getOpcode() == RISCV::FREP_O || I->getOpcode() == RISCV::FREP_I)
+        return Distance <= static_cast<uint64_t>(I->getOperand(1).getImm());
+      if (IsCounted(*I) && ++Distance > MaxFrepBody)
+        return false;
+    }
+    // Continue into the layout predecessor if control can fall through from
+    // it into this block.
+    const MachineBasicBlock *Prev = MBB->getPrevNode();
+    if (!Prev || !Prev->isSuccessor(MBB))
       return false;
+    MBB = Prev;
+    I = MBB->end();
   }
-  return false;
 }
 
 bool RISCVInstrInfo::isSchedulingBoundary(const MachineInstr &MI,
