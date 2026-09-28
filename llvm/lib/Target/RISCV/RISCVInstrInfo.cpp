@@ -3260,6 +3260,31 @@ std::string RISCVInstrInfo::createMIROperandComment(
   return Comment;
 }
 
+// Return true if MI is one of the instructions repeated by an frep.o/frep.i
+// earlier in its block. frep repeats the next N (operand 1) instructions that
+// emit code, so walk back over at most that many real instructions.
+static bool isInFrepBody(const MachineInstr &MI) {
+  // Debug and other meta instructions emit nothing, so they are not part of
+  // the repeated body and may be moved freely.
+  if (MI.isMetaInstruction())
+    return false;
+  // The frep instruction-count field is 12 bits wide (N - 1 is encoded).
+  const unsigned MaxFrepBody = 4096;
+  unsigned Distance = 1; // MI itself is the Distance-th instruction after I.
+  const MachineBasicBlock *MBB = MI.getParent();
+  for (MachineBasicBlock::const_iterator I = MI.getIterator();
+       I != MBB->begin();) {
+    --I;
+    if (I->isMetaInstruction())
+      continue;
+    if (I->getOpcode() == RISCV::FREP_O || I->getOpcode() == RISCV::FREP_I)
+      return Distance <= static_cast<uint64_t>(I->getOperand(1).getImm());
+    if (++Distance > MaxFrepBody)
+      return false;
+  }
+  return false;
+}
+
 bool RISCVInstrInfo::isSchedulingBoundary(const MachineInstr &MI,
                                           const MachineBasicBlock *MBB,
                                           const MachineFunction &MF) const {
@@ -3267,6 +3292,13 @@ bool RISCVInstrInfo::isSchedulingBoundary(const MachineInstr &MI,
   if (TargetInstrInfo::isSchedulingBoundary(MI, MBB, MF)) {
     return true;
   }
+
+  // frep repeats exactly the N instructions that follow it. Keep each of them
+  // in place: otherwise the scheduler can interleave an unrelated instruction
+  // into the repeated body (it would then run N times and a body instruction
+  // would run only once), or move a body instruction out of it.
+  if (STI.hasExtXfrep() && isInFrepBody(MI))
+    return true;
 
   switch (MI.getOpcode()) {
     case RISCV::LOOP0setup:
