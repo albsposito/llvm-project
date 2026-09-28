@@ -306,6 +306,8 @@ public:
 
 char SNITCHFrepLoops::ID = 0;
 
+static bool removeFrepInferPseudos(MachineFunction &MF);
+
 bool SNITCHFrepLoops::runOnMachineFunction(MachineFunction &MF) {
   LLVM_DEBUG(dbgs() << "********* Snitch FREP Loops *********\n");
 
@@ -317,7 +319,9 @@ bool SNITCHFrepLoops::runOnMachineFunction(MachineFunction &MF) {
   if (skipFunction(MF.getFunction())) {
     LLVM_DEBUG(
         dbgs() << "Machine function marked to be skipped, bailing out.\n");
-    return false;
+    // '#pragma frep infer' markers must still go: the pseudo has no encoding
+    // and would crash the asm printer (e.g. at -O0 or under optnone).
+    return removeFrepInferPseudos(MF);
   }
 
   bool Changed = false;
@@ -337,17 +341,26 @@ bool SNITCHFrepLoops::runOnMachineFunction(MachineFunction &MF) {
     }
 
   // sanity pass: look for infer pseudo and drop it
+  Changed |= removeFrepInferPseudos(MF);
+
+  return Changed;
+}
+
+/// Drop every PseudoFrepInfer (the '#pragma frep infer' marker) left in \p MF.
+static bool removeFrepInferPseudos(MachineFunction &MF) {
+  bool Removed = false;
   for (auto &MBB : MF) {
     MachineBasicBlock::iterator MBBI = MBB.begin(), E = MBB.end();
     while (MBBI != E) {
       MachineBasicBlock::iterator NMBBI = std::next(MBBI);
-      if (MBBI->getOpcode() == RISCV::PseudoFrepInfer)
+      if (MBBI->getOpcode() == RISCV::PseudoFrepInfer) {
         MBBI->removeFromParent();
+        Removed = true;
+      }
       MBBI = NMBBI;
     }
   }
-
-  return Changed;
+  return Removed;
 }
 
 /// Check if the loop is a candidate for converting to a hardware
