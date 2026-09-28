@@ -10679,6 +10679,9 @@ def err_systemz_invalid_tabort_code : Error<
   "invalid transaction abort code">;
 def err_riscv_pulp_builtin_bextract_range : Error<
   "size and offset arguments must be such that size + offset <= 32">;
+def err_riscv_pulp_builtin_clip_bounds : Error<
+  "bounds must be %select{0|-2^(N-1)}0 and 2^(N-1)-1 with 1 <= N <= 30 "
+  "(got %1 and %2)">;
 def err_riscv_pulp_builtin_negpow2 : Error<
   "argument should be a negative power of 2">;
 def err_riscv_pulp_builtin_pow2complement : Error<
