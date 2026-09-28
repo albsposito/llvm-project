@@ -890,6 +890,26 @@ CountValue *PULPHardwareLoops::computeCount(MachineLoop *Loop,
     }
   }
 
+  // getLoopTripCount accepts a start or end register whose definition does not
+  // dominate the loop header when it holds a known constant, e.g. an
+  // "ADDI $x0, 256" left inside the loop because a phi after the loop uses
+  // the same constant. That register is not available in the preheader, where
+  // the count is computed, so use the immediate instead, as
+  // HexagonHardwareLoops::computeCount does for a register assigned an
+  // immediate (A2_tfrsi). A register that is available keeps being used.
+  MachineOperand StartImmOp = MachineOperand::CreateImm(immStart);
+  MachineOperand EndImmOp = MachineOperand::CreateImm(immEnd);
+  auto isAvailableInPreheader = [&](const MachineOperand *MO) {
+    if (!MO->isReg() || !MO->getReg().isVirtual())
+      return true;
+    const MachineInstr *Def = MRI->getVRegDef(MO->getReg());
+    return Def && MDT->dominates(Def->getParent(), PH);
+  };
+  if (startIsImm && !isAvailableInPreheader(Start))
+    Start = &StartImmOp;
+  if (endIsImm && !isAvailableInPreheader(End))
+    End = &EndImmOp;
+
   // Cannot handle comparison EQ, i.e. while (A == B): such a loop runs once
   // or twice, it is not a counting loop (same as HexagonHardwareLoops).
   if (Cmp == Comparison::EQ)
