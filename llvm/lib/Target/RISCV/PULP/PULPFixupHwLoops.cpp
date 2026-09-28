@@ -55,15 +55,6 @@ MachineBasicBlock *splitMBBAt(MachineBasicBlock *OldMBB, MachineInstr &MI) {
 
   MachineFunction *MF = OldMBB->getParent();
 
-  LivePhysRegs LiveRegs;
-  // Make sure we add any physregs we define in the block as liveins to the
-  // new block.
-  MachineBasicBlock::iterator Prev(&MI);
-  LiveRegs.init(*MF->getSubtarget().getRegisterInfo());
-  LiveRegs.addLiveOuts(*OldMBB);
-  for (auto I = OldMBB->rbegin(), E = Prev.getReverse(); I != E; ++I)
-    LiveRegs.stepBackward(*I);
-
   MachineBasicBlock *SplitBB =
       MF->CreateMachineBasicBlock(OldMBB->getBasicBlock());
 
@@ -73,7 +64,14 @@ MachineBasicBlock *splitMBBAt(MachineBasicBlock *OldMBB, MachineInstr &MI) {
   SplitBB->transferSuccessorsAndUpdatePHIs(OldMBB);
   OldMBB->addSuccessor(SplitBB);
 
-  addLiveIns(*SplitBB, LiveRegs);
+  // The new block's live-ins are the registers live before MI (which moved
+  // into it), e.g. the loop count register read by lp.setup. Compute them
+  // from the successors' live-ins and the block's instructions, as upstream
+  // block-splitting code does (computeAndAddLiveIns). (The earlier version
+  // stepped back to just after MI, so MI's own operands were missing, and
+  // added the function's pristine callee-saved registers.)
+  LivePhysRegs LiveRegs;
+  computeAndAddLiveIns(LiveRegs, *SplitBB);
 
   return SplitBB;
 }
@@ -712,7 +710,7 @@ bool PULPFixupHwLoops::fixupLoopInstrs(MachineFunction &MF) {
         if (LastMBB->getFirstTerminator() == LastMBB->begin()) {
           DebugLoc DL = MII->getDebugLoc();
           BuildMI(*LastMBB, LastMBB->getFirstTerminator(), DL,
-                  RII->get(RISCV::ADDI)).addReg(RISCV::X0).addReg(RISCV::X0)
+                  RII->get(RISCV::ADDI), RISCV::X0).addReg(RISCV::X0)
                                         .addImm(0);
         }
 
@@ -726,7 +724,7 @@ bool PULPFixupHwLoops::fixupLoopInstrs(MachineFunction &MF) {
         if (instrToMove->isInlineAsm()) {
           DebugLoc DL = instrToMove->getDebugLoc();
           BuildMI(*LastMBB, LastMBB->getFirstTerminator(), DL,
-                  RII->get(RISCV::ADDI)).addReg(RISCV::X0).addReg(RISCV::X0)
+                  RII->get(RISCV::ADDI), RISCV::X0).addReg(RISCV::X0)
                                         .addImm(0);
           instrToMove = --LastMBB->getFirstTerminator();
         }
@@ -746,6 +744,32 @@ bool PULPFixupHwLoops::fixupLoopInstrs(MachineFunction &MF) {
         }
         LoopEnd->splice(LoopEnd->begin(), LastMBB, instrToMove, LastMBB->end());
         LoopEnd->setLabelMustBeEmitted();
+
+        // LoopEnd inherited the loop back edge to the header, which no
+        // instruction takes: the hardware jumps back by itself at the end
+        // address. Mark it with the zero-size PseudoLOOPend terminator (as
+        // Hexagon marks its hardware loop end with ENDLOOP0), so that the
+        // block's successors are explained by its terminators; branch
+        // analysis treats the block as unanalyzable, like any block ending
+        // in a target-specific loop branch. The asm printer emits nothing
+        // for it, so addresses and the loop length computed below do not
+        // change.
+        MachineLoopInfo *MLI =
+            &getAnalysis<MachineLoopInfoWrapperPass>().getLI();
+        if (MachineLoop *L = MLI->getLoopFor(LastMBB)) {
+          MachineBasicBlock *Header = L->getHeader();
+          if (LoopEnd->isSuccessor(Header))
+            BuildMI(*LoopEnd, LoopEnd->getFirstTerminator(),
+                    MII->getDebugLoc(), RII->get(RISCV::PseudoLOOPend))
+                .addMBB(Header);
+        }
+
+        // The registers read by the moved instructions are live into
+        // LoopEnd: compute its live-ins from its successors, as upstream
+        // block-splitting code does (the block had none, which the machine
+        // verifier reports as uses of undefined registers).
+        LivePhysRegs LiveRegs;
+        computeAndAddLiveIns(LiveRegs, *LoopEnd);
 
         // Update the loop setup instruction with the actual loop end.
         DebugLoc DL = MII->getDebugLoc();
@@ -861,14 +885,36 @@ bool PULPFixupHwLoops::fixupLoopInstrs(MachineFunction &MF) {
         if (LoopLen < 4) {
           // Loop length is too small (must be at least two instructions): Fill
           // up with nops.
+          // The nops go right after the setup, where the loop starts. The
+          // setup is a terminator and a block may not continue after its
+          // terminators (the machine verifier rejects it), so when the setup
+          // ends its block, put the nops in a block of their own between it
+          // and the block it falls into. Not at the start of that block:
+          // other blocks may jump to its label and must still skip the nops.
+          // The instructions and their addresses are the same as with the
+          // nops in the setup's block.
+          MachineBasicBlock *PadMBB = &MBB;
+          MachineBasicBlock::iterator PadPt = inspt;
+          MachineBasicBlock *Next = MBB.getNextNode();
+          if (inspt == MBB.end() && Next && MBB.isSuccessor(Next)) {
+            PadMBB = MF.CreateMachineBasicBlock();
+            MF.insert(Next->getIterator(), PadMBB);
+            MBB.replaceSuccessor(Next, PadMBB);
+            PadMBB->addSuccessor(Next);
+            PadPt = PadMBB->end();
+          }
           while (LoopLen < 4) {
-            MachineInstrBuilder NOP = BuildMI(MBB, inspt, DL,
+            MachineInstrBuilder NOP = BuildMI(*PadMBB, PadPt, DL,
                                               RII->get(RISCV::ADDI));
-            NOP.addReg(RISCV::X0);
+            NOP.addReg(RISCV::X0, RegState::Define);
             NOP.addReg(RISCV::X0);
             NOP.addImm(0);
             LoopLen += getMISize(*NOP.getInstr());
             offsetIncrease += getMISize(*NOP.getInstr());
+          }
+          if (PadMBB != &MBB) {
+            LivePhysRegs LiveRegs;
+            computeAndAddLiveIns(LiveRegs, *PadMBB);
           }
         }
 
