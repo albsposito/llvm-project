@@ -27,13 +27,35 @@ using namespace llvm;
 
 #define DEBUG_TYPE "hwloopsfixup"
 
+// The setup instructions encode the address of the last instruction of the
+// loop as a forward offset from their own address, in halfwords (GVSoC:
+// end = pc + (uimm << 1), pulp_v2.hpp lp_setup_exec/lp_setupi_exec; the loop
+// jumps back after executing the instruction at that address). The field
+// widths (RISCVInstrInfoXpulp.td, checked by RISCVAsmBackend's
+// fixup_pulpv2_loop_setupi / fixup_pulpv2_loop_setup) limit that offset to:
+//   lp.setupi: uimmS, Inst{19-15}, 5 bits  -> at most 62 bytes;
+//   lp.setup, lp.endi: uimmL, Inst{31-20}, 12 bits -> at most 8190 bytes.
+static constexpr int64_t MaxEndOffsetSetupi = 62;
+static constexpr int64_t MaxEndOffsetSetup = 8190;
+// Size of lp.setup/lp.setupi.
+static constexpr int64_t SetupSize = 4;
+
+// The two limits below are in bytes from the first instruction of the loop
+// (after the setup) to the start of its last instruction, i.e. the end offset
+// minus the size of the setup instruction. By default they are the largest
+// values the encodings allow; a smaller value restricts further (0 makes every
+// lp.setupi use the long form), a larger one is capped at the encoding limit.
 static cl::opt<signed> MaxLoopRangeImm(
-    "pulp-loop-range-immediate", cl::Hidden, cl::init(50),
-    cl::desc("Restrict range of lp.setupi to N instructions."));
+    "pulp-loop-range-immediate", cl::Hidden,
+    cl::init(MaxEndOffsetSetupi - SetupSize),
+    cl::desc("Restrict range of lp.setupi to N bytes (from the loop start to "
+             "its last instruction)."));
 
 static cl::opt<signed> MaxLoopRangeReg(
-    "pulp-loop-range-register", cl::Hidden, cl::init(8190),
-    cl::desc("Restrict range of lp.setup to N instructions."));
+    "pulp-loop-range-register", cl::Hidden,
+    cl::init(MaxEndOffsetSetup - SetupSize),
+    cl::desc("Restrict range of lp.setup to N bytes (from the loop start to "
+             "its last instruction)."));
 
 namespace llvm {
   FunctionPass *createPULPFixupHwLoops();
@@ -104,10 +126,12 @@ MachineBasicBlock *splitMBBAt(MachineBasicBlock *OldMBB, MachineInstr &MI) {
 
   private:
     bool removeUncountableLoops(MachineFunction &MF);
+    bool removeTooLongLoops(MachineFunction &MF);
     bool fixupLoopLayout(MachineFunction &MF);
     bool fixupLoopPreheader(MachineFunction &MF);
     bool fixupLoopLatch(MachineFunction &MF);
     bool fixupLoopInstrs(MachineFunction &MF);
+    bool fixupOneLoopLength(MachineFunction &MF);
 
   };
 
@@ -164,6 +188,7 @@ bool PULPFixupHwLoops::runOnMachineFunction(MachineFunction &MF) {
   bool removedLoops = removeUncountableLoops(MF);
   bool fixedLayout = fixupLoopLayout(MF);
   bool fixedPreHd = fixupLoopPreheader(MF);
+  removedLoops |= removeTooLongLoops(MF);
   bool fixedLatch = fixupLoopLatch(MF);
   bool fixedInstr = fixupLoopInstrs(MF);
 
@@ -274,6 +299,71 @@ bool PULPFixupHwLoops::removeUncountableLoops(MachineFunction &MF) {
                           << ": loop has " << (Latch ? "no single latch exit"
                                                      : "several back edges")
                           << ", keeping it a software loop\n");
+        ToRemove.push_back(&MI);
+      }
+    }
+  for (MachineInstr *MI : ToRemove)
+    MI->eraseFromParent();
+  return !ToRemove.empty();
+}
+
+// A loop whose end is further from its setup than any setup form can encode
+// (12-bit halfword offset of lp.setup, and of lp.endi in the long form that
+// replaces an lp.setupi) cannot be a hardware loop. Keep it a software loop
+// by deleting the setup instruction, as removeUncountableLoops does; this
+// must happen before fixupLoopLatch removes the loop's compare-and-branch.
+// The final loop is not known yet, so use an upper bound of its end offset
+// (the distance from the setup to the start of the loop's last instruction):
+// all instructions from the setup up to the terminators of the loop's last
+// block (the last instruction lies before them; it can be a NOP that
+// fixupLoopInstrs adds there), including the counter update fixupLoopLatch
+// may remove, the most alignment padding before aligned blocks, and for
+// every loop nested inside the most it can grow (long form +8 or padding
+// NOPs +4, a NOP at its end +4, alignment of its setup). PULPHardwareLoops
+// only forms loops of at most 4095 bytes (counted as 4 bytes per instruction
+// before register allocation), so this only triggers for loops that grew a
+// lot afterwards, e.g. through inline asm with many instructions.
+bool PULPFixupHwLoops::removeTooLongLoops(MachineFunction &MF) {
+  MachineLoopInfo *MLI = &getAnalysis<MachineLoopInfoWrapperPass>().getLI();
+  const int64_t G =
+      MF.getSubtarget<RISCVSubtarget>().hasStdExtCOrZca() ? 2 : 4;
+  SmallVector<MachineInstr *, 8> ToRemove;
+  for (MachineBasicBlock &MBB : MF)
+    for (MachineInstr &MI : MBB) {
+      if (!isHardwareLoop(MI))
+        continue;
+      MachineLoop *L = MLI->getLoopFor(MI.getOperand(0).getMBB());
+      assert(L && "Hardware loop end is not in a loop");
+      MachineBasicBlock *Bottom = getLayoutBottom(L);
+      int64_t Bound = 0;
+      for (auto I = MI.getIterator(), IE = MBB.instr_end(); I != IE; ++I)
+        Bound += getMISize(*I);
+      MachineBasicBlock *B = MBB.getNextNode();
+      for (; B; B = B->getNextNode()) {
+        if (int64_t(B->getAlignment().value()) > G)
+          Bound += B->getAlignment().value() - G;
+        MachineBasicBlock::instr_iterator E =
+            B == Bottom ? B->getFirstInstrTerminator() : B->instr_end();
+        for (const MachineInstr &I : make_range(B->instr_begin(), E)) {
+          Bound += getMISize(I);
+          if (isHardwareLoop(I))
+            Bound += (4 - G) + 8 + 4;
+        }
+        if (B == Bottom)
+          break;
+      }
+      if (!B)
+        continue; // The loop is not after its setup; not handled here.
+      int64_t Limit =
+          isHardwareLoopImm(MI)
+              ? MaxEndOffsetSetup - 4 // lp.endi is 4 bytes after lp.starti.
+              : std::min<int64_t>(MaxLoopRangeReg + SetupSize,
+                                  MaxEndOffsetSetup);
+      if (Bound > Limit) {
+        LLVM_DEBUG(dbgs() << "PULP hwloop fixup: " << printMBBReference(MBB)
+                          << ": loop may be " << Bound
+                          << " bytes long, more than a hardware loop can "
+                             "encode; keeping it a software loop\n");
         ToRemove.push_back(&MI);
       }
     }
@@ -669,17 +759,11 @@ bool PULPFixupHwLoops::fixupLoopLatch(MachineFunction &MF) {
   return changedOverall;
 }
 
-/// This function makes three passes over the basic blocks.  The first
-/// pass labels all loop ends. The second calculates the offset of the
-/// instructions between blocks. The third checks the length of the hardware
-/// loops, and pads them with NOPs if they are too short, or uses the explicit
-/// setup instructions if they are too long.
+/// This function makes two passes over the basic blocks. The first pass
+/// labels all loop ends. The second checks the length of the hardware loops,
+/// and pads them with NOPs if they are too short, or uses the explicit setup
+/// instructions if they are too long (fixupOneLoopLength).
 bool PULPFixupHwLoops::fixupLoopInstrs(MachineFunction &MF) {
-
-  // Offset of the current instruction from the start.
-  unsigned InstOffset = 0;
-  // Map for each basic block to it's first instruction.
-  DenseMap<const MachineBasicBlock *, unsigned> BlockToInstOffset;
 
   const RISCVInstrInfo *RII =
       static_cast<const RISCVInstrInfo *>(MF.getSubtarget().getInstrInfo());
@@ -788,164 +872,220 @@ bool PULPFixupHwLoops::fixupLoopInstrs(MachineFunction &MF) {
     }
   }
 
-  // Second pass: Compute offset from start
-  for (const MachineBasicBlock &MBB : MF) {
-    BlockToInstOffset[&MBB] = InstOffset;
-    for (const MachineInstr &MI : MBB) {
-      InstOffset += getMISize(MI);
-    }
-  }
-  
-  // Third pass: Pad with nops if short, switch to separate instructions if too
-  // long.
-  for (MachineBasicBlock &MBB : MF) {
-    InstOffset = BlockToInstOffset[&MBB];
-
-    // Loop over all the instructions.
-    MachineBasicBlock::iterator MII = MBB.begin();
-    MachineBasicBlock::iterator MIE = MBB.end();
-    while (MII != MIE) {
-      unsigned InstSize = getMISize(*MII);
-      if (MII->isMetaInstruction()) {
-        ++MII;
-        continue;
-      }
-      if (isHardwareLoop(*MII)) {
-        bool offsetIncrease = 0;
-        assert(MII->getOperand(0).isMBB() &&
-               "Expect a basic block as loop operand");
-        MachineBasicBlock *TargetBB = MII->getOperand(0).getMBB();
-
-        unsigned Diff = AbsoluteDifference(InstOffset,
-                                           BlockToInstOffset[TargetBB]);
-        signed LoopLen = Diff - getMISize(*MII);
-        // Adjust for too short or too long loops.
-        MachineBasicBlock::iterator inspt = MII;
-        DebugLoc DL = inspt->getDebugLoc();
-        inspt++;
-
-        // Handle loop lengths (address range).
-        if (isHardwareLoopImm(*MII) && LoopLen > MaxLoopRangeImm) {
-          // If the loop spans a larger address range than what can be supported
-          // by lp.setupi (five bits for relative end address), we have to
-          // switch to the separate lp.starti, lp.endi, and lp.counti
-          // instructions.
-          assert(MBB.succ_size() == 1 && "Too many successors!");
-          assert(isHardwareLoopZero(*MII) || isHardwareLoopOne(*MII));
-          MachineBasicBlock *LoopStartMBB = *MBB.succ_begin();
-          MachineInstrBuilder Start;
-          MachineInstrBuilder End;
-          MachineInstrBuilder Count;
-          // Expand into long loop setup instructions, depending on if it is
-          // loop 0 or loop 1.
-          if (isHardwareLoopZero(*MII)) {
-            Start = BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP0starti))
-                .addMBB(LoopStartMBB);
-            End = BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP0endi))
-                .addMBB(TargetBB);
-            Count = BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP0counti))
-                .addImm(MII->getOperand(1).getImm());
-          } else  if (isHardwareLoopOne(*MII)) {
-            Start = BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP1starti))
-                .addMBB(LoopStartMBB);
-            End = BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP1endi))
-                .addMBB(TargetBB);
-            Count = BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP1counti))
-                .addImm(MII->getOperand(1).getImm());
-          }
-          // Compute new loop length
-          LoopLen += getMISize(*Start.getInstr());
-          offsetIncrease += getMISize(*Start.getInstr());
-          LoopLen += getMISize(*End.getInstr());
-          offsetIncrease += getMISize(*Start.getInstr());
-          LoopLen += getMISize(*Count.getInstr());
-          offsetIncrease += getMISize(*Start.getInstr());
-          LoopLen -= getMISize(*MII);
-          offsetIncrease -= getMISize(*MII);
-          // Take address for start block.
-          LoopStartMBB->setMachineBlockAddressTaken();
-          LoopStartMBB->setLabelMustBeEmitted();
-          // This line is needed to set the hasAddressTaken flag on the
-          // BasicBlock object.
-          BlockAddress::get(
-              const_cast<BasicBlock *>(LoopStartMBB->getBasicBlock()));
-          // Remove old instruction.
-          MII->eraseFromParent();
-        }
-        if (isHardwareLoopReg(*MII) && LoopLen > MaxLoopRangeReg) {
-          // FIXME: If the loop spans a larger address range than what can fit
-          //        in lp.setup instruction format (twelve bits), I am not sure
-          //        what to do. We have no way of storing more information in
-          //        any of the "long" instructions. We'd have to roll back,
-          //        probably?
-          errs().changeColor(raw_fd_ostream::Colors::RED, true);
-          errs() << "UNHANDLED: Hardware Loop length " << LoopLen << " is "
-                 << "higher than limit for lp.setup: " << MaxLoopRangeReg
-                 << "\n";
-          errs().resetColor();
-          abort();
-        }
-        if (LoopLen < 4) {
-          // Loop length is too small (must be at least two instructions): Fill
-          // up with nops.
-          // The nops go right after the setup, where the loop starts. The
-          // setup is a terminator and a block may not continue after its
-          // terminators (the machine verifier rejects it), so when the setup
-          // ends its block, put the nops in a block of their own between it
-          // and the block it falls into. Not at the start of that block:
-          // other blocks may jump to its label and must still skip the nops.
-          // The instructions and their addresses are the same as with the
-          // nops in the setup's block.
-          MachineBasicBlock *PadMBB = &MBB;
-          MachineBasicBlock::iterator PadPt = inspt;
-          MachineBasicBlock *Next = MBB.getNextNode();
-          if (inspt == MBB.end() && Next && MBB.isSuccessor(Next)) {
-            PadMBB = MF.CreateMachineBasicBlock();
-            MF.insert(Next->getIterator(), PadMBB);
-            MBB.replaceSuccessor(Next, PadMBB);
-            PadMBB->addSuccessor(Next);
-            PadPt = PadMBB->end();
-          }
-          while (LoopLen < 4) {
-            MachineInstrBuilder NOP = BuildMI(*PadMBB, PadPt, DL,
-                                              RII->get(RISCV::ADDI));
-            NOP.addReg(RISCV::X0, RegState::Define);
-            NOP.addReg(RISCV::X0);
-            NOP.addImm(0);
-            LoopLen += getMISize(*NOP.getInstr());
-            offsetIncrease += getMISize(*NOP.getInstr());
-          }
-          if (PadMBB != &MBB) {
-            LivePhysRegs LiveRegs;
-            computeAndAddLiveIns(LiveRegs, *PadMBB);
-          }
-        }
-
-        // If the changes to the loop instructions caused the length of the
-        // basic block to increase, update the data structure to match.
-        MII = inspt;
-        if (offsetIncrease > 0) {
-          bool hasSeenOurselves = false;
-          for (const MachineBasicBlock &otherBlock : MF) {
-            // Increase the offset for all blocks after the current one.
-            // Currently we just go through the basic blocks in order, and once
-            // we have found the current basic block (MBB), we apply the change
-            // to all blocks following.
-            if (&MBB == &otherBlock) {
-              hasSeenOurselves = true;
-              continue;
-            } else if (!hasSeenOurselves) {
-              continue;
-            }
-            BlockToInstOffset[&otherBlock] += offsetIncrease;
-          }
-        }
-      } else {
-        ++MII;
-      }
-      InstOffset += InstSize;
-    }
-  }
+  // Second pass: pad loops that are too short and switch lp.setupi to the
+  // long form (lp.starti, lp.endi, lp.counti) where its end offset does not
+  // fit, based on the real sizes and addresses of all instructions.
+  //
+  // Both changes insert code, which makes every loop around the insertion
+  // point longer, including loops decided earlier (an outer loop is visited
+  // before the loops nested in it). So, like upstream branch relaxation
+  // (llvm/lib/CodeGen/BranchRelaxation.cpp), recompute the layout after each
+  // change and repeat until nothing changes. This terminates: a setup is
+  // expanded at most once and a loop is padded at most once, since loops only
+  // ever grow.
+  while (fixupOneLoopLength(MF))
+    ;
 
   return Changed;
+}
+
+namespace {
+// Size of a hardware loop in the final code.
+struct HwLoopExtent {
+  // False if the end label does not follow the setup in the layout.
+  bool EndAfterSetup = false;
+  // Upper bound of the end offset encoded in the setup instruction: bytes
+  // from the setup to the last instruction of the loop, including the
+  // alignment padding the assembler may insert in between.
+  int64_t EndOffset = 0;
+  // Instruction bytes from the loop start (after the setup) to the last
+  // instruction of the loop, without alignment padding.
+  int64_t LoopLen = 0;
+};
+} // namespace
+
+// Measures the loop set up by Setup, whose last instruction starts block End,
+// with the real size of every instruction (getInstSizeInBytes, which knows
+// which instructions will be compressed).
+//
+// Alignment: runOnMachineFunction later moves every setup that is not the
+// first instruction of its block into a new 4-byte aligned block, so the
+// assembler may insert padding before it, and before any aligned block.
+// Addresses are multiples of the instruction granularity G (2 bytes with
+// compressed instructions, else 4). If the setup itself ends up 4-byte
+// aligned, the addresses after it are known modulo 4 and padding up to
+// 4-byte alignment is known exactly. Otherwise the setup's address modulo 4
+// depends on where the function is placed, and like upstream branch
+// relaxation (BasicBlockInfo::postOffset, llvm/lib/CodeGen/BranchRelaxation
+// .cpp) the worst case is assumed: A - G bytes before an A-aligned point.
+static HwLoopExtent measureHwLoop(const MachineInstr &Setup,
+                                  const MachineBasicBlock *End) {
+  const MachineBasicBlock *SetupMBB = Setup.getParent();
+  const MachineFunction &MF = *SetupMBB->getParent();
+  const uint64_t G =
+      MF.getSubtarget<RISCVSubtarget>().hasStdExtCOrZca() ? 2 : 4;
+  const bool Known = &Setup != &SetupMBB->front() ||
+                     SetupMBB->getAlignment() >= Align(4);
+
+  HwLoopExtent E;
+  int64_t Rel = 0, Bytes = 0;
+  auto Pad = [&](Align A) {
+    if (A.value() <= G)
+      return;
+    if (!Known)
+      Rel += A.value() - G;
+    else if (A.value() <= 4)
+      Rel = alignTo(Rel, A);
+    else
+      Rel = alignTo(Rel, Align(4)) + A.value() - 4;
+  };
+  auto Add = [&](const MachineInstr &MI) {
+    int64_t Size = getMISize(MI);
+    Rel += Size;
+    Bytes += Size;
+  };
+
+  for (auto I = Setup.getIterator(), IE = SetupMBB->instr_end(); I != IE; ++I)
+    Add(*I);
+  const MachineBasicBlock *B = SetupMBB->getNextNode();
+  for (; B && B != End; B = B->getNextNode()) {
+    Pad(B->getAlignment());
+    for (const MachineInstr &MI : B->instrs()) {
+      if (isHardwareLoop(MI) && &MI != &B->front())
+        Pad(Align(4));
+      Add(MI);
+    }
+  }
+  if (!B)
+    return E;
+  Pad(End->getAlignment());
+  E.EndAfterSetup = true;
+  E.EndOffset = Rel;
+  E.LoopLen = Bytes - SetupSize;
+  return E;
+}
+
+/// Finds the first hardware loop (in layout order) that is too short or whose
+/// end offset does not fit its setup instruction, and fixes it: pads it with
+/// NOPs, or replaces lp.setupi with the long form. Returns false when every
+/// loop is fine. Called until it returns false, because each fix makes the
+/// loops around it longer.
+bool PULPFixupHwLoops::fixupOneLoopLength(MachineFunction &MF) {
+  const RISCVInstrInfo *RII =
+      static_cast<const RISCVInstrInfo *>(MF.getSubtarget().getInstrInfo());
+
+  for (MachineBasicBlock &MBB : MF) {
+    for (MachineBasicBlock::iterator MII = MBB.begin(), MIE = MBB.end();
+         MII != MIE; ++MII) {
+      if (!isHardwareLoop(*MII))
+        continue;
+      assert(MII->getOperand(0).isMBB() &&
+             "Expect a basic block as loop operand");
+      MachineBasicBlock *TargetBB = MII->getOperand(0).getMBB();
+      assert(getMISize(*MII) == SetupSize && "Unexpected setup size");
+
+      HwLoopExtent Extent = measureHwLoop(*MII, TargetBB);
+      // The end label must follow the setup; if it does not, the loop layout
+      // is broken in a way this function cannot repair, and the assembler
+      // reports the offset as out of range.
+      if (!Extent.EndAfterSetup)
+        continue;
+      int64_t RangeLen = Extent.EndOffset - SetupSize;
+      int64_t LoopLen = Extent.LoopLen;
+
+      MachineBasicBlock::iterator inspt = std::next(MII);
+      DebugLoc DL = MII->getDebugLoc();
+
+      // Handle loop lengths (address range).
+      if (isHardwareLoopImm(*MII) &&
+          RangeLen > std::min<int64_t>(MaxLoopRangeImm,
+                                       MaxEndOffsetSetupi - SetupSize)) {
+        // If the loop spans a larger address range than what can be supported
+        // by lp.setupi (five bits for relative end address), we have to
+        // switch to the separate lp.starti, lp.endi, and lp.counti
+        // instructions.
+        assert(MBB.succ_size() == 1 && "Too many successors!");
+        assert(isHardwareLoopZero(*MII) || isHardwareLoopOne(*MII));
+        MachineBasicBlock *LoopStartMBB = *MBB.succ_begin();
+        // Expand into long loop setup instructions, depending on if it is
+        // loop 0 or loop 1.
+        if (isHardwareLoopZero(*MII)) {
+          BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP0starti))
+              .addMBB(LoopStartMBB);
+          BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP0endi)).addMBB(TargetBB);
+          BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP0counti))
+              .addImm(MII->getOperand(1).getImm());
+        } else {
+          BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP1starti))
+              .addMBB(LoopStartMBB);
+          BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP1endi)).addMBB(TargetBB);
+          BuildMI(MBB, inspt, DL, RII->get(RISCV::LOOP1counti))
+              .addImm(MII->getOperand(1).getImm());
+        }
+        // Take address for start block.
+        LoopStartMBB->setMachineBlockAddressTaken();
+        LoopStartMBB->setLabelMustBeEmitted();
+        // This line is needed to set the hasAddressTaken flag on the
+        // BasicBlock object.
+        BlockAddress::get(
+            const_cast<BasicBlock *>(LoopStartMBB->getBasicBlock()));
+        // Remove old instruction.
+        MII->eraseFromParent();
+        return true;
+      }
+      if (isHardwareLoopReg(*MII) &&
+          RangeLen > std::min<int64_t>(MaxLoopRangeReg,
+                                       MaxEndOffsetSetup - SetupSize)) {
+        // FIXME: If the loop spans a larger address range than what can fit
+        //        in lp.setup instruction format (twelve bits), I am not sure
+        //        what to do. We have no way of storing more information in
+        //        any of the "long" instructions. We'd have to roll back,
+        //        probably?
+        errs().changeColor(raw_fd_ostream::Colors::RED, true);
+        errs() << "UNHANDLED: Hardware Loop length " << RangeLen << " is "
+               << "higher than limit for lp.setup: "
+               << std::min<int64_t>(MaxLoopRangeReg,
+                                    MaxEndOffsetSetup - SetupSize)
+               << "\n";
+        errs().resetColor();
+        abort();
+      }
+      if (LoopLen < 4) {
+        // Loop length is too small (must be at least two instructions): Fill
+        // up with nops.
+        // The nops go right after the setup, where the loop starts. The
+        // setup is a terminator and a block may not continue after its
+        // terminators (the machine verifier rejects it), so when the setup
+        // ends its block, put the nops in a block of their own between it
+        // and the block it falls into. Not at the start of that block:
+        // other blocks may jump to its label and must still skip the nops.
+        // The instructions and their addresses are the same as with the
+        // nops in the setup's block.
+        MachineBasicBlock *PadMBB = &MBB;
+        MachineBasicBlock::iterator PadPt = inspt;
+        MachineBasicBlock *Next = MBB.getNextNode();
+        if (inspt == MBB.end() && Next && MBB.isSuccessor(Next)) {
+          PadMBB = MF.CreateMachineBasicBlock();
+          MF.insert(Next->getIterator(), PadMBB);
+          MBB.replaceSuccessor(Next, PadMBB);
+          PadMBB->addSuccessor(Next);
+          PadPt = PadMBB->end();
+        }
+        while (LoopLen < 4) {
+          MachineInstrBuilder NOP = BuildMI(*PadMBB, PadPt, DL,
+                                            RII->get(RISCV::ADDI));
+          NOP.addReg(RISCV::X0, RegState::Define);
+          NOP.addReg(RISCV::X0);
+          NOP.addImm(0);
+          LoopLen += getMISize(*NOP.getInstr());
+        }
+        if (PadMBB != &MBB) {
+          LivePhysRegs LiveRegs;
+          computeAndAddLiveIns(LiveRegs, *PadMBB);
+        }
+        return true;
+      }
+    }
+  }
+  return false;
 }
