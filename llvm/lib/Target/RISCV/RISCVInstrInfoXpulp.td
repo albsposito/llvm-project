@@ -1583,10 +1583,12 @@ def : Pat<(i32 (sext_inreg (vector_extract GPRAV2:$rs1, uimm6:$index), i16)),
           (PV_EXTRACT_H GPRAV2:$rs1, uimm6:$index)>;
 def : Pat<(i32 (sext_inreg (vector_extract GPRAV4:$rs1, uimm6:$index), i8)),
           (PV_EXTRACT_B GPRAV4:$rs1, uimm6:$index)>;
+// A lane masked with 0xffff/0xff is a zero-extended lane: pv.extractu, not the
+// sign-extending pv.extract (backlog B112).
 def : Pat<(i32 (and (vector_extract (v2i16 GPRAV2:$rs1), uimm6:$index), 65535)),
-          (PV_EXTRACT_H GPRAV2:$rs1, uimm6:$index)>;
+          (PV_EXTRACTU_H GPRAV2:$rs1, uimm6:$index)>;
 def : Pat<(i32 (and (vector_extract (v4i8 GPRAV4:$rs1), uimm6:$index), 255)),
-          (PV_EXTRACT_B GPRAV4:$rs1, uimm6:$index)>;
+          (PV_EXTRACTU_B GPRAV4:$rs1, uimm6:$index)>;
 def : Pat<(vector_insert GPRAV2:$rd, (i32 GPR:$rs1), uimm6:$index),
           (PV_INSERT_H GPRAV2:$rd, (i32 GPR:$rs1), uimm6:$index)>;
 def : Pat<(vector_insert GPRAV4:$rd, (i32 GPR:$rs1), uimm6:$index),
