@@ -3254,58 +3254,73 @@ std::string RISCVInstrInfo::createMIROperandComment(
 }
 
 // Return true if the Snitch FPU sequencer certainly puts MI into an frep
-// repeat buffer, i.e. MI certainly counts towards an frep's N. The sequencer
-// repeats only floating-point instructions whose operands are all FP
-// registers, plus FP loads and stores (their address register is integer).
-// Integer instructions, and FP instructions that read or write an integer
-// register (fmv.x.w/fmv.w.x, int<->fp fcvt, feq/flt/fle, fclass), bypass the
-// sequencer: they run once and are not counted. The Snitch model also lets
-// fcvt.s.d/fcvt.d.s bypass it. COPYs are not counted either (the frep pass
-// does not count them and a pre-RA COPY may be coalesced away).
+// repeat buffer, i.e. MI certainly counts towards an frep's N. In the Snitch
+// model (GVSoC snitch_fast sequencer; 'nseq' tags in isa_riscv_gen.py and
+// isa_smallfloats.py) the sequencer repeats floating-point arithmetic, sign
+// injection, min/max and FP loads/stores. Everything else runs once and is
+// not counted: integer instructions, FP instructions that read or write an
+// integer register (fmv.x.*, fmv.*.x, feq/flt/fle and their vector forms,
+// fclass, int<->fp fcvt), and every conversion between FP formats (fcvt.s.d,
+// fcvt.h.s, the Xsmallfloat fcvt.b.s/fcvt.h.ab/..., vfcvt.*; fcvt.h.d and
+// fcvt.d.h are not modelled at all).
 //
-// Answering "no" for an instruction the hardware does count is safe: the
-// walk below then reaches its Nth instruction later, so the protected range
-// only grows. Answering "yes" wrongly would not be safe (the range could end
-// before the real body does), so every doubtful case answers "no".
+// So an instruction is counted only if it is certain: it is not a
+// conversion (no "CVT" in its opcode name), all its explicit register
+// operands are FP registers of one width (FPR16, FPR32 or FPR64), except the
+// integer address register of an FP load/store, and it is not a COPY, branch,
+// call, pseudo or meta instruction. Answering "no" for an instruction the
+// hardware does count is safe: the walk below then reaches its Nth
+// instruction later, so the protected range only grows. Answering "yes"
+// wrongly would not be safe (the range could end before the real body does),
+// so every doubtful case answers "no".
 static bool isFrepSequenced(const MachineInstr &MI) {
   if (MI.isMetaInstruction() || MI.isCopy() || MI.isBranch() ||
       MI.isPseudo() || MI.isCall() || MI.isInlineAsm())
     return false;
-  switch (MI.getOpcode()) {
-  case RISCV::FREP_O:
-  case RISCV::FREP_I:
-  case RISCV::FCVT_S_D:
-  case RISCV::FCVT_D_S:
+  unsigned Opc = MI.getOpcode();
+  if (Opc == RISCV::FREP_O || Opc == RISCV::FREP_I)
     return false;
-  default:
-    break;
-  }
-  const MachineRegisterInfo &MRI = MI.getMF()->getRegInfo();
-  auto IsFPR = [&MRI](Register Reg) {
+  const MachineFunction &MF = *MI.getMF();
+  if (MF.getSubtarget().getInstrInfo()->getName(Opc).contains("CVT"))
+    return false;
+  const MachineRegisterInfo &MRI = MF.getRegInfo();
+  // FP register width of Reg: 16, 32 or 64, or 0 if Reg is not an FPR.
+  auto FPRWidth = [&MRI](Register Reg) -> unsigned {
     if (Reg.isVirtual()) {
       const TargetRegisterClass *RC = MRI.getRegClass(Reg);
-      return RISCV::FPR64RegClass.hasSubClassEq(RC) ||
-             RISCV::FPR32RegClass.hasSubClassEq(RC) ||
-             RISCV::FPR16RegClass.hasSubClassEq(RC);
+      if (RISCV::FPR64RegClass.hasSubClassEq(RC))
+        return 64;
+      if (RISCV::FPR32RegClass.hasSubClassEq(RC))
+        return 32;
+      if (RISCV::FPR16RegClass.hasSubClassEq(RC))
+        return 16;
+      return 0;
     }
-    return RISCV::FPR64RegClass.contains(Reg) ||
-           RISCV::FPR32RegClass.contains(Reg) ||
-           RISCV::FPR16RegClass.contains(Reg);
+    if (RISCV::FPR64RegClass.contains(Reg))
+      return 64;
+    if (RISCV::FPR32RegClass.contains(Reg))
+      return 32;
+    if (RISCV::FPR16RegClass.contains(Reg))
+      return 16;
+    return 0;
   };
   bool IsMem = MI.mayLoadOrStore();
-  bool HasFPR = false;
+  unsigned Width = 0;
   for (const MachineOperand &MO : MI.explicit_operands()) {
     if (!MO.isReg() || !MO.getReg())
       continue;
-    if (IsFPR(MO.getReg())) {
-      HasFPR = true;
+    if (unsigned W = FPRWidth(MO.getReg())) {
+      // Mixed FP widths mean a format conversion: not counted.
+      if (Width && W != Width)
+        return false;
+      Width = W;
       continue;
     }
     // The only non-FP register allowed is the address of an FP load/store.
     if (!IsMem || MO.isDef())
       return false;
   }
-  return HasFPR;
+  return Width != 0;
 }
 
 // Return true if MI is one of the N instructions an earlier frep.o/frep.i
