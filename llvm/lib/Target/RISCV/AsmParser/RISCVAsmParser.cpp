@@ -230,6 +230,10 @@ class RISCVAsmParser : public MCTargetAsmParser {
   bool parseDirectiveAttribute();
   bool parseDirectiveInsn(SMLoc L);
   bool parseDirectiveVariantCC();
+  bool parseDirectiveFunc(bool IsEnd);
+
+  /// Name given by the open GNU-as .func directive (PULP), empty if none.
+  std::string PulpOpenFunc;
 
   /// Helper to reset target features for a new arch string. It
   /// also records the new arch string that is expanded by RISCVISAInfo
@@ -2998,6 +3002,10 @@ ParseStatus RISCVAsmParser::parseDirective(AsmToken DirectiveID) {
     return parseDirectiveInsn(DirectiveID.getLoc());
   if (IDVal == ".variant_cc")
     return parseDirectiveVariantCC();
+  // GNU-as .func/.endfunc, used by the PULP/GAP9 runtime assembly.
+  if (getSTI().hasFeature(RISCV::FeaturePULPExtV2) &&
+      (IDVal == ".func" || IDVal == ".endfunc"))
+    return parseDirectiveFunc(IDVal == ".endfunc");
 
   return ParseStatus::NoMatch;
 }
@@ -3430,6 +3438,40 @@ bool RISCVAsmParser::parseDirectiveVariantCC() {
     return true;
   getTargetStreamer().emitDirectiveVariantCC(
       *getContext().getOrCreateSymbol(Name));
+  return false;
+}
+
+/// parseDirectiveFunc
+///  ::= .func name [, label]
+///  ::= .endfunc
+/// GNU as (read.c, do_s_func) uses these only to emit STABS debug info for
+/// hand-written assembly when assembling with --gstabs; otherwise it checks
+/// that they pair up and emits nothing. The PULP/GAP9 runtime assembly uses
+/// them, and GNU as for RISC-V never emits STABS unless asked, so accept them
+/// with the same pairing checks and emit nothing.
+bool RISCVAsmParser::parseDirectiveFunc(bool IsEnd) {
+  SMLoc Loc = getLoc();
+  if (IsEnd) {
+    if (parseEOL())
+      return true;
+    if (PulpOpenFunc.empty())
+      return Error(Loc, "missing .func");
+    PulpOpenFunc.clear();
+    return false;
+  }
+  if (!PulpOpenFunc.empty())
+    return Error(Loc, ".endfunc missing for previous .func");
+  StringRef Name;
+  if (getParser().parseIdentifier(Name))
+    return TokError("expected symbol name");
+  if (parseOptionalToken(AsmToken::Comma)) {
+    StringRef Label;
+    if (getParser().parseIdentifier(Label))
+      return TokError("expected label name");
+  }
+  if (parseEOL())
+    return true;
+  PulpOpenFunc = Name.str();
   return false;
 }
 
