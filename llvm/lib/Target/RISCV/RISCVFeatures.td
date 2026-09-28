@@ -1486,17 +1486,43 @@ def FeaturePULPExtV2
 def HasPULPExtV2 : Predicate<"Subtarget->hasPULPExtV2()">,
                              AssemblerPredicate<(all_of FeaturePULPExtV2)>;
 
+// GAP9 half-precision extensions (GCC's Xf16alt and Xfvec on GAP9). Operands
+// live in the integer registers, as with Zfinx/Zhinx. GAP9's plain float16
+// ops (GCC's Xf16) are byte-identical to Zhinx and use Zhinx itself. These are
+// not the Snitch smallfloat extensions (xfalthalf, xfvechalf, ...), which use
+// the F registers and encode .ah differently; nothing here implies those.
+// Named xpulp<subset> like the PULP 22 branch's Xpulp subsets; the names end
+// in a letter so the ISA-string parser does not read a version off them.
+// Features only for now: the instructions come with a later task (B90 T2).
+// bfloat16 ("float16alt") scalar ops in GPRs.
+def FeatureVendorXpulpf16alt
+    : RISCVExtension<1, 0, "PULP bfloat16 scalar in integer registers",
+                     [FeatureStdExtZfinx]>;
+def HasVendorXpulpf16alt
+    : Predicate<"Subtarget->hasVendorXpulpf16alt()">,
+      AssemblerPredicate<(all_of FeatureVendorXpulpf16alt),
+                         "'Xpulpf16alt' (PULP bfloat16 scalar in integer registers)">;
+// Packed 2 x 16-bit float ops (v2h, v2ah) in one GPR.
+def FeatureVendorXpulpfvec
+    : RISCVExtension<1, 0, "PULP packed half-precision in integer registers",
+                     [FeaturePULPExtV2, FeatureStdExtZfinx]>;
+def HasVendorXpulpfvec
+    : Predicate<"Subtarget->hasVendorXpulpfvec()">,
+      AssemblerPredicate<(all_of FeatureVendorXpulpfvec),
+                         "'Xpulpfvec' (PULP packed half-precision in integer registers)">;
+
 // GAP9 chip, spelled like GAP9 GCC's -march=rv32imcxgap9 (GCC's multilib name
 // for it is RV32IMFCXgap9: xgap9 brings single-precision float, which GAP9
 // keeps in the integer registers, i.e. Zfinx). Implies the PULPv2 set GAP9
-// has. The ISA-string parser reads trailing digits as a version, so, as with
+// has, and GAP9's half-precision float (Zhinx for float16, Xpulpf16alt for
+// float16alt, Xpulpfvec for v2h/v2ah; GAP9 has no 8-bit float or Xfaux).
+// The ISA-string parser reads trailing digits as a version, so, as with
 // "xpulpv2" (xpulpv version 2.0), "xgap9" is extension "xgap" version 9.0;
 // other versions (xgap8, xgap10) are rejected.
-// TODO: fp16 (Zhinx/smallfloat) is not implied until clang supports GAP9's
-// float16/float16alt types (backlog B90).
 def FeatureVendorXgap9
     : RISCVExtension<9, 0, "GAP9 chip",
-                     [FeaturePULPExtV2, FeatureStdExtZfinx]> {
+                     [FeaturePULPExtV2, FeatureStdExtZfinx, FeatureStdExtZhinx,
+                      FeatureVendorXpulpf16alt, FeatureVendorXpulpfvec]> {
   let Name = "xgap";
   let Desc = "'Xgap9' (GAP9 chip)";
 }
