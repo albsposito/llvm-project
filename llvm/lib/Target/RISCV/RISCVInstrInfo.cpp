@@ -1022,6 +1022,13 @@ bool RISCVInstrInfo::analyzeBranch(MachineBasicBlock &MBB,
   int NumTerminators = 0;
   for (auto J = I.getReverse(); J != MBB.rend() && isUnpredicatedTerminator(*J);
        J++) {
+    // The PULP hardware loop end marker (placed by PULPFixupHwLoops) stands
+    // for the implicit jump back to the loop start. It is a branch without
+    // condition operands, which the code below cannot express: the block is
+    // unanalyzable, as blocks ending in ARM's t2LoopEnd or t2LoopEndDec are
+    // for ARMBaseInstrInfo::analyzeBranch.
+    if (J->getOpcode() == RISCV::PseudoLOOPend)
+      return true;
     NumTerminators++;
     if (J->getDesc().isUnconditionalBranch() ||
         J->getDesc().isIndirectBranch()) {

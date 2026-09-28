@@ -338,6 +338,10 @@ void RISCVAsmPrinter::emitInstruction(const MachineInstr *MI) {
   case TargetOpcode::PATCHABLE_TAIL_CALL:
     LowerPATCHABLE_TAIL_CALL(MI);
     return;
+  case RISCV::PseudoLOOPend:
+    // PULP hardware loop end marker (PULPFixupHwLoops): the hardware jumps
+    // back by itself, there is no instruction to emit.
+    return;
   }
 
   MCInst OutInst;
