@@ -97,6 +97,7 @@ FunctionPass *createPULPHardwareLoops();
 void initializePULPHardwareLoopsPass(PassRegistry &);
 
 FunctionPass *createPULPFixupHwLoops();
+void initializePULPFixupHwLoopsPass(PassRegistry &);
 
 FunctionPass *createRISCVExpandSSRPass();
 void initializeRISCVExpandSSRPass(PassRegistry &);

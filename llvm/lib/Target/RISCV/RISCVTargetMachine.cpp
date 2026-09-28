@@ -149,6 +149,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeRISCVTarget() {
   initializeSNITCHFrepLoopsPass(*PR);
   initializeRISCVExpandSDMAPass(*PR);
   initializePULPHardwareLoopsPass(*PR);
+  initializePULPFixupHwLoopsPass(*PR);
 }
 
 static StringRef computeDataLayout(const Triple &TT,
