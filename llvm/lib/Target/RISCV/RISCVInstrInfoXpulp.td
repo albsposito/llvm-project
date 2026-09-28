@@ -928,11 +928,6 @@ def between
                [(smin (smax node:$value, node:$lowerBound), node:$upperBound),
                 (smax (smin node:$value, node:$upperBound), node:$lowerBound)]>;
 
-def betweenu
-    : PatFrags<(ops node:$upperBound, node:$value),
-               [(umin (umax node:$value, 0), node:$upperBound),
-                (umax (umin node:$value, node:$upperBound), 0)]>;
-
 
 // p.clipu clamps to [0, hi] with signed compares (GVSoC lib_CLIPU: a > hi -> hi,
 // a <= 0 -> 0), so the idiom is a signed clamp. umin(smax(x, 0), hi) is the same
@@ -942,6 +937,34 @@ def clipu_idiom
                [(smin (smax node:$value, 0), node:$upperBound),
                 (smax (smin node:$value, node:$upperBound), 0),
                 (umin (smax node:$value, 0), node:$upperBound)]>;
+
+// p.clipr rD, rs1, rs2 clamps to [~rs2, rs2] (GVSoC p_clip_exec: low = -rs2 - 1,
+// high = rs2, then lib_CLIP: a < low -> low, a > high -> high). That equals
+// smin(smax(x, ~b), b) and smax(smin(x, b), ~b) only when b >= 0: for b < 0 the
+// idioms give b (resp. ~b) for every x, while p.clipr returns ~b for x < ~b and
+// b otherwise. So the idiom is matched only when the bound's sign bit is known
+// to be zero; otherwise p.max/p.min are selected, as GAP9 GCC does.
+def clipr_idiom
+    : PatFrag<(ops node:$bound, node:$value),
+              (between (not node:$bound), node:$bound, node:$value), [{
+  return CurDAG->SignBitIsZero(Operands[0]);
+}]> {
+  let PredicateCodeUsesOperands = 1;
+}
+
+// p.clipur rD, rs1, rs2 clamps to [0, rs2] with signed compares (GVSoC
+// p_clipu_exec / lib_CLIPU: a > rs2 -> rs2, a <= 0 -> 0). That equals the signed
+// clamp clipu_idiom only when rs2 >= 0 (for rs2 < 0 the idiom gives rs2 for every
+// x, p.clipur gives 0 for x <= rs2). Constant bounds are left to the p.clipu
+// immediate pattern and to p.max/p.min, as before.
+def clipur_idiom
+    : PatFrag<(ops node:$bound, node:$value),
+              (clipu_idiom node:$bound, node:$value), [{
+  return !isa<ConstantSDNode>(Operands[0]) &&
+         CurDAG->SignBitIsZero(Operands[0]);
+}]> {
+  let PredicateCodeUsesOperands = 1;
+}
 
 // The bounds must be sign-compared: getZExtValue() of an i32 constant has the
 // upper 32 bits clear, so ~ of it never equals the other bound.
@@ -1290,11 +1313,11 @@ def : Pat<(and (i32 GPR:$rs1), 0xff  ), (P_EXTBZ (i32 GPR:$rs1))>;
 
 def : Pat<(clip negativePowerOf2_imm, powerOf2Minus1_imm_pulp:$upperBound, (i32 GPR:$rs1)),
           (P_CLIP (i32 GPR:$rs1), (trailing1sPlus1_pulp imm:$upperBound))>;
-def : Pat<(between (not (i32 GPR:$rs2)), (i32 GPR:$rs2), (i32 GPR:$rs1)),
+def : Pat<(clipr_idiom (i32 GPR:$rs2), (i32 GPR:$rs1)),
           (P_CLIPR (i32 GPR:$rs1), (i32 GPR:$rs2))>;
 def : Pat<(clipu_idiom powerOf2Minus1_imm_pulp:$upperBound, (i32 GPR:$rs1)),
           (P_CLIPU (i32 GPR:$rs1), (trailing1sPlus1_pulp imm:$upperBound))>;
-def : Pat<(betweenu (i32 GPR:$rs2), (i32 GPR:$rs1)),
+def : Pat<(clipur_idiom (i32 GPR:$rs2), (i32 GPR:$rs1)),
           (P_CLIPUR (i32 GPR:$rs1), (i32 GPR:$rs2))>;
 
 def : Pat<(sra (add (i32 GPR:$rs1), (i32 GPR:$rs2)), uimm5:$Is3),
