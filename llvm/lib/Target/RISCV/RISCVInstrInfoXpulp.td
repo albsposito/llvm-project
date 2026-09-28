@@ -96,6 +96,15 @@ def mask                : TImmLeaf<XLenVT, [{ return isMask_32(Imm);         }]>
 def flippedMask         : TImmLeaf<XLenVT, [{ return isMask_32(~Imm);        }]>;
 def shiftedMask         : TImmLeaf<XLenVT, [{ return isShiftedMask_32(Imm);  }]>;
 def shiftedFlippedMask  : TImmLeaf<XLenVT, [{ return isShiftedMask_32(~Imm); }]>;
+// ImmLeaf twins of shiftedMask/shiftedFlippedMask for the plain-C p.bset/p.bclr
+// idioms (x | C, x & C): their constant is an ordinary Constant, which a TImmLeaf
+// never matches. Like upstream Zbs BCLRMask/SingleBitSetMask
+// (RISCVInstrInfoZb.td:61-72), masks that fit a 12-bit signed immediate are left
+// to a single andi/ori. 0xffff is left to p.exthz.
+def shiftedMask_imm        : ImmLeaf<XLenVT, [{
+  return isShiftedMask_32(Imm) && !isInt<12>(Imm); }]>;
+def shiftedFlippedMask_imm : ImmLeaf<XLenVT, [{
+  return isShiftedMask_32(~Imm) && !isInt<12>(Imm) && Imm != 0xffff; }]>;
 // Bit-field width of the bextract builtins, 1..32; p.extract[u] encodes width-1.
 def bitFieldWidth       : TImmLeaf<XLenVT, [{ return Imm >= 1 && Imm <= 32; }]>;
 
@@ -1243,7 +1252,7 @@ def : Pat<(or (and (i32 GPR:$dest), (not (maskFromRegs (i32 GPR:$widthMinus1), (
 
 // bclr
 // widthMinus1 and shift immediates
-def : Pat<(and (i32 GPR:$rs1), shiftedFlippedMask:$mask),
+def : Pat<(and (i32 GPR:$rs1), shiftedFlippedMask_imm:$mask),
           (P_BCLR (i32 GPR:$rs1), (flippedMaskWidthMinus1 imm:$mask), (trailing1s imm:$mask))>;
 
 // widthMinus1 immediate
@@ -1269,7 +1278,7 @@ def : Pat<(and (not (maskFromRegs (i32 GPR:$widthMinus1), (i32 GPR:$shift))), (i
 
 // bset
 // widthMinus1 and shift immediates
-def : Pat<(or (i32 GPR:$rs1), shiftedMask:$mask),
+def : Pat<(or (i32 GPR:$rs1), shiftedMask_imm:$mask),
           (P_BSET (i32 GPR:$rs1), (maskWidthMinus1 imm:$mask), (trailing0s imm:$mask))>;
 
 // widthMinus1 immediate
