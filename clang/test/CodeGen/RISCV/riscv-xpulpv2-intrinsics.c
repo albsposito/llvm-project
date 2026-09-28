@@ -271,11 +271,11 @@ int32_t test_builtin_pulp_adduRN_r(void) {
 
 // CHECK-LABEL: @test_builtin_pulp_clip(
 // CHECK-NEXT:  entry:
-// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.clip(i32 -10, i32 -4, i32 15)
+// CHECK-NEXT:    [[RES:%.*]] = call i32 @llvm.riscv.pulp.clip(i32 -10, i32 -16, i32 15)
 // CHECK-NEXT:    ret i32 [[RES]]
 //
 int32_t test_builtin_pulp_clip(void) {
-  return __builtin_pulp_clip(-10, -4, 15);
+  return __builtin_pulp_clip(-10, -16, 15);
 }
 
 // CHECK-LABEL: @test_builtin_pulp_clip_r(

@@ -33,7 +33,7 @@ void test_builtin_pulp_diag(int32_t *data) {
   (void) __builtin_pulp_adduN_r(11, 2, 1); // expected-error {{'__builtin_pulp_adduN_r' needs target feature xpulpv}}
   (void) __builtin_pulp_adduRN(11, 2, 2u, 2u); // expected-error {{'__builtin_pulp_adduRN' needs target feature xpulpv}}
   (void) __builtin_pulp_adduRN_r(11, 2, 1); // expected-error {{'__builtin_pulp_adduRN_r' needs target feature xpulpv}}
-  (void) __builtin_pulp_clip(-10, -4, 15); // expected-error {{'__builtin_pulp_clip' needs target feature xpulpv}}
+  (void) __builtin_pulp_clip(-10, -16, 15); // expected-error {{'__builtin_pulp_clip' needs target feature xpulpv}}
   (void) __builtin_pulp_clip_r(-10, 4); // expected-error {{'__builtin_pulp_clip_r' needs target feature xpulpv}}
   (void) __builtin_pulp_clipu(20, 0, 15); // expected-error {{'__builtin_pulp_clipu' needs target feature xpulpv}}
   (void) __builtin_pulp_clipu_r(10, 2); // expected-error {{'__builtin_pulp_clipu_r' needs target feature xpulpv}}
