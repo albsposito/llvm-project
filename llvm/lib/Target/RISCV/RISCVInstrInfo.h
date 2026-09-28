@@ -41,6 +41,12 @@ enum CondCode {
   COND_GE,
   COND_LTU,
   COND_GEU,
+  // PULP immediate branches (p.beqimm/p.bneimm) compare a register with a
+  // 5-bit immediate. They need their own condition codes so that a branch
+  // rebuilt by insertBranch/reverseBranchCondition stays a PULP immediate
+  // branch instead of becoming BEQ/BNE (or CORE-V cv.beqimm/cv.bneimm).
+  COND_P_BEQIMM,
+  COND_P_BNEIMM,
   COND_INVALID
 };
 

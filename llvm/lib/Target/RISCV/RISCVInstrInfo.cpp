@@ -931,9 +931,9 @@ static RISCVCC::CondCode getCondFromBranchOpc(unsigned Opc) {
   case RISCV::BGEU:
     return RISCVCC::COND_GEU;
   case RISCV::P_BEQIMM:
-    return RISCVCC::COND_EQ;
+    return RISCVCC::COND_P_BEQIMM;
   case RISCV::P_BNEIMM:
-    return RISCVCC::COND_NE;
+    return RISCVCC::COND_P_BNEIMM;
   }
 }
 
@@ -968,6 +968,10 @@ unsigned RISCVCC::getBrCond(RISCVCC::CondCode CC, bool Imm) {
     return RISCV::BLTU;
   case RISCVCC::COND_GEU:
     return RISCV::BGEU;
+  case RISCVCC::COND_P_BEQIMM:
+    return RISCV::P_BEQIMM;
+  case RISCVCC::COND_P_BNEIMM:
+    return RISCV::P_BNEIMM;
   }
 }
 
@@ -992,6 +996,10 @@ RISCVCC::CondCode RISCVCC::getOppositeBranchCondition(RISCVCC::CondCode CC) {
     return RISCVCC::COND_GEU;
   case RISCVCC::COND_GEU:
     return RISCVCC::COND_LTU;
+  case RISCVCC::COND_P_BEQIMM:
+    return RISCVCC::COND_P_BNEIMM;
+  case RISCVCC::COND_P_BNEIMM:
+    return RISCVCC::COND_P_BEQIMM;
   }
 }
 
@@ -1225,7 +1233,12 @@ bool RISCVInstrInfo::optimizeCondBranch(MachineInstr &MI) const {
   RISCVCC::CondCode CC = static_cast<RISCVCC::CondCode>(Cond[0].getImm());
   assert(CC != RISCVCC::COND_INVALID);
 
-  if (CC == RISCVCC::COND_EQ || CC == RISCVCC::COND_NE)
+  // The rewrites below only apply to register-register BLT/BGE/BLTU/BGEU. PULP
+  // immediate branches (p.beqimm/p.bneimm) compare against an immediate and
+  // are skipped like BEQ/BNE (before they had their own condition codes they
+  // were reported as COND_EQ/COND_NE and returned here).
+  if (CC == RISCVCC::COND_EQ || CC == RISCVCC::COND_NE ||
+      CC == RISCVCC::COND_P_BEQIMM || CC == RISCVCC::COND_P_BNEIMM)
     return false;
 
   // For two constants C0 and C1 from
