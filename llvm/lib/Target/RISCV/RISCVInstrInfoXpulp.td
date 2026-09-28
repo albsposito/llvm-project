@@ -745,9 +745,11 @@ def LOOP1count : Instruction, Sched<[ReadIALU, WriteCSR]> {
 // instruction and the machine verifier can check the function. It is not an
 // instruction of the ISA: it has size 0 and the asm printer emits nothing for
 // it. Same role as Hexagon's ENDLOOP0 (HexagonPseudo.td), which the Hexagon
-// MC lowering also turns into no instruction word.
+// MC lowering also turns into no instruction word. isMeta: no code, so no
+// line-table row (DwarfDebug) and no asm-printer instruction count either, as
+// for AMDGPU's zero-size WAVE_BARRIER/SCHED_BARRIER (SIInstructions.td).
 let isBranch = 1, isTerminator = 1, hasSideEffects = 0, mayLoad = 0,
-    mayStore = 0, Size = 0 in
+    mayStore = 0, Size = 0, isMeta = 1 in
 def PseudoLOOPend : Pseudo<(outs), (ins simm13_lsb0:$header), []>;
 
 // Bit manipulation operations
