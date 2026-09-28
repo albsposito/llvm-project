@@ -223,3 +223,14 @@ def pulp_OffsetedWrite : PULPBuiltin<"void(int, int *, int)", "xpulpv">;
 def pulp_OffsetedWriteByte : PULPBuiltin<"void(int, char *, int)", "xpulpv">;
 def pulp_OffsetedWriteHalf : PULPBuiltin<"void(int, short *, int)", "xpulpv">;
 } // Attributes = [NoThrow]
+
+// GAP9 PMSIS memory builtins (task 20/F016). Prototypes are the ones GAP9 GCC
+// declares for the same builtins (void * base, int offset):
+//  - event_unit_read_fenced: p.elw, event-unit load that sleeps the core until
+//    the event unit answers; a full compiler memory barrier (PMSIS evt_read32).
+//  - OffsetedWritePtr: store of a pointer at base + offset (sw / p.sw) that
+//    is never removed as a dead store (PMSIS GAP_WRITE_PTR).
+let Attributes = [NoThrow] in {
+def pulp_event_unit_read_fenced : PULPBuiltin<"int(void *, int)", "xpulpv">;
+def pulp_OffsetedWritePtr : PULPBuiltin<"void(void *, void *, int)", "xpulpv">;
+} // Attributes = [NoThrow]
