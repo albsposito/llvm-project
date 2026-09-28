@@ -1486,6 +1486,24 @@ def FeaturePULPExtV2
 def HasPULPExtV2 : Predicate<"Subtarget->hasPULPExtV2()">,
                              AssemblerPredicate<(all_of FeaturePULPExtV2)>;
 
+// GAP9 chip, spelled like GAP9 GCC's -march=rv32imcxgap9 (GCC's multilib name
+// for it is RV32IMFCXgap9: xgap9 brings single-precision float, which GAP9
+// keeps in the integer registers, i.e. Zfinx). Implies the PULPv2 set GAP9
+// has. The ISA-string parser reads trailing digits as a version, so, as with
+// "xpulpv2" (xpulpv version 2.0), "xgap9" is extension "xgap" version 9.0;
+// other versions (xgap8, xgap10) are rejected.
+// TODO: fp16 (Zhinx/smallfloat) is not implied until clang supports GAP9's
+// float16/float16alt types (backlog B90).
+def FeatureVendorXgap9
+    : RISCVExtension<9, 0, "GAP9 chip",
+                     [FeaturePULPExtV2, FeatureStdExtZfinx]> {
+  let Name = "xgap";
+  let Desc = "'Xgap9' (GAP9 chip)";
+}
+def HasVendorXgap9 : Predicate<"Subtarget->hasVendorXgap9()">,
+                     AssemblerPredicate<(all_of FeatureVendorXgap9),
+                                        "'Xgap9' (GAP9 chip)">;
+
 def FeatureExtXfrep
     : RISCVExtension<0, 1, "'Xfrep' (Floating-Point Repetition)"> {
   let Name = "xfrep";
