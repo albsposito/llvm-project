@@ -80,6 +80,11 @@ private:
   /// any are used, its register is reserved. one-hot coded
   unsigned UsedSSR = 0;
 
+  /// Largest instruction count N of any frep.o/frep.i in this function, set
+  /// by the Snitch frep pass; 0 if the function has no frep. Lets the
+  /// scheduling-boundary check skip functions without frep.
+  unsigned MaxFrepBody = 0;
+
   int64_t StackProbeSize = 0;
 
   /// Does it probe the stack for a dynamic allocation?
@@ -122,6 +127,9 @@ public:
 
   unsigned getUsedSSR() const { return UsedSSR; }
   void setUsedSSR(unsigned SSR) { UsedSSR = SSR; }
+
+  unsigned getMaxFrepBody() const { return MaxFrepBody; }
+  void noteFrepBody(unsigned N) { MaxFrepBody = std::max(MaxFrepBody, N); }
 
   bool useSaveRestoreLibCalls(const MachineFunction &MF) const {
     // We cannot use fixed locations for the callee saved spill slots if the

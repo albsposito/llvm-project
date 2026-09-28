@@ -3260,30 +3260,81 @@ std::string RISCVInstrInfo::createMIROperandComment(
   return Comment;
 }
 
-// Return true if MI is one of the instructions repeated by an frep.o/frep.i.
-// frep repeats the next N (operand 1) instructions in program order, so the
-// frep may sit in an earlier block that falls through into MI's block (the
-// frep pass leaves the loop control block address-taken, so branch folding
-// never merges it into the block holding the frep).
+// Return true if the Snitch FPU sequencer certainly puts MI into an frep
+// repeat buffer, i.e. MI certainly counts towards an frep's N. The sequencer
+// repeats only floating-point instructions whose operands are all FP
+// registers, plus FP loads and stores (their address register is integer).
+// Integer instructions, and FP instructions that read or write an integer
+// register (fmv.x.w/fmv.w.x, int<->fp fcvt, feq/flt/fle, fclass), bypass the
+// sequencer: they run once and are not counted. The Snitch model also lets
+// fcvt.s.d/fcvt.d.s bypass it. COPYs are not counted either (the frep pass
+// does not count them and a pre-RA COPY may be coalesced away).
 //
-// Only instructions that certainly are part of the body are counted: meta
-// instructions emit nothing, and COPYs and branches are not counted by the
-// frep pass either (pre-RA COPYs may later be coalesced away). Counting fewer
-// instructions than the hardware can only mark extra instructions as
-// boundaries, which costs scheduling freedom but never leaves a body
-// instruction unprotected.
-static bool isInFrepBody(const MachineInstr &MI) {
-  // Debug and other meta instructions emit nothing, so they are not part of
-  // the repeated body and may be moved freely.
-  if (MI.isMetaInstruction())
+// Answering "no" for an instruction the hardware does count is safe: the
+// walk below then reaches its Nth instruction later, so the protected range
+// only grows. Answering "yes" wrongly would not be safe (the range could end
+// before the real body does), so every doubtful case answers "no".
+static bool isFrepSequenced(const MachineInstr &MI) {
+  if (MI.isMetaInstruction() || MI.isCopy() || MI.isBranch() ||
+      MI.isPseudo() || MI.isCall() || MI.isInlineAsm())
     return false;
-  auto IsCounted = [](const MachineInstr &I) {
-    return !I.isMetaInstruction() && !I.isCopy() && !I.isBranch();
+  switch (MI.getOpcode()) {
+  case RISCV::FREP_O:
+  case RISCV::FREP_I:
+  case RISCV::FCVT_S_D:
+  case RISCV::FCVT_D_S:
+    return false;
+  default:
+    break;
+  }
+  const MachineRegisterInfo &MRI = MI.getMF()->getRegInfo();
+  auto IsFPR = [&MRI](Register Reg) {
+    if (Reg.isVirtual()) {
+      const TargetRegisterClass *RC = MRI.getRegClass(Reg);
+      return RISCV::FPR64RegClass.hasSubClassEq(RC) ||
+             RISCV::FPR32RegClass.hasSubClassEq(RC) ||
+             RISCV::FPR16RegClass.hasSubClassEq(RC);
+    }
+    return RISCV::FPR64RegClass.contains(Reg) ||
+           RISCV::FPR32RegClass.contains(Reg) ||
+           RISCV::FPR16RegClass.contains(Reg);
   };
-  // The frep instruction-count field is 12 bits wide (N - 1 is encoded).
-  const unsigned MaxFrepBody = 4096;
-  // Counted instructions after the frep up to and including MI.
-  unsigned Distance = IsCounted(MI) ? 1 : 0;
+  bool IsMem = MI.mayLoadOrStore();
+  bool HasFPR = false;
+  for (const MachineOperand &MO : MI.explicit_operands()) {
+    if (!MO.isReg() || !MO.getReg())
+      continue;
+    if (IsFPR(MO.getReg())) {
+      HasFPR = true;
+      continue;
+    }
+    // The only non-FP register allowed is the address of an FP load/store.
+    if (!IsMem || MO.isDef())
+      return false;
+  }
+  return HasFPR;
+}
+
+// Return true if MI is one of the N instructions an earlier frep.o/frep.i
+// repeats. frep repeats the next N sequenced instructions in program order,
+// whatever the block boundaries: the frep pass leaves the loop control block
+// address-taken, so branch folding never merges it into the block holding the
+// frep, and frep.o may end one block while its body starts the fallthrough
+// block. So the walk continues into the layout predecessor when that block
+// can flow into the current one.
+//
+// The frep and each of its N sequenced instructions become scheduling
+// boundaries. Instructions the sequencer does not repeat (integer code,
+// fmv.x.w, ...) stay schedulable, but only inside the gaps between two of
+// these boundaries, so no instruction can enter or leave the repeated body.
+// Because isFrepSequenced errs towards "no", the Nth counted instruction is
+// never before the hardware's Nth, so the protected range always covers the
+// real body.
+static bool isInFrepBody(const MachineInstr &MI, unsigned MaxN) {
+  if (!isFrepSequenced(MI))
+    return false;
+  // Sequenced instructions after the frep up to and including MI.
+  unsigned Distance = 1;
   const MachineBasicBlock *MBB = MI.getParent();
   MachineBasicBlock::const_iterator I = MI.getIterator();
   while (true) {
@@ -3291,7 +3342,8 @@ static bool isInFrepBody(const MachineInstr &MI) {
       --I;
       if (I->getOpcode() == RISCV::FREP_O || I->getOpcode() == RISCV::FREP_I)
         return Distance <= static_cast<uint64_t>(I->getOperand(1).getImm());
-      if (IsCounted(*I) && ++Distance > MaxFrepBody)
+      // No frep in this function covers more than MaxN instructions.
+      if (isFrepSequenced(*I) && ++Distance > MaxN)
         return false;
     }
     // Continue into the layout predecessor if control can fall through from
@@ -3312,12 +3364,18 @@ bool RISCVInstrInfo::isSchedulingBoundary(const MachineInstr &MI,
     return true;
   }
 
-  // frep repeats exactly the N instructions that follow it. Keep each of them
-  // in place: otherwise the scheduler can interleave an unrelated instruction
-  // into the repeated body (it would then run N times and a body instruction
-  // would run only once), or move a body instruction out of it.
-  if (STI.hasExtXfrep() && isInFrepBody(MI))
-    return true;
+  // frep repeats the next N floating-point instructions. Keep the frep and
+  // everything up to its Nth FP instruction in place: otherwise the scheduler
+  // can move an unrelated FP instruction into the repeated body (it would
+  // then run N times and a body instruction would run only once), or move a
+  // body instruction out of it.
+  // Functions without frep (the frep pass records the largest N) pay only
+  // this check.
+  if (STI.hasExtXfrep()) {
+    unsigned MaxN = MF.getInfo<RISCVMachineFunctionInfo>()->getMaxFrepBody();
+    if (MaxN && isInFrepBody(MI, MaxN))
+      return true;
+  }
 
   switch (MI.getOpcode()) {
     case RISCV::LOOP0setup:
