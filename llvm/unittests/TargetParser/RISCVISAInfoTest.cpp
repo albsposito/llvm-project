@@ -1118,6 +1118,8 @@ R"(All available -march extensions for RISC-V
     xmempool             0.1
     xmipscmove           1.0
     xmipslsp             1.0
+    xpulpf16alt          1.0
+    xpulpfvec            1.0
     xpulpv               2.0
     xsfcease             1.0
     xsfvcp               1.0
