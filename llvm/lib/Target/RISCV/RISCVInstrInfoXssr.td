@@ -97,9 +97,13 @@ class SPseudoSetupBoundStride:
   let usesCustomInserter = 0;
 }
 
+// Push/pop advance the hidden state of their data stream, so like their
+// intrinsics (int_riscv_ssr_push/pop, unknown memory effects) they both may load
+// and may store. This matches the flags TableGen infers for upstream's XCore
+// stream instructions IN_2r/OUT_2r from int_xcore_in/int_xcore_out.
 class SPseudoPush:
       Pseudo<(outs), (ins uimm5:$ssr, FPR64:$val),[]> {
-  let mayLoad = 0;
+  let mayLoad = 1;
   let mayStore = 1;
   let hasSideEffects = 1;
   let usesCustomInserter = 0;
@@ -108,7 +112,7 @@ class SPseudoPush:
 class SPseudoPop:
       Pseudo<(outs FPR64:$val), (ins uimm5:$ssr),[]> {
   let mayLoad = 1;
-  let mayStore = 0;
+  let mayStore = 1;
   let hasSideEffects = 1;
   let usesCustomInserter = 0;
 }
