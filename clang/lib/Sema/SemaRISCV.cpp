@@ -631,6 +631,25 @@ bool SemaRISCV::CheckBuiltinFunctionCall(const TargetInfo &TI,
     // that takes int args, let's narrow it here...
     return static_cast<int>(Result.getSExtValue());
   };
+  // Clip bounds: as GAP9 GCC requires, the bounds must be Min = -2^(N-1)
+  // (signed) or Min = 0 (unsigned) and Max = 2^(N-1)-1, with 1 <= N <= 30.
+  // p.clip/p.clipu encode only N (from Max), so mismatched bounds would be
+  // silently ignored, and N = 32 (INT_MIN/INT_MAX) does not fit the 5-bit
+  // field. GCC also rejects N = 31; mirror it exactly.
+  auto CheckPulpClipBounds = [&](bool Signed) -> bool {
+    llvm::APSInt Lo, Hi;
+    if (SemaRef.BuiltinConstantArg(TheCall, 1, Lo) ||
+        SemaRef.BuiltinConstantArg(TheCall, 2, Hi))
+      return true;
+    int64_t L = Lo.getSExtValue(), H = Hi.getSExtValue();
+    if (H >= 0 && H <= (INT64_C(1) << 29) - 1 && llvm::isPowerOf2_64(H + 1) &&
+        L == (Signed ? -(H + 1) : 0))
+      return false;
+    return Diag(TheCall->getBeginLoc(), diag::err_riscv_pulp_builtin_clip_bounds)
+           << Signed << L << H
+           << SourceRange(TheCall->getArg(1)->getBeginLoc(),
+                          TheCall->getArg(2)->getEndLoc());
+  };
   // Indicate, if present, the position of well-known immediate arguments.
   std::optional<int> RoundArgNum;
   std::optional<int> NormArgNum;
@@ -1413,15 +1432,19 @@ bool SemaRISCV::CheckBuiltinFunctionCall(const TargetInfo &TI,
     if (SemaRef.BuiltinConstantArgRange(TheCall, 4, 0, 31))
       return true;
     break;
-  case RISCV::BI__builtin_pulp_clip: NegPow2ArgNum = 1; Pow2ComplArgNum = 2; break;
-  case RISCV::BI__builtin_pulp_clipu: Pow2ComplArgNum = 2;
-    if (SemaRef.BuiltinConstantArgRange(TheCall, 1, 0, 0))
+  case RISCV::BI__builtin_pulp_clip: NegPow2ArgNum = 1; Pow2ComplArgNum = 2;
+    if (CheckPulpClipBounds(/*Signed=*/true))
       return true;
     break;
-  // Bit extract: size + offset <= 32
+  case RISCV::BI__builtin_pulp_clipu: Pow2ComplArgNum = 2;
+    if (SemaRef.BuiltinConstantArgRange(TheCall, 1, 0, 0) ||
+        CheckPulpClipBounds(/*Signed=*/false))
+      return true;
+    break;
+  // Bit extract: size >= 1 and size + offset <= 32 (as GAP9 GCC requires)
   case RISCV::BI__builtin_pulp_bextract:
   case RISCV::BI__builtin_pulp_bextractu:
-    if (SemaRef.BuiltinConstantArgRange(TheCall, 1, 0, 32) ||
+    if (SemaRef.BuiltinConstantArgRange(TheCall, 1, 1, 32) ||
         SemaRef.BuiltinConstantArgRange(TheCall, 2, 0, 32))
       return true;
     if (ArgValue(1) + ArgValue(2) > 32)
