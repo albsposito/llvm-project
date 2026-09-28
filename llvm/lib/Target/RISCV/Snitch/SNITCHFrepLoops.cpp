@@ -15,6 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "../RISCVInstrInfo.h"
+#include "../RISCVMachineFunctionInfo.h"
 #include "../RISCVRegisterInfo.h"
 #include "../RISCVSubtarget.h"
 #include "llvm/ADT/SmallVector.h"
@@ -513,6 +514,9 @@ bool SNITCHFrepLoops::convertToHardwareLoop(MachineLoop *L) {
                       .addImm(0)
                       .addImm(0);
     KnownHardwareLoops.insert(hwloop.getInstr());
+    // Tell RISCVInstrInfo::isSchedulingBoundary this function has an frep.
+    TopBlock->getParent()->getInfo<RISCVMachineFunctionInfo>()->noteFrepBody(
+        nFlops);
   } else {
     assert(TripCount->isImm() &&
            "Expecting immediate value for trip count if not register");
@@ -529,6 +533,9 @@ bool SNITCHFrepLoops::convertToHardwareLoop(MachineLoop *L) {
                       .addImm(0)
                       .addImm(0);
     KnownHardwareLoops.insert(hwloop.getInstr());
+    // Tell RISCVInstrInfo::isSchedulingBoundary this function has an frep.
+    TopBlock->getParent()->getInfo<RISCVMachineFunctionInfo>()->noteFrepBody(
+        nFlops);
   }
   delete TripCount;
 
