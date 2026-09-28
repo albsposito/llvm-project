@@ -737,6 +737,19 @@ def LOOP1count : Instruction, Sched<[ReadIALU, WriteCSR]> {
     let AsmString = "lp.count\tx1, $uimmS";
 }
 
+// End of a hardware loop range, placed by PULPFixupHwLoops as the terminator
+// of the block that holds the last instruction of the loop. It stands for the
+// jump back to the loop start ($header) that the hardware performs when it
+// reaches the end address with iterations left, so that the machine CFG
+// (whose back edge LoopEnd -> header already exists) is explained by an
+// instruction and the machine verifier can check the function. It is not an
+// instruction of the ISA: it has size 0 and the asm printer emits nothing for
+// it. Same role as Hexagon's ENDLOOP0 (HexagonPseudo.td), which the Hexagon
+// MC lowering also turns into no instruction word.
+let isBranch = 1, isTerminator = 1, hasSideEffects = 0, mayLoad = 0,
+    mayStore = 0, Size = 0 in
+def PseudoLOOPend : Pseudo<(outs), (ins simm13_lsb0:$header), []>;
+
 // Bit manipulation operations
 def P_EXTRACT :   Pulp_ALU_rii   <0b11, 0b000, "p.extract">;
 def P_EXTRACTU :  Pulp_ALU_rii   <0b11, 0b001, "p.extractu">;
