@@ -1357,9 +1357,13 @@ def : Pat<(srl (add (sub (i32 GPR:$rd), (i32 GPR:$rs1)), (roundBit (i32 GPR:$rs2
           (P_SUBURNR (i32 GPR:$rd), (i32 GPR:$rs1), (i32 GPR:$rs2))>;
 
 // Patterns for immediate branching Operations
-def : Pat<(brcond (XLenVT (seteq (i32 GPR:$rs1), simm5:$imm5)), bb:$imm12),
+// RISC-V lowers brcond to riscv_brcc before selection, so match that node (as
+// CORE-V does for cv.beqimm/cv.bneimm in RISCVInstrInfoXCV.td). No
+// AddedComplexity: comparisons with 0 keep BccPat's beqz/bnez (compressible
+// c.beqz/c.bnez), like GAP9 GCC.
+def : Pat<(riscv_brcc (i32 GPR:$rs1), simm5:$imm5, SETEQ, bb:$imm12),
           (P_BEQIMM (i32 GPR:$rs1), simm5:$imm5, simm13_lsb0:$imm12)>;
-def : Pat<(brcond (XLenVT (setne (i32 GPR:$rs1), simm5:$imm5)), bb:$imm12),
+def : Pat<(riscv_brcc (i32 GPR:$rs1), simm5:$imm5, SETNE, bb:$imm12),
           (P_BNEIMM (i32 GPR:$rs1), simm5:$imm5, simm13_lsb0:$imm12)>;
 
 def : Pat<(add (i32 GPR:$rd), (mul (i32 GPR:$rs1), (i32 GPR:$rs2))),
