@@ -1038,6 +1038,15 @@ CountValue *PULPHardwareLoops::computeCount(MachineLoop *Loop,
   // preserved in Cmp.
   assert((Cmp == Comparison::NE || CmpLess) && "Unexpected comparison");
 
+  // Recheck the immediate ranges for the roles after the swap: an immediate
+  // Start is used negated ("ADDI End, -Start"), an immediate End as
+  // "ADDI $x0, End". The check above covers the roles before the swap; an end
+  // constant substituted above for a count-down loop becomes Start here, and
+  // -2048 cannot be negated in a 12-bit immediate.
+  if ((Start->isImm() && (!isInt<12>(immStart) || !isInt<12>(-immStart))) ||
+      (End->isImm() && !isInt<12>(immEnd)))
+    return nullptr;
+
   // Is the ordered loop's distance known to be in range at the loop entry,
   // so that no runtime guard is needed?
   bool NeedGuard =
