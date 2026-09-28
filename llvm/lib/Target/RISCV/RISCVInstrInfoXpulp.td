@@ -944,6 +944,46 @@ let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in {
 
 } // Predicates = [IsRV32, HasPULPExtV2], DecoderNamespace = "RV32Xpulp"
 
+// Assembler-only aliases that the PULP/GAP9 GNU assembler accepts (binutils
+// opcodes/riscv-opc.c, "Xpulpv2" entries with the base MATCH_* encodings):
+// the p. spelling of the base loads and stores with an immediate offset and no
+// post-increment ('!'), and p.mul. They assemble to the plain RV32I/M
+// instruction, exactly as GNU as does; EmitPriority = 0 keeps the printer and
+// the disassembler on the base spelling. Same shape as the upstream
+// "lw $rd, (${rs1})" aliases in RISCVInstrInfo.td and the CORE-V cv.muls
+// aliases in RISCVInstrInfoXCV.td. GNU as gates p.mul on Xpulpv2 alone (PULP
+// cores always have the multiplier), so no M/Zmmul predicate is added.
+let Predicates = [IsRV32, HasPULPExtV2], EmitPriority = 0 in {
+  def : InstAlias<"p.lb $rd, ${imm12}(${rs1})",
+                  (LB  GPR:$rd, GPRMem:$rs1, simm12:$imm12)>;
+  def : InstAlias<"p.lbu $rd, ${imm12}(${rs1})",
+                  (LBU GPR:$rd, GPRMem:$rs1, simm12:$imm12)>;
+  def : InstAlias<"p.lh $rd, ${imm12}(${rs1})",
+                  (LH  GPR:$rd, GPRMem:$rs1, simm12:$imm12)>;
+  def : InstAlias<"p.lhu $rd, ${imm12}(${rs1})",
+                  (LHU GPR:$rd, GPRMem:$rs1, simm12:$imm12)>;
+  def : InstAlias<"p.lw $rd, ${imm12}(${rs1})",
+                  (LW  GPR:$rd, GPRMem:$rs1, simm12:$imm12)>;
+  def : InstAlias<"p.sb $rs2, ${imm12}(${rs1})",
+                  (SB  GPR:$rs2, GPRMem:$rs1, simm12:$imm12)>;
+  def : InstAlias<"p.sh $rs2, ${imm12}(${rs1})",
+                  (SH  GPR:$rs2, GPRMem:$rs1, simm12:$imm12)>;
+  def : InstAlias<"p.sw $rs2, ${imm12}(${rs1})",
+                  (SW  GPR:$rs2, GPRMem:$rs1, simm12:$imm12)>;
+
+  def : InstAlias<"p.lb $rd, (${rs1})",  (LB  GPR:$rd, GPR:$rs1, 0)>;
+  def : InstAlias<"p.lbu $rd, (${rs1})", (LBU GPR:$rd, GPR:$rs1, 0)>;
+  def : InstAlias<"p.lh $rd, (${rs1})",  (LH  GPR:$rd, GPR:$rs1, 0)>;
+  def : InstAlias<"p.lhu $rd, (${rs1})", (LHU GPR:$rd, GPR:$rs1, 0)>;
+  def : InstAlias<"p.lw $rd, (${rs1})",  (LW  GPR:$rd, GPR:$rs1, 0)>;
+  def : InstAlias<"p.sb $rs2, (${rs1})", (SB  GPR:$rs2, GPR:$rs1, 0)>;
+  def : InstAlias<"p.sh $rs2, (${rs1})", (SH  GPR:$rs2, GPR:$rs1, 0)>;
+  def : InstAlias<"p.sw $rs2, (${rs1})", (SW  GPR:$rs2, GPR:$rs1, 0)>;
+
+  def : InstAlias<"p.mul $rd, $rs1, $rs2",
+                  (MUL GPR:$rd, GPR:$rs1, GPR:$rs2)>;
+} // Predicates = [IsRV32, HasPULPExtV2], EmitPriority = 0
+
 //===----------------------------------------------------------------------===//
 // Codegen pattern templates
 //===----------------------------------------------------------------------===//
