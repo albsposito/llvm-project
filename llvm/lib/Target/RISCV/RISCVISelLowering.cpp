@@ -22223,6 +22223,18 @@ bool RISCVTargetLowering::allowsMisalignedMemoryAccesses(
     return Subtarget.enableUnalignedScalarMem();
   }
 
+  // PULP packed SIMD: v2i16 and v4i8 live in GPRs and are loaded/stored as a
+  // plain 32-bit lw/sw (LOAD/STORE are promoted to i32 above), so they have
+  // exactly the alignment rules of an i32 scalar access, not the RVV
+  // element-alignment rule below. Answering "element aligned is fine" here
+  // made the DAG combiner merge two adjacent i16 (or four i8) copies into one
+  // v2i16 (v4i8) access that legalization split back up, forever.
+  if (Subtarget.hasPULPExtV2() && (VT == MVT::v2i16 || VT == MVT::v4i8)) {
+    if (Fast)
+      *Fast = Subtarget.enableUnalignedScalarMem();
+    return Subtarget.enableUnalignedScalarMem();
+  }
+
   // All vector implementations must support element alignment
   EVT ElemVT = VT.getVectorElementType();
   if (Alignment >= ElemVT.getStoreSize() || Subtarget.hasPULPExtV2()) {
