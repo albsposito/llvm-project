@@ -753,14 +753,17 @@ bool PULPFixupHwLoops::fixupLoopInstrs(MachineFunction &MF) {
         // analysis treats the block as unanalyzable, like any block ending
         // in a target-specific loop branch. The asm printer emits nothing
         // for it, so addresses and the loop length computed below do not
-        // change.
+        // change. It carries no source location: with -g it must not change
+        // the line table, and the debug-info writer takes the last located
+        // instruction of a block as the line the block leaves with (for
+        // is_stmt on the successor, DwarfDebug::findForceIsStmtInstrs).
         MachineLoopInfo *MLI =
             &getAnalysis<MachineLoopInfoWrapperPass>().getLI();
         if (MachineLoop *L = MLI->getLoopFor(LastMBB)) {
           MachineBasicBlock *Header = L->getHeader();
           if (LoopEnd->isSuccessor(Header))
-            BuildMI(*LoopEnd, LoopEnd->getFirstTerminator(),
-                    MII->getDebugLoc(), RII->get(RISCV::PseudoLOOPend))
+            BuildMI(*LoopEnd, LoopEnd->getFirstTerminator(), DebugLoc(),
+                    RII->get(RISCV::PseudoLOOPend))
                 .addMBB(Header);
         }
 
