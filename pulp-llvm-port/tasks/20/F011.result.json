@@ -1,0 +1,63 @@
+{
+ "status": "done",
+ "branch": "work/20/F011",
+ "commits": [
+  "2936dfa5fdec",
+  "9f2568dcad5e"
+ ],
+ "commit_roles": {
+  "2936dfa5fdec": "fixup! [pulp] clang-builtins: RISC-V builtins and their Sema checks -- clang/lib/Sema/SemaRISCV.cpp + clang/include/clang/Basic/DiagnosticSemaKinds.td (new err_riscv_pulp_builtin_clip_bounds)",
+  "9f2568dcad5e": "fixup! [pulp] tests: fork-authored lit tests and pipeline expectations -- owner exception B12; trailers Test-Regen: notes/20/F011-regen.md, Owner-Exception: notes/20/owner-test-exceptions.md#b12; 3 hand-edited lines"
+ },
+ "note": "notes/20/F011.md",
+ "regen_report": "notes/20/F011-regen.md",
+ "signature_gone": true,
+ "retry": "Previous attempt's uncommitted diff saved to logs/20-F011.prev-attempt.diff (no git stash). Reviewed against my own GAP9 GCC probes: its logic was correct and was kept. Only its comment was fixed, because it wrongly implied that N=31 cannot be encoded. Worktree was already at integration head abe1ba6bf62d, so no rebase was needed.",
+ "rules_implemented": {
+  "clip": "Min == -(Max+1), Max == 2^(N-1)-1, 1 <= N <= 30 (Max <= 536870911)",
+  "clipu": "Min == 0, Max == 2^(N-1)-1, 1 <= N <= 30",
+  "bextract/bextractu": "Size in [1,32] (was [0,32]); Offset in [0,32] and Size+Offset <= 32 unchanged; together = GCC 'Size>0, Offset>=0, (Size+Offset)<=32'",
+  "deviation_from_task_text": "Task said hi <= 2^30-1; GAP9 GCC actually rejects Max=1073741823 (N=31) and accepts up to 536870911 (N=30). Task asked to mirror GCC's exact rules, so the cap is 2^29-1."
+ },
+ "rule8": "Pre-existing fork defect: fork commit f1b7aebff8c2 '[LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms' (Federico Ficarelli 2022-08-25), found by git log -S'NegPow2ArgNum' and -S'err_riscv_pulp_builtin_bextract_range' over e6c3289804a6..pulp/integer_SIMD_fix. Reference: GAP9 GCC diagnostics (logs/20-F011.gcc-probes.log). Upstream CORE-V cv_alu_clip takes a single bound with no Sema check (BuiltinsRISCVXCV.td:31, RISCVInstrInfoXCV.td:723,771 @llvmorg-20.1.8), so there is no upstream code to copy.",
+ "verification": {
+  "build": "scripts/build.sh clang (+ lit tools) exit 0; cluster_errors.py: 0 clusters (logs/20-F011.after.log)",
+  "gcc_probes": "48 probes: F011 accept/reject == GCC on all 48; int-20 accepted 6 that GCC rejects (logs/20-F011.repro.log vs logs/20-F011.fix.log)",
+  "exhaustive_sweep": "2913 calls: F011 accept/reject == GCC on all; 1116 accepted by all three compilers, F011 asm identical to int-20 for all 1116; 96 previously accepted now rejected with 'bounds must be ...'; 66 bextract Size=0 cases that int-20 failed with backend 'Cannot select' now get a Sema error; 0 backend errors with F011 (logs/20-F011-sweep/)",
+  "previously_accepted_now_rejected_examples": "clip(x,-4,15) -> 'bounds must be -2^(N-1) and 2^(N-1)-1 with 1 <= N <= 30 (got -4 and 15)'; clip(x,INT_MIN,INT_MAX); clipu(x,0,1073741823) -> 'bounds must be 0 and 2^(N-1)-1 ...'; bextract(x,0,5) -> 'argument value 0 is outside the valid range [1, 32]'",
+  "gap9_sweep": "benchmarks/gap9-sweep/run.py in a scratch copy with GAP9_EXTRA_COMPILERS=int20,mine: both compile 54 rows; 226/226 output files identical (.o byte-identical, .dis identical apart from the path header) (logs/20-F011.gap9sweep.log)",
+  "sdk_repro": "steps/20/fixes/repro.sh on 20 SDK files that use gap_clip/gap_clipu/gap_bitextract[u] (incl. DSP_Libraries DctLibraryFix.c, MatAddDSP.c, MatMulDSP.c) at O2/O3/Os: 9 compile with both compilers, with identical objects; 51 fail identically with both for unrelated reasons (missing g722_private.h, fp16 'v2u' header config). A static check of all 851 call sites finds only valid constants (logs/20-F011.sdk.log)",
+  "simulator": "GVSoC: sim/tests/clip.c 'CLIP: ALL OK, mismatches=0'; logs/20-F002-sim/clipall.c 'CLIPALL: ALL OK, mismatches=0' (logs/20-F011.sim.log)",
+  "fuzzer": "hwloop-fuzz seeds 5000-5299 x O2/O3/Os: all 900 compiles give asm identical to int-20; no new crash, hang or wrong result (logs/20-F011.fuzz.log)",
+  "lit": "scripts/wlit.sh over LIT_PATHS + data/fork-tests.txt: 4777 tests, 4776 passed, 1 failed = llvm/test/CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (known failure, data/known-failures.txt). Before the test commit, exactly riscv-xpulpv2-intrinsics.c and -diag.c failed on the new diagnostic (logs/20-F011.lit-before-tests.v.log). Both pass after (logs/20-F011.lit.log)",
+  "test_commit_codegen": "clip(-10,-4,15) on int-20 and clip(-10,-16,15) on F011 both give 'li a0,-10; p.clip a0,a0,5'; llc gives p.clip a0,a0,5 for Min=-4 and Min=-16 (logs/20-F011.fix.log)",
+  "policy_check": "0 FAIL, 2 WARN (expected test-edit WARNs asking the reviewer to check the regen report)"
+ },
+ "tests_edited": {
+  "clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics.c:274": "CHECK-NEXT pulp.clip(i32 -10, i32 -4, i32 15) -> (i32 -10, i32 -16, i32 15)",
+  "clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics.c:278": "__builtin_pulp_clip(-10, -4, 15) -> (-10, -16, 15)",
+  "clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics-diag.c:36": "__builtin_pulp_clip(-10, -4, 15) -> (-10, -16, 15)",
+  "not_edited": "llvm/test/CodeGen/RISCV/intrinsics/xpulpv.ll:318 passes the same (-4, 15) bounds straight to the IR intrinsic llvm.riscv.pulp.clip. It never goes through Sema, still passes, and is outside the B12 exception (which covers builtin calls). The backend itself does not check Min against Max (see other_errors_seen)."
+ },
+ "other_errors_seen": [
+  "hwloop-fuzz seeds 5050 and 5183 (with N/M/K from one.sh) produce wrong results on GVSoC vs the GAP9 GCC reference at O2, O3 and Os, with assembly identical between int-20 and F011, so the bug is pre-existing and not caused by this change. Both programs use hardware loops (lp.* count 6-8 and 1). Not investigated; possibly related to B03/B04. Reproduce with logs/20-F011.fuzz-one.sh <seed> from a copy of benchmarks/hwloop-fuzz.",
+  "The IR intrinsics llvm.riscv.pulp.clip/clipu and llvm.riscv.pulp.bextract[u] still accept inconsistent bounds or out-of-range values at the IR level (e.g. xpulpv.ll clip(-10,-4,15) encodes from Max only; clip with Max=INT_MAX gives immediate 32). This matters only for IR not produced by clang's builtins. Possible hardening: an IR verifier/ISel guard. Not in scope.",
+  "SDK DSP_Libraries MatAddDSP.c/MatMulDSP.c and CNN_Libraries files do not compile via steps/20/fixes/repro.sh because FastFloatApprox16.h needs fp16 vector typedefs (v2u) from the SDK's GAP9 build config. Harness limitation in repro.sh, identical for int-20."
+ ],
+ "proposed_test": {
+  "file": "clang/test/CodeGen/RISCV/riscv-xpulpv2-clip-extract-range.c (new)",
+  "run": "// RUN: %clang_cc1 -triple riscv32 -target-feature +xpulpv -fsyntax-only -verify %s",
+  "checks": [
+   "__builtin_pulp_clip(x, -128, 127); __builtin_pulp_clip(x, -1, 0); __builtin_pulp_clip(x, -536870912, 536870911); // no diagnostic",
+   "__builtin_pulp_clip(x, -4, 15); // expected-error {{bounds must be -2^(N-1) and 2^(N-1)-1 with 1 <= N <= 30 (got -4 and 15)}}",
+   "__builtin_pulp_clip(x, -1073741824, 1073741823); // expected-error {{bounds must be -2^(N-1)}}",
+   "__builtin_pulp_clip(x, -2147483647-1, 2147483647); // expected-error {{bounds must be}}",
+   "__builtin_pulp_clipu(x, 0, 255); __builtin_pulp_clipu(x, 0, 0); __builtin_pulp_clipu(x, 0, 536870911); // no diagnostic",
+   "__builtin_pulp_clipu(x, 0, 1073741823); // expected-error {{bounds must be 0 and 2^(N-1)-1}}",
+   "__builtin_pulp_bextract(x, 1, 31); __builtin_pulp_bextractu(x, 32, 0); // no diagnostic",
+   "__builtin_pulp_bextract(x, 0, 5); // expected-error {{argument value 0 is outside the valid range [1, 32]}}",
+   "__builtin_pulp_bextractu(x, 16, 24); // expected-error {{size and offset arguments must be such that size + offset <= 32}}"
+  ],
+  "fails_before_fix": "yes on int-20: the clip(-4,15), clip Max 2^30-1/INT_MAX and clipu Max 2^30-1 lines are accepted, and bextract Size=0 gets no Sema diagnostic"
+ }
+}

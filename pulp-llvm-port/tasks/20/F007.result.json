@@ -1,0 +1,37 @@
+{
+ "status": "done",
+ "branch": "work/20/F007",
+ "commits": [
+  "53aa20faf0b3"
+ ],
+ "integration_head": "b0f18c5a6b886a603fab13304ec9452bdb604f4a",
+ "note": "notes/20/F007.md",
+ "signature_gone": true,
+ "summary": "One passes-cluster fixup to PULPHardwareLoops.cpp. B01 and B02 are handled in one commit because both come from the same place: computeCount did not implement Hexagon's comparison-dependent count. The fix restores Hexagon's latch negation, declines EQ-continue loops, uses Hexagon's imm/imm path, adds the equality/ceil adjustment, ports the upstream 89adc2d4f93b runtime distance check as an SLT/SLTU mask guard (on the first compared value, so a wrapping first step is also exact), and leaves the guard out when a dominating branch proves the distance. loopCountMayWrapOrUnderFlow is re-enabled and ported for != loops (constants via checkForImmediate, range checks read from branches since RISC-V has no analyzeCompare, a dominating Start!=End proof accepted first). BGEU/COND_GEU are now unsigned. The fork's $x0 COPY is kept as it was, so unchanged loops get identical code. Pre-existing defect from fork commit f1b7aebff8c2.",
+ "verification": {
+  "oracle": "logs/20-F007/oracle.py + orun.sh: 1330 functions (18+7 C do/while shapes as int and unsigned; 1280 IR loops covering every icmp predicate, cont/exit orientation, steps +-1/+-2/+4, end %m/$x0/3/-1, guarded or not; n=-5..100, m in {-3,0,1,7,50,100}) on GVSoC, expected counts from host C/IR semantics. Base (e2bc52b and b0f18c5): 239 BAD + 108 HANG out of 1330. Fix: 1330/1330 OK at O2, O3 and Os. Results in logs/20-F007/res/.",
+  "gap9_sweep": "54/54 compiled kernel TUs (O2+O3) have byte-identical disassembly vs baseline b0f18c5 (logs/20-F007-sweep/build/{base,mine}); the 5 TUs that fail, fail the same way on both (front-end errors).",
+  "sdk_drivers": "54 kernel/opt pairs (FIR k01/k02, MatMul k03-k07, FFT k10a, the rest): all match GAP9 GCC; checksums, cycles and kernel objects identical to baseline (logs/20-F007/runtime_summary.txt).",
+  "fuzzer": "seeds 1-240 x O2/O3/Os, both builds simulated (logs/20-F007-fuzz/summary.txt): 0 regressions; the pre-existing seed 27 O2/O3 MISMATCH (tail-dup layout defect) is unchanged; 24/720 compiles change asm; 2292 -> 2285 hwloops formed.",
+  "lit": "fork tests 65/65 PASS (including xpulp-hwloop-countdown.ll); CodeGen/RISCV+MC/RISCV 2581/2582, the only failure is known-failure rvv/vsetvli-insert-zve64f.mir.",
+  "policy_check": "0 FAIL, 1 WARN (diff-size 561 lines; one root cause, see note)."
+ },
+ "other_errors_seen": [
+  "Pre-existing, not fixed: seed 27 (hwloop-fuzz) O2/O3 MISMATCH on baseline and fix alike. Tail duplication leaves two lp.setup in two predecessors of one loop (F003 reviewer's finding).",
+  "Missed optimisation from this change: 7 of 2292 fuzzer hardware loops are no longer formed (seeds 10,17,111,138,214). They are != loops whose start could equal the end value unless you reason past the dominating guard, e.g. (m&3)!=0 implies m!=0. The re-enabled wrap check declines them. Unguarded do{}while(--u!=0) is declined for the same reason. LSR drops nsw/nuw from the IV update, so no-wrap flags cannot be used.",
+  "Limit, same as Hexagon: a count of 2^32 cannot be represented. An ordered loop whose IV would pass the type's max (End within step of INT_MAX/UINT_MAX) is not exact; that is UB for signed C and an endless loop for unsigned.",
+  "Pre-existing sweep TU failures, unrelated and identical on the baseline: k05/k06/k07/k10 -file TUs and k10b (front-end errors: v2h argument type, AT_L2_EVENT, __builtin_pulp_add2div2)."
+ ],
+ "proposed_test": {
+  "file": "llvm/test/CodeGen/RISCV/xpulp-hwloop-tripcount.ll",
+  "run": "; RUN: llc -mtriple=riscv32 -mattr=+m,+xpulpv -O2 < %s | FileCheck %s",
+  "content": "The F003 reviewer IR shapes (logs/20-F003-review/ge.ll: ge0, gem, eqhdr; shapes.ll: eqm, ne0, eq0exit), plus an unguarded do{}while(--i>=0) with a register bound and an unsigned (i+=2)<m loop. Generate the checks with update_llc_test_checks.py. Key checks: ge0 -> 'addi aN, a1, 1' then 'lp.setup x0, aN'; gem -> 'sub' + 'addi 1' + lp.setup; eqm/eqhdr -> no lp.setup; the unguarded loops -> slt/sltu, neg, and, addi 1 in front of lp.setup."
+ },
+ "evidence_paths": [
+  "logs/20-F007.repro.log",
+  "logs/20-F007/",
+  "logs/20-F007-sweep/",
+  "logs/20-F007-fuzz/summary.txt",
+  "notes/20/F007.md"
+ ]
+}

@@ -1,0 +1,28 @@
+{
+  "status": "done",
+  "branch": "work/20/T010",
+  "base": "abe1ba6bf62d7293b33981f923c8444d18d46366",
+  "commits": ["ccd15908573ce536f0e876a520763a4d7a50838b"],
+  "note": "notes/20/T010.md",
+  "regen_report": "notes/20/T010-regen.md",
+  "signature_gone": true,
+  "new_tests": [
+    "clang/test/CodeGen/RISCV/riscv-xpulpv2-rn-builtins-range.c",
+    "llvm/test/CodeGen/RISCV/xpulp-clip-extract-imm.ll",
+    "llvm/test/CodeGen/RISCV/xpulp-hwloop-countdown.ll",
+    "llvm/test/CodeGen/RISCV/xpulp-hwloop-layout.ll",
+    "llvm/test/CodeGen/RISCV/xpulp-hwloop-obj.ll",
+    "llvm/test/CodeGen/RISCV/xpulp-postinc-f32.ll",
+    "llvm/test/CodeGen/RISCV/xpulp-postinc-f32-mir.ll",
+    "llvm/test/CodeGen/RISCV/xpulpv2-simd-cost-model.ll",
+    "llvm/test/CodeGen/RISCV/xpulp-lsr-postinc-heuristic.ll"
+  ],
+  "lit_log": "logs/20-T010.lit.log",
+  "before_after_log": "logs/20-T010.before-after.log",
+  "policy_log": "logs/20-T010.policy.json",
+  "summary": "9/9 pass on build/int-20 and via scripts/wlit.sh on build/20-T010; 8/9 fail on toolchains/port-20; E007 test passes on port-20 (E007 predates port-20-green) and fails on a reverted probe build without the Xpulpv2 AMK_PostIndexed branch. port-20fix/port-20fix2 isolate each fix (F006 tests fail only on port-20fix2, which lacks only F006). data/fork-tests.txt already listed all nine paths (harness commit 77e0563d8a0b), so it is unchanged. F004/F001 tests placed under CodeGen/RISCV dirs because LIT_PATHS does not cover Analysis/CostModel or clang/test/Sema.",
+  "other_errors_seen": [
+    "Worktree was not clean at start: nine untracked draft tests from an earlier attempt (2026-09-27 23:20-23:28), two of which (xpulp-postinc-f32.ll, xpulpv2-simd-cost-model.ll) had been removed. I kept and re-verified the seven drafts (update scripts reproduce them byte-identically) and regenerated the two missing ones.",
+    "xpulp-hwloop-obj.ll and xpulp-postinc-f32.ll also need 20/F003: on port-20 they crash first in PULP Hardware Loops (@workn, @dot_stride) before reaching the R001/F006 behaviour; isolation evidence in logs/20-T010.before-after.log and logs/20-T010.r001-isolate.log"
+  ]
+}

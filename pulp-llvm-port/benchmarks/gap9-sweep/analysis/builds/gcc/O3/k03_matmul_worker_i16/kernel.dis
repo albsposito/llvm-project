@@ -1,0 +1,67 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/gap9-sweep/analysis/builds/gcc/O3/k03_matmul_worker_i16/kernel.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <matmul_worker>:
+       0: 1141         	addi	sp, sp, -0x10
+       2: c622         	sw	s0, 0xc(sp)
+       4: 4540         	lw	s0, 0xc(a0)
+       6: c426         	sw	s1, 0x8(sp)
+       8: c24a         	sw	s2, 0x4(sp)
+       a: c04e         	sw	s3, 0x0(sp)
+       c: 06805a63     	blez	s0, 0x80 <.L1>
+      10: 01452383     	lw	t2, 0x14(a0)
+      14: 06705663     	blez	t2, 0x80 <.L1>
+      18: 01052f03     	lw	t5, 0x10(a0)
+      1c: 4504         	lw	s1, 0x8(a0)
+      1e: 00239913     	slli	s2, t2, 0x2
+      22: 4281         	li	t0, 0x0
+      24: 0386         	slli	t2, t2, 0x1
+      26: 4f81         	li	t6, 0x0
+
+00000028 <.L4>:
+      28: 03ef8e33     	mul	t3, t6, t5
+      2c: ffe38893     	addi	a7, t2, -0x2
+      30: 0018d893     	srli	a7, a7, 0x1
+      34: 00548eb3     	add	t4, s1, t0
+      38: 4301         	li	t1, 0x0
+      3a: 0885         	addi	a7, a7, 0x1
+      3c: 01cf09b3     	add	s3, t5, t3
+      40: 0986         	slli	s3, s3, 0x1
+      42: 0e06         	slli	t3, t3, 0x1
+      44: 0198c07b     	lp.setup	x0, a7, 0x19
+      48: 4601         	li	a2, 0x0
+      4a: 03e05463     	blez	t5, 0x72 <.L8>
+      4e: 4118         	lw	a4, 0x0(a0)
+      50: 4154         	lw	a3, 0x4(a0)
+      52: 41c987b3     	sub	a5, s3, t3
+      56: 17f9         	addi	a5, a5, -0x2
+      58: 8385         	srli	a5, a5, 0x1
+      5a: 969a         	add	a3, a3, t1
+      5c: 9772         	add	a4, a4, t3
+      5e: 4601         	li	a2, 0x0
+      60: 0785         	addi	a5, a5, 0x1
+      62: 0067c0fb     	lp.setup	x1, a5, 0x6
+      66: 0027158b     	p.lh	a1, 0x2(a4!)
+      6a: 1076f80b     	p.lh	a6, t2(a3!)
+
+0000006e <.L16>:
+      6e: 42b80633     	p.mac	a2, a6, a1
+
+00000072 <.L8>:
+      72: 00cea22b     	p.sw	a2, 0x4(t4!)
+
+00000076 <.L17>:
+      76: 0309         	addi	t1, t1, 0x2
+      78: 0f85         	addi	t6, t6, 0x1
+      7a: 92ca         	add	t0, t0, s2
+      7c: fa8f96e3     	bne	t6, s0, 0x28 <.L4>
+
+00000080 <.L1>:
+      80: 4432         	lw	s0, 0xc(sp)
+      82: 44a2         	lw	s1, 0x8(sp)
+      84: 4912         	lw	s2, 0x4(sp)
+      86: 4982         	lw	s3, 0x0(sp)
+      88: 0141         	addi	sp, sp, 0x10
+      8a: 8082         	ret

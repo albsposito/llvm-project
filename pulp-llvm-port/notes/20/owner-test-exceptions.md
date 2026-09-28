@@ -25,3 +25,5 @@ The owner approved adding the regression tests proposed in the `proposed_test` f
 ## B12 — stricter builtin range checks: approved (2026-09-27)
 
 The owner approved making `__builtin_pulp_clip`, `__builtin_pulp_clipu` and `__builtin_pulp_bextract[u]` reject what GAP9 GCC rejects (clip: lo == -(hi+1); clip/clipu: hi <= 2^30-1; bextract: Size >= 1), including updating the existing fork test calls that use now-invalid arguments (e.g. `clip(-10,-4,15)`) to valid ones. Done by task 20/F011 (worker plus a test-regen commit), independently reviewed.
+
+Note on B12 (2026-09-28): the owner's intent was "reject what GAP9 GCC rejects". GCC accepts clip/clipu upper bounds only up to 2^29-1 (N <= 30), so task 20/F011 caps at 2^29-1, not the 2^30-1 written above; the independent review (tasks/20/F011.review.json) confirmed GCC rejects 2^30-1.

@@ -1,0 +1,141 @@
+function                          instrs     cycles
+KerFirSeqf32                      194720     196175
+rt_hash                            86952     121728
+KerFirSeqBaselinef32               44400      44432
+rt_hex                             11822      13878
+fill_int_f32                        5774       8656
+rt_dump_f32                         5400       8481
+rt_range                            4785      11963
+copy_f32                            4609       6911
+.Lpcrel_hi3                         4510       5637
+rt_puts                             2373       3409
+
+hottest PCs in KerFirSeqf32 (count, cycles, pc, insn):
+       5       10  000cbc  addi	sp, sp, -0x40
+       5        5  000cbe  sw	ra, 0x3c(sp)
+       5        5  000cc0  sw	s0, 0x38(sp)
+       5        5  000cc2  sw	s1, 0x34(sp)
+       5        5  000cc4  sw	s2, 0x30(sp)
+       5        5  000cc6  sw	s3, 0x2c(sp)
+       5        5  000cc8  sw	s4, 0x28(sp)
+       5        5  000cca  sw	s5, 0x24(sp)
+       5        5  000ccc  sw	s6, 0x20(sp)
+       5        5  000cce  sw	s7, 0x1c(sp)
+       5        5  000cd0  sw	s8, 0x18(sp)
+       5        5  000cd2  sw	s9, 0x14(sp)
+       5        5  000cd4  sw	s10, 0x10(sp)
+       5        0  000cd6  sw	s11, 0xc(sp)
+       5        5  000cd8  li	a5, 0x2
+       5        5  000cda  blt	a4, a5, 0xe82 <KerFirSeqf32+0x1c6>
+       5        5  000cde  srli	a5, a4, 0x1f
+       5        5  000ce2  srai	s1, a3, 0x1f
+       5        5  000ce6  p.addn	a7, a4, a5, 0x1
+       5        5  000cea  srli	s1, s1, 0x1e
+       5        5  000cec  p.addn	a5, a3, s1, 0x2
+       5        5  000cf0  add	s1, s1, a3
+       5        5  000cf2  li	s0, 0x4
+       5        5  000cf4  andi	a6, s1, -0x4
+       5        5  000cf8  blt	a3, s0, 0xe1a <KerFirSeqf32+0x15e>
+       5        5  000cfc  li	t2, 0x0
+       5        5  000cfe  addi	t0, a1, 0x8
+       5        5  000d02  addi	t1, a0, 0x10
+       5        5  000d06  slli	a5, a5, 0x4
+       5        5  000d08  slli	t5, a3, 0x2
+       5        5  000d0c  add	s3, t0, a5
+       5        5  000d10  add	t4, a5, a0
+       5        5  000d14  add	t3, a1, a5
+       5        5  000d18  addi	t4, t4, 0x4
+       5        5  000d1a  addi	t5, t5, 0x4
+       5        5  000d1c  mv	t6, a2
+       5        5  000d1e  nop
+       5        5  000d20  lp.setup	x1, a7, 0x7b
+     640      640  000d24  li	s1, 0x0
+     640      640  000d26  li	s4, 0x0
+     640      640  000d28  slli	a5, t2, 0x3
+     640      640  000d2c  add	s2, t5, a5
+     640     1280  000d30  add	a5, a5, a0
+     640        0  000d32  lw	s5, 0x0(a5)
+     640      640  000d36  sub	a5, s3, t0
+     640      640  000d3a  srli	s6, a5, 0x4
+     640      640  000d3e  add	s2, s2, a0
+     640      640  000d40  mv	s0, t1
+     640      640  000d42  mv	a5, t0
+     640      640  000d44  lp.setup	x0, s6, 0x44
+    5120    10240  000d48  fcvt.s.w	s6, s1
+    5120     5120  000d4c  lw	s10, -0x8(a5)
+    5120     5120  000d50  lw	s7, -0x4(a5)
+    5120     5120  000d54  lw	s8, 0x0(a5)
+    5120        0  000d58  lw	s9, 0x4(a5)
+    5120     5120  000d5c  fcvt.s.w	s4, s4
+    5120     5120  000d60  addi	a5, a5, 0x10
+    5120    10240  000d62  fmadd.s	s5, s5, s10, s6
+    5120     5120  000d66  lw	s1, -0xc(s0)
+    5120     5120  000d6a  lw	s6, -0x8(s0)
+    5120     5120  000d6e  lw	s11, -0x4(s0)
+    5120        0  000d72  lw	ra, 0x0(s0)
+    5120     5120  000d76  fmadd.s	s4, s1, s10, s4
+    5120     5120  000d7a  fcvt.w.s	s5, s5, rtz
+    5120     5120  000d7e  fcvt.w.s	s4, s4, rtz
+    5120     5120  000d82  fcvt.s.w	s5, s5
+    5120     5120  000d86  fcvt.s.w	s4, s4
+    5120     5120  000d8a  fmadd.s	s1, s1, s7, s5
+    5120     5120  000d8e  fmadd.s	s4, s6, s7, s4
+    5120     5120  000d92  fcvt.w.s	s1, s1, rtz
+    5120     5120  000d96  fcvt.w.s	s4, s4, rtz
+    5120     5120  000d9a  fcvt.s.w	s1, s1
+    5120     5120  000d9e  fcvt.s.w	s4, s4
+    5120     5120  000da2  fmadd.s	s1, s6, s8, s1
+    5120     5120  000da6  fmadd.s	s4, s11, s8, s4
+    5120     5120  000daa  fcvt.w.s	s1, s1, rtz
+    5120     5120  000dae  fcvt.w.s	s4, s4, rtz
+    5120     5120  000db2  fcvt.s.w	s1, s1
+    5120     5120  000db6  fcvt.s.w	s4, s4
+    5120     5120  000dba  fmadd.s	s1, s11, s9, s1
+    5120     5120  000dbe  fmadd.s	s4, ra, s9, s4
+    5120     5120  000dc2  fcvt.w.s	s1, s1, rtz
+    5120     5120  000dc6  fcvt.w.s	s4, s4, rtz
+    5120     5120  000dca  addi	s0, s0, 0x10
+    5120     5120  000dcc  mv	s5, ra
+     640      640  000dce  mv	a5, t3
+     640      640  000dd0  mv	s0, t4
+     640     1920  000dd2  bge	a6, a3, 0xe00 <KerFirSeqf32+0x144>
+     640      640  000e00  fcvt.s.w	a5, s1
+     640      640  000e04  fcvt.s.w	s0, s4
+     640     1280  000e08  addi	t2, t2, 0x1
+     640      640  000e0a  sw	a5, 0x0(t6)
+     640        0  000e0e  sw	s0, 0x4(t6)
+     640      640  000e12  addi	t6, t6, 0x8
+     640      640  000e14  addi	t1, t1, 0x8
+     640      640  000e16  addi	t4, t4, 0x8
+       5       10  000e18  j	0xe82 <KerFirSeqf32+0x1c6>
+       5        5  000e82  andi	a5, a4, 0x1
+       5        5  000e86  slli	a6, a4, 0x2
+       5       15  000e8a  beqz	a5, 0xece <KerFirSeqf32+0x212>
+       5        5  000ece  li	a1, 0x2
+       5        5  000ed0  blt	a3, a1, 0xef4 <KerFirSeqf32+0x238>
+       5        5  000ed4  slli	a3, a3, 0x2
+       5        5  000ed6  add	a1, a3, a0
+       5        5  000eda  addi	a1, a1, -0x4
+       5        5  000edc  sub	a2, a1, a0
+       5        5  000ee0  srli	a2, a2, 0x2
+       5        5  000ee2  add	a4, a0, a6
+       5        5  000ee6  nop
+       5       10  000ee8  lp.setup	x0, a2, 0x5
+     155      310  000eec  p.lw	a2, 0x4(a4!)
+     155        0  000ef0  sw	a2, 0x0(a0)
+     155      310  000ef2  addi	a0, a0, 0x4
+       5        5  000ef4  lw	ra, 0x3c(sp)
+       5        5  000ef6  lw	s0, 0x38(sp)
+       5        5  000ef8  lw	s1, 0x34(sp)
+       5        5  000efa  lw	s2, 0x30(sp)
+       5        5  000efc  lw	s3, 0x2c(sp)
+       5        5  000efe  lw	s4, 0x28(sp)
+       5        5  000f00  lw	s5, 0x24(sp)
+       5        5  000f02  lw	s6, 0x20(sp)
+       5        5  000f04  lw	s7, 0x1c(sp)
+       5        5  000f06  lw	s8, 0x18(sp)
+       5        5  000f08  lw	s9, 0x14(sp)
+       5        5  000f0a  lw	s10, 0x10(sp)
+       5        0  000f0c  lw	s11, 0xc(sp)
+       5        5  000f0e  addi	sp, sp, 0x40
+       5       10  000f10  ret

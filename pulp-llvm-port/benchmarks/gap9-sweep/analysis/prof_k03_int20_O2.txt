@@ -1,0 +1,66 @@
+function                          instrs     cycles
+matmul_worker                     615770     795450
+rt_hash                            81941     114715
+rt_fill_i16                        34852      51246
+rt_range                           30720      77824
+.Lpcrel_hi3                         8230      10287
+rt_u64                               870       1180
+rt_puts                              330        613
+main                                 111        141
+rt_result                             77        174
+rt_hex                                46         54
+
+hottest PCs in matmul_worker (count, cycles, pc, insn):
+       5        0  000518  lw	a1, 0xc(a0)
+       5        5  00051a  li	a2, 0x1
+       5        5  00051c  p.fl1	a2, a2
+       5        5  000520  srl	a2, a1, a2
+       5        5  000524  p.min	a6, a2, a1
+       5        5  000528  blez	a6, 0x5b0 <matmul_worker+0x98>
+       5       10  00052c  addi	sp, sp, -0x10
+       5        5  00052e  sw	s0, 0xc(sp)
+       5        0  000530  sw	s1, 0x8(sp)
+       5       10  000532  li	t0, 0x0
+       5        0  000534  lw	t3, 0x14(a0)
+       5        5  000538  li	t2, 0x0
+       5        5  00053a  nop
+       5        5  00053c  lp.setup	x1, a6, 0x36
+     160      160  000540  addi	a7, t0, 0x2
+     160      160  000544  blez	t3, 0x5a6 <matmul_worker+0x8e>
+     160      320  000548  li	t4, 0x0
+     160        0  00054a  lw	t1, 0x8(a0)
+     160      160  00054e  li	t5, 0x0
+     160      480  000550  j	0x570 <matmul_worker+0x58>
+    5120     5120  000554  mul	a1, t3, t2
+    5120     5120  000558  slli	a1, a1, 0x2
+    5120     5120  00055a  add	a1, a1, t1
+    5120     5120  00055c  slli	a2, t5, 0x2
+    5120    10240  000560  add	a1, a1, a2
+    5120     5120  000562  sw	a5, 0x0(a1)
+    5120        0  000564  lw	t3, 0x14(a0)
+    5120     5120  000568  addi	t5, t5, 0x1
+    5120     5120  00056a  addi	t4, t4, 0x2
+    5120    10400  00056c  bge	t5, t3, 0x5a6 <matmul_worker+0x8e>
+    5120     5120  000570  lw	a2, 0x10(a0)
+    5120     5120  000572  blez	a2, 0x552 <matmul_worker+0x3a>
+    5120    10240  000576  li	a5, 0x0
+    5120     5120  000578  lw	s1, 0x0(a0)
+    5120     5120  00057a  lw	a1, 0x4(a0)
+    5120     5120  00057c  add	a1, a1, t4
+    5120     5120  00057e  mv	a3, s1
+    5120     5120  000580  p.mac	a3, t0, a2
+    5120     5120  000584  p.mac	s1, a7, a2
+    5120     5120  000588  sub	a2, s1, a3
+    5120     5120  00058c  srli	t6, a2, 0x1
+    5120     5120  000590  slli	a2, t3, 0x1
+    5120    10240  000594  lp.setup	x0, t6, 0x6
+  163840   163840  000598  p.lh	a4, 0x2(a3!)
+  163840   163840  00059c  p.lh	s0, a2(a1!)
+  163840   322560  0005a0  p.mac	a5, s0, a4
+    5120    10240  0005a4  j	0x554 <matmul_worker+0x3c>
+     160      160  0005a6  addi	t2, t2, 0x1
+     160      165  0005a8  mv	t0, a7
+       5        5  0005aa  lw	s0, 0xc(sp)
+       5        0  0005ac  lw	s1, 0x8(sp)
+       5        5  0005ae  addi	sp, sp, 0x10
+       5       10  0005b0  ret

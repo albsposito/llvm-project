@@ -1,0 +1,202 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/gap9-sweep/analysis/builds/int20_simd/O3/k10a_fft_radix2_scalar/kernel.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <Radix2FFT_DIF_Scalar_orig>:
+       0: 7179         	addi	sp, sp, -0x30
+       2: d622         	sw	s0, 0x2c(sp)
+       4: d426         	sw	s1, 0x28(sp)
+       6: d24a         	sw	s2, 0x24(sp)
+       8: d04e         	sw	s3, 0x20(sp)
+       a: ce52         	sw	s4, 0x1c(sp)
+       c: cc56         	sw	s5, 0x18(sp)
+       e: ca5a         	sw	s6, 0x14(sp)
+      10: c85e         	sw	s7, 0x10(sp)
+      12: c662         	sw	s8, 0xc(sp)
+      14: 100618b3     	p.fl1	a7, a2
+      18: 4689         	li	a3, 0x2
+      1a: 0ad8cb63     	blt	a7, a3, 0xd0 <Radix2FFT_DIF_Scalar_orig+0xd0>
+      1e: 4681         	li	a3, 0x0
+      20: 01f65713     	srli	a4, a2, 0x1f
+      24: 18f9         	addi	a7, a7, -0x2
+      26: 00250813     	addi	a6, a0, 0x2
+      2a: 02e6235b     	p.addn	t1, a2, a4, 0x1
+      2e: 4385         	li	t2, 0x1
+      30: a801         	j	0x40 <Radix2FFT_DIF_Scalar_orig+0x40>
+      32: 0386         	slli	t2, t2, 0x1
+      34: 40135313     	srai	t1, t1, 0x1
+      38: 00128693     	addi	a3, t0, 0x1
+      3c: 09128a63     	beq	t0, a7, 0xd0 <Radix2FFT_DIF_Scalar_orig+0xd0>
+      40: 82b6         	mv	t0, a3
+      42: fe6058e3     	blez	t1, 0x32 <Radix2FFT_DIF_Scalar_orig+0x32>
+      46: fe7056e3     	blez	t2, 0x32 <Radix2FFT_DIF_Scalar_orig+0x32>
+      4a: 4e01         	li	t3, 0x0
+      4c: 4e81         	li	t4, 0x0
+      4e: 00331913     	slli	s2, t1, 0x3
+      52: 00231f13     	slli	t5, t1, 0x2
+      56: 9f2a         	add	t5, t5, a0
+      58: 8fc2         	mv	t6, a6
+      5a: 0001         	nop
+      5c: 038340fb     	lp.setup	x1, t1, 0x38
+      60: 002e9693     	slli	a3, t4, 0x2
+      64: 00d58733     	add	a4, a1, a3
+      68: 00071983     	lh	s3, 0x0(a4)
+      6c: 00271a03     	lh	s4, 0x2(a4)
+      70: 847a         	mv	s0, t5
+      72: 84fe         	mv	s1, t6
+      74: 879e         	mv	a5, t2
+      76: 0001         	nop
+      78: 0273c07b     	lp.setup	x0, t2, 0x27
+      7c: ffe49a83     	lh	s5, -0x2(s1)
+      80: 00049b03     	lh	s6, 0x0(s1)
+      84: 00041b83     	lh	s7, 0x0(s0)
+      88: 00241c03     	lh	s8, 0x2(s0)
+      8c: 417a86b3     	sub	a3, s5, s7
+      90: 418b0733     	sub	a4, s6, s8
+      94: 835baadb     	p.addun	s5, s7, s5, 0x1
+      98: 836c2b5b     	p.addun	s6, s8, s6, 0x1
+      9c: ff549f23     	sh	s5, -0x2(s1)
+      a0: 01649023     	sh	s6, 0x0(s1)
+      a4: 03368ab3     	mul	s5, a3, s3
+      a8: 03470b33     	mul	s6, a4, s4
+      ac: 03468bb3     	mul	s7, a3, s4
+      b0: 03370733     	mul	a4, a4, s3
+      b4: 94ca         	add	s1, s1, s2
+      b6: a16ab6db     	p.subun	a3, s5, s6, 0x10
+      ba: a177275b     	p.addun	a4, a4, s7, 0x10
+      be: 00d41023     	sh	a3, 0x0(s0)
+      c2: 00e41123     	sh	a4, 0x2(s0)
+      c6: 944a         	add	s0, s0, s2
+      c8: 9e9e         	add	t4, t4, t2
+      ca: 0f91         	addi	t6, t6, 0x4
+      cc: 0f11         	addi	t5, t5, 0x4
+      ce: b795         	j	0x32 <Radix2FFT_DIF_Scalar_orig+0x32>
+      d0: 8605         	srai	a2, a2, 0x1
+      d2: 04c05263     	blez	a2, 0x116 <Radix2FFT_DIF_Scalar_orig+0x116>
+      d6: 0511         	addi	a0, a0, 0x4
+      d8: 00361593     	slli	a1, a2, 0x3
+      dc: 95aa         	add	a1, a1, a0
+      de: 40a58633     	sub	a2, a1, a0
+      e2: 820d         	srli	a2, a2, 0x3
+      e4: 0186407b     	lp.setup	x0, a2, 0x18
+      e8: ffc51603     	lh	a2, -0x4(a0)
+      ec: ffe51683     	lh	a3, -0x2(a0)
+      f0: 00051703     	lh	a4, 0x0(a0)
+      f4: 00251783     	lh	a5, 0x2(a0)
+      f8: 40e604b3     	sub	s1, a2, a4
+      fc: 40f68433     	sub	s0, a3, a5
+     100: 963a         	add	a2, a2, a4
+     102: 96be         	add	a3, a3, a5
+     104: fec51e23     	sh	a2, -0x4(a0)
+     108: fed51f23     	sh	a3, -0x2(a0)
+     10c: 00951023     	sh	s1, 0x0(a0)
+     110: 00851123     	sh	s0, 0x2(a0)
+     114: 0521         	addi	a0, a0, 0x8
+     116: 5432         	lw	s0, 0x2c(sp)
+     118: 54a2         	lw	s1, 0x28(sp)
+     11a: 5912         	lw	s2, 0x24(sp)
+     11c: 5982         	lw	s3, 0x20(sp)
+     11e: 4a72         	lw	s4, 0x1c(sp)
+     120: 4ae2         	lw	s5, 0x18(sp)
+     122: 4b52         	lw	s6, 0x14(sp)
+     124: 4bc2         	lw	s7, 0x10(sp)
+     126: 4c32         	lw	s8, 0xc(sp)
+     128: 6145         	addi	sp, sp, 0x30
+     12a: 8082         	ret
+
+0000012c <Radix2FFT_DIF_Scalar>:
+     12c: 7179         	addi	sp, sp, -0x30
+     12e: d622         	sw	s0, 0x2c(sp)
+     130: d426         	sw	s1, 0x28(sp)
+     132: d24a         	sw	s2, 0x24(sp)
+     134: d04e         	sw	s3, 0x20(sp)
+     136: ce52         	sw	s4, 0x1c(sp)
+     138: cc56         	sw	s5, 0x18(sp)
+     13a: ca5a         	sw	s6, 0x14(sp)
+     13c: c85e         	sw	s7, 0x10(sp)
+     13e: c662         	sw	s8, 0xc(sp)
+     140: 100618b3     	p.fl1	a7, a2
+     144: 4689         	li	a3, 0x2
+     146: 0ad8cb63     	blt	a7, a3, 0x1fc <Radix2FFT_DIF_Scalar+0xd0>
+     14a: 4681         	li	a3, 0x0
+     14c: 01f65713     	srli	a4, a2, 0x1f
+     150: 18f9         	addi	a7, a7, -0x2
+     152: 00250813     	addi	a6, a0, 0x2
+     156: 02e6235b     	p.addn	t1, a2, a4, 0x1
+     15a: 4385         	li	t2, 0x1
+     15c: a801         	j	0x16c <Radix2FFT_DIF_Scalar+0x40>
+     15e: 0386         	slli	t2, t2, 0x1
+     160: 40135313     	srai	t1, t1, 0x1
+     164: 00128693     	addi	a3, t0, 0x1
+     168: 09128a63     	beq	t0, a7, 0x1fc <Radix2FFT_DIF_Scalar+0xd0>
+     16c: 82b6         	mv	t0, a3
+     16e: fe6058e3     	blez	t1, 0x15e <Radix2FFT_DIF_Scalar+0x32>
+     172: fe7056e3     	blez	t2, 0x15e <Radix2FFT_DIF_Scalar+0x32>
+     176: 4e01         	li	t3, 0x0
+     178: 4e81         	li	t4, 0x0
+     17a: 00331913     	slli	s2, t1, 0x3
+     17e: 00231f13     	slli	t5, t1, 0x2
+     182: 9f2a         	add	t5, t5, a0
+     184: 8fc2         	mv	t6, a6
+     186: 0001         	nop
+     188: 038340fb     	lp.setup	x1, t1, 0x38
+     18c: 002e9693     	slli	a3, t4, 0x2
+     190: 00d58733     	add	a4, a1, a3
+     194: 00071983     	lh	s3, 0x0(a4)
+     198: 00271a03     	lh	s4, 0x2(a4)
+     19c: 847a         	mv	s0, t5
+     19e: 84fe         	mv	s1, t6
+     1a0: 879e         	mv	a5, t2
+     1a2: 0001         	nop
+     1a4: 0273c07b     	lp.setup	x0, t2, 0x27
+     1a8: ffe49a83     	lh	s5, -0x2(s1)
+     1ac: 00049b03     	lh	s6, 0x0(s1)
+     1b0: 00041b83     	lh	s7, 0x0(s0)
+     1b4: 00241c03     	lh	s8, 0x2(s0)
+     1b8: 417a86b3     	sub	a3, s5, s7
+     1bc: 418b0733     	sub	a4, s6, s8
+     1c0: 835baadb     	p.addun	s5, s7, s5, 0x1
+     1c4: 836c2b5b     	p.addun	s6, s8, s6, 0x1
+     1c8: ff549f23     	sh	s5, -0x2(s1)
+     1cc: 01649023     	sh	s6, 0x0(s1)
+     1d0: 03368ab3     	mul	s5, a3, s3
+     1d4: 03470b33     	mul	s6, a4, s4
+     1d8: 03468bb3     	mul	s7, a3, s4
+     1dc: 03370733     	mul	a4, a4, s3
+     1e0: 94ca         	add	s1, s1, s2
+     1e2: a16ab6db     	p.subun	a3, s5, s6, 0x10
+     1e6: a177275b     	p.addun	a4, a4, s7, 0x10
+     1ea: 00d41023     	sh	a3, 0x0(s0)
+     1ee: 00e41123     	sh	a4, 0x2(s0)
+     1f2: 944a         	add	s0, s0, s2
+     1f4: 9e9e         	add	t4, t4, t2
+     1f6: 0f91         	addi	t6, t6, 0x4
+     1f8: 0f11         	addi	t5, t5, 0x4
+     1fa: b795         	j	0x15e <Radix2FFT_DIF_Scalar+0x32>
+     1fc: 8605         	srai	a2, a2, 0x1
+     1fe: 02c05663     	blez	a2, 0x22a <Radix2FFT_DIF_Scalar+0xfe>
+     202: 0511         	addi	a0, a0, 0x4
+     204: 00361593     	slli	a1, a2, 0x3
+     208: 95aa         	add	a1, a1, a0
+     20a: 40a58633     	sub	a2, a1, a0
+     20e: 820d         	srli	a2, a2, 0x3
+     210: 00c6407b     	lp.setup	x0, a2, 0xc
+     214: ffc52603     	lw	a2, -0x4(a0)
+     218: 4114         	lw	a3, 0x0(a0)
+     21a: 00c68757     	pv.add.h	a4, a3, a2
+     21e: 08d60657     	pv.sub.h	a2, a2, a3
+     222: fee52e23     	sw	a4, -0x4(a0)
+     226: c110         	sw	a2, 0x0(a0)
+     228: 0521         	addi	a0, a0, 0x8
+     22a: 5432         	lw	s0, 0x2c(sp)
+     22c: 54a2         	lw	s1, 0x28(sp)
+     22e: 5912         	lw	s2, 0x24(sp)
+     230: 5982         	lw	s3, 0x20(sp)
+     232: 4a72         	lw	s4, 0x1c(sp)
+     234: 4ae2         	lw	s5, 0x18(sp)
+     236: 4b52         	lw	s6, 0x14(sp)
+     238: 4bc2         	lw	s7, 0x10(sp)
+     23a: 4c32         	lw	s8, 0xc(sp)
+     23c: 6145         	addi	sp, sp, 0x30
+     23e: 8082         	ret

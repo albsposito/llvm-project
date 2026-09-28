@@ -1,0 +1,129 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/gap9-sweep/analysis/builds/gcc/O2/k10a_fft_radix2_scalar/kernel.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <Radix2FFT_DIF_Scalar>:
+       0: 7139         	addi	sp, sp, -0x40
+       2: ce62         	sw	s8, 0x1c(sp)
+       4: ca6a         	sw	s10, 0x14(sp)
+       6: 01f65c13     	srli	s8, a2, 0x1f
+       a: de22         	sw	s0, 0x3c(sp)
+       c: dc26         	sw	s1, 0x38(sp)
+       e: da4a         	sw	s2, 0x34(sp)
+      10: d84e         	sw	s3, 0x30(sp)
+      12: d652         	sw	s4, 0x2c(sp)
+      14: d456         	sw	s5, 0x28(sp)
+      16: d25a         	sw	s6, 0x24(sp)
+      18: d05e         	sw	s7, 0x20(sp)
+      1a: cc66         	sw	s9, 0x18(sp)
+      1c: c86e         	sw	s11, 0x10(sp)
+      1e: c632         	sw	a2, 0xc(sp)
+      20: 10061d33     	p.fl1	s10, a2
+      24: 4785         	li	a5, 0x1
+      26: 02cc2c5b     	p.addn	s8, s8, a2, 0x1
+      2a: 0ba7d863     	bge	a5, s10, 0xda <.L2>
+      2e: 1d7d         	addi	s10, s10, -0x1
+      30: 4a05         	li	s4, 0x1
+      32: 4c81         	li	s9, 0x0
+
+00000034 <.L3>:
+      34: 09805d63     	blez	s8, 0xce <.L8>
+      38: 002c1a93     	slli	s5, s8, 0x2
+      3c: ffca8413     	addi	s0, s5, -0x4
+      40: 8009         	srli	s0, s0, 0x2
+      42: 002a1993     	slli	s3, s4, 0x2
+      46: 892e         	mv	s2, a1
+      48: 83aa         	mv	t2, a0
+      4a: 00258493     	addi	s1, a1, 0x2
+      4e: 003c1b93     	slli	s7, s8, 0x3
+      52: 002a8b13     	addi	s6, s5, 0x2
+      56: 0405         	addi	s0, s0, 0x1
+      58: 03a4407b     	lp.setup	x0, s0, 0x3a
+      5c: 00091f83     	lh	t6, 0x0(s2)
+      60: 00049283     	lh	t0, 0x0(s1)
+      64: 07405263     	blez	s4, 0xc8 <.L4>
+      68: 007a8eb3     	add	t4, s5, t2
+      6c: 00238893     	addi	a7, t2, 0x2
+      70: 007b0833     	add	a6, s6, t2
+      74: 8e1e         	mv	t3, t2
+      76: 8352         	mv	t1, s4
+      78: 026340fb     	lp.setup	x1, t1, 0x26
+      7c: 000e9f03     	lh	t5, 0x0(t4)
+      80: 000e1783     	lh	a5, 0x0(t3)
+      84: 00089d83     	lh	s11, 0x0(a7)
+      88: 00081603     	lh	a2, 0x0(a6)
+      8c: 41e786b3     	sub	a3, a5, t5
+      90: 03e7a7db     	p.addn	a5, a5, t5, 0x1
+      94: 00fe5bab     	p.sh	a5, s7(t3!)
+      98: 00081783     	lh	a5, 0x0(a6)
+      9c: 00089f03     	lh	t5, 0x0(a7)
+      a0: 40cd8633     	sub	a2, s11, a2
+      a4: 03f68733     	mul	a4, a3, t6
+      a8: 02ff2f5b     	p.addn	t5, t5, a5, 0x1
+      ac: 01e8dbab     	p.sh	t5, s7(a7!)
+      b0: 03f607b3     	mul	a5, a2, t6
+      b4: 42561733     	p.msu	a4, a2, t0
+      b8: 425687b3     	p.mac	a5, a3, t0
+      bc: 8741         	srai	a4, a4, 0x10
+      be: 00eedbab     	p.sh	a4, s7(t4!)
+      c2: 87c1         	srai	a5, a5, 0x10
+
+000000c4 <.L18>:
+      c4: 00f85bab     	p.sh	a5, s7(a6!)
+
+000000c8 <.L4>:
+      c8: 994e         	add	s2, s2, s3
+      ca: 0391         	addi	t2, t2, 0x4
+
+000000cc <.L19>:
+      cc: 94ce         	add	s1, s1, s3
+
+000000ce <.L8>:
+      ce: 0c85         	addi	s9, s9, 0x1
+      d0: 0a06         	slli	s4, s4, 0x1
+      d2: 401c5c13     	srai	s8, s8, 0x1
+      d6: f5ac9fe3     	bne	s9, s10, 0x34 <.L3>
+
+000000da <.L2>:
+      da: 4732         	lw	a4, 0xc(sp)
+      dc: 40175793     	srai	a5, a4, 0x1
+      e0: 04f05463     	blez	a5, 0x128 <.L1>
+      e4: 00379593     	slli	a1, a5, 0x3
+      e8: 15e1         	addi	a1, a1, -0x8
+      ea: 818d         	srli	a1, a1, 0x3
+      ec: 0585         	addi	a1, a1, 0x1
+      ee: 01c5c0fb     	lp.setup	x1, a1, 0x1c
+      f2: 00251783     	lh	a5, 0x2(a0)
+      f6: 00651683     	lh	a3, 0x6(a0)
+      fa: 00055703     	lhu	a4, 0x0(a0)
+      fe: 00455603     	lhu	a2, 0x4(a0)
+     102: 1007d7b3     	p.exthz	a5, a5
+     106: 1006d6b3     	p.exthz	a3, a3
+     10a: 00c708b3     	add	a7, a4, a2
+     10e: 00d78833     	add	a6, a5, a3
+     112: 8f11         	sub	a4, a4, a2
+     114: 8f95         	sub	a5, a5, a3
+     116: 01151023     	sh	a7, 0x0(a0)
+     11a: 01051123     	sh	a6, 0x2(a0)
+     11e: 00e51223     	sh	a4, 0x4(a0)
+     122: 00f51323     	sh	a5, 0x6(a0)
+
+00000126 <.L17>:
+     126: 0521         	addi	a0, a0, 0x8
+
+00000128 <.L1>:
+     128: 5472         	lw	s0, 0x3c(sp)
+     12a: 54e2         	lw	s1, 0x38(sp)
+     12c: 5952         	lw	s2, 0x34(sp)
+     12e: 59c2         	lw	s3, 0x30(sp)
+     130: 5a32         	lw	s4, 0x2c(sp)
+     132: 5aa2         	lw	s5, 0x28(sp)
+     134: 5b12         	lw	s6, 0x24(sp)
+     136: 5b82         	lw	s7, 0x20(sp)
+     138: 4c72         	lw	s8, 0x1c(sp)
+     13a: 4ce2         	lw	s9, 0x18(sp)
+     13c: 4d52         	lw	s10, 0x14(sp)
+     13e: 4dc2         	lw	s11, 0x10(sp)
+     140: 6121         	addi	sp, sp, 0x40
+     142: 8082         	ret

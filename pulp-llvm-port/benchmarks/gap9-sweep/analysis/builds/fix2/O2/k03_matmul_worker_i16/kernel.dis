@@ -1,0 +1,60 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/gap9-sweep/analysis/builds/fix2/O2/k03_matmul_worker_i16/kernel.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <matmul_worker>:
+       0: 454c         	lw	a1, 0xc(a0)
+       2: 4605         	li	a2, 0x1
+       4: 10061633     	p.fl1	a2, a2
+       8: 00c5d633     	srl	a2, a1, a2
+       c: 04b64833     	p.min	a6, a2, a1
+      10: 09005463     	blez	a6, 0x98 <matmul_worker+0x98>
+      14: 1141         	addi	sp, sp, -0x10
+      16: c622         	sw	s0, 0xc(sp)
+      18: c426         	sw	s1, 0x8(sp)
+      1a: 4281         	li	t0, 0x0
+      1c: 01452e03     	lw	t3, 0x14(a0)
+      20: 4381         	li	t2, 0x0
+      22: 0001         	nop
+      24: 036840fb     	lp.setup	x1, a6, 0x36
+      28: 00228893     	addi	a7, t0, 0x2
+      2c: 07c05163     	blez	t3, 0x8e <matmul_worker+0x8e>
+      30: 4e81         	li	t4, 0x0
+      32: 00852303     	lw	t1, 0x8(a0)
+      36: 4f01         	li	t5, 0x0
+      38: a005         	j	0x58 <matmul_worker+0x58>
+      3a: 4781         	li	a5, 0x0
+      3c: 027e05b3     	mul	a1, t3, t2
+      40: 058a         	slli	a1, a1, 0x2
+      42: 959a         	add	a1, a1, t1
+      44: 002f1613     	slli	a2, t5, 0x2
+      48: 95b2         	add	a1, a1, a2
+      4a: c19c         	sw	a5, 0x0(a1)
+      4c: 01452e03     	lw	t3, 0x14(a0)
+      50: 0f05         	addi	t5, t5, 0x1
+      52: 0e89         	addi	t4, t4, 0x2
+      54: 03cf5d63     	bge	t5, t3, 0x8e <matmul_worker+0x8e>
+      58: 4910         	lw	a2, 0x10(a0)
+      5a: fec050e3     	blez	a2, 0x3a <matmul_worker+0x3a>
+      5e: 4781         	li	a5, 0x0
+      60: 4104         	lw	s1, 0x0(a0)
+      62: 414c         	lw	a1, 0x4(a0)
+      64: 95f6         	add	a1, a1, t4
+      66: 86a6         	mv	a3, s1
+      68: 42c286b3     	p.mac	a3, t0, a2
+      6c: 42c884b3     	p.mac	s1, a7, a2
+      70: 40d48633     	sub	a2, s1, a3
+      74: 00165f93     	srli	t6, a2, 0x1
+      78: 001e1613     	slli	a2, t3, 0x1
+      7c: 006fc07b     	lp.setup	x0, t6, 0x6
+      80: 0026970b     	p.lh	a4, 0x2(a3!)
+      84: 10c5f40b     	p.lh	s0, a2(a1!)
+      88: 42e407b3     	p.mac	a5, s0, a4
+      8c: bf45         	j	0x3c <matmul_worker+0x3c>
+      8e: 0385         	addi	t2, t2, 0x1
+      90: 82c6         	mv	t0, a7
+      92: 4432         	lw	s0, 0xc(sp)
+      94: 44a2         	lw	s1, 0x8(sp)
+      96: 0141         	addi	sp, sp, 0x10
+      98: 8082         	ret

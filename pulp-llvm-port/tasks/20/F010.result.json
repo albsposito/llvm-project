@@ -1,0 +1,39 @@
+{
+ "status": "done",
+ "branch": "work/20/F010",
+ "commits": [
+  "9e4f849a6239",
+  "daf52f7bbc58"
+ ],
+ "cluster_commits": {
+  "insn-tablegen": "9e4f849a6239",
+  "mc": "daf52f7bbc58"
+ },
+ "note": "notes/20/F010.md",
+ "signature_gone": true,
+ "cause": "Pre-existing fork defect (backlog B11), fork commit f1b7aebff8c2 '[LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms': label operand uimm12pcrel used the constant-only parser class UImmAsmOperand<12> with no Match_InvalidUImm12 diagnostic (-> 'Unknown match type detected!' crash); R001 copied the pattern to uimm5pcrel (-> lp.setupi label rejected as [0,31]).",
+ "fix": "insn-tablegen: uimm12pcrel/uimm5pcrel ParserMatchClass -> UImmAsmOperand<12/5,\"PCRel\"> (bare symbol or constant, like upstream simm13_lsb0/SImmAsmOperand<13,\"Lsb0\"> RISCVInstrInfo.td:271 @llvmorg-20.1.8); loop-count operand of LOOP{0,1}setupi and LOOP{0,1}counti -> fork uimm12 (was the label operand; count is a plain number; same field/decoder, getImmOpValue returns constants unchanged). mc: RISCVAsmParser isUImm5PCRel/isUImm12PCRel (shape of upstream isBareSimmNLsb0, RISCVAsmParser.cpp:523) + diagnostics for InvalidUImm12/UImm5PCRel/UImm12PCRel; RISCVAsmBackend: range + 2-byte-alignment check on fixup_pulpv2_loop_setup(i), same as upstream fixup_riscv_branch (RISCVAsmBackend.cpp:461).",
+ "prev_attempt_review": "Previous attempt diff saved to logs/20-F010.prev-attempt.diff. Parser and .td hunks kept as-is. RISCVAsmBackend.cpp hunk was dropped, then restored (comment reworded) after demonstrating it is necessary: applyFixup does not mask, so an out-of-range hand-written label silently corrupts the adjacent field (lp.setupi x0, 100, .Lfar at +104 bytes assembled to 'lp.setupi x0, 0x65, 0x14', i.e. count 100->101); GNU as rejects it (BFD_RELOC_RISCV_RELU5 Overflow). Accepted limits match GNU as exactly (62 B setupi / 8190 B setup accepted byte-identical, 64 / 8192 rejected by both). Return value (Value>>1) unchanged, so no in-range encoding changes; compiler path objects are byte-identical to int-20 (sweep + fuzzer + C loops).",
+ "verification": {
+  "build": "logs/20-F010.verify.log (llvm-mc llvm-objdump clang lld llc), cluster_errors: 0 clusters",
+  "repro": "logs/20-F010.repro.log (int-20: lp.setupi label rejected [0,31]; lp.setup/starti/endi label UNREACHABLE 'Unknown match type detected!')",
+  "hand_asm_vs_gcc": "logs/20-F010-evidence/hand.s (all 5 forms, both levels x0/x1, parenthesised label): llvm-mc -filetype=obj .text bytes identical to GAP9 riscv32-unknown-elf-as -march=rv32imcxgap9 (hand.llvm-mc.dis / hand.gnu-as.dis)",
+  "c_loops": "loops.c/loops2.c, default and -pulp-loop-range-immediate=0 (lp.setup x0/x1, lp.setupi x1, lp.starti/endi/counti): clang -c object == clang -S + assemble == GNU as (.option norelax) on the same .s; objects byte-identical to build/int-20. int-20 cannot assemble these .s (crash / [0,31] error).",
+  "gvsoc": "kern.s (nested loops, all 5 forms, both levels) + main.c: llvm-mc+ld.lld ELF prints 'RES 100237' exit 0 (expected 100237); GNU as+GNU ld ELF same (gvsoc-mc.txt, gvsoc-gcc.txt); kern .text bytes identical across llvm-mc, clang -c and GNU as",
+  "numeric_operands": "num.s: bytes identical to int-20 (constant = raw field value, unchanged)",
+  "error_cases": "bad.s/bad2.s/edge.s: out-of-range, backward and odd labels -> 'fixup value out of range' / 'must be 2-byte aligned'; lp.counti x0,.L and lp.setupi x0,.L,.L rejected with [0,4095]; %lo(sym) rejected with 'operand must be a bare symbol name or an immediate integer in the range'",
+  "gap9_sweep": "copy of benchmarks/gap9-sweep run in scratch with GAP9_EXTRA_COMPILERS=int20,mine: 64/64 kernel x opt rows identical object_sha256 and status to int-20 (all kernels, not only unrelated ones); logs/20-F010-evidence/gap9-sweep-results.json",
+  "fuzz": "logs/20-F010.fuzz.txt (script logs/20-F010.fuzz-one.sh): seeds 1-60 x O2/O3/Os x {default, -pulp-loop-range-immediate=0} = 360 builds, 1154 lp.* insns (all 5 forms, both levels): 360/360 objects identical to int-20; 360/360 'clang -S then assemble' == 'clang -c'; 356 OK on GVSoC vs GCC reference, 4 wrong = seed 27 O2/O3 in BOTH int-20 and mine (known backlog B03); no new crash/hang/wrong result",
+  "lit": "logs/20-F010-lit.log: LIT_PATHS (llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, clang/test/CodeGen/RISCV, ...) + all fork tests from data/fork-tests.txt except the unittest: 4777 discovered, 4776 pass, 1 fail = CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir, which also fails in build/int-20 (and in logs/lit-int-20-final.log); no test edited",
+  "policy_check": "0 fail, 0 warn"
+ },
+ "other_errors_seen": [
+  "GNU as vs LLVM numeric-operand semantics differ (pre-existing, not changed): GNU as treats a numeric lp.setup/lp.setupi/lp.starti/lp.endi label operand as a BYTE offset ('lp.setup x0,a0,20' -> field 10), LLVM as the raw halfword field value (field 20, and llvm-objdump prints the raw field so it round-trips). Changing this would change existing LLVM behaviour; owner decision.",
+  "GNU as keeps R_RISCV_REL12/R_RISCV_RELU5 relocations for hardware-loop labels (for linker relaxation); LLVM resolves them in the assembler and emits none (pre-existing, same for the compiler path). ld.lld cannot link GNU-as objects that contain these (unknown relocation 58).",
+  "Pre-existing: 'scfgri a0, 5000' (Xssr, uimm12) crashed llvm-mc with 'Unknown match type detected!' for the same missing InvalidUImm12 diagnostic; now a normal range error (side effect of this fix).",
+  "The insn-tablegen fixup commit alone does not compile (the generated matcher needs isUImm12PCRel from the mc fixup); both must land together (cluster order puts insn-tablegen before mc in the stack).",
+  "Known: hwloop fuzz seed 27 O2/O3 wrong result in int-20 and here (backlog B03).",
+  "Known: CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir fails on int-20 as well."
+ ],
+ "proposed_test": "llvm/test/MC/RISCV/xpulp/xpulp-hwloop-labels.s: 'RUN: llvm-mc %s -filetype=obj -triple=riscv32 -mattr=+c,+xpulpv | llvm-objdump -d -r --mattr=+c,+xpulpv - | FileCheck %s' on logs/20-F010-evidence/hand.s with CHECK lines for the GNU-as-identical encodings (e.g. 00a0007b lp.starti x0,0xa; 0646d07b lp.setupi x0,0x64,0xd; 006540fb lp.setup x1,a0,0x6; fff030fb lp.counti x1,0xfff) and no relocations; plus 'RUN: not llvm-mc ... %s --defsym ERR=1 2>&1 | FileCheck --check-prefix=ERR' for out-of-range/backward labels ('fixup value out of range'), a label in lp.counti and %lo(sym) (parser errors). Also a CodeGen round-trip: llc -filetype=asm | llvm-mc -filetype=obj vs llc -filetype=obj on xpulp-hwloop.ll."
+}

@@ -1,0 +1,2 @@
+RESULT kernel=k03_matmul_worker_i16 cycles=159103 instrs=123163 checksum=0xae63bc89 reps=4 total_cycles=636412 pccr_cycles=636417
+[run_sim] exit code: 0

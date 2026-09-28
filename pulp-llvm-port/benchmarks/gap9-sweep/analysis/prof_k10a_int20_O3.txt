@@ -1,0 +1,113 @@
+function                          instrs     cycles
+Radix2FFT_DIF_Scalar              113915     113971
+rt_hash                           102495     143486
+prep                               34905      53380
+rt_fill_i16                         8725      12826
+rt_range                            7680      18944
+.Lpcrel_hi3                         5166       6457
+rt_u64                               738        996
+rt_puts                              333        619
+main                                 111        133
+cks                                  101        142
+
+hottest PCs in Radix2FFT_DIF_Scalar (count, cycles, pc, insn):
+       5       10  0005e8  addi	sp, sp, -0x30
+       5        5  0005ea  sw	s0, 0x2c(sp)
+       5        5  0005ec  sw	s1, 0x28(sp)
+       5        5  0005ee  sw	s2, 0x24(sp)
+       5        5  0005f0  sw	s3, 0x20(sp)
+       5        5  0005f2  sw	s4, 0x1c(sp)
+       5        5  0005f4  sw	s5, 0x18(sp)
+       5        5  0005f6  sw	s6, 0x14(sp)
+       5        5  0005f8  sw	s7, 0x10(sp)
+       5        0  0005fa  sw	s8, 0xc(sp)
+       5        5  0005fc  p.fl1	a7, a2
+       5        5  000600  li	a3, 0x2
+       5        5  000602  blt	a7, a3, 0x6b8 <Radix2FFT_DIF_Scalar+0xd0>
+       5        5  000606  li	a3, 0x0
+       5        5  000608  srli	a4, a2, 0x1f
+       5        5  00060c  addi	a7, a7, -0x2
+       5        5  00060e  addi	a6, a0, 0x2
+       5        5  000612  p.addn	t1, a2, a4, 0x1
+       5        5  000616  li	t2, 0x1
+       5       10  000618  j	0x628 <Radix2FFT_DIF_Scalar+0x40>
+      35       35  00061a  slli	t2, t2, 0x1
+      35       35  00061c  srai	t1, t1, 0x1
+      35       35  000620  addi	a3, t0, 0x1
+      35       45  000624  beq	t0, a7, 0x6b8 <Radix2FFT_DIF_Scalar+0xd0>
+      35       35  000628  mv	t0, a3
+      35       35  00062a  blez	t1, 0x61a <Radix2FFT_DIF_Scalar+0x32>
+      35       35  00062e  blez	t2, 0x61a <Radix2FFT_DIF_Scalar+0x32>
+      35       35  000632  li	t3, 0x0
+      35       35  000634  li	t4, 0x0
+      35       35  000636  slli	s2, t1, 0x3
+      35       35  00063a  slli	t5, t1, 0x2
+      35       35  00063e  add	t5, t5, a0
+      35       35  000640  mv	t6, a6
+      35       35  000642  nop
+      35       35  000644  lp.setup	x1, t1, 0x38
+    1270     1270  000648  slli	a3, t4, 0x2
+    1270     2540  00064c  add	a4, a1, a3
+    1270     1270  000650  lh	s3, 0x0(a4)
+    1270        0  000654  lh	s4, 0x2(a4)
+    1270     1270  000658  mv	s0, t5
+    1270     1270  00065a  mv	s1, t6
+    1270     1270  00065c  mv	a5, t2
+    1270     1270  00065e  nop
+    1270     2540  000660  lp.setup	x0, t2, 0x27
+    4480     4480  000664  lh	s5, -0x2(s1)
+    4480     4480  000668  lh	s6, 0x0(s1)
+    4480     4480  00066c  lh	s7, 0x0(s0)
+    4480        0  000670  lh	s8, 0x2(s0)
+    4480     4480  000674  sub	a3, s5, s7
+    4480     4480  000678  sub	a4, s6, s8
+    4480     4480  00067c  p.addun	s5, s7, s5, 0x1
+    4480     8960  000680  p.addun	s6, s8, s6, 0x1
+    4480     4480  000684  sh	s5, -0x2(s1)
+    4480        0  000688  sh	s6, 0x0(s1)
+    4480     4480  00068c  mul	s5, a3, s3
+    4480     4480  000690  mul	s6, a4, s4
+    4480     4480  000694  mul	s7, a3, s4
+    4480     4480  000698  mul	a4, a4, s3
+    4480     4480  00069c  add	s1, s1, s2
+    4480     4480  00069e  p.subun	a3, s5, s6, 0x10
+    4480     8960  0006a2  p.addun	a4, a4, s7, 0x10
+    4480     4480  0006a6  sh	a3, 0x0(s0)
+    4480        0  0006aa  sh	a4, 0x2(s0)
+    4480     7690  0006ae  add	s0, s0, s2
+    1270     1270  0006b0  add	t4, t4, t2
+    1270     1270  0006b2  addi	t6, t6, 0x4
+    1270     1270  0006b4  addi	t5, t5, 0x4
+      35       70  0006b6  j	0x61a <Radix2FFT_DIF_Scalar+0x32>
+       5        5  0006b8  srai	a2, a2, 0x1
+       5        5  0006ba  blez	a2, 0x6fe <Radix2FFT_DIF_Scalar+0x116>
+       5        5  0006be  addi	a0, a0, 0x4
+       5        5  0006c0  slli	a1, a2, 0x3
+       5        5  0006c4  add	a1, a1, a0
+       5        5  0006c6  sub	a2, a1, a0
+       5        5  0006ca  srli	a2, a2, 0x3
+       5       10  0006cc  lp.setup	x0, a2, 0x18
+     640      640  0006d0  lh	a2, -0x4(a0)
+     640      640  0006d4  lh	a3, -0x2(a0)
+     640      640  0006d8  lh	a4, 0x0(a0)
+     640        0  0006dc  lh	a5, 0x2(a0)
+     640      640  0006e0  sub	s1, a2, a4
+     640      640  0006e4  sub	s0, a3, a5
+     640      640  0006e8  add	a2, a2, a4
+     640     1280  0006ea  add	a3, a3, a5
+     640      640  0006ec  sh	a2, -0x4(a0)
+     640      640  0006f0  sh	a3, -0x2(a0)
+     640      640  0006f4  sh	s1, 0x0(a0)
+     640        0  0006f8  sh	s0, 0x2(a0)
+     640     1280  0006fc  addi	a0, a0, 0x8
+       5        5  0006fe  lw	s0, 0x2c(sp)
+       5        5  000700  lw	s1, 0x28(sp)
+       5        5  000702  lw	s2, 0x24(sp)
+       5        5  000704  lw	s3, 0x20(sp)
+       5        5  000706  lw	s4, 0x1c(sp)
+       5        5  000708  lw	s5, 0x18(sp)
+       5        5  00070a  lw	s6, 0x14(sp)
+       5        5  00070c  lw	s7, 0x10(sp)
+       5        0  00070e  lw	s8, 0xc(sp)
+       5        5  000710  addi	sp, sp, 0x30
+       5       11  000712  ret

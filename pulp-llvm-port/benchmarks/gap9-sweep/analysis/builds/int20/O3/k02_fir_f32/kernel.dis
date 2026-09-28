@@ -1,0 +1,534 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/gap9-sweep/analysis/builds/int20/O3/k02_fir_f32/kernel.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <KerFirInitf32>:
+       0: 1101         	addi	sp, sp, -0x20
+       2: ce06         	sw	ra, 0x1c(sp)
+       4: cc22         	sw	s0, 0x18(sp)
+       6: ca26         	sw	s1, 0x14(sp)
+       8: c84a         	sw	s2, 0x10(sp)
+       a: c64e         	sw	s3, 0xc(sp)
+       c: 8936         	mv	s2, a3
+       e: 84aa         	mv	s1, a0
+      10: 4509         	li	a0, 0x2
+      12: 00261413     	slli	s0, a2, 0x2
+      16: 00a64c63     	blt	a2, a0, 0x2e <KerFirInitf32+0x2e>
+      1a: ffc40613     	addi	a2, s0, -0x4
+      1e: 8526         	mv	a0, s1
+      20: 89ae         	mv	s3, a1
+      22: 4581         	li	a1, 0x0
+      24: 00000097     	auipc	ra, 0x0
+      28: 000080e7     	jalr	ra <KerFirInitf32+0x24>
+      2c: 85ce         	mv	a1, s3
+      2e: 00848533     	add	a0, s1, s0
+      32: 1571         	addi	a0, a0, -0x4
+      34: 00291613     	slli	a2, s2, 0x2
+      38: 40f2         	lw	ra, 0x1c(sp)
+      3a: 4462         	lw	s0, 0x18(sp)
+      3c: 44d2         	lw	s1, 0x14(sp)
+      3e: 4942         	lw	s2, 0x10(sp)
+      40: 49b2         	lw	s3, 0xc(sp)
+      42: 6105         	addi	sp, sp, 0x20
+      44: 00000317     	auipc	t1, 0x0
+      48: 00030067     	jr	t1 <KerFirInitf32+0x44>
+
+0000004c <KerFirSeqBaselinef32>:
+      4c: 04e05963     	blez	a4, 0x9e <KerFirSeqBaselinef32+0x52>
+      50: 06d05b63     	blez	a3, 0xc6 <KerFirSeqBaselinef32+0x7a>
+      54: 4801         	li	a6, 0x0
+      56: 00269293     	slli	t0, a3, 0x2
+      5a: 92ae         	add	t0, t0, a1
+      5c: 88aa         	mv	a7, a0
+      5e: 0001         	nop
+      60: 01e740fb     	lp.setup	x1, a4, 0x1e
+      64: 4301         	li	t1, 0x0
+      66: 40b287b3     	sub	a5, t0, a1
+      6a: 0027de13     	srli	t3, a5, 0x2
+      6e: 83c6         	mv	t2, a7
+      70: 8f2e         	mv	t5, a1
+      72: 0001         	nop
+      74: 00ae407b     	lp.setup	x0, t3, 0xa
+      78: 0043ae0b     	p.lw	t3, 0x4(t2!)
+      7c: 004f2e8b     	p.lw	t4, 0x4(t5!)
+      80: d00377d3     	fcvt.s.w	a5, t1
+      84: 79de77c3     	fmadd.s	a5, t3, t4, a5
+      88: c0079353     	fcvt.w.s	t1, a5, rtz
+      8c: d0037353     	fcvt.s.w	t1, t1
+      90: 00281793     	slli	a5, a6, 0x2
+      94: 0805         	addi	a6, a6, 0x1
+      96: 97b2         	add	a5, a5, a2
+      98: 0067a023     	sw	t1, 0x0(a5)
+      9c: 0891         	addi	a7, a7, 0x4
+      9e: 4589         	li	a1, 0x2
+      a0: 02b6c263     	blt	a3, a1, 0xc4 <KerFirSeqBaselinef32+0x78>
+      a4: 00271613     	slli	a2, a4, 0x2
+      a8: 068a         	slli	a3, a3, 0x2
+      aa: 00a685b3     	add	a1, a3, a0
+      ae: 15f1         	addi	a1, a1, -0x4
+      b0: 40a586b3     	sub	a3, a1, a0
+      b4: 8289         	srli	a3, a3, 0x2
+      b6: 962a         	add	a2, a2, a0
+      b8: 0056c07b     	lp.setup	x0, a3, 0x5
+      bc: 0046268b     	p.lw	a3, 0x4(a2!)
+      c0: c114         	sw	a3, 0x0(a0)
+      c2: 0511         	addi	a0, a0, 0x4
+      c4: 8082         	ret
+      c6: 070a         	slli	a4, a4, 0x2
+      c8: 8532         	mv	a0, a2
+      ca: 4581         	li	a1, 0x0
+      cc: 863a         	mv	a2, a4
+      ce: 00000317     	auipc	t1, 0x0
+      d2: 00030067     	jr	t1 <KerFirSeqBaselinef32+0x82>
+
+000000d6 <KerFirSeqf32>:
+      d6: 7139         	addi	sp, sp, -0x40
+      d8: de06         	sw	ra, 0x3c(sp)
+      da: dc22         	sw	s0, 0x38(sp)
+      dc: da26         	sw	s1, 0x34(sp)
+      de: d84a         	sw	s2, 0x30(sp)
+      e0: d64e         	sw	s3, 0x2c(sp)
+      e2: d452         	sw	s4, 0x28(sp)
+      e4: d256         	sw	s5, 0x24(sp)
+      e6: d05a         	sw	s6, 0x20(sp)
+      e8: ce5e         	sw	s7, 0x1c(sp)
+      ea: cc62         	sw	s8, 0x18(sp)
+      ec: ca66         	sw	s9, 0x14(sp)
+      ee: c86a         	sw	s10, 0x10(sp)
+      f0: c66e         	sw	s11, 0xc(sp)
+      f2: c42e         	sw	a1, 0x8(sp)
+      f4: 4789         	li	a5, 0x2
+      f6: 41f6d593     	srai	a1, a3, 0x1f
+      fa: c22e         	sw	a1, 0x4(sp)
+      fc: 14f74263     	blt	a4, a5, 0x240 <KerFirSeqf32+0x16a>
+     100: 4981         	li	s3, 0x0
+     102: 01f75793     	srli	a5, a4, 0x1f
+     106: 4492         	lw	s1, 0x4(sp)
+     108: 80f9         	srli	s1, s1, 0x1e
+     10a: 00850893     	addi	a7, a0, 0x8
+     10e: 4f22         	lw	t5, 0x8(sp)
+     110: 008f0293     	addi	t0, t5, 0x8
+     114: 02f7235b     	p.addn	t1, a4, a5, 0x1
+     118: 94b6         	add	s1, s1, a3
+     11a: ffc4f393     	andi	t2, s1, -0x4
+     11e: 048a         	slli	s1, s1, 0x2
+     120: 98c1         	andi	s1, s1, -0x10
+     122: 40768e33     	sub	t3, a3, t2
+     126: 00848e93     	addi	t4, s1, 0x8
+     12a: 9f26         	add	t5, t5, s1
+     12c: 00a48fb3     	add	t6, s1, a0
+     130: 0f91         	addi	t6, t6, 0x4
+     132: 4911         	li	s2, 0x4
+     134: 085340fb     	lp.setup	x1, t1, 0x85
+     138: 0b26c763     	blt	a3, s2, 0x1e6 <KerFirSeqf32+0x110>
+     13c: 4b01         	li	s6, 0x0
+     13e: 4a81         	li	s5, 0x0
+     140: 00399793     	slli	a5, s3, 0x3
+     144: 97f6         	add	a5, a5, t4
+     146: 00f50a33     	add	s4, a0, a5
+     14a: 411a07b3     	sub	a5, s4, a7
+     14e: 8391         	srli	a5, a5, 0x4
+     150: 8416         	mv	s0, t0
+     152: 84c6         	mv	s1, a7
+     154: 0457c07b     	lp.setup	x0, a5, 0x45
+     158: d00b7b53     	fcvt.s.w	s6, s6
+     15c: ff84ab83     	lw	s7, -0x8(s1)
+     160: ffc4ad03     	lw	s10, -0x4(s1)
+     164: 0004ac03     	lw	s8, 0x0(s1)
+     168: 0044ac83     	lw	s9, 0x4(s1)
+     16c: ff842783     	lw	a5, -0x8(s0)
+     170: ffc42d83     	lw	s11, -0x4(s0)
+     174: 00042083     	lw	ra, 0x0(s0)
+     178: 00442803     	lw	a6, 0x4(s0)
+     17c: b0fbfb43     	fmadd.s	s6, s7, a5, s6
+     180: d00af5d3     	fcvt.s.w	a1, s5
+     184: 58fd75c3     	fmadd.s	a1, s10, a5, a1
+     188: 0084aa83     	lw	s5, 0x8(s1)
+     18c: 04c1         	addi	s1, s1, 0x10
+     18e: c00b17d3     	fcvt.w.s	a5, s6, rtz
+     192: c00595d3     	fcvt.w.s	a1, a1, rtz
+     196: d007f7d3     	fcvt.s.w	a5, a5
+     19a: d005f5d3     	fcvt.s.w	a1, a1
+     19e: 79bd77c3     	fmadd.s	a5, s10, s11, a5
+     1a2: 59bc75c3     	fmadd.s	a1, s8, s11, a1
+     1a6: c00797d3     	fcvt.w.s	a5, a5, rtz
+     1aa: c00595d3     	fcvt.w.s	a1, a1, rtz
+     1ae: d007f7d3     	fcvt.s.w	a5, a5
+     1b2: d005f5d3     	fcvt.s.w	a1, a1
+     1b6: 781c77c3     	fmadd.s	a5, s8, ra, a5
+     1ba: 581cf5c3     	fmadd.s	a1, s9, ra, a1
+     1be: c00797d3     	fcvt.w.s	a5, a5, rtz
+     1c2: c00595d3     	fcvt.w.s	a1, a1, rtz
+     1c6: d007f7d3     	fcvt.s.w	a5, a5
+     1ca: d005f5d3     	fcvt.s.w	a1, a1
+     1ce: 790cf7c3     	fmadd.s	a5, s9, a6, a5
+     1d2: 590af5c3     	fmadd.s	a1, s5, a6, a1
+     1d6: c0079b53     	fcvt.w.s	s6, a5, rtz
+     1da: c0059ad3     	fcvt.w.s	s5, a1, rtz
+     1de: 0441         	addi	s0, s0, 0x10
+     1e0: 00d3c763     	blt	t2, a3, 0x1ee <KerFirSeqf32+0x118>
+     1e4: a82d         	j	0x21e <KerFirSeqf32+0x148>
+     1e6: 4a81         	li	s5, 0x0
+     1e8: 4b01         	li	s6, 0x0
+     1ea: 02d3da63     	bge	t2, a3, 0x21e <KerFirSeqf32+0x148>
+     1ee: 847e         	mv	s0, t6
+     1f0: 84fa         	mv	s1, t5
+     1f2: 87f2         	mv	a5, t3
+     1f4: 014e407b     	lp.setup	x0, t3, 0x14
+     1f8: ffc42803     	lw	a6, -0x4(s0)
+     1fc: 0044a58b     	p.lw	a1, 0x4(s1!)
+     200: d00b7a53     	fcvt.s.w	s4, s6
+     204: 00042b03     	lw	s6, 0x0(s0)
+     208: a0b87843     	fmadd.s	a6, a6, a1, s4
+     20c: d00afa53     	fcvt.s.w	s4, s5
+     210: a0bb75c3     	fmadd.s	a1, s6, a1, s4
+     214: c0081b53     	fcvt.w.s	s6, a6, rtz
+     218: c0059ad3     	fcvt.w.s	s5, a1, rtz
+     21c: 0411         	addi	s0, s0, 0x4
+     21e: 00199593     	slli	a1, s3, 0x1
+     222: d00b77d3     	fcvt.s.w	a5, s6
+     226: d00af4d3     	fcvt.s.w	s1, s5
+     22a: 0985         	addi	s3, s3, 0x1
+     22c: 08a1         	addi	a7, a7, 0x8
+     22e: 00158413     	addi	s0, a1, 0x1
+     232: 058a         	slli	a1, a1, 0x2
+     234: 95b2         	add	a1, a1, a2
+     236: 040a         	slli	s0, s0, 0x2
+     238: 9432         	add	s0, s0, a2
+     23a: c19c         	sw	a5, 0x0(a1)
+     23c: c004         	sw	s1, 0x0(s0)
+     23e: 0fa1         	addi	t6, t6, 0x8
+     240: 00177593     	andi	a1, a4, 0x1
+     244: 00271893     	slli	a7, a4, 0x2
+     248: c1e9         	beqz	a1, 0x30a <KerFirSeqf32+0x234>
+     24a: 4592         	lw	a1, 0x4(sp)
+     24c: 81f9         	srli	a1, a1, 0x1e
+     24e: 04b6a2db     	p.addn	t0, a3, a1, 0x2
+     252: 4591         	li	a1, 0x4
+     254: 00429813     	slli	a6, t0, 0x4
+     258: 4401         	li	s0, 0x0
+     25a: 06b6c963     	blt	a3, a1, 0x2cc <KerFirSeqf32+0x1f6>
+     25e: 00a887b3     	add	a5, a7, a0
+     262: 0791         	addi	a5, a5, 0x4
+     264: 01078333     	add	t1, a5, a6
+     268: 40f305b3     	sub	a1, t1, a5
+     26c: 8191         	srli	a1, a1, 0x4
+     26e: 44a2         	lw	s1, 0x8(sp)
+     270: 04a1         	addi	s1, s1, 0x8
+     272: 0001         	nop
+     274: 02b5c07b     	lp.setup	x0, a1, 0x2b
+     278: d00473d3     	fcvt.s.w	t2, s0
+     27c: ff87af03     	lw	t5, -0x8(a5)
+     280: ffc7ae03     	lw	t3, -0x4(a5)
+     284: 0007af83     	lw	t6, 0x0(a5)
+     288: 0047ae83     	lw	t4, 0x4(a5)
+     28c: ff84a403     	lw	s0, -0x8(s1)
+     290: ffc4a583     	lw	a1, -0x4(s1)
+     294: 0004a903     	lw	s2, 0x0(s1)
+     298: 0044a983     	lw	s3, 0x4(s1)
+     29c: 388f7443     	fmadd.s	s0, t5, s0, t2
+     2a0: c0041453     	fcvt.w.s	s0, s0, rtz
+     2a4: d0047453     	fcvt.s.w	s0, s0
+     2a8: 40be75c3     	fmadd.s	a1, t3, a1, s0
+     2ac: c00595d3     	fcvt.w.s	a1, a1, rtz
+     2b0: d005f5d3     	fcvt.s.w	a1, a1
+     2b4: 592ff5c3     	fmadd.s	a1, t6, s2, a1
+     2b8: 07c1         	addi	a5, a5, 0x10
+     2ba: c00595d3     	fcvt.w.s	a1, a1, rtz
+     2be: d005f5d3     	fcvt.s.w	a1, a1
+     2c2: 593ef5c3     	fmadd.s	a1, t4, s3, a1
+     2c6: c0059453     	fcvt.w.s	s0, a1, rtz
+     2ca: 04c1         	addi	s1, s1, 0x10
+     2cc: 028a         	slli	t0, t0, 0x2
+     2ce: fff70313     	addi	t1, a4, -0x1
+     2d2: 02d2d763     	bge	t0, a3, 0x300 <KerFirSeqf32+0x22a>
+     2d6: 405687b3     	sub	a5, a3, t0
+     2da: 45a2         	lw	a1, 0x8(sp)
+     2dc: 95c2         	add	a1, a1, a6
+     2de: 9846         	add	a6, a6, a7
+     2e0: 982a         	add	a6, a6, a0
+     2e2: ffc80493     	addi	s1, a6, -0x4
+     2e6: 0001         	nop
+     2e8: 00a7c07b     	lp.setup	x0, a5, 0xa
+     2ec: 0044a80b     	p.lw	a6, 0x4(s1!)
+     2f0: 0045a70b     	p.lw	a4, 0x4(a1!)
+     2f4: d0047453     	fcvt.s.w	s0, s0
+     2f8: 40e87743     	fmadd.s	a4, a6, a4, s0
+     2fc: c0071453     	fcvt.w.s	s0, a4, rtz
+     300: d00475d3     	fcvt.s.w	a1, s0
+     304: 030a         	slli	t1, t1, 0x2
+     306: 961a         	add	a2, a2, t1
+     308: c20c         	sw	a1, 0x0(a2)
+     30a: 4589         	li	a1, 0x2
+     30c: 02b6c063     	blt	a3, a1, 0x32c <KerFirSeqf32+0x256>
+     310: 068a         	slli	a3, a3, 0x2
+     312: 00a685b3     	add	a1, a3, a0
+     316: 15f1         	addi	a1, a1, -0x4
+     318: 40a58633     	sub	a2, a1, a0
+     31c: 8209         	srli	a2, a2, 0x2
+     31e: 98aa         	add	a7, a7, a0
+     320: 0056407b     	lp.setup	x0, a2, 0x5
+     324: 0048a60b     	p.lw	a2, 0x4(a7!)
+     328: c110         	sw	a2, 0x0(a0)
+     32a: 0511         	addi	a0, a0, 0x4
+     32c: 50f2         	lw	ra, 0x3c(sp)
+     32e: 5462         	lw	s0, 0x38(sp)
+     330: 54d2         	lw	s1, 0x34(sp)
+     332: 5942         	lw	s2, 0x30(sp)
+     334: 59b2         	lw	s3, 0x2c(sp)
+     336: 5a22         	lw	s4, 0x28(sp)
+     338: 5a92         	lw	s5, 0x24(sp)
+     33a: 5b02         	lw	s6, 0x20(sp)
+     33c: 4bf2         	lw	s7, 0x1c(sp)
+     33e: 4c62         	lw	s8, 0x18(sp)
+     340: 4cd2         	lw	s9, 0x14(sp)
+     342: 4d42         	lw	s10, 0x10(sp)
+     344: 4db2         	lw	s11, 0xc(sp)
+     346: 6121         	addi	sp, sp, 0x40
+     348: 8082         	ret
+
+0000034a <KerFirParf32>:
+     34a: 715d         	addi	sp, sp, -0x50
+     34c: c686         	sw	ra, 0x4c(sp)
+     34e: c4a2         	sw	s0, 0x48(sp)
+     350: c2a6         	sw	s1, 0x44(sp)
+     352: c0ca         	sw	s2, 0x40(sp)
+     354: de4e         	sw	s3, 0x3c(sp)
+     356: dc52         	sw	s4, 0x38(sp)
+     358: da56         	sw	s5, 0x34(sp)
+     35a: d85a         	sw	s6, 0x30(sp)
+     35c: d65e         	sw	s7, 0x2c(sp)
+     35e: d462         	sw	s8, 0x28(sp)
+     360: d266         	sw	s9, 0x24(sp)
+     362: d06a         	sw	s10, 0x20(sp)
+     364: ce6e         	sw	s11, 0x1c(sp)
+     366: 00052c03     	lw	s8, 0x0(a0)
+     36a: 00452b03     	lw	s6, 0x4(a0)
+     36e: 450c         	lw	a1, 0x8(a0)
+     370: cc2e         	sw	a1, 0x18(sp)
+     372: 00c52383     	lw	t2, 0xc(a0)
+     376: 01052b83     	lw	s7, 0x10(a0)
+     37a: 4505         	li	a0, 0x1
+     37c: 100515b3     	p.fl1	a1, a0
+     380: c82e         	sw	a1, 0x10(sp)
+     382: 00b3d5b3     	srl	a1, t2, a1
+     386: 0475c5b3     	p.min	a1, a1, t2
+     38a: c62e         	sw	a1, 0xc(sp)
+     38c: 0405ee33     	p.max	t3, a1, zero
+     390: 41fbd593     	srai	a1, s7, 0x1f
+     394: ca2e         	sw	a1, 0x14(sp)
+     396: 15c55263     	bge	a0, t3, 0x4da <KerFirParf32+0x190>
+     39a: 4d81         	li	s11, 0x0
+     39c: 01fe5513     	srli	a0, t3, 0x1f
+     3a0: 45d2         	lw	a1, 0x14(sp)
+     3a2: 81f9         	srli	a1, a1, 0x1e
+     3a4: 008c0d13     	addi	s10, s8, 0x8
+     3a8: 4a62         	lw	s4, 0x18(sp)
+     3aa: 008a0e93     	addi	t4, s4, 0x8
+     3ae: 02ae2f5b     	p.addn	t5, t3, a0, 0x1
+     3b2: 95de         	add	a1, a1, s7
+     3b4: ffc5fa93     	andi	s5, a1, -0x4
+     3b8: 058a         	slli	a1, a1, 0x2
+     3ba: 99c1         	andi	a1, a1, -0x10
+     3bc: 415b8fb3     	sub	t6, s7, s5
+     3c0: 00858913     	addi	s2, a1, 0x8
+     3c4: 9a2e         	add	s4, s4, a1
+     3c6: 95e2         	add	a1, a1, s8
+     3c8: 00458c93     	addi	s9, a1, 0x4
+     3cc: 4991         	li	s3, 0x4
+     3ce: 0001         	nop
+     3d0: 084f40fb     	lp.setup	x1, t5, 0x84
+     3d4: 0b3bc663     	blt	s7, s3, 0x480 <KerFirParf32+0x136>
+     3d8: 4481         	li	s1, 0x0
+     3da: 4701         	li	a4, 0x0
+     3dc: 003d9513     	slli	a0, s11, 0x3
+     3e0: 954a         	add	a0, a0, s2
+     3e2: 00ac00b3     	add	ra, s8, a0
+     3e6: 41a08533     	sub	a0, ra, s10
+     3ea: 00455413     	srli	s0, a0, 0x4
+     3ee: 8576         	mv	a0, t4
+     3f0: 85ea         	mv	a1, s10
+     3f2: 0001         	nop
+     3f4: 0424407b     	lp.setup	x0, s0, 0x42
+     3f8: d0077753     	fcvt.s.w	a4, a4
+     3fc: ff85a403     	lw	s0, -0x8(a1)
+     400: ffc5a783     	lw	a5, -0x4(a1)
+     404: 4194         	lw	a3, 0x0(a1)
+     406: 41d0         	lw	a2, 0x4(a1)
+     408: ff852803     	lw	a6, -0x8(a0)
+     40c: ffc52883     	lw	a7, -0x4(a0)
+     410: 00052283     	lw	t0, 0x0(a0)
+     414: 00452303     	lw	t1, 0x4(a0)
+     418: 71047743     	fmadd.s	a4, s0, a6, a4
+     41c: d004f453     	fcvt.s.w	s0, s1
+     420: 4107f4c3     	fmadd.s	s1, a5, a6, s0
+     424: 4580         	lw	s0, 0x8(a1)
+     426: 05c1         	addi	a1, a1, 0x10
+     428: c0071753     	fcvt.w.s	a4, a4, rtz
+     42c: c00494d3     	fcvt.w.s	s1, s1, rtz
+     430: d0077753     	fcvt.s.w	a4, a4
+     434: d004f4d3     	fcvt.s.w	s1, s1
+     438: 7117f743     	fmadd.s	a4, a5, a7, a4
+     43c: 4916f7c3     	fmadd.s	a5, a3, a7, s1
+     440: c0071753     	fcvt.w.s	a4, a4, rtz
+     444: c00797d3     	fcvt.w.s	a5, a5, rtz
+     448: d0077753     	fcvt.s.w	a4, a4
+     44c: d007f7d3     	fcvt.s.w	a5, a5
+     450: 7056f6c3     	fmadd.s	a3, a3, t0, a4
+     454: 78567743     	fmadd.s	a4, a2, t0, a5
+     458: c00696d3     	fcvt.w.s	a3, a3, rtz
+     45c: c0071753     	fcvt.w.s	a4, a4, rtz
+     460: d006f6d3     	fcvt.s.w	a3, a3
+     464: d0077753     	fcvt.s.w	a4, a4
+     468: 68667643     	fmadd.s	a2, a2, t1, a3
+     46c: 706476c3     	fmadd.s	a3, s0, t1, a4
+     470: c0061753     	fcvt.w.s	a4, a2, rtz
+     474: c00694d3     	fcvt.w.s	s1, a3, rtz
+     478: 0541         	addi	a0, a0, 0x10
+     47a: 017ac763     	blt	s5, s7, 0x488 <KerFirParf32+0x13e>
+     47e: a82d         	j	0x4b8 <KerFirParf32+0x16e>
+     480: 4701         	li	a4, 0x0
+     482: 4481         	li	s1, 0x0
+     484: 037ada63     	bge	s5, s7, 0x4b8 <KerFirParf32+0x16e>
+     488: 8566         	mv	a0, s9
+     48a: 85d2         	mv	a1, s4
+     48c: 867e         	mv	a2, t6
+     48e: 0001         	nop
+     490: 013fc07b     	lp.setup	x0, t6, 0x13
+     494: ffc52683     	lw	a3, -0x4(a0)
+     498: 0045a78b     	p.lw	a5, 0x4(a1!)
+     49c: d0077753     	fcvt.s.w	a4, a4
+     4a0: 4100         	lw	s0, 0x0(a0)
+     4a2: 70f6f6c3     	fmadd.s	a3, a3, a5, a4
+     4a6: d004f753     	fcvt.s.w	a4, s1
+     4aa: 70f477c3     	fmadd.s	a5, s0, a5, a4
+     4ae: c0069753     	fcvt.w.s	a4, a3, rtz
+     4b2: c00794d3     	fcvt.w.s	s1, a5, rtz
+     4b6: 0511         	addi	a0, a0, 0x4
+     4b8: 001d9513     	slli	a0, s11, 0x1
+     4bc: d00775d3     	fcvt.s.w	a1, a4
+     4c0: d004f653     	fcvt.s.w	a2, s1
+     4c4: 0d85         	addi	s11, s11, 0x1
+     4c6: 0d21         	addi	s10, s10, 0x8
+     4c8: 00150693     	addi	a3, a0, 0x1
+     4cc: 050a         	slli	a0, a0, 0x2
+     4ce: 955a         	add	a0, a0, s6
+     4d0: 068a         	slli	a3, a3, 0x2
+     4d2: 96da         	add	a3, a3, s6
+     4d4: c10c         	sw	a1, 0x0(a0)
+     4d6: c290         	sw	a2, 0x0(a3)
+     4d8: 0ca1         	addi	s9, s9, 0x8
+     4da: 001e7513     	andi	a0, t3, 0x1
+     4de: c979         	beqz	a0, 0x5b4 <KerFirParf32+0x26a>
+     4e0: 4552         	lw	a0, 0x14(sp)
+     4e2: 8179         	srli	a0, a0, 0x1e
+     4e4: 4691         	li	a3, 0x4
+     4e6: 04aba8db     	p.addn	a7, s7, a0, 0x2
+     4ea: 4fb2         	lw	t6, 0xc(sp)
+     4ec: 002f9813     	slli	a6, t6, 0x2
+     4f0: 00489293     	slli	t0, a7, 0x4
+     4f4: 06dbce63     	blt	s7, a3, 0x570 <KerFirParf32+0x226>
+     4f8: 4681         	li	a3, 0x0
+     4fa: 01880733     	add	a4, a6, s8
+     4fe: 0711         	addi	a4, a4, 0x4
+     500: 00570333     	add	t1, a4, t0
+     504: 40e307b3     	sub	a5, t1, a4
+     508: 8391         	srli	a5, a5, 0x4
+     50a: 44e2         	lw	s1, 0x18(sp)
+     50c: 04a1         	addi	s1, s1, 0x8
+     50e: 0001         	nop
+     510: 0287c07b     	lp.setup	x0, a5, 0x28
+     514: d006fe53     	fcvt.s.w	t3, a3
+     518: ff872783     	lw	a5, -0x8(a4)
+     51c: ffc72f03     	lw	t5, -0x4(a4)
+     520: 4300         	lw	s0, 0x0(a4)
+     522: 00472e83     	lw	t4, 0x4(a4)
+     526: ff84a603     	lw	a2, -0x8(s1)
+     52a: ffc4a683     	lw	a3, -0x4(s1)
+     52e: 4088         	lw	a0, 0x0(s1)
+     530: 40cc         	lw	a1, 0x4(s1)
+     532: e0c7f643     	fmadd.s	a2, a5, a2, t3
+     536: c0061653     	fcvt.w.s	a2, a2, rtz
+     53a: d0067653     	fcvt.s.w	a2, a2
+     53e: 60df7643     	fmadd.s	a2, t5, a3, a2
+     542: c0061653     	fcvt.w.s	a2, a2, rtz
+     546: d0067653     	fcvt.s.w	a2, a2
+     54a: 60a47543     	fmadd.s	a0, s0, a0, a2
+     54e: 0741         	addi	a4, a4, 0x10
+     550: c0051553     	fcvt.w.s	a0, a0, rtz
+     554: d0057553     	fcvt.s.w	a0, a0
+     558: 50bef543     	fmadd.s	a0, t4, a1, a0
+     55c: c00516d3     	fcvt.w.s	a3, a0, rtz
+     560: 04c1         	addi	s1, s1, 0x10
+     562: 00289513     	slli	a0, a7, 0x2
+     566: ffff8313     	addi	t1, t6, -0x1
+     56a: 01754a63     	blt	a0, s7, 0x57e <KerFirParf32+0x234>
+     56e: a82d         	j	0x5a8 <KerFirParf32+0x25e>
+     570: 4681         	li	a3, 0x0
+     572: 00289513     	slli	a0, a7, 0x2
+     576: ffff8313     	addi	t1, t6, -0x1
+     57a: 03755763     	bge	a0, s7, 0x5a8 <KerFirParf32+0x25e>
+     57e: 40ab8533     	sub	a0, s7, a0
+     582: 48e2         	lw	a7, 0x18(sp)
+     584: 9896         	add	a7, a7, t0
+     586: 9816         	add	a6, a6, t0
+     588: 018805b3     	add	a1, a6, s8
+     58c: 15f1         	addi	a1, a1, -0x4
+     58e: 0001         	nop
+     590: 00a5407b     	lp.setup	x0, a0, 0xa
+     594: 0045a60b     	p.lw	a2, 0x4(a1!)
+     598: 0048a70b     	p.lw	a4, 0x4(a7!)
+     59c: d006f6d3     	fcvt.s.w	a3, a3
+     5a0: 68e67643     	fmadd.s	a2, a2, a4, a3
+     5a4: c00616d3     	fcvt.w.s	a3, a2, rtz
+     5a8: d006f553     	fcvt.s.w	a0, a3
+     5ac: 030a         	slli	t1, t1, 0x2
+     5ae: 935a         	add	t1, t1, s6
+     5b0: 00a32023     	sw	a0, 0x0(t1)
+     5b4: 027bd863     	bge	s7, t2, 0x5e4 <KerFirParf32+0x29a>
+     5b8: 4509         	li	a0, 0x2
+     5ba: 04abcc63     	blt	s7, a0, 0x612 <KerFirParf32+0x2c8>
+     5be: 00239593     	slli	a1, t2, 0x2
+     5c2: 0b8a         	slli	s7, s7, 0x2
+     5c4: 018b8533     	add	a0, s7, s8
+     5c8: 1571         	addi	a0, a0, -0x4
+     5ca: 41850633     	sub	a2, a0, s8
+     5ce: 8209         	srli	a2, a2, 0x2
+     5d0: 95e2         	add	a1, a1, s8
+     5d2: 0001         	nop
+     5d4: 0066407b     	lp.setup	x0, a2, 0x6
+     5d8: 0045a60b     	p.lw	a2, 0x4(a1!)
+     5dc: 00cc2023     	sw	a2, 0x0(s8)
+     5e0: 0c11         	addi	s8, s8, 0x4
+     5e2: a805         	j	0x612 <KerFirParf32+0x2c8>
+     5e4: 1bfd         	addi	s7, s7, -0x1
+     5e6: 4542         	lw	a0, 0x10(sp)
+     5e8: 00abd533     	srl	a0, s7, a0
+     5ec: 05754533     	p.min	a0, a0, s7
+     5f0: 02a05163     	blez	a0, 0x612 <KerFirParf32+0x2c8>
+     5f4: 00239593     	slli	a1, t2, 0x2
+     5f8: 050a         	slli	a0, a0, 0x2
+     5fa: 9562         	add	a0, a0, s8
+     5fc: 41850633     	sub	a2, a0, s8
+     600: 8209         	srli	a2, a2, 0x2
+     602: 95e2         	add	a1, a1, s8
+     604: 0066407b     	lp.setup	x0, a2, 0x6
+     608: 0045a60b     	p.lw	a2, 0x4(a1!)
+     60c: 00cc2023     	sw	a2, 0x0(s8)
+     610: 0c11         	addi	s8, s8, 0x4
+     612: 40b6         	lw	ra, 0x4c(sp)
+     614: 4426         	lw	s0, 0x48(sp)
+     616: 4496         	lw	s1, 0x44(sp)
+     618: 4906         	lw	s2, 0x40(sp)
+     61a: 59f2         	lw	s3, 0x3c(sp)
+     61c: 5a62         	lw	s4, 0x38(sp)
+     61e: 5ad2         	lw	s5, 0x34(sp)
+     620: 5b42         	lw	s6, 0x30(sp)
+     622: 5bb2         	lw	s7, 0x2c(sp)
+     624: 5c22         	lw	s8, 0x28(sp)
+     626: 5c92         	lw	s9, 0x24(sp)
+     628: 5d02         	lw	s10, 0x20(sp)
+     62a: 4df2         	lw	s11, 0x1c(sp)
+     62c: 6161         	addi	sp, sp, 0x50
+     62e: 8082         	ret

@@ -1,0 +1,2 @@
+RESULT kernel=k10a_fft_radix2_scalar cycles=22800 instrs=22788 checksum=0xdeebe4e7 reps=4 total_cycles=91203 pccr_cycles=91208
+[run_sim] exit code: 0

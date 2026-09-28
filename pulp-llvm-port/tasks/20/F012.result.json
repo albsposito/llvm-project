@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "branch": "work/20/F012",
+  "commits": [
+    "ac754d0b92f501322cd06e6bec4da0364a0d6998"
+  ],
+  "note": "notes/20/F012.md",
+  "signature_gone": true,
+  "owner_cluster_used": "insn-tablegen (only llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td)",
+  "root_cause": "Fork idiom patterns from f1b7aebff8c2 (retyped in 93e0fc427e93) selected P_CLIPR for smin(smax(x,~b),b)/smax(smin(x,b),~b) with any register b, and P_CLIPUR for the unsigned betweenu shape. ISA (GVSoC pulp_v2.hpp:1949 p_clip_exec low=-b-1 high=b + int.h:1291 lib_CLIP; :1958 p_clipu_exec + int.h:1305 lib_CLIPU signed) equals the C clamp only when b>=0; for b<0 the C idioms return b (or ~b) for all x, p.clipr returns ~b for x<~b. betweenu (umin(umax(x,0),b)=umin(x,b)) was dead (umax(x,0) folds) and not equivalent to p.clipur for negative x even with b>=0.",
+  "fix": "New PatFrags clipr_idiom (same between(not b,b,x) shape) and clipur_idiom (F008's signed clipu_idiom shapes) with PredicateCodeUsesOperands and CurDAG->SignBitIsZero(Operands[0]); clipur_idiom also rejects ConstantSDNode bounds so constant clamps keep their current code (p.clipu imm via F008, else p.max/p.min). Unused wrong betweenu fragment removed. Builtin patterns (int_riscv_pulp_clip_r/clipu_r) unchanged. Upstream CORE-V (RISCVInstrInfoXCV.td:231-233,797-798 @llvmorg-20.1.8) selects cv.clipr/cv.clipur only from intrinsics; PredicateCodeUsesOperands usage follows RISCVInstrInfoZb.td:183-188. GAP9 GCC emits not+p.max+p.min for these idioms (logs/20-F012/gcc_probe.c).",
+  "behaviour_change": "Unknown-sign register bound: p.clipr -> not+p.max+p.min (same as GAP9 GCC). Known non-negative register bound (b&0x7fff, (unsigned)b>>1, zext u16): p.clipr kept; clipu-shaped clamps now become p.clipur (was p.max+p.min; newly live, correct by ISA semantics). Constant bounds and builtins unchanged.",
+  "results": {
+    "repro": "logs/20-F012.repro.log (build), logs/20-F012/clipr/before.sim.txt: p.clipr, CLIPR mismatches=5 on GVSoC",
+    "after_repro": "logs/20-F012/clipr/after.sim.txt: not/p.max/p.min, mismatches=0",
+    "gvsoc_semantic": "logs/20-F012/sim/results.txt: 13 kernels x (36x36 edges + 2000 random) = 42848 checks at O2/O3/Os vs -O0 reference; int-20 1677 mismatches each, this build 0; this build emits 4 p.clipr (3 non-negative + builtin) and 5 p.clipur (4 non-negative + builtin)",
+    "ir_idioms": "logs/20-F012/idioms.ll, idioms.{before,after}.clean.s (llc -verify-machineinstrs): only the any-sign clipr cases and the 3 non-negative clipu shapes change",
+    "gap9_sweep": "logs/20-F012/sweep/compare.txt: scratch copy, GAP9_EXTRA_COMPILERS int20 and mine; all 54 .dis byte-identical (excluding file-format line)",
+    "fuzzer": "logs/20-F012/fuzz/res.txt: seeds 7200-7499 x O2/O3/Os, 900/900 asm identical to int-20, 900/900 OK vs GCC, no NEWFAIL/OBJFAIL/hang",
+    "lit": "logs/20-F012-lit/ (scripts/lit.sh, full LIT_PATHS incl. all fork tests): 4729 PASS, 1 FAIL = known rvv/vsetvli-insert-zve64f.mir (data/known-failures.txt); lit_diff green; RISCVISAInfo unit 84 tests pass",
+    "build": "logs/20-F012.after.log (llc clang llvm-mc lld llvm-objdump), cluster_errors 0 failed targets",
+    "policy_check": "logs/20-F012.policy.log: 0 FAIL, 0 WARN"
+  },
+  "other_errors_seen": [],
+  "proposed_test": {
+    "file": "llvm/test/CodeGen/RISCV/xpulp-clipr-idiom.ll (new)",
+    "run": "; RUN: llc -mtriple=riscv32 -mattr=+xpulpv -verify-machineinstrs < %s | FileCheck %s",
+    "checks": [
+      "clipr_any_a/clipr_any_b (b of unknown sign, both orders): CHECK not, p.max, p.min; CHECK-NOT p.clipr",
+      "clipr_nn_a (b&32767), clipr_nn_b (lshr b,1), clipr_nn_c (zext i16, commuted operands): p.clipr a0, a0, a1",
+      "clipur_any_s/_s2/_u (unknown sign): p.max/p.min(u), CHECK-NOT p.clipur",
+      "clipur_nn_s/_s2/_u (non-negative b): p.clipur a0, a0, a1",
+      "c200, c201: p.max/p.min, no p.clipr/p.clipur; c8 -> p.clip 8; cu9 -> p.clipu 9",
+      "bclipr/bclipur builtins with arbitrary b: p.clipr / p.clipur"
+    ],
+    "source": "logs/20-F012/idioms.ll"
+  }
+}

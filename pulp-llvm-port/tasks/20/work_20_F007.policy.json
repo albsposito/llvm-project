@@ -1,0 +1,14 @@
+{
+  "range": "b0f18c5a6b886a603fab13304ec9452bdb604f4a..work/20/F007",
+  "commits": 1,
+  "fail": 0,
+  "warn": 1,
+  "findings": [
+    {
+      "commit": "53aa20faf0b3",
+      "level": "WARN",
+      "rule": "diff-size",
+      "msg": "561 changed lines; reviewer must confirm this is one root cause"
+    }
+  ]
+}

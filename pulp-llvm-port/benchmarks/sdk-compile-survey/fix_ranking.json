@@ -1,0 +1,313 @@
+{
+ "steps": [
+  {
+   "fix": "__builtin_pulp_event_unit_read_fenced",
+   "files_unlocked": 21,
+   "cumulative": 21,
+   "files_needing": 398
+  },
+  {
+   "fix": "__builtin_pulp_OffsetedWritePtr",
+   "files_unlocked": 246,
+   "cumulative": 267,
+   "files_needing": 377
+  },
+  {
+   "fix": "float16/float16alt types",
+   "files_unlocked": 38,
+   "cumulative": 305,
+   "files_needing": 132
+  },
+  {
+   "fix": "gcc-only language feature: __builtin_pulp_CoreCount() folded to a constant (-mPE) in a static initializer",
+   "files_unlocked": 24,
+   "cumulative": 329,
+   "files_needing": 68
+  },
+  {
+   "fix": "gcc-only language feature: __builtin_shuffle",
+   "files_unlocked": 17,
+   "cumulative": 346,
+   "files_needing": 26
+  },
+  {
+   "fix": "clang-stricter default error",
+   "files_unlocked": 7,
+   "cumulative": 353,
+   "files_needing": 7
+  },
+  {
+   "fix": "builtin argument check: argument to '__builtin_pulp_mulsN' must be a constant integer",
+   "files_unlocked": 6,
+   "cumulative": 359,
+   "files_needing": 9
+  },
+  {
+   "fix": "__builtin_pulp_f16altmax",
+   "files_unlocked": 4,
+   "cumulative": 363,
+   "files_needing": 14
+  },
+  {
+   "fix": "__builtin_pulp_f32max",
+   "files_unlocked": 3,
+   "cumulative": 366,
+   "files_needing": 15
+  },
+  {
+   "fix": "other",
+   "files_unlocked": 3,
+   "cumulative": 369,
+   "files_needing": 6
+  },
+  {
+   "fix": "__builtin_pulp_f32min",
+   "files_unlocked": 2,
+   "cumulative": 371,
+   "files_needing": 9
+  },
+  {
+   "fix": "__builtin_pulp_f32abs",
+   "files_unlocked": 7,
+   "cumulative": 378,
+   "files_needing": 7
+  },
+  {
+   "fix": "__builtin_pulp_f16max",
+   "files_unlocked": 2,
+   "cumulative": 380,
+   "files_needing": 9
+  },
+  {
+   "fix": "__builtin_pulp_f16altmin",
+   "files_unlocked": 2,
+   "cumulative": 382,
+   "files_needing": 9
+  },
+  {
+   "fix": "__builtin_pulp_f16altmax2",
+   "files_unlocked": 3,
+   "cumulative": 385,
+   "files_needing": 8
+  },
+  {
+   "fix": "__builtin_pulp_f32sqrt",
+   "files_unlocked": 4,
+   "cumulative": 389,
+   "files_needing": 5
+  },
+  {
+   "fix": "__builtin_pulp_f16altmin2",
+   "files_unlocked": 2,
+   "cumulative": 391,
+   "files_needing": 3
+  },
+  {
+   "fix": "__builtin_pulp_rintsf2",
+   "files_unlocked": 2,
+   "cumulative": 393,
+   "files_needing": 2
+  },
+  {
+   "fix": "__builtin_pulp_f16max2",
+   "files_unlocked": 1,
+   "cumulative": 394,
+   "files_needing": 6
+  },
+  {
+   "fix": "__builtin_pulp_f16min",
+   "files_unlocked": 3,
+   "cumulative": 397,
+   "files_needing": 6
+  },
+  {
+   "fix": "__builtin_pulp_f16min2",
+   "files_unlocked": 2,
+   "cumulative": 399,
+   "files_needing": 3
+  },
+  {
+   "fix": "crash: Assertion `MBB != &MF->front() && \"Can't find reaching def for virtreg\"' failed | pass 'Li",
+   "files_unlocked": 1,
+   "cumulative": 400,
+   "files_needing": 1
+  },
+  {
+   "fix": "__builtin_pulp_f16sqrt",
+   "files_unlocked": 1,
+   "cumulative": 401,
+   "files_needing": 1
+  },
+  {
+   "fix": "__builtin_pulp_f16altsqrt",
+   "files_unlocked": 1,
+   "cumulative": 402,
+   "files_needing": 1
+  },
+  {
+   "fix": "__builtin_pulp_mul64hu",
+   "files_unlocked": 1,
+   "cumulative": 403,
+   "files_needing": 1
+  }
+ ],
+ "item_counts": [
+  [
+   "__builtin_pulp_event_unit_read_fenced",
+   398
+  ],
+  [
+   "__builtin_pulp_OffsetedWritePtr",
+   377
+  ],
+  [
+   "float16/float16alt types",
+   132
+  ],
+  [
+   "gcc-only language feature: __builtin_pulp_CoreCount() folded to a constant (-mPE) in a static initializer",
+   68
+  ],
+  [
+   "gcc-only language feature: __builtin_shuffle",
+   26
+  ],
+  [
+   "__builtin_pulp_f32max",
+   15
+  ],
+  [
+   "__builtin_pulp_f16altmax",
+   14
+  ],
+  [
+   "__builtin_pulp_f32min",
+   9
+  ],
+  [
+   "__builtin_pulp_f16max",
+   9
+  ],
+  [
+   "__builtin_pulp_f16altmin",
+   9
+  ],
+  [
+   "builtin argument check: argument to '__builtin_pulp_mulsN' must be a constant integer",
+   9
+  ],
+  [
+   "__builtin_pulp_f16altmax2",
+   8
+  ],
+  [
+   "__builtin_pulp_f32abs",
+   7
+  ],
+  [
+   "clang-stricter default error",
+   7
+  ],
+  [
+   "other",
+   6
+  ],
+  [
+   "__builtin_pulp_f16max2",
+   6
+  ],
+  [
+   "__builtin_pulp_f16min",
+   6
+  ],
+  [
+   "__builtin_pulp_f32sqrt",
+   5
+  ],
+  [
+   "__builtin_pulp_f16altmin2",
+   3
+  ],
+  [
+   "__builtin_pulp_f16min2",
+   3
+  ],
+  [
+   "builtin argument check: argument to '__builtin_pulp_clipu' must be a constant integer",
+   2
+  ],
+  [
+   "builtin argument check: argument to '__builtin_pulp_clip' must be a constant integer",
+   2
+  ],
+  [
+   "__builtin_pulp_rintsf2",
+   2
+  ],
+  [
+   "crash: Assertion `MBB != &MF->front() && \"Can't find reaching def for virtreg\"' failed | pass 'Li",
+   1
+  ],
+  [
+   "__builtin_pulp_mulfsN",
+   1
+  ],
+  [
+   "__builtin_pulp_trunch",
+   1
+  ],
+  [
+   "__builtin_pulp_v2ohftov2hf",
+   1
+  ],
+  [
+   "__builtin_pulp_v2hftov2ohf",
+   1
+  ],
+  [
+   "__builtin_pulp_f16sqrt",
+   1
+  ],
+  [
+   "__builtin_pulp_f16altsqrt",
+   1
+  ],
+  [
+   "__builtin_pulp_mul64hu",
+   1
+  ],
+  [
+   "__builtin_pulp_sub2rotmj",
+   1
+  ],
+  [
+   "__builtin_pulp_cplxmuls2div4",
+   1
+  ],
+  [
+   "__builtin_pulp_sub2div2",
+   1
+  ],
+  [
+   "__builtin_pulp_cplxmuls2",
+   1
+  ],
+  [
+   "__builtin_pulp_cplxmuls2div2",
+   1
+  ],
+  [
+   "__builtin_pulp_add2div2",
+   1
+  ],
+  [
+   "__builtin_pulp_cplx_conj",
+   1
+  ],
+  [
+   "__builtin_pulp_add2div4",
+   1
+  ]
+ ],
+ "never_unlocked": 5
+}

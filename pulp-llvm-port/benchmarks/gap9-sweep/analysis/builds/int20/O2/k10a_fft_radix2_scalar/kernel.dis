@@ -1,0 +1,105 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/gap9-sweep/analysis/builds/int20/O2/k10a_fft_radix2_scalar/kernel.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <Radix2FFT_DIF_Scalar>:
+       0: 7179         	addi	sp, sp, -0x30
+       2: d622         	sw	s0, 0x2c(sp)
+       4: d426         	sw	s1, 0x28(sp)
+       6: d24a         	sw	s2, 0x24(sp)
+       8: d04e         	sw	s3, 0x20(sp)
+       a: ce52         	sw	s4, 0x1c(sp)
+       c: cc56         	sw	s5, 0x18(sp)
+       e: ca5a         	sw	s6, 0x14(sp)
+      10: c85e         	sw	s7, 0x10(sp)
+      12: c662         	sw	s8, 0xc(sp)
+      14: 10061833     	p.fl1	a6, a2
+      18: 4689         	li	a3, 0x2
+      1a: 0ad84963     	blt	a6, a3, 0xcc <Radix2FFT_DIF_Scalar+0xcc>
+      1e: 4681         	li	a3, 0x0
+      20: 01f65713     	srli	a4, a2, 0x1f
+      24: 1879         	addi	a6, a6, -0x2
+      26: 00250893     	addi	a7, a0, 0x2
+      2a: 02e6235b     	p.addn	t1, a2, a4, 0x1
+      2e: 4385         	li	t2, 0x1
+      30: a801         	j	0x40 <Radix2FFT_DIF_Scalar+0x40>
+      32: 0386         	slli	t2, t2, 0x1
+      34: 40135313     	srai	t1, t1, 0x1
+      38: 00128693     	addi	a3, t0, 0x1
+      3c: 09028863     	beq	t0, a6, 0xcc <Radix2FFT_DIF_Scalar+0xcc>
+      40: 82b6         	mv	t0, a3
+      42: fe6058e3     	blez	t1, 0x32 <Radix2FFT_DIF_Scalar+0x32>
+      46: 4f01         	li	t5, 0x0
+      48: 4e01         	li	t3, 0x0
+      4a: 00231e93     	slli	t4, t1, 0x2
+      4e: 9ec6         	add	t4, t4, a7
+      50: 00331913     	slli	s2, t1, 0x3
+      54: 8fc6         	mv	t6, a7
+      56: 0001         	nop
+      58: 038340fb     	lp.setup	x1, t1, 0x38
+      5c: 06705463     	blez	t2, 0xc4 <Radix2FFT_DIF_Scalar+0xc4>
+      60: 002e1693     	slli	a3, t3, 0x2
+      64: 96ae         	add	a3, a3, a1
+      66: 00069983     	lh	s3, 0x0(a3)
+      6a: 00269a03     	lh	s4, 0x2(a3)
+      6e: 847e         	mv	s0, t6
+      70: 84f6         	mv	s1, t4
+      72: 869e         	mv	a3, t2
+      74: 0273c07b     	lp.setup	x0, t2, 0x27
+      78: ffe41a83     	lh	s5, -0x2(s0)
+      7c: 00041b03     	lh	s6, 0x0(s0)
+      80: ffe49b83     	lh	s7, -0x2(s1)
+      84: 00049c03     	lh	s8, 0x0(s1)
+      88: 417a8733     	sub	a4, s5, s7
+      8c: 418b07b3     	sub	a5, s6, s8
+      90: 835baadb     	p.addun	s5, s7, s5, 0x1
+      94: 836c2b5b     	p.addun	s6, s8, s6, 0x1
+      98: ff541f23     	sh	s5, -0x2(s0)
+      9c: 01641023     	sh	s6, 0x0(s0)
+      a0: 03370ab3     	mul	s5, a4, s3
+      a4: 03478b33     	mul	s6, a5, s4
+      a8: 03470bb3     	mul	s7, a4, s4
+      ac: 033787b3     	mul	a5, a5, s3
+      b0: a16ab75b     	p.subun	a4, s5, s6, 0x10
+      b4: a177a7db     	p.addun	a5, a5, s7, 0x10
+      b8: fee49f23     	sh	a4, -0x2(s1)
+      bc: 00f49023     	sh	a5, 0x0(s1)
+      c0: 94ca         	add	s1, s1, s2
+      c2: 944a         	add	s0, s0, s2
+      c4: 9e1e         	add	t3, t3, t2
+      c6: 0e91         	addi	t4, t4, 0x4
+      c8: 0f91         	addi	t6, t6, 0x4
+      ca: b7a5         	j	0x32 <Radix2FFT_DIF_Scalar+0x32>
+      cc: 8605         	srai	a2, a2, 0x1
+      ce: 04c05263     	blez	a2, 0x112 <Radix2FFT_DIF_Scalar+0x112>
+      d2: 0511         	addi	a0, a0, 0x4
+      d4: 00361593     	slli	a1, a2, 0x3
+      d8: 95aa         	add	a1, a1, a0
+      da: 40a58633     	sub	a2, a1, a0
+      de: 820d         	srli	a2, a2, 0x3
+      e0: 0186407b     	lp.setup	x0, a2, 0x18
+      e4: ffc51603     	lh	a2, -0x4(a0)
+      e8: ffe51683     	lh	a3, -0x2(a0)
+      ec: 00051703     	lh	a4, 0x0(a0)
+      f0: 00251783     	lh	a5, 0x2(a0)
+      f4: 40e604b3     	sub	s1, a2, a4
+      f8: 40f68433     	sub	s0, a3, a5
+      fc: 963a         	add	a2, a2, a4
+      fe: 96be         	add	a3, a3, a5
+     100: fec51e23     	sh	a2, -0x4(a0)
+     104: fed51f23     	sh	a3, -0x2(a0)
+     108: 00951023     	sh	s1, 0x0(a0)
+     10c: 00851123     	sh	s0, 0x2(a0)
+     110: 0521         	addi	a0, a0, 0x8
+     112: 5432         	lw	s0, 0x2c(sp)
+     114: 54a2         	lw	s1, 0x28(sp)
+     116: 5912         	lw	s2, 0x24(sp)
+     118: 5982         	lw	s3, 0x20(sp)
+     11a: 4a72         	lw	s4, 0x1c(sp)
+     11c: 4ae2         	lw	s5, 0x18(sp)
+     11e: 4b52         	lw	s6, 0x14(sp)
+     120: 4bc2         	lw	s7, 0x10(sp)
+     122: 4c32         	lw	s8, 0xc(sp)
+     124: 6145         	addi	sp, sp, 0x30
+     126: 8082         	ret

@@ -1,0 +1,68 @@
+{
+  "range": "abe1ba6bf62d7293b33981f923c8444d18d46366..work/20/T010",
+  "commits": 1,
+  "fail": 0,
+  "warn": 10,
+  "findings": [
+    {
+      "commit": "ccd15908573c",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: clang/test/CodeGen/RISCV/riscv-xpulpv2-rn-builtins-range.c"
+    },
+    {
+      "commit": "ccd15908573c",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/CodeGen/RISCV/xpulp-clip-extract-imm.ll"
+    },
+    {
+      "commit": "ccd15908573c",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/CodeGen/RISCV/xpulp-hwloop-countdown.ll"
+    },
+    {
+      "commit": "ccd15908573c",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/CodeGen/RISCV/xpulp-hwloop-layout.ll"
+    },
+    {
+      "commit": "ccd15908573c",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/CodeGen/RISCV/xpulp-hwloop-obj.ll"
+    },
+    {
+      "commit": "ccd15908573c",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/CodeGen/RISCV/xpulp-lsr-postinc-heuristic.ll"
+    },
+    {
+      "commit": "ccd15908573c",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/CodeGen/RISCV/xpulp-postinc-f32-mir.ll"
+    },
+    {
+      "commit": "ccd15908573c",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/CodeGen/RISCV/xpulp-postinc-f32.ll"
+    },
+    {
+      "commit": "ccd15908573c",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/test/CodeGen/RISCV/xpulpv2-simd-cost-model.ll"
+    },
+    {
+      "commit": "ccd15908573c",
+      "level": "WARN",
+      "rule": "diff-size",
+      "msg": "1064 changed lines; reviewer must confirm this is one root cause"
+    }
+  ]
+}

@@ -1,0 +1,2185 @@
+{
+ "__builtin_pulp_ClusterId": {
+  "c_files_calling": 1,
+  "call_sites": 2,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AT_CLUSTERID",
+   "__CLUSTERID",
+   "gap_clusterid",
+   "hal_cluster_id"
+  ]
+ },
+ "__builtin_pulp_CoreCount": {
+  "c_files_calling": 121,
+  "call_sites": 322,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AT_NCORE",
+   "__NCORE",
+   "gap_ncore"
+  ]
+ },
+ "__builtin_pulp_CoreCount_m1": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_ncorem1"
+  ]
+ },
+ "__builtin_pulp_CoreId": {
+  "c_files_calling": 112,
+  "call_sites": 2501,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AT_COREID",
+   "__COREID",
+   "gap_coreid",
+   "gap_coreidm1"
+  ]
+ },
+ "__builtin_pulp_IsFc": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ISFC"
+  ]
+ },
+ "__builtin_pulp_OffsetedRead": {
+  "c_files_calling": 3,
+  "call_sites": 10581,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "ARCHI_READ",
+   "GAP_READ",
+   "NE16_READ_REG_CXT0",
+   "NE16_READ_REG_CXT1",
+   "PMU_READ",
+   "__READ_BASE_OFF_VOL"
+  ]
+ },
+ "__builtin_pulp_OffsetedReadByte": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__READ_BASE_OFF_BYTE_VOL"
+  ]
+ },
+ "__builtin_pulp_OffsetedReadHalf": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__READ_BASE_OFF_HALF_VOL"
+  ]
+ },
+ "__builtin_pulp_OffsetedWrite": {
+  "c_files_calling": 10,
+  "call_sites": 4700,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "ARCHI_WRITE",
+   "GAP_WRITE",
+   "NE16EL1_WRITE_CMD",
+   "NE16EL1_WRITE_REG",
+   "NE16_WRITE_CMD",
+   "NE16_WRITE_REG",
+   "NE16_WRITE_REG_CXT0",
+   "NE16_WRITE_REG_CXT1",
+   "PMU_WRITE",
+   "__WRITE_BASE_OFF_VOL"
+  ]
+ },
+ "__builtin_pulp_OffsetedWriteByte": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__WRITE_BASE_OFF_BYTE_VOL"
+  ]
+ },
+ "__builtin_pulp_OffsetedWriteHalf": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__WRITE_BASE_OFF_HALF_VOL"
+  ]
+ },
+ "__builtin_pulp_OffsetedWritePtr": {
+  "c_files_calling": 0,
+  "call_sites": 10,
+  "defined_in_clang": false,
+  "files_failing_on_it": 377,
+  "wrappers": [
+   "GAP_WRITE_PTR"
+  ]
+ },
+ "__builtin_pulp_abs": {
+  "c_files_calling": 13,
+  "call_sites": 45,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "Abs",
+   "gap_abs"
+  ]
+ },
+ "__builtin_pulp_abs2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ABS2",
+   "gap_abs2"
+  ]
+ },
+ "__builtin_pulp_abs4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ABS4",
+   "gap_abs4"
+  ]
+ },
+ "__builtin_pulp_add2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ADD2",
+   "gap_add2"
+  ]
+ },
+ "__builtin_pulp_add2div2": {
+  "c_files_calling": 1,
+  "call_sites": 5,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "__ADD2DIV2",
+   "__ADD2_DIV2",
+   "gap_add2div2"
+  ]
+ },
+ "__builtin_pulp_add2div4": {
+  "c_files_calling": 1,
+  "call_sites": 4,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "__ADD2DIV4",
+   "__ADD2_DIV4",
+   "gap_add2div4"
+  ]
+ },
+ "__builtin_pulp_add4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ADD4",
+   "gap_add4"
+  ]
+ },
+ "__builtin_pulp_add4div2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ADD4DIV2"
+  ]
+ },
+ "__builtin_pulp_add4div4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ADD4DIV4"
+  ]
+ },
+ "__builtin_pulp_addN": {
+  "c_files_calling": 5,
+  "call_sites": 72,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ADDNORM",
+   "gap_addnorm",
+   "gap_norm"
+  ]
+ },
+ "__builtin_pulp_addN_r": {
+  "c_files_calling": 26,
+  "call_sites": 2294,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AT_NORM",
+   "AT_SCALE",
+   "__ADDNORM_REG",
+   "gap_addnorm_reg",
+   "gap_norm_reg"
+  ]
+ },
+ "__builtin_pulp_addRN": {
+  "c_files_calling": 5,
+  "call_sites": 54,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ADDROUNDNORM",
+   "__ADD_ROUND_NORM",
+   "__ROUNDNORM",
+   "__ROUND_NORM",
+   "gap_addroundnorm",
+   "gap_roundnorm"
+  ]
+ },
+ "__builtin_pulp_addRN_r": {
+  "c_files_calling": 33,
+  "call_sites": 2412,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AT_NORM",
+   "AT_SCALE",
+   "__ADDROUNDNORM_REG",
+   "__ADD_ROUND_NORM_REG",
+   "__ROUNDNORM_REG",
+   "__ROUND_NORM_REG",
+   "gap_addroundnorm_reg",
+   "gap_roundnorm_reg"
+  ]
+ },
+ "__builtin_pulp_adduN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ADDNORMU",
+   "gap_addnormu",
+   "gap_normu"
+  ]
+ },
+ "__builtin_pulp_adduN_r": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ADDNORMU_REG",
+   "gap_addnormu_reg",
+   "gap_normu_reg"
+  ]
+ },
+ "__builtin_pulp_adduRN": {
+  "c_files_calling": 3,
+  "call_sites": 17,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ADDROUNDNORMU",
+   "__ADD_ROUND_NORMU",
+   "__ROUNDNORMU",
+   "__ROUND_NORMU",
+   "gap_addroundnormu",
+   "gap_roundnormu"
+  ]
+ },
+ "__builtin_pulp_adduRN_r": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ADDROUNDNORMU_REG",
+   "__ADD_ROUND_NORMU_REG",
+   "__ROUNDNORMU_REG",
+   "__ROUND_NORMU_REG",
+   "gap_addroundnormu_reg",
+   "gap_roundnormu_reg"
+  ]
+ },
+ "__builtin_pulp_and2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__AND2"
+  ]
+ },
+ "__builtin_pulp_and4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__AND4"
+  ]
+ },
+ "__builtin_pulp_avg2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__AVG2"
+  ]
+ },
+ "__builtin_pulp_avg4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__AVG4"
+  ]
+ },
+ "__builtin_pulp_avgu2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__AVGU2"
+  ]
+ },
+ "__builtin_pulp_avgu4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__AVGU4"
+  ]
+ },
+ "__builtin_pulp_bclr": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__BITCLR"
+  ]
+ },
+ "__builtin_pulp_bclr_r": {
+  "c_files_calling": 3,
+  "call_sites": 21,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__BITCLR_R",
+   "__BITCLR_R_SAFE"
+  ]
+ },
+ "__builtin_pulp_bextract": {
+  "c_files_calling": 4,
+  "call_sites": 3010,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "ADV_TIMER_CG_ENA_GETS",
+   "ADV_TIMER_CG_MUX_GETS",
+   "ADV_TIMER_CH_MUX_CH_SEL_0_GETS",
+   "ADV_TIMER_CH_MUX_CH_SEL_1_GETS",
+   "ADV_TIMER_CH_MUX_CH_SEL_2_GETS",
+   "ADV_TIMER_CH_MUX_CH_SEL_3_GETS",
+   "ADV_TIMER_CH_MUX_CH_SEL_4_GETS",
+   "ADV_TIMER_CH_MUX_CH_SEL_5_GETS",
+   "ADV_TIMER_CH_MUX_CH_SEL_6_GETS",
+   "ADV_TIMER_CH_MUX_CH_SEL_7_GETS",
+   "ADV_TIMER_EVENT_CFG_ENA_GETS",
+   "ADV_TIMER_EVENT_CFG_SEL0_GETS"
+  ]
+ },
+ "__builtin_pulp_bextract_r": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__BITEXTRACT_R",
+   "__BITEXTRACT_R_SAFE",
+   "__BIT_EXTRACT_R",
+   "__BIT_EXTRACT_R_SAFE",
+   "gap_bitextract_r",
+   "gap_bitextract_r_safe"
+  ]
+ },
+ "__builtin_pulp_bextractu": {
+  "c_files_calling": 12,
+  "call_sites": 3106,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "ADV_TIMER_CG_ENA_GET",
+   "ADV_TIMER_CG_MUX_GET",
+   "ADV_TIMER_CH_MUX_CH_SEL_0_GET",
+   "ADV_TIMER_CH_MUX_CH_SEL_1_GET",
+   "ADV_TIMER_CH_MUX_CH_SEL_2_GET",
+   "ADV_TIMER_CH_MUX_CH_SEL_3_GET",
+   "ADV_TIMER_CH_MUX_CH_SEL_4_GET",
+   "ADV_TIMER_CH_MUX_CH_SEL_5_GET",
+   "ADV_TIMER_CH_MUX_CH_SEL_6_GET",
+   "ADV_TIMER_CH_MUX_CH_SEL_7_GET",
+   "ADV_TIMER_EVENT_CFG_ENA_GET",
+   "ADV_TIMER_EVENT_CFG_SEL0_GET"
+  ]
+ },
+ "__builtin_pulp_bextractu_r": {
+  "c_files_calling": 6,
+  "call_sites": 14,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__BITEXTRACTU_R",
+   "__BITEXTRACTU_R_SAFE",
+   "__BIT_EXTRACTU_R",
+   "__BIT_EXTRACTU_R_SAFE",
+   "gap_bitextractu_r",
+   "gap_bitextractu_r_safe"
+  ]
+ },
+ "__builtin_pulp_binsert": {
+  "c_files_calling": 6,
+  "call_sites": 3069,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "ADV_TIMER_CG_ENA_SET",
+   "ADV_TIMER_CG_MUX_SET",
+   "ADV_TIMER_CH_MUX_CH_SEL_0_SET",
+   "ADV_TIMER_CH_MUX_CH_SEL_1_SET",
+   "ADV_TIMER_CH_MUX_CH_SEL_2_SET",
+   "ADV_TIMER_CH_MUX_CH_SEL_3_SET",
+   "ADV_TIMER_CH_MUX_CH_SEL_4_SET",
+   "ADV_TIMER_CH_MUX_CH_SEL_5_SET",
+   "ADV_TIMER_CH_MUX_CH_SEL_6_SET",
+   "ADV_TIMER_CH_MUX_CH_SEL_7_SET",
+   "ADV_TIMER_EVENT_CFG_ENA_SET",
+   "ADV_TIMER_EVENT_CFG_SEL0_SET"
+  ]
+ },
+ "__builtin_pulp_binsert_r": {
+  "c_files_calling": 8,
+  "call_sites": 40,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "GAP_BINSERT_R",
+   "__BITINSERT_R",
+   "__BITINSERT_R_SAFE",
+   "__BIT_INSERT_R",
+   "__BIT_INSERT_R_SAFE",
+   "gap_bitinsert_r",
+   "gap_bitinsert_r_safe"
+  ]
+ },
+ "__builtin_pulp_bset": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__BITSET"
+  ]
+ },
+ "__builtin_pulp_bset_r": {
+  "c_files_calling": 0,
+  "call_sites": 4,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__BITSET_R",
+   "__BITSET_R_SAFE"
+  ]
+ },
+ "__builtin_pulp_clb": {
+  "c_files_calling": 1,
+  "call_sites": 4,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__CLB",
+   "gap_clb"
+  ]
+ },
+ "__builtin_pulp_clip": {
+  "c_files_calling": 31,
+  "call_sites": 1499,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AT_CLIP",
+   "OUT_CLIP",
+   "__CLIP",
+   "gap_clip"
+  ]
+ },
+ "__builtin_pulp_clip_r": {
+  "c_files_calling": 0,
+  "call_sites": 1,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AT_CLIP_",
+   "__CLIP_R",
+   "gap_clipr"
+  ]
+ },
+ "__builtin_pulp_clipu": {
+  "c_files_calling": 21,
+  "call_sites": 658,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AT_CLIP_POS_IMM",
+   "OUT_CLIP",
+   "__CLIPU",
+   "gap_clipu"
+  ]
+ },
+ "__builtin_pulp_clipu_r": {
+  "c_files_calling": 28,
+  "call_sites": 1053,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AT_CLIP_POS",
+   "__CLIPU_R",
+   "gap_clipur"
+  ]
+ },
+ "__builtin_pulp_cplx_conj": {
+  "c_files_calling": 1,
+  "call_sites": 10,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "__CPLXCONJ",
+   "__CPLX_CONJ",
+   "gap_cplxconj"
+  ]
+ },
+ "__builtin_pulp_cplxmjrot2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__CPLX_MJ",
+   "gap_cplxmj"
+  ]
+ },
+ "__builtin_pulp_cplxmuls": {
+  "c_files_calling": 1,
+  "call_sites": 20,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__CPLXMULS",
+   "__CPLX_MULS",
+   "gap_cplxmuls",
+   "gap_cplxmulsdiv2",
+   "gap_cplxmulsdiv4"
+  ]
+ },
+ "__builtin_pulp_cplxmuls2": {
+  "c_files_calling": 1,
+  "call_sites": 20,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "gap_cplxmuls",
+   "gap_cplxmulsdiv2",
+   "gap_cplxmulsdiv4"
+  ]
+ },
+ "__builtin_pulp_cplxmuls2div2": {
+  "c_files_calling": 1,
+  "call_sites": 8,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "gap_cplxmulsdiv2"
+  ]
+ },
+ "__builtin_pulp_cplxmuls2div4": {
+  "c_files_calling": 1,
+  "call_sites": 3,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "gap_cplxmulsdiv4"
+  ]
+ },
+ "__builtin_pulp_cplxmuls2div8": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_cplxmulsdiv8"
+  ]
+ },
+ "__builtin_pulp_cplxmulsdiv2": {
+  "c_files_calling": 1,
+  "call_sites": 8,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__CPLXMULSDIV2",
+   "__CPLX_MULS_DIV2",
+   "gap_cplxmulsdiv2"
+  ]
+ },
+ "__builtin_pulp_cplxmulsdiv4": {
+  "c_files_calling": 1,
+  "call_sites": 3,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__CPLXMULSDIV4",
+   "__CPLX_MULS_DIV4",
+   "gap_cplxmulsdiv4"
+  ]
+ },
+ "__builtin_pulp_dotsp2": {
+  "c_files_calling": 2,
+  "call_sites": 6,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTP2",
+   "gap_dotp2"
+  ]
+ },
+ "__builtin_pulp_dotsp4": {
+  "c_files_calling": 2,
+  "call_sites": 6,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTP4",
+   "gap_dotp4"
+  ]
+ },
+ "__builtin_pulp_dotspsc2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTPSC2"
+  ]
+ },
+ "__builtin_pulp_dotspsc4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTPSC4"
+  ]
+ },
+ "__builtin_pulp_dotup2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTPU2",
+   "gap_dotpu2"
+  ]
+ },
+ "__builtin_pulp_dotup4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTPU4",
+   "gap_dotpu4"
+  ]
+ },
+ "__builtin_pulp_dotupsc2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTPUSC2"
+  ]
+ },
+ "__builtin_pulp_dotupsc4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTPUSC4"
+  ]
+ },
+ "__builtin_pulp_dotusp2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTPUS2",
+   "gap_dotpus2"
+  ]
+ },
+ "__builtin_pulp_dotusp4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTPUS4",
+   "gap_dotpus4"
+  ]
+ },
+ "__builtin_pulp_dotuspsc2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTPUSSC2"
+  ]
+ },
+ "__builtin_pulp_dotuspsc4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__DOTPUSSC4"
+  ]
+ },
+ "__builtin_pulp_event_unit_read": {
+  "c_files_calling": 0,
+  "call_sites": 1,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": []
+ },
+ "__builtin_pulp_event_unit_read_fenced": {
+  "c_files_calling": 0,
+  "call_sites": 3,
+  "defined_in_clang": false,
+  "files_failing_on_it": 398,
+  "wrappers": []
+ },
+ "__builtin_pulp_exor2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__EXOR2"
+  ]
+ },
+ "__builtin_pulp_exor4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__EXOR4"
+  ]
+ },
+ "__builtin_pulp_f16abs": {
+  "c_files_calling": 2,
+  "call_sites": 3,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AbsF",
+   "AbsF16",
+   "Absf16"
+  ]
+ },
+ "__builtin_pulp_f16abs2": {
+  "c_files_calling": 0,
+  "call_sites": 1,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AbsF2",
+   "Absv2h"
+  ]
+ },
+ "__builtin_pulp_f16altabs": {
+  "c_files_calling": 2,
+  "call_sites": 3,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AbsF",
+   "AbsF16",
+   "Absf16a"
+  ]
+ },
+ "__builtin_pulp_f16altabs2": {
+  "c_files_calling": 0,
+  "call_sites": 1,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "AbsF2",
+   "Absv2ah"
+  ]
+ },
+ "__builtin_pulp_f16altmax": {
+  "c_files_calling": 12,
+  "call_sites": 253,
+  "defined_in_clang": false,
+  "files_failing_on_it": 14,
+  "wrappers": [
+   "ClipF",
+   "Clipf16a",
+   "MaxF",
+   "MaxF16",
+   "Maxf16a"
+  ]
+ },
+ "__builtin_pulp_f16altmax2": {
+  "c_files_calling": 6,
+  "call_sites": 67,
+  "defined_in_clang": false,
+  "files_failing_on_it": 8,
+  "wrappers": [
+   "ClipF2",
+   "Clipv2ah",
+   "MaxF2",
+   "Maxv2ah"
+  ]
+ },
+ "__builtin_pulp_f16altmin": {
+  "c_files_calling": 7,
+  "call_sites": 32,
+  "defined_in_clang": false,
+  "files_failing_on_it": 9,
+  "wrappers": [
+   "ClipF",
+   "Clipf16a",
+   "MinF",
+   "MinF16",
+   "Minf16a"
+  ]
+ },
+ "__builtin_pulp_f16altmin2": {
+  "c_files_calling": 1,
+  "call_sites": 21,
+  "defined_in_clang": false,
+  "files_failing_on_it": 3,
+  "wrappers": [
+   "ClipF2",
+   "Clipv2ah",
+   "MinF2",
+   "Minv2ah"
+  ]
+ },
+ "__builtin_pulp_f16altsqrt": {
+  "c_files_calling": 1,
+  "call_sites": 2,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "SqrtF16",
+   "Sqrtf16a"
+  ]
+ },
+ "__builtin_pulp_f16max": {
+  "c_files_calling": 13,
+  "call_sites": 256,
+  "defined_in_clang": false,
+  "files_failing_on_it": 8,
+  "wrappers": [
+   "ClipF",
+   "Clipf16",
+   "MaxF",
+   "MaxF16",
+   "Maxf16"
+  ]
+ },
+ "__builtin_pulp_f16max2": {
+  "c_files_calling": 7,
+  "call_sites": 74,
+  "defined_in_clang": false,
+  "files_failing_on_it": 6,
+  "wrappers": [
+   "ClipF2",
+   "Clipv2h",
+   "MaxF2",
+   "Maxv2h"
+  ]
+ },
+ "__builtin_pulp_f16min": {
+  "c_files_calling": 8,
+  "call_sites": 35,
+  "defined_in_clang": false,
+  "files_failing_on_it": 5,
+  "wrappers": [
+   "ClipF",
+   "Clipf16",
+   "MinF",
+   "MinF16",
+   "Minf16"
+  ]
+ },
+ "__builtin_pulp_f16min2": {
+  "c_files_calling": 2,
+  "call_sites": 28,
+  "defined_in_clang": false,
+  "files_failing_on_it": 3,
+  "wrappers": [
+   "ClipF2",
+   "Clipv2h",
+   "MinF2",
+   "Minv2h"
+  ]
+ },
+ "__builtin_pulp_f16sqrt": {
+  "c_files_calling": 1,
+  "call_sites": 2,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "SqrtF16",
+   "Sqrtf16"
+  ]
+ },
+ "__builtin_pulp_f32abs": {
+  "c_files_calling": 1,
+  "call_sites": 3,
+  "defined_in_clang": false,
+  "files_failing_on_it": 7,
+  "wrappers": [
+   "Absf32",
+   "gap_f32abs"
+  ]
+ },
+ "__builtin_pulp_f32max": {
+  "c_files_calling": 8,
+  "call_sites": 88,
+  "defined_in_clang": false,
+  "files_failing_on_it": 15,
+  "wrappers": [
+   "Clipf32",
+   "Maxf32",
+   "gap_f32max"
+  ]
+ },
+ "__builtin_pulp_f32min": {
+  "c_files_calling": 1,
+  "call_sites": 9,
+  "defined_in_clang": false,
+  "files_failing_on_it": 9,
+  "wrappers": [
+   "Clipf32",
+   "Minf32",
+   "gap_f32min"
+  ]
+ },
+ "__builtin_pulp_f32sqrt": {
+  "c_files_calling": 6,
+  "call_sites": 14,
+  "defined_in_clang": false,
+  "files_failing_on_it": 5,
+  "wrappers": [
+   "FN_1",
+   "Sqrtf32",
+   "gap_f32sqrt"
+  ]
+ },
+ "__builtin_pulp_ff1": {
+  "c_files_calling": 5,
+  "call_sites": 34,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "FF1",
+   "LOG2_R0",
+   "__FF1"
+  ]
+ },
+ "__builtin_pulp_fl1": {
+  "c_files_calling": 126,
+  "call_sites": 184,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "FL1",
+   "__FL1",
+   "gap_fl1"
+  ]
+ },
+ "__builtin_pulp_mac": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MAC"
+  ]
+ },
+ "__builtin_pulp_macfs": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_macfs"
+  ]
+ },
+ "__builtin_pulp_macfsN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_macfsN"
+  ]
+ },
+ "__builtin_pulp_macfsRN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_macfsRN"
+  ]
+ },
+ "__builtin_pulp_macfu": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_macfu"
+  ]
+ },
+ "__builtin_pulp_macfuN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_macfuN"
+  ]
+ },
+ "__builtin_pulp_macfuRN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_macfuRN"
+  ]
+ },
+ "__builtin_pulp_machhs": {
+  "c_files_calling": 12,
+  "call_sites": 952,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MACHHS",
+   "gap_dotp2",
+   "gap_machhs",
+   "gap_sumdotp2"
+  ]
+ },
+ "__builtin_pulp_machhsN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MACHHSN",
+   "__MACHHSRN",
+   "gap_machhsN",
+   "gap_machhsRN"
+  ]
+ },
+ "__builtin_pulp_machhu": {
+  "c_files_calling": 1,
+  "call_sites": 5,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MACHHU",
+   "gap_dotpu2",
+   "gap_machhu",
+   "gap_sumdotpu2"
+  ]
+ },
+ "__builtin_pulp_machhuN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MACHHUN",
+   "__MACHHURN",
+   "gap_machhuN",
+   "gap_machhuRN"
+  ]
+ },
+ "__builtin_pulp_macs": {
+  "c_files_calling": 13,
+  "call_sites": 1057,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MACS",
+   "gap_macs",
+   "gap_sumdotp2"
+  ]
+ },
+ "__builtin_pulp_macsN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MACSN",
+   "gap_macsN"
+  ]
+ },
+ "__builtin_pulp_macsRN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MACSRN",
+   "gap_macsRN"
+  ]
+ },
+ "__builtin_pulp_macu": {
+  "c_files_calling": 1,
+  "call_sites": 5,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MACU",
+   "gap_macu",
+   "gap_sumdotpu2"
+  ]
+ },
+ "__builtin_pulp_macuN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MACUN",
+   "gap_macuN"
+  ]
+ },
+ "__builtin_pulp_macuRN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MACURN",
+   "gap_macuRN"
+  ]
+ },
+ "__builtin_pulp_max2": {
+  "c_files_calling": 3,
+  "call_sites": 16,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MAX2",
+   "gap_max2"
+  ]
+ },
+ "__builtin_pulp_max4": {
+  "c_files_calling": 3,
+  "call_sites": 37,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MAX4",
+   "gap_max4"
+  ]
+ },
+ "__builtin_pulp_maxsi": {
+  "c_files_calling": 60,
+  "call_sites": 5336,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "Max",
+   "__MAX",
+   "gap_max"
+  ]
+ },
+ "__builtin_pulp_maxu2": {
+  "c_files_calling": 1,
+  "call_sites": 1,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MAXU2",
+   "gap_maxu2"
+  ]
+ },
+ "__builtin_pulp_maxu4": {
+  "c_files_calling": 1,
+  "call_sites": 7,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MAXU4",
+   "gap_maxu4"
+  ]
+ },
+ "__builtin_pulp_min2": {
+  "c_files_calling": 1,
+  "call_sites": 3,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MIN2",
+   "gap_min2"
+  ]
+ },
+ "__builtin_pulp_min4": {
+  "c_files_calling": 1,
+  "call_sites": 2,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MIN4",
+   "gap_min4"
+  ]
+ },
+ "__builtin_pulp_minsi": {
+  "c_files_calling": 112,
+  "call_sites": 9323,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "Min",
+   "gap_min"
+  ]
+ },
+ "__builtin_pulp_minu2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MINU2",
+   "gap_minu2"
+  ]
+ },
+ "__builtin_pulp_minu4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MINU4",
+   "gap_minu4"
+  ]
+ },
+ "__builtin_pulp_msu": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MSU"
+  ]
+ },
+ "__builtin_pulp_mul64hs": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_mul64h"
+  ]
+ },
+ "__builtin_pulp_mul64hu": {
+  "c_files_calling": 0,
+  "call_sites": 4,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "gap_mul64uh"
+  ]
+ },
+ "__builtin_pulp_mul64hus": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_mul64ush"
+  ]
+ },
+ "__builtin_pulp_mulfs": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_mulfs"
+  ]
+ },
+ "__builtin_pulp_mulfsN": {
+  "c_files_calling": 1,
+  "call_sites": 11,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "gap_mulfsN"
+  ]
+ },
+ "__builtin_pulp_mulfsRN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_mulfsRN"
+  ]
+ },
+ "__builtin_pulp_mulfu": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_mulfu"
+  ]
+ },
+ "__builtin_pulp_mulfuN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_mulfuN"
+  ]
+ },
+ "__builtin_pulp_mulhhs": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULHHS",
+   "gap_mulhhs"
+  ]
+ },
+ "__builtin_pulp_mulhhsN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULHHSN",
+   "gap_mulhhsN"
+  ]
+ },
+ "__builtin_pulp_mulhhsRN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULHHSRN",
+   "gap_mulhhsRN"
+  ]
+ },
+ "__builtin_pulp_mulhhu": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULHHU",
+   "gap_mulhhu"
+  ]
+ },
+ "__builtin_pulp_mulhhuN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULHHUN",
+   "gap_mulhhuN"
+  ]
+ },
+ "__builtin_pulp_mulhhuRN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULHHURN",
+   "gap_mulhhuRN"
+  ]
+ },
+ "__builtin_pulp_muls": {
+  "c_files_calling": 3,
+  "call_sites": 18,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULS",
+   "gap_dotp2",
+   "gap_muls"
+  ]
+ },
+ "__builtin_pulp_mulsN": {
+  "c_files_calling": 28,
+  "call_sites": 546,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULSN",
+   "gap_mulsN"
+  ]
+ },
+ "__builtin_pulp_mulsRN": {
+  "c_files_calling": 4,
+  "call_sites": 14,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULSRN",
+   "gap_mulsRN"
+  ]
+ },
+ "__builtin_pulp_mulu": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULU",
+   "gap_dotpu2",
+   "gap_mulu"
+  ]
+ },
+ "__builtin_pulp_muluN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULUN",
+   "gap_muluN"
+  ]
+ },
+ "__builtin_pulp_muluRN": {
+  "c_files_calling": 3,
+  "call_sites": 4,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__MULURN",
+   "gap_muluRN"
+  ]
+ },
+ "__builtin_pulp_neg2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__NEG2"
+  ]
+ },
+ "__builtin_pulp_neg4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__NEG4"
+  ]
+ },
+ "__builtin_pulp_or2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__OR2"
+  ]
+ },
+ "__builtin_pulp_or4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__OR4"
+  ]
+ },
+ "__builtin_pulp_pack2": {
+  "c_files_calling": 7,
+  "call_sites": 498,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__PACK2",
+   "__PACKU2",
+   "__VEC_PACK2",
+   "__VEC_PACKU2",
+   "gap_pack2",
+   "gap_packu2"
+  ]
+ },
+ "__builtin_pulp_pack4": {
+  "c_files_calling": 20,
+  "call_sites": 310,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__PACK4",
+   "__PACKU4",
+   "__VEC_PACK4",
+   "__VEC_PACKU4",
+   "gap_pack4",
+   "gap_packu4"
+  ]
+ },
+ "__builtin_pulp_rdownsf2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_f32rdn"
+  ]
+ },
+ "__builtin_pulp_read_base_off": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__READ_BASE_OFF"
+  ]
+ },
+ "__builtin_pulp_read_then_spr_bit_clr": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SPRREADTHENBITCLR"
+  ]
+ },
+ "__builtin_pulp_read_then_spr_bit_set": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SPRREADTHENBITSET"
+  ]
+ },
+ "__builtin_pulp_read_then_spr_write": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SPRREADTHENWRITE"
+  ]
+ },
+ "__builtin_pulp_rintsf2": {
+  "c_files_calling": 2,
+  "call_sites": 32,
+  "defined_in_clang": false,
+  "files_failing_on_it": 2,
+  "wrappers": [
+   "AT_SCALEF",
+   "gap_f32rmm"
+  ]
+ },
+ "__builtin_pulp_rotr": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__ROTR",
+   "gap_rotr"
+  ]
+ },
+ "__builtin_pulp_rupsf2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_f32rup"
+  ]
+ },
+ "__builtin_pulp_sdotsp2": {
+  "c_files_calling": 11,
+  "call_sites": 946,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTP2",
+   "__SUM_DOTP2",
+   "gap_sumdotp2"
+  ]
+ },
+ "__builtin_pulp_sdotsp4": {
+  "c_files_calling": 17,
+  "call_sites": 1681,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTP4",
+   "__SUM_DOTP4",
+   "gap_sumdotp4"
+  ]
+ },
+ "__builtin_pulp_sdotspsc2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTPSC2"
+  ]
+ },
+ "__builtin_pulp_sdotspsc4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTPSC4"
+  ]
+ },
+ "__builtin_pulp_sdotup2": {
+  "c_files_calling": 1,
+  "call_sites": 5,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTPU2",
+   "__SUM_DOTPU2",
+   "gap_sumdotpu2"
+  ]
+ },
+ "__builtin_pulp_sdotup4": {
+  "c_files_calling": 1,
+  "call_sites": 24,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTPU4",
+   "__SUM_DOTPU4",
+   "gap_sumdotpu4"
+  ]
+ },
+ "__builtin_pulp_sdotupsc2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTPUSC2"
+  ]
+ },
+ "__builtin_pulp_sdotupsc4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTPUSC4"
+  ]
+ },
+ "__builtin_pulp_sdotusp2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTPUS2",
+   "__SUM_DOTPUS2",
+   "gap_sumdotpus2"
+  ]
+ },
+ "__builtin_pulp_sdotusp4": {
+  "c_files_calling": 3,
+  "call_sites": 375,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTPUS4",
+   "__SUM_DOTPUS4",
+   "gap_sumdotpus4"
+  ]
+ },
+ "__builtin_pulp_sdotuspsc2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTPUSSC2"
+  ]
+ },
+ "__builtin_pulp_sdotuspsc4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUMDOTPUSSC4"
+  ]
+ },
+ "__builtin_pulp_sll2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SLL2"
+  ]
+ },
+ "__builtin_pulp_sll4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SLL4"
+  ]
+ },
+ "__builtin_pulp_spr_bit_clr": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SPRBITCLR"
+  ]
+ },
+ "__builtin_pulp_spr_bit_set": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SPRBITSET"
+  ]
+ },
+ "__builtin_pulp_spr_read": {
+  "c_files_calling": 0,
+  "call_sites": 6,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SPRREAD"
+  ]
+ },
+ "__builtin_pulp_spr_read_vol": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SPRREAD_VOL"
+  ]
+ },
+ "__builtin_pulp_spr_write": {
+  "c_files_calling": 0,
+  "call_sites": 1,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SPRWRITE"
+  ]
+ },
+ "__builtin_pulp_sra2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SRA2"
+  ]
+ },
+ "__builtin_pulp_sra4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SRA4"
+  ]
+ },
+ "__builtin_pulp_srl2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SRL2"
+  ]
+ },
+ "__builtin_pulp_srl4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SRL4"
+  ]
+ },
+ "__builtin_pulp_sub2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUB2",
+   "gap_sub2"
+  ]
+ },
+ "__builtin_pulp_sub2div2": {
+  "c_files_calling": 1,
+  "call_sites": 2,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "__SUB2DIV2",
+   "__SUB2_DIV2",
+   "gap_sub2div2"
+  ]
+ },
+ "__builtin_pulp_sub2div4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUB2DIV4",
+   "__SUB2_DIV4",
+   "gap_sub2div4"
+  ]
+ },
+ "__builtin_pulp_sub2rotmj": {
+  "c_files_calling": 1,
+  "call_sites": 6,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "__SUB2ROTMJ",
+   "__SUB2_ROTMJ",
+   "gap_sub2rotmj"
+  ]
+ },
+ "__builtin_pulp_sub4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUB4",
+   "gap_sub4"
+  ]
+ },
+ "__builtin_pulp_sub4div2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUB4DIV2"
+  ]
+ },
+ "__builtin_pulp_sub4div4": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUB4DIV4"
+  ]
+ },
+ "__builtin_pulp_subN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUBNORM",
+   "gap_subnorm"
+  ]
+ },
+ "__builtin_pulp_subN_r": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUBNORM_REG",
+   "gap_subnorm_reg"
+  ]
+ },
+ "__builtin_pulp_subRN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUBROUNDNORM",
+   "gap_subroundnorm"
+  ]
+ },
+ "__builtin_pulp_subRN_r": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUBROUNDNORM_REG",
+   "gap_subroundnorm_reg"
+  ]
+ },
+ "__builtin_pulp_subuN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUBNORMU",
+   "gap_subnormu"
+  ]
+ },
+ "__builtin_pulp_subuN_r": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUBNORMU_REG",
+   "gap_subnormu_reg"
+  ]
+ },
+ "__builtin_pulp_subuRN": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUBROUNDNORMU",
+   "gap_subroundnormu"
+  ]
+ },
+ "__builtin_pulp_subuRN_r": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__SUBROUNDNORMU_REG",
+   "gap_subroundnormu_reg"
+  ]
+ },
+ "__builtin_pulp_truncb": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "gap_trunb"
+  ]
+ },
+ "__builtin_pulp_trunch": {
+  "c_files_calling": 1,
+  "call_sites": 16,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "gap_trunh"
+  ]
+ },
+ "__builtin_pulp_v2hftov2hi": {
+  "c_files_calling": 0,
+  "call_sites": 6,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "Cvt_v2h_v2s"
+  ]
+ },
+ "__builtin_pulp_v2hftov2hi_u": {
+  "c_files_calling": 0,
+  "call_sites": 1,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "Cvt_v2h_v2u"
+  ]
+ },
+ "__builtin_pulp_v2hftov2ohf": {
+  "c_files_calling": 1,
+  "call_sites": 9,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "Cvt_v2h_v2ah"
+  ]
+ },
+ "__builtin_pulp_v2hitov2hf": {
+  "c_files_calling": 0,
+  "call_sites": 1,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "Cvt_v2s_v2h"
+  ]
+ },
+ "__builtin_pulp_v2hitov2hf_u": {
+  "c_files_calling": 0,
+  "call_sites": 3,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "Cvt_v2u_v2h"
+  ]
+ },
+ "__builtin_pulp_v2hitov2ohf": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "Cvt_v2s_v2ah"
+  ]
+ },
+ "__builtin_pulp_v2hitov2ohf_u": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "Cvt_v2u_v2ah"
+  ]
+ },
+ "__builtin_pulp_v2ohftov2hf": {
+  "c_files_calling": 1,
+  "call_sites": 6,
+  "defined_in_clang": false,
+  "files_failing_on_it": 1,
+  "wrappers": [
+   "Cvt_v2ah_v2h",
+   "PULP_V2OHFTOV2HF"
+  ]
+ },
+ "__builtin_pulp_v2ohftov2hi": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "Cvt_v2ah_v2s"
+  ]
+ },
+ "__builtin_pulp_v2ohftov2hi_u": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "Cvt_v2ah_v2u"
+  ]
+ },
+ "__builtin_pulp_vitmax2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__VITMAX",
+   "__VIT_MAX",
+   "gap_vitmax"
+  ]
+ },
+ "__builtin_pulp_vitsel2": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": false,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__VITSEL",
+   "__VIT_SEL",
+   "gap_vitsel"
+  ]
+ },
+ "__builtin_pulp_write_base_off": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "__WRITE_BASE_OFF"
+  ]
+ },
+ "__builtin_pulp_write_base_off_v": {
+  "c_files_calling": 0,
+  "call_sites": 0,
+  "defined_in_clang": true,
+  "files_failing_on_it": 0,
+  "wrappers": [
+   "GAP_WRITE_VOL"
+  ]
+ },
+ "__builtin_shuffle": {
+  "c_files_calling": 28,
+  "call_sites": 1232,
+  "defined_in_clang": false,
+  "files_failing_on_it": 26,
+  "wrappers": []
+ }
+}

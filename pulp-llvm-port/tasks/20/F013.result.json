@@ -1,0 +1,53 @@
+{
+ "status": "done",
+ "branch": "work/20/F013",
+ "integration_head": "b0f18c5a6b886a603fab13304ec9452bdb604f4a",
+ "rebased": "Task integration_head was 1cb8d139f7d3; int-20 moved to b0f18c5a6b88 (F012, F015) during the task and build/int-20 was rebuilt, so the branch was rebased onto b0f18c5a6b88 (clean, no conflicts) and all comparisons use a snapshot of build/int-20 at b0f18c5a6b88 (scratchpad f013/base). policy_check is clean from either base.",
+ "commits": [
+  "5665dcd6c5b48b8115ce3f692a413140f63c4799",
+  "4025723cd1f94e3886527d58078dcd66b0860cc8",
+  "b58c3bd5744f6637a942900d8fa397ebd3815eed",
+  "be24841f69b79e5dc80859c6d2e75fc0b9b1b194",
+  "f9b9b624d165009e67a5feacc5666d932d2a0a52"
+ ],
+ "commit_clusters": {
+  "5665dcd6c5b4": "insn-tablegen: RISCVInstrInfoXpulp.td adds PseudoLOOPend (size 0, isBranch, isTerminator, operand = loop header)",
+  "4025723cd1f9": "codegen-core: RISCVInstrInfo::analyzeBranch unanalyzable for PseudoLOOPend; RISCVAsmPrinter.cpp emits nothing for it (Upstream-File-Edit trailer, accepted in review; conductor maps the file to codegen-core)",
+  "b58c3bd5744f": "passes: PULPFixupHwLoops.cpp",
+  "be24841f69b7": "insn-tablegen: PseudoLOOPend isMeta = 1 (review fix)",
+  "f9b9b624d165": "passes: PseudoLOOPend built with an empty DebugLoc (review fix)"
+ },
+ "note": "notes/20/F013.md",
+ "signature_gone": true,
+ "defect_origin": "fork commit f1b7aebff8c2 (Federico Ficarelli 2022-08-25, [LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms) added PULPFixupHwLoops.cpp incl. splitMBBAt and the LoopEnd block; same 4 verifier errors on xpulp-hwloop.ll with toolchains/ref-18 and port-19 llc",
+ "root_cause": "Four independent verifier violations in the PULP Hardware Loop Fixup output: (1) blocks the pass creates had no/wrong live-ins: fixupLoopInstrs' LoopEnd block got none; splitMBBAt stepped back only to after lp.setup (count register missing) and used addLiveOuts (added pristine CSRs) -> 'Using an undefined physical register'; (2) the LoopEnd block has the header as CFG successor (hardware back edge) but no terminator says so -> 'MBB has unexpected successors' (on the LoopEnd block, not the lp.setup block as F005 guessed; the lp.setup block is already unanalyzable because LOOPsetup is a non-branch terminator, which the verifier accepts); (3) the pass's nops were built with x0 as a use in operand 0 -> 'Explicit definition marked as use'; (4) nops padding a <4-byte loop were inserted after the LOOPsetup terminator in the same block -> 'Non-terminator instruction after the first terminator' (138 of 495 fuzz builds, seeds 1-165).",
+ "fix": "(1) computeAndAddLiveIns for each created block (LoopEnd, split setup block, pad block), as RISCVExpandAtomicPseudoInsts.cpp:421 does; (2) new zero-size terminator PseudoLOOPend <header> at the end of the LoopEnd block (Hexagon ENDLOOP0 design, HexagonPseudo.td:92 / HexagonMCInstLower.cpp:98), analyzeBranch treats it as unanalyzable (as ARM does for t2LoopEnd, ARMBaseInstrInfo.cpp:417), asm printer emits nothing; (3) nops define x0; (4) padding nops go into a new block between the setup block and its fall-through block (not at the start of that block: other blocks may jump to its label; a first attempt that did so changed the jump target in fuzz seeds 938/960 -O3 and was discarded). LOOP0/1setup definitions unchanged (making them branches would change earlier passes' code).",
+ "code_change": "None in object code or debug information (.text, .debug_line and the rest of the DWARF identical with -g, DW_AT_producer aside). Assembly text: when a loop is nop-padded, one extra local label line precedes the nops and later .LBB numbers can shift.",
+ "not_in_PULPHardwareLoops": "PULPHardwareLoops.cpp untouched (F007).",
+ "verification": {
+  "verifier_on_fork_tests": "llc -verify-machineinstrs with every fork llc RUN line: 0 errors on xpulp-hwloop.ll, xpulp-hwloop-countdown.ll, xpulp-hwloop-layout.ll (T010), xpulp-hwloop-obj.ll (x2), xpulp-postinc-f32.ll (x2), xpulp-lsr-postinc-heuristic.ll, and xpulp-postinc-f32-mir.ll's input through the full pipeline (base: 2-5 errors each). All output byte-identical to base (logs/20-F013/forktests-identity-verify.txt, logs/20-F013.verify.log). FREP tests still fail the verifier identically in both builds, in an earlier pass (see other_errors_seen). Re-run after the review fix: same.",
+  "gap9_sweep": "all src/*.c + build/gen/k12_*.c at O2/O3/Os (96 builds): asm and objdump byte-identical to base for all 81 compiling builds; same 15 compile failures in both (-file TUs and k10b, Sema/shim); all 81 verifier-clean (base fails on 42, every build with a hardware loop). logs/20-F013/gap9-sweep-vs-int20.txt, script logs/20-F013/sweep.sh. Objects identical, so GVSoC behaviour is identical by construction. Re-run after the review fix: same result.",
+  "fuzz_compile": "benchmarks/hwloop-fuzz gen.py seeds 1-2000 x O2/O3/Os, default flags: 6000/6000 object-identical to base and verifier-clean, 5482 with hardware loops (logs/20-F013/compile-fuzz-1-2000.txt, logs/20-F013/cfuzz.sh) Re-run after the review fix: 6000/6000 identical and verifier-clean.",
+  "fuzz_gvsoc": "one.sh (adapted: NEW=build/20-F013, BASE=snapshot of int-20 at b0f18c5a6b88, plus object compare and verifier) seeds 1-800 x O2/O3/Os with -pulp-loop-range-immediate=0: 2400/2400 compile, object-identical to base, verifier-clean (base fails verifier on 2160); 2392 match GAP9 GCC on GVSoC; 8 mismatch identically in both builds (pre-existing, see other_errors_seen); 0 hangs, 0 new crashes (logs/20-F013/fuzz-gvsoc-1-800.txt) Not re-run after the review fix: the fix does not change .text (compile fuzz 6000/6000 and sweep objects identical to base), so GVSoC behaviour is unchanged.",
+  "lit": "After the review fix: 2646/2647, only known CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (logs/20-F013.lit.log)",
+  "build": "scripts/build.sh targets llc,clang (+lit tools): 0 error clusters (logs/20-F013-build7.log)",
+  "policy": "policy_check b0f18c5a6b88..work/20/F013 (5 commits): 0 FAIL, 0 WARN (RISCVAsmPrinter.cpp now mapped to codegen-core by the conductor; the Upstream-File-Edit trailer stays on 4025723cd1f9) (logs/20-F013/policy.json)",
+  "repro": "logs/20-F013.repro.log",
+  "debug_info": "-g objects vs int-20 snapshot (b0f18c5a6b88): llvm-objdump -d, llvm-dwarfdump --debug-line and llvm-dwarfdump -a minus DW_AT_producer. GAP9 sweep -g O2/O3/Os: 81/81 compiling builds identical, 42 with hardware loops (incl. k12_dot16_loop, k12_dot8_loop, k12_sum_loop), same 15 compile failures (logs/20-F013/gap9-sweep-g-vs-int20.txt). Fuzz seeds 7001-7200 -g O2/O3/Os: 600/600 identical, 183 with hardware loops at -O2, all verifier-clean (logs/20-F013/fuzz-g-7001-7200.txt, script logs/20-F013/gcmp.sh). -pass-remarks-analysis=asm-printer output identical on xpulp-hwloop.ll and xpulp-hwloop-layout.ll."
+ },
+ "proposed_test": {
+  "file": "llvm/test/CodeGen/RISCV/xpulp-hwloop-verify.ll (or add RUN lines to existing tests)",
+  "run": "; RUN: llc -mtriple=riscv32 -mattr=+xpulpv -verify-machineinstrs < %s | FileCheck %s   (and the same with -O3 -mattr=+m,+c,+zfinx,+xpulpv)",
+  "body": "the functions of xpulp-hwloop.ll, xpulp-hwloop-countdown.ll, xpulp-hwloop-layout.ll (incl. empty_latch), plus a one-instruction loop that needs nop padding (fuzz seed 163 or 938 kern.c at -O3 gives one, with a second preheader jumping to the header), plus a loop whose trip count is computed right before lp.setup (split setup block)",
+  "checks": "generated with update_llc_test_checks.py; key property: llc does not abort (the verifier passes); lp.setup followed by the nops then the header label; object via -filetype=obj has no extra instruction for the loop-end marker. Simplest alternative: add -verify-machineinstrs to the existing RUN lines of xpulp-hwloop*.ll and xpulp-postinc-f32.ll (output is unchanged)."
+ },
+ "other_errors_seen": [
+  "PRE-EXISTING WRONG RESULTS (hardware loops, not caused by this change, objects identical to int-20 at b0f18c5a6b88): benchmarks/hwloop-fuzz seeds 27 (-O2,-O3), 330 (-O2,-O3,-Os), 562 (-O2,-O3,-Os) with -pulp-loop-range-immediate=0 give results different from GAP9 GCC on GVSoC (e.g. 330: GCC 0x981786f0 0x251e5380, clang 0xc79b5ca6 0xb57263d2). At F005 time these seeds crashed in PULP Hardware Loops (F003); they now compile and are wrong. Possibly the same class as backlog B15 (seeds 5050/5183). Kernels copied to logs/20-F013/fuzz-mismatch/seed<N>.kern.c (driver benchmarks/hwloop-fuzz/drv.c with -DN_/M_/K_ as in one.sh).",
+  "FREP tests (freploop.ll, freploop-nested.ll, -mcpu=snitch -snitch-frep-inference) fail -verify-machineinstrs after 'RISCV SSR pseudo instruction expansion pass' (RISCVExpandSSRInsts.cpp): 'MBB has allocatable live-in, but isn't entry, landing-pad, or inlineasm-br-indirect-target' (9/12 errors, $f0_d etc.); identical in int-20; aborts before the hwloop fixup pass so FREP output after the fixup could not be verified. Separate root cause (SSR pass).",
+  "sdma-pseudo-instructions.mir / ssr-pseudo-instructions.mir with -verify-machineinstrs: 'Function has NoVRegs property but there are VReg operands' after riscv-expand-sdma / riscv-expand-ssr; identical in int-20 (maybe the MIR inputs, not checked).",
+  "PULPFixupHwLoops.cpp fixupLoopInstrs third pass: 'bool offsetIncrease = 0;' is a bool, so the block-offset bookkeeping adds 1 instead of the byte size of inserted nops / lp.starti+lp.endi+lp.counti (and the long-form code adds getMISize(Start) three times). Later loops' lengths can be computed a few bytes short; only matters near the lp.setupi (50) / lp.setup (8190) range limits. Not changed (would change code).",
+  "Loops with two lp.setup instructions (second preheader 'lp.setup x0,a4,.LBB_end2; j .LBB_header', e.g. fuzz seed 938 -O3): the second setup's range starts at the 'j', so every iteration executes an extra jump; two different end labels for one loop. Pre-existing, results correct in the fuzz run; performance/robustness issue for PULPHardwareLoops/fixup layout."
+ ],
+ "revision": 2,
+ "review_response": "Review REJECT (tasks/20/F013.review.json): the marker produced a .debug_line row with -g. Fixed with isMeta = 1 (as requested) AND an empty DebugLoc on the marker: with isMeta alone, 26 of 200 fuzz objects (seeds 7001-7200 -g -O2, e.g. 7008) still differed, rows losing is_stmt, because DwarfDebug::findForceIsStmtInstrs (DwarfDebug.cpp:2334-2463 at llvmorg-20.1.8) takes the last located instruction of a block (meta or not) as its outgoing line; the marker carried the lp.setup's line. With both changes all -g objects are identical."
+}

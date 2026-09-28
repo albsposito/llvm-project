@@ -1,0 +1,20 @@
+{
+  "range": "abe1ba6bf62d7293b33981f923c8444d18d46366..work/20/F011",
+  "commits": 2,
+  "fail": 0,
+  "warn": 2,
+  "findings": [
+    {
+      "commit": "9f2568dcad5e",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics-diag.c"
+    },
+    {
+      "commit": "9f2568dcad5e",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: clang/test/CodeGen/RISCV/riscv-xpulpv2-intrinsics.c"
+    }
+  ]
+}

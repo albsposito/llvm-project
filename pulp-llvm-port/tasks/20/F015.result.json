@@ -1,0 +1,28 @@
+{
+ "status": "done",
+ "branch": "work/20/F015",
+ "commits": ["33604e394241"],
+ "commit_clusters": {"33604e394241": "insn-tablegen (RISCVInstrInfoXpulp.td, immediate-branch patterns only, 2 patterns + 4 comment lines)"},
+ "note": "notes/20/F015.md",
+ "signature_gone": true,
+ "change": "RISCVInstrInfoXpulp.td immediate-branch patterns: brcond (seteq/setne GPR, simm5) -> riscv_brcc GPR, simm5, SETEQ/SETNE (as CORE-V RISCVInstrInfoXCV.td:814-817 at llvmorg-20.1.8). No AddedComplexity (CORE-V uses 2): x==0 keeps beqz/bnez (compressible), matching GAP9 GCC. Clip patterns untouched (20/F012). PULPHardwareLoops.cpp untouched (20/F007).",
+ "rule8": "Fork commit f1b7aebff8c2 '[LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms' added the brcond patterns (git log pulp/integer_SIMD_fix -S'brcond (XLenVT (seteq'); they never matched because upstream 41759c3d92c5 '[RISCV] Add RISCVISD::BR_CC similar to RISCVISD::SELECT_CC' (LLVM 13) lowers brcond to riscv_brcc before selection. CORE-V reference: f4d2f7a3b798 '[RISCV] Codegen support for XCVbi extension (#89719)'.",
+ "reference_behaviour": "GAP9 GCC -march=rv32imcxgap9 -O2: p.beqimm/p.bneimm for constants -16..15 except 0 (bnez), li+beq for 16/-17. GVSoC isa_pulpv2.py:119-121 Format_SB2 SignedImm(1, Range(20,5)); pulp_v2.hpp:1600 compares (int32_t)reg == simm5.",
+ "evidence_logs": {
+  "repro_before": "logs/20-F015.repro.log (logs/20-F015-repro/t.c -O2: GCC 9 p.b*imm, ref-18 0, int-20 0)",
+  "after_asm": "logs/20-F015-repro/t.c with build/20-F015: 10 p.b*imm at O0/O1/O2/O3/Os, 9 at Oz; boundaries -16/15 selected, 16/-17 li+bne, 0 beqz. Before/after asm: logs/20-F015-repro/int20.s vs out/ (run.sh) and new.s in the note",
+  "build": "logs/20-F015-build1.log (llc clang llvm-mc llvm-objdump lld FileCheck; cluster_errors: 0 clusters); logs/20-F015-build2.log (llvm-test-depends clang-test-depends lld, rc 0)",
+  "gvsoc": "logs/20-F015.gvsoc.log via logs/20-F015-repro/run.sh (br.c): boundary hash 0xaa5b9013 and kernel results identical for GCC/int-20/F015. classify kernel (noinline, 4 small-constant compares, 2000 calls): int-20 43850 cycles -> F015 39951 (-8.9%), GCC 31799. interp loop kernel: 37465 -> 37463 (constants already hoisted by LICM; saves 2 setup li and 2 registers).",
+  "f009_reproducer": "logs/20-F015.f009-repro.log (logs/20-F009-repro inputs, output to logs/20-F015-repro/f009-out): branch-folder P_BNEIMM $x10, 3; branch-relaxation P_BNEIMM $x10, -7 + PseudoBR; GVSoC checks=64 bad=0 on both int-20 and F015. C-level: logs/20-F015.relaxc.log (relaxc.c): F015 emits relaxed 'p.beqimm a0,-7 ; j' and 'p.bneimm a0,12', GVSoC checks=80 bad=0 (int-20: li+beq/bne, checks=80 bad=0).",
+  "lit": "logs/20-F015-lit.log: LIT_PATHS + data/fork-tests.txt, 4795 tests, 4793 pass. Failures: rvv/vsetvli-insert-zve64f.mir (known, data/known-failures.txt) and Driver/riscv-arch.c, which is a harness artifact (the file is in both LIT_PATHS and fork-tests.txt, so two lit instances wrote the same .script concurrently: 'unexpected EOF while looking for matching'); rerun alone: pass.",
+  "fuzz": "logs/20-F015-fuzz (one.sh NEW=build/20-F015, BASE=build/int-20): res.txt seeds 1-400 and res2.txt fresh seeds 6001-6300, x O2/O3/Os = 2100 compiles. No NEWFAIL/OBJFAIL/crash/hang. 1319 same asm, 780 CHANGED (p.b*imm). Every MISMATCH vs GCC is pre-existing with the identical result on int-20: seed 27 O2/O3 (B03; O3 CHANGED, int-20 O3 gives the same 0x535e4646), seed 330 O2/O3/Os (asm same as int-20), seed 6012 O2/O3/Os (O2/Os CHANGED; int-20 O2/Os give the same 0xb1ae795c 0xa7f363b3), seed 6050 O2/O3/Os (asm same). Seed 256 O2/Os: int-20 asserts (LiveVariables), F015 compiles and runs OK (masked, not fixed; see other_errors_seen).",
+  "gap9_sweep": "logs/20-F015-sweep (scratch copy of benchmarks/gap9-sweep, GAP9_EXTRA_COMPILERS int20+mine): all 54 objects (27 kernels x O2/O3) byte-identical disassembly mine vs int20; no SDK kernel contains an equality branch against a small constant (no p.b*imm from any compiler, GCC included)."
+ },
+ "proposed_test": "llvm/test/CodeGen/RISCV/xpulp-branch-imm.ll: RUN: llc -mtriple=riscv32 -mattr=+xpulpv -verify-machineinstrs < %s | FileCheck %s. Functions branching on icmp eq/ne i32 %x with constants 5, -16, 15 (CHECK: p.beqimm/p.bneimm a0, <C>), 16 and -17 (CHECK: li + beq/bne, CHECK-NOT: p.b), 0 (CHECK: beqz/bnez, CHECK-NOT: p.beqimm), and a loop with a small-constant exit test. Generated with update_llc_test_checks.py.",
+ "other_errors_seen": [
+  "PULP has no select-with-immediate pseudo: select-shaped equality tests (return x==3 ? a : b; or 'if (x==C) return K;' turned into a select) still expand to li + beq/bne, where GAP9 GCC uses p.beqimm. Upstream CORE-V reference: Select_GPR_Using_CC_Imm + Selectbi (RISCVInstrInfoXCV.td:819-832 at llvmorg-20.1.8) and its custom inserter in RISCVISelLowering.cpp (codegen-core cluster); needs a COND_P_* aware IntCCtoRISCVCC. Missed optimization, P2.",
+  "hwloop fuzz seed 330 (O2/O3/Os) and seed 6012, 6050 (O2/O3/Os): wrong results vs GAP9 GCC on GVSoC, identical on build/int-20 (pre-existing hardware-loop miscompiles, not analysed; like B15).",
+  "hwloop fuzz seed 256 O2/Os: build/int-20 asserts in LiveVariables ('Can't find reaching def for virtreg'); with this change the seed happens to compile and run correctly, so the underlying crash (B04 family) is masked for this input, not fixed.",
+  "hwloop fuzz seed 27 O2/O3 wrong result (known B03), unchanged."
+ ]
+}

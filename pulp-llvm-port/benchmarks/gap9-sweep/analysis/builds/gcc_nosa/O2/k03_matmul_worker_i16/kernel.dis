@@ -1,0 +1,58 @@
+
+/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/gap9-sweep/analysis/builds/gcc_nosa/O2/k03_matmul_worker_i16/kernel.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <matmul_worker>:
+       0: 00c52f03     	lw	t5, 0xc(a0)
+       4: 07e05663     	blez	t5, 0x70 <.L14>
+       8: 01452303     	lw	t1, 0x14(a0)
+       c: 4e01         	li	t3, 0x0
+
+0000000e <.L2>:
+       e: 4881         	li	a7, 0x0
+      10: 04605c63     	blez	t1, 0x68 <.L5>
+
+00000014 <.L8>:
+      14: 491c         	lw	a5, 0x10(a0)
+      16: 4601         	li	a2, 0x0
+      18: 02f05c63     	blez	a5, 0x50 <.L7>
+      1c: 03c785b3     	mul	a1, a5, t3
+      20: 4150         	lw	a2, 0x4(a0)
+      22: 4118         	lw	a4, 0x0(a0)
+      24: 00189693     	slli	a3, a7, 0x1
+      28: 96b2         	add	a3, a3, a2
+      2a: 00131e93     	slli	t4, t1, 0x1
+      2e: 4601         	li	a2, 0x0
+      30: 97ae         	add	a5, a5, a1
+      32: 0786         	slli	a5, a5, 0x1
+      34: 0586         	slli	a1, a1, 0x1
+      36: 8f8d         	sub	a5, a5, a1
+      38: 17f9         	addi	a5, a5, -0x2
+      3a: 8385         	srli	a5, a5, 0x1
+      3c: 972e         	add	a4, a4, a1
+      3e: 0785         	addi	a5, a5, 0x1
+      40: 0067c0fb     	lp.setup	x1, a5, 0x6
+      44: 0027158b     	p.lh	a1, 0x2(a4!)
+      48: 11d6f80b     	p.lh	a6, t4(a3!)
+
+0000004c <.L15>:
+      4c: 42b80633     	p.mac	a2, a6, a1
+
+00000050 <.L7>:
+      50: 87c6         	mv	a5, a7
+      52: 4518         	lw	a4, 0x8(a0)
+      54: 0885         	addi	a7, a7, 0x1
+      56: 43c307b3     	p.mac	a5, t1, t3
+      5a: 078a         	slli	a5, a5, 0x2
+      5c: 00c767a3     	p.sw	a2, a5(a4)
+      60: 01452303     	lw	t1, 0x14(a0)
+      64: fa68c8e3     	blt	a7, t1, 0x14 <.L8>
+
+00000068 <.L5>:
+      68: 0e05         	addi	t3, t3, 0x1
+      6a: fbee12e3     	bne	t3, t5, 0xe <.L2>
+      6e: 8082         	ret
+
+00000070 <.L14>:
+      70: 8082         	ret

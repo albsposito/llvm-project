@@ -1,0 +1,133 @@
+function                          instrs     cycles
+KerFirSeqf32                      210545     211995
+KerFirSeqBaselinef32               44374      52598
+rt_dump_f32.constprop.1            15649      16685
+rt_hash                            13060      17408
+_start                              4519       5646
+fill_int_f32                        3531      10394
+__udivdi3                           1127       2921
+__umoddi3                            989       2806
+rt_result.constprop.2                902       1346
+copy_f32.constprop.0                 583        871
+
+hottest PCs in KerFirSeqf32 (count, cycles, pc, insn):
+       5        5  00072a  addi	sp, sp, -0x30
+       5       10  00072c  srli	a5, a4, 0x1f
+       5        5  000730  sw	s0, 0x2c(sp)
+       5        5  000732  sw	s1, 0x28(sp)
+       5        5  000734  sw	s2, 0x24(sp)
+       5        5  000736  sw	s3, 0x20(sp)
+       5        5  000738  sw	s4, 0x1c(sp)
+       5        5  00073a  sw	s5, 0x18(sp)
+       5        5  00073c  sw	s6, 0x14(sp)
+       5        5  00073e  sw	s7, 0x10(sp)
+       5        5  000740  sw	s8, 0xc(sp)
+       5        5  000742  sw	s9, 0x8(sp)
+       5        5  000744  sw	s10, 0x4(sp)
+       5        0  000746  sw	s11, 0x0(sp)
+       5        5  000748  p.addn	a5, a5, a4, 0x1
+       5        5  00074c  blez	a5, 0x89a <KerFirSeqf32+0x170>
+       5        5  000750  srai	s3, a3, 0x1f
+       5        5  000754  p.bclr	s3, s3, 0x1d, 0x2
+       5        5  000758  slli	t2, a5, 0x3
+       5        5  00075c  p.addn	s3, s3, a3, 0x2
+       5        5  000760  addi	t2, t2, -0x8
+       5        5  000762  slli	s2, s3, 0x4
+       5        5  000766  slli	s5, a3, 0x2
+       5        5  00076a  srli	t2, t2, 0x3
+       5        5  00076e  slli	s6, s3, 0x2
+       5        5  000772  mv	s1, a2
+       5        5  000774  mv	t0, a0
+       5        5  000776  addi	s0, a2, 0x4
+       5        5  00077a  add	s4, a1, s2
+       5        5  00077e  add	s5, s5, a1
+       5        5  000780  addi	s7, s2, 0x4
+       5        5  000784  addi	t2, t2, 0x1
+       5        5  000786  lp.setup	x0, t2, 0x89
+     640      640  00078a  blez	s3, 0x9b4 <KerFirSeqf32+0x28a>
+     640      640  00078e  addi	t6, s2, -0x10
+     640      640  000792  srli	t6, t6, 0x4
+     640      640  000796  addi	t5, t0, 0x4
+     640      640  00079a  mv	t4, a1
+     640      640  00079c  mv	t3, t0
+     640      640  00079e  li	a5, 0x0
+     640      640  0007a0  li	a6, 0x0
+     640      640  0007a2  addi	t6, t6, 0x1
+     640     1280  0007a4  lp.setup	x1, t6, 0x4b
+    5120        0  0007a8  lw	a7, 0x0(t4)
+    5120    10240  0007ac  fcvt.s.w	s11, a6
+    5120     5120  0007b0  lw	a6, 0x0(t3)
+    5120        0  0007b4  lw	s8, 0x0(t5)
+    5120     5120  0007b8  fcvt.s.w	a5, a5
+    5120    10240  0007bc  fmadd.s	a6, a6, a7, s11
+    5120        0  0007c0  lw	t1, 0x4(t4)
+    5120    10240  0007c4  fmadd.s	a5, a7, s8, a5
+    5120     5120  0007c8  lw	s10, 0x4(t3)
+    5120        0  0007cc  lw	s8, 0x4(t5)
+    5120    10240  0007d0  fcvt.w.s	s11, a6, rtz
+    5120        0  0007d4  lw	a7, 0x8(t4)
+    5120     5120  0007d8  fcvt.w.s	a5, a5, rtz
+    5120    10240  0007dc  fcvt.s.w	a6, s11
+    5120        0  0007e0  lw	s9, 0x8(t3)
+    5120     5120  0007e4  fcvt.s.w	a5, a5
+    5120    10240  0007e8  fmadd.s	s10, s10, t1, a6
+    5120        0  0007ec  lw	a6, 0xc(t3)
+    5120    10240  0007f0  fmadd.s	t1, t1, s8, a5
+    5120     5120  0007f4  lw	a5, 0xc(t4)
+    5120        0  0007f8  lw	s8, 0xc(t5)
+    5120     5120  0007fc  fcvt.w.s	s10, s10, rtz
+    5120     5120  000800  addi	t3, t3, 0x10
+    5120     5120  000802  fcvt.w.s	t1, t1, rtz
+    5120     5120  000806  fcvt.s.w	s10, s10
+    5120     5120  00080a  addi	t4, t4, 0x10
+    5120     5120  00080c  fcvt.s.w	t1, t1
+    5120    10240  000810  fmadd.s	s9, s9, a7, s10
+    5120        0  000814  lw	s10, 0x8(t5)
+    5120     5120  000818  addi	t5, t5, 0x10
+    5120     5120  00081a  fmadd.s	a7, a7, s10, t1
+    5120     5120  00081e  fcvt.w.s	t1, s9, rtz
+    5120     5120  000822  fcvt.s.w	t1, t1
+    5120     5120  000826  fcvt.w.s	a7, a7, rtz
+    5120     5120  00082a  fmadd.s	a6, a6, a5, t1
+    5120     5120  00082e  fcvt.s.w	a7, a7
+    5120     5120  000832  fmadd.s	a5, a5, s8, a7
+    5120     5120  000836  fcvt.w.s	a6, a6, rtz
+    5120     9600  00083a  fcvt.w.s	a5, a5, rtz
+     640      640  00083e  fcvt.s.w	t1, a6
+     640      640  000842  fcvt.s.w	a7, a5
+     640     2560  000846  bge	s6, a3, 0x890 <KerFirSeqf32+0x166>
+     640      640  000890  p.sw	t1, 0x8(s1!)
+     640        0  000894  p.sw	a7, 0x8(s0!)
+     640      640  000898  addi	t0, t0, 0x8
+       5        5  00089a  p.bclr	a5, a4, 0x1e, 0x1
+       5       15  00089e  beqz	a5, 0x96c <KerFirSeqf32+0x242>
+       5        5  00096c  li	a5, 0x1
+       5        5  00096e  bge	a5, a3, 0x998 <KerFirSeqf32+0x26e>
+       5        5  000972  add	a5, a3, a4
+       5        5  000976  slli	a5, a5, 0x2
+       5        5  000978  addi	a3, a0, -0x4
+       5        5  00097c  slli	a4, a4, 0x2
+       5        5  00097e  mv	a2, a0
+       5        5  000980  add	a5, a5, a3
+       5        5  000982  add	a0, a0, a4
+       5        5  000984  sub	a5, a5, a0
+       5        5  000986  addi	a5, a5, -0x4
+       5        5  000988  srli	a5, a5, 0x2
+       5        5  00098a  addi	a5, a5, 0x1
+       5       10  00098c  lp.setup	x1, a5, 0x4
+     155      310  000990  p.lw	a4, 0x4(a0!)
+     155      155  000994  p.sw	a4, 0x4(a2!)
+       5        5  000998  lw	s0, 0x2c(sp)
+       5        5  00099a  lw	s1, 0x28(sp)
+       5        5  00099c  lw	s2, 0x24(sp)
+       5        5  00099e  lw	s3, 0x20(sp)
+       5        5  0009a0  lw	s4, 0x1c(sp)
+       5        5  0009a2  lw	s5, 0x18(sp)
+       5        5  0009a4  lw	s6, 0x14(sp)
+       5        5  0009a6  lw	s7, 0x10(sp)
+       5        5  0009a8  lw	s8, 0xc(sp)
+       5        5  0009aa  lw	s9, 0x8(sp)
+       5        5  0009ac  lw	s10, 0x4(sp)
+       5        0  0009ae  lw	s11, 0x0(sp)
+       5        5  0009b0  addi	sp, sp, 0x30
+       5       10  0009b2  ret

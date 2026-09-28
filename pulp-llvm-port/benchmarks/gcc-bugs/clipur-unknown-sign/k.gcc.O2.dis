@@ -1,0 +1,168 @@
+
+/tmp/claude-1000/-home-ubuntu-llvm-project/8aeebf17-9c73-413d-b44d-f6985f3428f5/scratchpad/adv/k.gcc.O2.o:	file format elf32-littleriscv
+
+Disassembly of section .text:
+
+00000000 <k0>:
+       0:      	not	a5, a1
+       4:      	<unknown>
+       8:      	<unknown>
+       c:      	ret
+
+0000000e <k1>:
+       e:      	lui	a0, 0x80000
+      12:      	ret
+
+00000014 <k2>:
+      14:      	li	a0, -0x1
+      16:      	ret
+
+00000018 <k3>:
+      18:      	<unknown>
+      1c:      	ret
+
+0000001e <k4>:
+      1e:      	li	a0, -0x1
+      20:      	ret
+
+00000022 <k5>:
+      22:      	li	a0, 0x0
+      24:      	ret
+
+00000026 <k6>:
+      26:      	lui	a0, 0x80000
+      2a:      	ret
+
+0000002c <k7>:
+      2c:      	li	a0, 0x0
+      2e:      	ret
+
+00000030 <k8>:
+      30:      	andi	a1, a1, 0xff
+      34:      	not	a5, a1
+      38:      	<unknown>
+      3c:      	<unknown>
+      40:      	ret
+
+00000042 <k9>:
+      42:      	andi	a1, a1, 0xff
+      46:      	<unknown>
+      4a:      	<unknown>
+      4e:      	ret
+
+00000050 <k10>:
+      50:      	<unknown>
+      54:      	not	a5, a1
+      58:      	<unknown>
+      5c:      	<unknown>
+      60:      	ret
+
+00000062 <k11>:
+      62:      	srai	a1, a1, 0x1
+      64:      	not	a5, a1
+      68:      	<unknown>
+      6c:      	<unknown>
+      70:      	ret
+
+00000072 <k12>:
+      72:      	<unknown>
+      76:      	not	a5, a1
+      7a:      	<unknown>
+      7e:      	<unknown>
+      82:      	ret
+
+00000084 <k13>:
+      84:      	srai	a5, a1, 0x8
+      88:      	<unknown>
+      8c:      	not	a5, a5
+      90:      	<unknown>
+      94:      	<unknown>
+      98:      	<unknown>
+      9c:      	ret
+
+0000009e <k14>:
+      9e:      	srai	a0, a1, 0x1f
+      a2:      	ret
+
+000000a4 <k15>:
+      a4:      	srli	a1, a1, 0x1f
+      a6:      	<unknown>
+      aa:      	<unknown>
+      ae:      	ret
+
+000000b0 <k16>:
+      b0:      	<unknown>
+      b4:      	ret
+
+000000b6 <k17>:
+      b6:      	li	a5, 0x64
+      ba:      	<unknown>
+      be:      	not	a5, a1
+      c2:      	<unknown>
+      c6:      	<unknown>
+      ca:      	ret
+
+000000cc <k18>:
+      cc:      	li	a5, 0x3e8
+      d0:      	<unknown>
+      d4:      	not	a5, a1
+      d8:      	<unknown>
+      dc:      	<unknown>
+      e0:      	ret
+
+000000e2 <k19>:
+      e2:      	<unknown>
+      e6:      	<unknown>
+      ea:      	<unknown>
+      ee:      	ret
+
+000000f0 <k20>:
+      f0:      	<unknown>
+      f4:      	<unknown>
+      f8:      	<unknown>
+      fc:      	ret
+
+000000fe <k21>:
+      fe:      	<unknown>
+     102:      	ret
+
+00000104 <k22>:
+     104:      	<unknown>
+     108:      	neg	a5, a1
+     10c:      	<unknown>
+     110:      	addi	a1, a1, -0x1
+     112:      	<unknown>
+     116:      	ret
+
+00000118 <k23>:
+     118:      	<unknown>
+     11c:      	addi	a1, a1, -0x1
+     11e:      	<unknown>
+     122:      	<unknown>
+     126:      	ret
+
+00000128 <kl0>:
+     128:      	lbu	a4, 0x0(a1)
+     12c:      	not	a5, a4
+     130:      	<unknown>
+     134:      	<unknown>
+     138:      	ret
+
+0000013a <kl1>:
+     13a:      	lbu	a5, 0x0(a1)
+     13e:      	<unknown>
+     142:      	<unknown>
+     146:      	ret
+
+00000148 <kl2>:
+     148:      	lb	a4, 0x0(a1)
+     14c:      	not	a5, a4
+     150:      	<unknown>
+     154:      	<unknown>
+     158:      	ret
+
+0000015a <kl3>:
+     15a:      	lb	a5, 0x0(a1)
+     15e:      	<unknown>
+     162:      	<unknown>
+     166:      	ret

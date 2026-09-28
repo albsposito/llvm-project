@@ -1,0 +1,44 @@
+{
+  "status": "done",
+  "branch": "work/20/F008",
+  "commits": ["f5e7c8b65ded349bc40243f3feb670d23f8ace85"],
+  "note": "notes/20/F008.md",
+  "signature_gone": true,
+  "retry_review": "The previous attempt's commit 189b3f774c38 was a real code fix, not comment-only. I rebuilt it from scratch and re-verified every requirement (the last rebuild of the earlier attempt had been interrupted). The code is kept unchanged. The commit was amended only to put Co-Authored-By in the same trailer paragraph as Change-Note/Task, because policy_check had FAILed with 'missing Change-Note trailer'. The tree is identical to 189b3f774c38.",
+  "owner_cluster_used": "insn-tablegen (only llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td; fixup! [pulp] insn-tablegen: ...)",
+  "root_cause": "Three defects in the fork's plain-C clip idiom patterns (RISCVInstrInfoXpulp.td, introduced in fork commit f1b7aebff8c2 [LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms; found with git log pulp/integer_SIMD_fix -S'def betweenu' and -S'getZExtValue() == ~bound2'). (1) The bound leaves powerOf2Minus1_pulp/negativePowerOf2 are TImmLeaf, which matches only TargetConstant, while smin/smax operands are plain Constant. (2) The clip PatFrag predicate compared getZExtValue() with ~getZExtValue(): for i32 constants the upper 32 bits are zero, so ~ never equals the other bound. (3) The p.clipu idiom (betweenu) used umin/umax, but p.clipu compares signed (GVSoC lib_CLIPU: a>hi -> hi, a<=0 -> 0), and umax(x,0) is folded away before ISel. Missed optimization only; no miscompile before or after.",
+  "fix": "New ImmLeaf leaves powerOf2Minus1_imm_pulp (isPowerOf2_32(Imm+1) && isUInt<30>) and negativePowerOf2_imm (capped at -2^30), so the encoded field is at most 31. The clip predicate uses getSExtValue. A new clipu_idiom PatFrags matches smin(smax(x,0),hi), smax(smin(x,hi),0) and umin(smax(x,0),hi). The existing trailing1sPlus1_pulp xform gives the immediate, as in upstream CORE-V (RISCVInstrInfoXCV.td:723 powerOf2Minus1 ImmLeaf, :771-773 trailing1sPlus1 @llvmorg-20.1.8). Upstream matches only the cv.clip intrinsic, not smin/smax idioms, at 20.1.8. Builtin patterns and register-form (p.clipr/p.clipur) patterns are unchanged.",
+  "isa_semantics": "gvsoc2 core/models/cpu/iss/include/isa/pulp_v2.hpp:1930 p_clipi_exec clamps to [-2^(imm-1), 2^(imm-1)-1]; :1940 p_clipui_exec clamps to [0, 2^(imm-1)-1] via isa_lib/int.h:1305 lib_CLIPU (signed compares). [-128,127] -> p.clip 8, [0,255] -> p.clipu 9, the same as GAP9 GCC (encoding word 0x14851533 for p.clip a0,a0,8).",
+  "results": {
+    "c_microtest_asm": "logs/20-F008-v2/clamps.{before,after,gcc}.clean.s. Before: 0 p.clip (li+p.min+li+p.max). After: s8 (both orders) p.clip 8, s16 p.clip 16, u8 (both orders) p.clipu 9, u16 p.clipu 17, int8_t/uint8_t saturating casts p.clip 8 / p.clipu 9, all identical to GAP9 GCC. [-2^30,2^30-1] and [0,2^30-1] give p.clip/p.clipu 31. [INT_MIN,INT_MAX] is folded to nothing and [0,INT_MAX] gives p.max. Non-power-of-two bounds (+-100, [0,200], [-127,127], [-128,255]) and unsigned x>255 stay p.min/p.max/p.minu.",
+    "ir_idioms": "logs/20-F008-v2/idioms.{before,after}.clean.s: every smin/smax/umin ordering is matched; the not-matching cases are correct; -verify-machineinstrs is clean.",
+    "gvsoc_fixed_edges": "logs/20-F008-v2/sim_clamp.txt: 816 checks (17 clamps x 48 inputs incl. INT_MIN/INT_MAX and every bound +-1), 0 mismatches for GCC, int-20 and this build.",
+    "gvsoc_random_clamps": "logs/20-F008-v2/rclamp.txt (genclamp.py): 8 seeds x 60 random-bound clamps x 55 inputs = 26400 checks, 0 mismatches for int-20 and this build. This build selected 309 p.clip/p.clipu, int-20 selected 0.",
+    "clip_kernel_cycles": "logs/20-F008-v2/sim_clip.txt, clip_kernel_dis.txt. Builtin kernel: 21535 cycles int-20 and this build, O2/O3 (unchanged). Plain-C clip kernel: 26655 -> 21535 cycles (-19.2%), and its kernel code is now p.clip 8 / p.clipu 9, the same as the GCC builtin kernel. Checksum 0x5ec4255d everywhere. GCC: builtin 17437, plain 19986 cycles; the remaining gap to GCC is outside the kernel.",
+    "gap9_sweep": "logs/20-F008-v2/sweep_compare.txt: GAP9_EXTRA_COMPILERS int20 and mine, all 54 kernel .dis byte-identical (except the objdump file-path line).",
+    "fuzzer": "logs/20-F008-v2/fuzz/res.txt: seeds 5000-5299 x O2/O3/Os, 900/900 assembly identical to int-20, no NEWFAIL/OBJFAIL/hang. Seeds 5050 and 5183 mismatch GCC with the same assembly as int-20 (pre-existing, see other_errors_seen).",
+    "lit": "logs/20-F008.lit.log: fork tests 56/56 pass (clang fork tests 7/7 also run separately). llvm/test/CodeGen/RISCV + llvm/test/MC/RISCV: 2629/2630; the only failure is the known rvv/vsetvli-insert-zve64f.mir (data/known-failures.txt, BACKLOG B41), which also fails on build/int-20.",
+    "build": "logs/20-F008.after.log (llc clang llvm-mc lld), cluster_errors: 0 failed targets.",
+    "policy_check": "logs/20-F008.policy.log: 0 FAIL, 0 WARN."
+  },
+  "evidence_logs": ["logs/20-F008.repro.log", "logs/20-F008.after.log", "logs/20-F008.lit.log", "logs/20-F008.policy.log", "logs/20-F008-v2/"],
+  "other_errors_seen": [
+    "PRE-EXISTING MISCOMPILE (codegen, insn-tablegen, not caused or changed by this task): the p.clipr idiom pattern `def : Pat<(between (not rs2), rs2, rs1), (P_CLIPR rs1, rs2)>` (RISCVInstrInfoXpulp.td, from f1b7aebff8c2) is only equivalent when rs2 >= 0. For a negative bound, p.clipr computes low=-rs2-1 > high=rs2 and lib_CLIP returns low for x<low, while smin(smax(x,~b),b) = b. Repro: logs/20-F008-v2/clipr/ (int rc(int x,int b){int t=x<~b?~b:x; return t>b?b:t;} with b=-5): int-20 and this build both emit p.clipr and give 5/8 wrong results on GVSoC (x=0 gives 4, expected -5). GAP9 GCC emits not+p.max+p.min. Suggested separate task: drop the idiom-to-p.clipr pattern or restrict it to a provably non-negative bound; keep the builtin clip_r pattern.",
+    "The p.clipur idiom pattern (betweenu rs2, rs1) uses unsigned min/max and is dead, because umax(x,0) folds away. If it ever matched, it would be wrong (p.clipur compares signed). Same separate task as p.clipr; not touched here.",
+    "hwloop fuzzer seeds 5050 and 5183 (benchmarks/hwloop-fuzz gen.py; logs/20-F008-v2/fuzz/w/5050, w/5183) give wrong results at O2/O3/Os versus GCC, with assembly identical to int-20. Pre-existing hardware-loop miscompiles (probably the B03/B04 class, not analysed)."
+  ],
+  "proposed_test": {
+    "file": "llvm/test/CodeGen/RISCV/xpulp-clip-idiom.ll (new)",
+    "run": "; RUN: llc -mtriple=riscv32 -mattr=+xpulpv -verify-machineinstrs < %s | FileCheck %s",
+    "checks": [
+      "smin(smax(x,-128),127) and smax(smin(x,127),-128) -> p.clip a0, a0, 8",
+      "smin(smax(x,-32768),32767) -> p.clip a0, a0, 16",
+      "smax(x,-1073741824)+smin(,1073741823) -> p.clip a0, a0, 31",
+      "smin(smax(x,0),255), smax(smin(x,255),0), umin(smax(x,0),255) -> p.clipu a0, a0, 9",
+      "smin(smax(x,0),1) -> p.clipu a0, a0, 2",
+      "negative: smin(smax(x,-128),128), smin(smax(x,-255),255), smin(smax(x,1),255) -> CHECK-NOT: p.clip",
+      "negative: smin(smax(x,0),2147483647) -> p.max, no p.clipu (field would be 32)"
+    ],
+    "source": "logs/20-F008-v2/idioms.ll contains all these functions"
+  }
+}

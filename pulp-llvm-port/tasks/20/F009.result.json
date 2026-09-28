@@ -1,0 +1,32 @@
+{
+ "status": "done",
+ "branch": "work/20/F009",
+ "commits": [
+  "6249c9104ea7",
+  "b00d864afedf"
+ ],
+ "commit_clusters": {
+  "6249c9104ea7": "codegen-core (RISCVInstrInfo.cpp/.h)",
+  "b00d864afedf": "passes (PULPHardwareLoops.cpp, SNITCHFrepLoops.cpp)"
+ },
+ "note": "notes/20/F009.md",
+ "signature_gone": true,
+ "retry": "Previous attempt's uncommitted diff saved to logs/20-F009.retry-prev-attempt.diff (no git stash). Reviewed against 0439a4eca78f: kept all of it (new COND_P_BEQIMM/COND_P_BNEIMM, getCondFromBranchOpc/getBrCond/getOppositeBranchCondition cases, optimizeCondBranch exclusion, EQ/NE classification in the two loop passes); only the optimizeCondBranch comment was reworded. CORE-V's own COND_EQ+Imm->CV_BEQIMM mapping at 20 left untouched (upstream changes it at 21).",
+ "overlap_with_F007": "PULPHardwareLoops.cpp: this task adds two case labels (COND_P_BEQIMM under COND_EQ, COND_P_BNEIMM under COND_NE) in PULPHardwareLoops::getComparisonKindFromCC (around line 612-617 at abe1ba6bf62d) and nothing else. F007 (trip-count logic) had no diff in wt/20-F007 when checked; the hunks should merge cleanly unless F007 rewrites getComparisonKindFromCC, in which case the two labels must be carried over.",
+ "evidence_logs": {
+  "repro_before": "logs/20-F009.repro.log (int-20: CV_BNEIMM, llc abort; +xcvbi forced: GVSoC trap; ref-18: BNE a0,gp, GVSoC bad=2)",
+  "after": "logs/20-F009.after.log (P_BNEIMM with immediate, GVSoC checks=64 bad=0)",
+  "reproducer": "logs/20-F009-repro/run.sh <bindir> <tag> (rev.mir: branch-folder reversal; relax.mir: branch-relaxation inversion; drv.c: GVSoC driver)",
+  "build": "logs/20-F009-build2.log (llc, clang; cluster_errors: 0 clusters)",
+  "lit": "logs/20-F009-lit.log: LIT_PATHS 4721 tests, 4720 pass, 1 fail = known failure CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (20/T002)",
+  "fuzz": "logs/20-F009-fuzz/res.txt: seeds 1-200 x O2/O3/Os, all 600 assemblies byte-identical to build/int-20 ('same'), no NEWFAIL/OBJFAIL/crash; 598 OK, 2 MISMATCH both seed 27 O2/O3 with identical int-20 asm = known backlog B03",
+  "gap9_sweep": "logs/20-F009-sweep (private copy of benchmarks/gap9-sweep/run.py, GAP9_EXTRA_COMPILERS int20+mine): all 54 kernel objects (27 x O2/O3) byte-identical disassembly mine vs int20; no kernel contains p.beqimm/p.bneimm"
+ },
+ "c_level_reproducer": "Not possible at step 20: clang never emits p.beqimm/p.bneimm from C (ref-18 neither), see other_errors_seen; reproducer uses MIR input.",
+ "proposed_test": "llvm/test/CodeGen/RISCV/pulp-branch-imm-reverse.mir: RUN llc -mtriple=riscv32 -mattr=+xpulpv -run-pass=branch-folder (rev.mir body: P_BEQIMM $x10, 3, %bb.1; PseudoBR %bb.2) CHECK: P_BNEIMM $x10, 3, %bb.2; and -run-pass=branch-relaxation on relax.mir CHECK: P_BNEIMM $x10, -7 followed by PseudoBR; CHECK-NOT: CV_B / BNE $x10. Generated with update_mir_test_checks.py.",
+ "other_errors_seen": [
+  "PULP immediate-branch ISel patterns never fire: RISCVInstrInfoXpulp.td:1312-1315 match (brcond (seteq GPR, simm5)) but RISC-V lowers brcond to riscv_brcc before selection, so clang emits li+beq/bne instead of p.beqimm/p.bneimm (also at ref-18; GAP9 GCC emits p.beqimm). Upstream CORE-V pattern to follow: RISCVInstrInfoXCV.td:815-817 (riscv_brcc GPR, simm5, SETEQ/SETNE). Missed optimization; once fixed, this F009 fix becomes reachable from C.",
+  "hwloop fuzz seed 27 O2/O3 wrong result (known backlog B03, identical in int-20)"
+ ],
+ "step21_followup": "Upstream c8243251cb25 (21) removes immediate condition codes (Cond[0] becomes the opcode): drop COND_P_* and add P_BEQIMM<->P_BNEIMM to the opcode switch in reverseBranchCondition (steps/21/leads.md), keep getCondFromBranchOpc cases for RISCVLateBranchOpt; at 23 move the pair into RISCVCC::getInverseBranchOpcode (steps/23/leads.md). The loop passes' getComparisonKindFromCC will then receive opcodes, not CCs, and need adapting."
+}
