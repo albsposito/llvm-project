@@ -284,6 +284,27 @@ let TargetPrefix = "riscv" in {
                 [llvm_ptr_ty, llvm_i32_ty],
                 [IntrHasSideEffects]>;
 
+  // GAP9 PMSIS builtins (task 20/F016).
+  // p.elw that GAP9 GCC treats as a full memory barrier: no memory attribute,
+  // so it may read and write any memory, plus side effects, so it is never
+  // removed, merged, hoisted or reordered across other memory operations.
+  def int_riscv_pulp_event_unit_read_fenced
+    : ClangBuiltin<"__builtin_pulp_event_unit_read_fenced">,
+      Intrinsic<[llvm_i32_ty],
+                [llvm_ptr_ty, llvm_i32_ty],
+                [IntrHasSideEffects]>;
+  // Store of a pointer value (operand 0) at base (operand 1) + offset
+  // (operand 2), modelled like OffsetedWrite (PulpWriteMemIntrinsic above).
+  // The stored pointer escapes, so operand 0 is not NoCapture. The call may
+  // write any memory and is not willreturn, so IR passes never delete it as a
+  // dead store, and the selected store has no memory operand, so machine
+  // passes keep it and keep it ordered with every other memory access.
+  def int_riscv_pulp_OffsetedWritePtr
+    : ClangBuiltin<"__builtin_pulp_OffsetedWritePtr">,
+      Intrinsic<[],
+                [llvm_ptr_ty, llvm_ptr_ty, llvm_i32_ty],
+                [IntrWriteMem, WriteOnly<ArgIndex<1>>, NoCapture<ArgIndex<1>>]>;
+
   def int_riscv_pulp_bitinsert
     : ClangBuiltin<"__builtin_bitinsert">, // NOTE: GCC has no pulp here
       Intrinsic<[llvm_i32_ty],
