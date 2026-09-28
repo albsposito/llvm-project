@@ -520,9 +520,24 @@ static uint64_t adjustFixupValue(const MCFixup &Fixup, uint64_t Value,
     return Value;
   }
   case RISCV::fixup_pulpv2_loop_setup: {
+    // Forward offset in halfwords, 12-bit unsigned field. Checked like
+    // fixup_riscv_branch above: a hand-written label can be out of range or
+    // behind the instruction, and applyFixup does not mask the value, so an
+    // unchecked overflow would silently corrupt the neighbouring fields
+    // (GNU as rejects these with an overflow error).
+    if (!isUInt<13>(Value))
+      Ctx.reportError(Fixup.getLoc(), "fixup value out of range");
+    if (Value & 0x1)
+      Ctx.reportError(Fixup.getLoc(), "fixup value must be 2-byte aligned");
     return Value >> 1;
   }
   case RISCV::fixup_pulpv2_loop_setupi: {
+    // Forward offset in halfwords, 5-bit unsigned field; an overflow would
+    // spill into the loop-count field above it (checked as above).
+    if (!isUInt<6>(Value))
+      Ctx.reportError(Fixup.getLoc(), "fixup value out of range");
+    if (Value & 0x1)
+      Ctx.reportError(Fixup.getLoc(), "fixup value must be 2-byte aligned");
     return Value >> 1;
   }
 
