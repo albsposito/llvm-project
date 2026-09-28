@@ -720,6 +720,23 @@ public:
   bool isUImm10() const { return IsUImm<10>(); }
   bool isUImm11() const { return IsUImm<11>(); }
   bool isUImm12() const { return IsUImm<12>(); }
+  // PULP hardware-loop label operands: a bare symbol, or a constant that is
+  // the raw field value (same shape as isBareSimmNLsb0 for branch targets).
+  template <unsigned N> bool isBareSymbolOrUImm() const {
+    int64_t Imm;
+    RISCVMCExpr::VariantKind VK = RISCVMCExpr::VK_RISCV_None;
+    if (!isImm())
+      return false;
+    bool IsConstantImm = evaluateConstantImm(getImm(), Imm, VK);
+    bool IsValid;
+    if (!IsConstantImm)
+      IsValid = RISCVAsmParser::classifySymbolRef(getImm(), VK);
+    else
+      IsValid = isUInt<N>(Imm);
+    return IsValid && VK == RISCVMCExpr::VK_RISCV_None;
+  }
+  bool isUImm5PCRel() const { return isBareSymbolOrUImm<5>(); }
+  bool isUImm12PCRel() const { return isBareSymbolOrUImm<12>(); }
   bool isUImm16() const { return IsUImm<16>(); }
   bool isUImm20() const { return IsUImm<20>(); }
   bool isUImm32() const { return IsUImm<32>(); }
@@ -1650,6 +1667,18 @@ bool RISCVAsmParser::matchAndEmitInstruction(SMLoc IDLoc, unsigned &Opcode,
     return generateImmOutOfRangeError(Operands, ErrorInfo, 0, (1 << 10) - 1);
   case Match_InvalidUImm11:
     return generateImmOutOfRangeError(Operands, ErrorInfo, 0, (1 << 11) - 1);
+  case Match_InvalidUImm12:
+    return generateImmOutOfRangeError(Operands, ErrorInfo, 0, (1 << 12) - 1);
+  case Match_InvalidUImm5PCRel:
+    return generateImmOutOfRangeError(
+        Operands, ErrorInfo, 0, (1 << 5) - 1,
+        "operand must be a bare symbol name or an immediate integer in the "
+        "range");
+  case Match_InvalidUImm12PCRel:
+    return generateImmOutOfRangeError(
+        Operands, ErrorInfo, 0, (1 << 12) - 1,
+        "operand must be a bare symbol name or an immediate integer in the "
+        "range");
   case Match_InvalidSImm12:
     return generateImmOutOfRangeError(
         Operands, ErrorInfo, -(1 << 11), (1 << 11) - 1,
