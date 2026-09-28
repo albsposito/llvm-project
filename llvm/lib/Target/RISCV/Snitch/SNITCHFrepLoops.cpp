@@ -155,6 +155,10 @@ private:
   /// loop.
   bool isInvalidLoopOperation(const MachineInstr *MI) const;
 
+  /// Return true if PHI elimination / register allocation may have to turn
+  /// the loop-carried PHI into a copy inside the loop body.
+  bool phiMayNeedCopy(MachineLoop *L, const MachineInstr &Phi) const;
+
   /// Scan the loop body and search for a branch instruction that
   /// leads to the induction variable and trip count
   const MachineInstr *findBranchInstruction(MachineLoop *L);
@@ -785,6 +789,17 @@ unsigned SNITCHFrepLoops::containsInvalidInstruction(
       LLVM_DEBUG(dbgs() << "Checking"; MI->dump());
 
       if (MI->getOpcode() == TargetOpcode::PHI) {
+        // A loop-carried value that stays live after its next value is
+        // defined (a swap or rotation, a value used after its update) becomes
+        // a copy (fmv.d = fsgnj.d, or mv) in the body after this pass. The
+        // sequencer repeats an FP copy, so it would have to be in N; an
+        // integer copy would run only once. Neither can be counted here, so
+        // such a loop is left alone. The induction variable is loop control.
+        if (MI != IVPhi && phiMayNeedCopy(L, *MI)) {
+          LLVM_DEBUG(dbgs() << "Cannot convert to frep: PHI needs a copy:";
+                     MI->dump());
+          return 0;
+        }
         LLVM_DEBUG(dbgs() << "  ignoring PHI node\n");
         // Add to list of FP PHIs that need fixing-up
         if (MRI->getRegClass(MI->getOperand(0).getReg()) ==
@@ -797,29 +812,13 @@ unsigned SNITCHFrepLoops::containsInvalidInstruction(
       }
 
       if (MI->getOpcode() == TargetOpcode::COPY) {
-        // A copy between FP registers is not counted (as before; it is
-        // normally coalesced away). A copy that involves an integer register
-        // is integer work in the body: it would run only once.
-        bool FPOnly = true;
-        for (const MachineOperand &MO : MI->operands()) {
-          if (!MO.isReg() || !MO.getReg())
-            continue;
-          Register Reg = MO.getReg();
-          const TargetRegisterClass *RC =
-              Reg.isVirtual() ? MRI->getRegClass(Reg)
-                              : TRI->getMinimalPhysRegClass(Reg);
-          if (!RISCV::FPR64RegClass.hasSubClassEq(RC) &&
-              !RISCV::FPR32RegClass.hasSubClassEq(RC) &&
-              !RISCV::FPR16RegClass.hasSubClassEq(RC))
-            FPOnly = false;
-        }
-        if (!FPOnly) {
-          LLVM_DEBUG(dbgs() << "Cannot convert to frep due to integer COPY:";
-                     MI->dump());
-          return 0;
-        }
-        LLVM_DEBUG(dbgs() << "  ignoring FP COPY\n");
-        continue;
+        // Whether a copy survives register allocation is not known here. If
+        // it does, an FP copy becomes fmv.d (fsgnj.d), which the sequencer
+        // repeats and N would have to count, and an integer copy runs only
+        // once. Neither can be counted reliably, so the loop is left alone.
+        LLVM_DEBUG(dbgs() << "Cannot convert to frep due to COPY:";
+                   MI->dump());
+        return 0;
       }
 
       if (MI->isUnconditionalBranch()) {
@@ -876,6 +875,77 @@ unsigned SNITCHFrepLoops::containsInvalidInstruction(
     }
   }
   return Flops;
+}
+
+/// Return true if the loop-carried PHI may need a copy inside the loop once
+/// PHIs are eliminated. The PHI result R and its back-edge value V can share
+/// one register (so no copy is needed) only if R is dead once V is defined:
+/// V must be defined by a non-PHI instruction D in the loop (or be R itself),
+/// and every use of R must come before or at D in the iteration, including
+/// the path out of the loop. Otherwise (a swap or rotation of loop-carried
+/// values, a loop-invariant back-edge value, R used after D or after the
+/// loop when the loop exits after D) the register allocator has to insert a
+/// copy in the body. Plain accumulators (R used only by D) need none.
+bool SNITCHFrepLoops::phiMayNeedCopy(MachineLoop *L,
+                                     const MachineInstr &Phi) const {
+  Register R = Phi.getOperand(0).getReg();
+  const MachineBasicBlock *PhiBB = Phi.getParent();
+  if (PhiBB != L->getHeader())
+    return true;
+  SmallVector<MachineBasicBlock *, 2> Exiting;
+  L->getExitingBlocks(Exiting);
+  for (unsigned i = 1, n = Phi.getNumOperands(); i < n; i += 2) {
+    if (!L->contains(Phi.getOperand(i + 1).getMBB()))
+      continue; // value from outside the loop
+    Register V = Phi.getOperand(i).getReg();
+    if (V == R)
+      continue; // unchanged value
+    if (!V.isVirtual())
+      return true;
+    const MachineInstr *D = MRI->getVRegDef(V);
+    if (!D || D->isPHI() || !L->contains(D))
+      return true;
+    // Two PHIs of this loop carrying the same value need two registers: one
+    // gets a copy. (A PHI outside the loop, e.g. in an outer loop, reads V
+    // after the loop and needs no copy inside it.)
+    for (const MachineInstr &VUse : MRI->use_nodbg_instructions(V))
+      if (VUse.isPHI() && &VUse != &Phi && VUse.getParent() == PhiBB)
+        return true;
+    const MachineBasicBlock *DB = D->getParent();
+    for (const MachineInstr &UseMI : MRI->use_nodbg_instructions(R)) {
+      if (&UseMI == D)
+        continue;
+      if (UseMI.isPHI())
+        return true; // R feeds another PHI: a rotation, or a use after exit
+      const MachineBasicBlock *UB = UseMI.getParent();
+      if (!L->contains(UB)) {
+        // R is live out of the loop: it must not be live after D on the way
+        // out, so every exit must be taken before D is reached.
+        for (const MachineBasicBlock *EB : Exiting)
+          if (!MDT->properlyDominates(EB, DB))
+            return true;
+        continue;
+      }
+      if (UB == DB) {
+        // UseMI must come before D in the block.
+        bool Before = false;
+        for (const MachineInstr &I : *DB) {
+          if (&I == &UseMI) {
+            Before = true;
+            break;
+          }
+          if (&I == D)
+            break;
+        }
+        if (!Before)
+          return true;
+        continue;
+      }
+      if (!MDT->properlyDominates(UB, DB))
+        return true;
+    }
+  }
+  return false;
 }
 
 /// Return true if MI cannot be in an frep body: the sequencer would not
