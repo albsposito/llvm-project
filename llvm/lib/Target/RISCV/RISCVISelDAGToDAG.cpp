@@ -955,18 +955,25 @@ bool RISCVDAGToDAGISel::tryPulpVectorShuffle(SDNode *Node) {
     return true;
   }
 
+  // pv.shuffle2.{h,b} rD, rs1, rs2: result lane i is lane (rs2[i] mod N) of
+  // rs1 if bit log2(N) of rs2[i] is set, else of rD (N = 2 or 4 lanes). With
+  // Vec0 in rD and Vec1 in rs1, each shufflevector index (0..2N-1) is the
+  // selector unchanged: keep 2 bits per halfword, 3 bits per byte. The
+  // selector is a scalar constant materialized in an XLen register.
   if (VT == MVT::v2i16) {
     Opcode = RISCV::PV_SHUFFLE2_H;
-    imm = (Shuffle->getMaskElt(1) & 1) << 16;
-    imm |= Shuffle->getMaskElt(0) & 1;
+    imm = (Shuffle->getMaskElt(1) & 3) << 16;
+    imm |= Shuffle->getMaskElt(0) & 3;
   } else {
     Opcode = RISCV::PV_SHUFFLE2_B;
-    imm  = (Shuffle->getMaskElt(3) & 3) << 24;
-    imm |= (Shuffle->getMaskElt(2) & 3) << 16;
-    imm |= (Shuffle->getMaskElt(1) & 3) << 8;
-    imm |=  Shuffle->getMaskElt(0) & 3;
+    imm  = (Shuffle->getMaskElt(3) & 7) << 24;
+    imm |= (Shuffle->getMaskElt(2) & 7) << 16;
+    imm |= (Shuffle->getMaskElt(1) & 7) << 8;
+    imm |=  Shuffle->getMaskElt(0) & 7;
   }
-  SDValue Imm = SDValue(selectImm(CurDAG, DL, VT, imm, *Subtarget).getNode(), 0);
+  SDValue Imm = SDValue(
+      selectImm(CurDAG, DL, Subtarget->getXLenVT(), imm, *Subtarget).getNode(),
+      0);
   ReplaceNode(Node, CurDAG->getMachineNode(Opcode, DL, VT, Vec0, Vec1, Imm));
   return true;
 }
