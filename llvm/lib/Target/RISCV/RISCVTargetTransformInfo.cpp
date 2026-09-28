@@ -212,6 +212,11 @@ InstructionCost RISCVTTIImpl::getIntImmCostInst(unsigned Opcode, unsigned Idx,
     // bclri
     if (ST->hasStdExtZbs() && (~Imm).isPowerOf2())
       return TTI::TCC_Free;
+    // PULP p.bclr clears any contiguous bit field (RISCVInstrInfoXpulp.td), so
+    // keep the mask next to the and where instruction selection can use it.
+    if (ST->hasPULPExtV2() && !ST->is64Bit() && Imm.getBitWidth() == 32 &&
+        (~Imm).isShiftedMask())
+      return TTI::TCC_Free;
     if (Inst && Idx == 1 && Imm.getBitWidth() <= ST->getXLen() &&
         canUseShiftPair(Inst, Imm))
       return TTI::TCC_Free;
@@ -224,6 +229,10 @@ InstructionCost RISCVTTIImpl::getIntImmCostInst(unsigned Opcode, unsigned Idx,
   case Instruction::Xor:
     // bseti/binvi
     if (ST->hasStdExtZbs() && Imm.isPowerOf2())
+      return TTI::TCC_Free;
+    // PULP p.bset sets any contiguous bit field (not for xor).
+    if (Opcode == Instruction::Or && ST->hasPULPExtV2() && !ST->is64Bit() &&
+        Imm.getBitWidth() == 32 && Imm.isShiftedMask())
       return TTI::TCC_Free;
     Takes12BitImm = true;
     break;
