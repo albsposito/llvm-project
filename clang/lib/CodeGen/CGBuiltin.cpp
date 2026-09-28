@@ -23213,7 +23213,7 @@ static Value *EmitPULPBuiltinShuffle(CodeGenFunction &CGF, const CallExpr *E) {
     SmallVector<int, 16> Indices;
     for (unsigned I = 0; I != NumElts; ++I)
       Indices.push_back(
-          MaskVal.Val.getVectorElt(I).getInt().getZExtValue() % NumSrcElts);
+          MaskVal.Val.getVectorElt(I).getInt().urem(NumSrcElts));
     return Builder.CreateShuffleVector(
         V1, V2 ? V2 : llvm::PoisonValue::get(VecTy), Indices);
   }
@@ -23251,9 +23251,15 @@ static Value *EmitPULPBuiltinShuffle(CodeGenFunction &CGF, const CallExpr *E) {
   }
   Value *Res = llvm::PoisonValue::get(VecTy);
   for (unsigned I = 0; I != NumElts; ++I) {
-    Value *Idx = Builder.CreateZExt(Builder.CreateExtractElement(Mask, I),
-                                    CGF.Int32Ty);
-    Idx = Builder.CreateURem(Idx, Builder.getInt32(NumSrcElts));
+    // Reduce in the mask lane's own type (lanes may be wider than 32 bits),
+    // then narrow to i32. If the lane cannot hold NumSrcElts, every lane value
+    // is already below it (N is a power of two for GCC vectors).
+    Value *Idx = Builder.CreateExtractElement(Mask, I);
+    unsigned LaneBits = Idx->getType()->getIntegerBitWidth();
+    if (LaneBits >= 64 || NumSrcElts < (uint64_t(1) << LaneBits))
+      Idx = Builder.CreateURem(
+          Idx, llvm::ConstantInt::get(Idx->getType(), NumSrcElts));
+    Idx = Builder.CreateZExtOrTrunc(Idx, CGF.Int32Ty);
     Res = Builder.CreateInsertElement(Res, Builder.CreateExtractElement(Src, Idx),
                                       I);
   }
