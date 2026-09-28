@@ -310,6 +310,12 @@ public:
   bool isSchedulingBoundary(const MachineInstr &MI,
                             const MachineBasicBlock *MBB,
                             const MachineFunction &MF) const override;
+
+  // Return true if the Snitch FPU sequencer certainly repeats MI when it is
+  // in an frep body, i.e. MI certainly counts towards an frep's N. Doubtful
+  // cases answer false. Used by isSchedulingBoundary and by the frep pass.
+  static bool isFrepSequenced(const MachineInstr &MI);
+
 protected:
   const RISCVSubtarget &STI;
 

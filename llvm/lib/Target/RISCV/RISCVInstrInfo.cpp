@@ -3279,8 +3279,9 @@ std::string RISCVInstrInfo::createMIROperandComment(
 // hardware does count is safe: the walk below then reaches its Nth
 // instruction later, so the protected range only grows. Answering "yes"
 // wrongly would not be safe (the range could end before the real body does),
-// so every doubtful case answers "no".
-static bool isFrepSequenced(const MachineInstr &MI) {
+// so every doubtful case answers "no". SNITCHFrepLoops uses the same test
+// to decide which loop bodies it may turn into an frep and to compute N.
+bool RISCVInstrInfo::isFrepSequenced(const MachineInstr &MI) {
   if (MI.isMetaInstruction() || MI.isCopy() || MI.isBranch() ||
       MI.isPseudo() || MI.isCall() || MI.isInlineAsm())
     return false;
@@ -3346,7 +3347,7 @@ static bool isFrepSequenced(const MachineInstr &MI) {
 // never before the hardware's Nth, so the protected range always covers the
 // real body.
 static bool isInFrepBody(const MachineInstr &MI, unsigned MaxN) {
-  if (!isFrepSequenced(MI))
+  if (!RISCVInstrInfo::isFrepSequenced(MI))
     return false;
   // Sequenced instructions after the frep up to and including MI.
   unsigned Distance = 1;
@@ -3358,7 +3359,7 @@ static bool isInFrepBody(const MachineInstr &MI, unsigned MaxN) {
       if (I->getOpcode() == RISCV::FREP_O || I->getOpcode() == RISCV::FREP_I)
         return Distance <= static_cast<uint64_t>(I->getOperand(1).getImm());
       // No frep in this function covers more than MaxN instructions.
-      if (isFrepSequenced(*I) && ++Distance > MaxN)
+      if (RISCVInstrInfo::isFrepSequenced(*I) && ++Distance > MaxN)
         return false;
     }
     // Continue into the layout predecessor if control can fall through from
