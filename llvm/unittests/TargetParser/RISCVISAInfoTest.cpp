@@ -1114,6 +1114,7 @@ R"(All available -march extensions for RISC-V
     xfvechalf            0.1
     xfvecquarter         0.1
     xfvecsingle          0.1
+    xgap                 9.0
     xmempool             0.1
     xmipscmove           1.0
     xmipslsp             1.0
