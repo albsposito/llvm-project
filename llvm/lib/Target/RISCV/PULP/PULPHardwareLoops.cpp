@@ -610,9 +610,11 @@ PULPHardwareLoops::Comparison::Kind PULPHardwareLoops::getComparisonKindFromCC(
   default:
     break;
   case RISCVCC::COND_EQ:
+  case RISCVCC::COND_P_BEQIMM:
     Cmp = Comparison::EQ;
     break;
   case RISCVCC::COND_NE:
+  case RISCVCC::COND_P_BNEIMM:
     Cmp = Comparison::NE;
     break;
   case RISCVCC::COND_LT:
