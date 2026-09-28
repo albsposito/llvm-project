@@ -1747,6 +1747,17 @@ def : Pat<(int_riscv_pulp_event_unit_read (i32 GPR:$rs), simm12:$simm12),
           (PULP_ELW (i32 GPR:$rs), simm12:$simm12)>;
 def : Pat<(int_riscv_pulp_event_unit_read (i32 GPR:$rs), (i32 GPR:$off)),
           (PULP_ELW (ADD (i32 GPR:$rs), (i32 GPR:$off)), 0)>;
+// GAP9 PMSIS builtins (task 20/F016), same addressing GAP9 GCC emits:
+// immediate offset -> p.elw / sw rs2, imm(rs1); register offset -> add + p.elw
+// / p.sw rs2, rs3(rs1).
+def : Pat<(int_riscv_pulp_event_unit_read_fenced (i32 GPR:$rs), simm12:$simm12),
+          (PULP_ELW (i32 GPR:$rs), simm12:$simm12)>;
+def : Pat<(int_riscv_pulp_event_unit_read_fenced (i32 GPR:$rs), (i32 GPR:$off)),
+          (PULP_ELW (ADD (i32 GPR:$rs), (i32 GPR:$off)), 0)>;
+def : Pat<(int_riscv_pulp_OffsetedWritePtr (i32 GPR:$rs2), (i32 GPR:$rs1), simm12:$imm12),
+          (SW (i32 GPR:$rs2), (i32 GPR:$rs1), simm12:$imm12)>;
+def : Pat<(int_riscv_pulp_OffsetedWritePtr (i32 GPR:$rs2), (i32 GPR:$rs1), (i32 GPR:$rs3)),
+          (P_SW_rr (i32 GPR:$rs2), (i32 GPR:$rs1), (i32 GPR:$rs3))>;
 def : Pat<(int_riscv_pulp_bitinsert (i32 GPR:$rd), (i32 GPR:$rs1), uimm5:$ls2, uimm5:$ls3),
           (P_INSERT (i32 GPR:$rd), (i32 GPR:$rs1), uimm5:$ls2, uimm5:$ls3)>;
 
