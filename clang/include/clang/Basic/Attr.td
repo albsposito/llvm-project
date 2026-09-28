@@ -4385,6 +4385,10 @@ def Frep : Attr {
     }
   }];
   let Documentation = [FrepDocs];
+  // The parser (Parser::ParsePragmaFrep) passes the pragma name and the option
+  // as two identifier arguments, like LoopHint above; the attribute stores only
+  // the option, so skip the generic argument-count check.
+  let HasCustomParsing = 1;
 }
 
 def CapturedRecord : InheritableAttr {

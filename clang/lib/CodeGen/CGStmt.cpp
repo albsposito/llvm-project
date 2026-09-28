@@ -62,10 +62,17 @@ void CodeGenFunction::EmitStmt(const Stmt *S, ArrayRef<const Attr *> Attrs) {
   assert(S && "Null statement?");
   PGO.setCurrentStmt(S);
 
-  if (Attrs.size() > 0) {
-    if (Attrs[0]->getKind() == attr::Frep)
-      addFrepMetadata(Builder.GetInsertBlock(), Attrs);
-  }
+  // llvm.riscv.frep.infer can only be selected with Xfrep (the pattern in
+  // RISCVInstrInfoXfrep.td is predicated on HasExtXfrep); elsewhere the hint
+  // is dropped instead of failing instruction selection. The Frep attribute
+  // shares the list with other loop pragmas (e.g. '#pragma unroll' written
+  // before it), so look through all of them.
+  for (const Attr *A : Attrs)
+    if (A->getKind() == attr::Frep) {
+      if (getTarget().hasFeature("xfrep"))
+        addFrepMetadata(Builder.GetInsertBlock(), A);
+      break;
+    }
 
   // These statements have their own debug info handling.
   if (EmitSimpleStmt(S, Attrs))

@@ -189,7 +189,9 @@ static Attr *handleFrepAttr(Sema &S, Stmt *St, const ParsedAttr &A,
                                 SourceRange) {
   IdentifierLoc *PragmaNameLoc = A.getArgAsIdent(0);
   IdentifierLoc *OptionLoc = A.getArgAsIdent(1);
-  bool PragmaInfer = (OptionLoc->Ident->getName() == "infer");
+  // The parser only forms this attribute for '#pragma frep infer'.
+  assert(OptionLoc->Ident->isStr("infer") && "unexpected '#pragma frep' option");
+  (void)OptionLoc;
   FrepAttr::OptionType Option = FrepAttr::Infer;
 
   StringRef PragmaName = PragmaNameLoc->Ident->getName();
@@ -200,11 +202,6 @@ static Attr *handleFrepAttr(Sema &S, Stmt *St, const ParsedAttr &A,
     return nullptr;
   }
 
-  if (PragmaInfer) {
-    Option = FrepAttr::Infer;
-  } else {
-    printf("Error, no loop\n");
-  }
   return FrepAttr::CreateImplicit(S.Context, Option, A.getRange());
 }
 

@@ -2575,14 +2575,15 @@ StmtResult Parser::ParsePragmaFrep(StmtVector &Stmts,
     FrepHint Hint;
     if (!HandlePragmaFrep(Hint))
       continue;
-    if (Hint.OptionLoc->Ident->getName() == "infer") {
-      ArgsUnion ArgHints[] = {Hint.PragmaNameLoc, Hint.OptionLoc};
-      TempAttrs.addNew(Hint.PragmaNameLoc->Ident, Hint.Range, nullptr,
+    // The pragma handler only accepts 'infer' (and warns on anything else).
+    assert(Hint.OptionLoc->Ident->isStr("infer") &&
+           "unexpected '#pragma frep' option");
+    // Two identifier arguments (pragma name, option), as ParsePragmaLoopHint
+    // does; the Frep attribute sets HasCustomParsing so Sema accepts them.
+    ArgsUnion ArgHints[] = {Hint.PragmaNameLoc, Hint.OptionLoc};
+    TempAttrs.addNew(Hint.PragmaNameLoc->Ident, Hint.Range, nullptr,
                      Hint.PragmaNameLoc->Loc, ArgHints, 2,
                      ParsedAttr::Form::Pragma());
-    } else {
-      printf("Error, no valid option in ParseStmt\n");
-    }
   }
   // Get the next statement.
   MaybeParseCXX11Attributes(Attrs);

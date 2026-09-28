@@ -1657,7 +1657,8 @@ void PragmaFrepHandler::HandlePragma(Preprocessor &PP,
   SmallVector<Token, 1> TokenList;
   PP.Lex(Tok);
   if (Tok.isNot(tok::identifier)) {
-    printf("Error, not a identifier token for the option of pragma frep\n");
+    PP.Diag(Tok.getLocation(), diag::warn_pragma_expected_identifier)
+        << "frep";
     return;
   }
 
@@ -1667,10 +1668,19 @@ void PragmaFrepHandler::HandlePragma(Preprocessor &PP,
                            .Case("infer", true)
                            .Default(false);
   if (!OptionValid) {
-    printf("Error, option not recognized for pragma frep\n");
+    PP.Diag(Tok.getLocation(), diag::warn_pragma_invalid_argument)
+        << PP.getSpelling(Tok) << "frep" << /*Expected=*/true << "'infer'";
     return;
   }
   PP.Lex(Tok);
+
+  // Checked before ParseFrepValue, which would otherwise swallow the rest of
+  // the line; like '#pragma unroll', a pragma with trailing tokens is ignored.
+  if (Tok.isNot(tok::eod)) {
+    PP.Diag(Tok.getLocation(), diag::warn_pragma_extra_tokens_at_eol)
+        << "frep";
+    return;
+  }
 
   auto *Info = new (PP.getPreprocessorAllocator()) PragmaFrepInfo;
   if (!ParseFrepValue(PP, Tok, PragmaName, Option, *Info))
@@ -1684,12 +1694,6 @@ void PragmaFrepHandler::HandlePragma(Preprocessor &PP,
   QualityTok.setAnnotationValue(static_cast<void *>(Info));
   TokenList.push_back(QualityTok);
 
-  if (Tok.isNot(tok::eod)) {
-    printf("Error, extra tokens at the end of pragma frep\n");
-    PP.Diag(Tok.getLocation(), diag::warn_pragma_extra_tokens_at_eol)
-        << "frep pragma";
-    return;
-  }
   auto TokenArray = std::make_unique<Token[]>(TokenList.size());
   std::copy(TokenList.begin(), TokenList.end(), TokenArray.get());
   PP.EnterTokenStream(std::move(TokenArray), TokenList.size(),
@@ -1709,22 +1713,17 @@ bool Parser::HandlePragmaFrep(FrepHint &Hint) {
   Hint.OptionLoc = IdentifierLoc::create(
       Actions.Context, Info->Option.getLocation(), OptionInfo);
 
-  bool OptionInfer = OptionInfo->isStr("infer");
+  // PragmaFrepHandler::HandlePragma only forms the annotation for 'infer'.
+  assert(OptionInfo->isStr("infer") && "unexpected '#pragma frep' option");
 
   llvm::ArrayRef<Token> Toks = Info->Toks;
   PP.EnterTokenStream(Toks, /*DisableMacroExpansion=*/false, /*IsReinject=*/false);
 
   ConsumeAnnotationToken();
 
-  if (OptionInfer) {
-    // pass
-  } else {
-    printf("No loop as option parameters\n");
-  }
-    // Tokens following an error in an ill-formed constant expression will
-    // remain in the token stream and must be removed.
+  // HandlePragma rejects trailing tokens, so only the eof terminator is left,
+  // but drain defensively as HandlePragmaLoopHint does.
   if (Tok.isNot(tok::eof)) {
-    printf("Not EOF\n");
     while (Tok.isNot(tok::eof))
       ConsumeAnyToken();
   }
