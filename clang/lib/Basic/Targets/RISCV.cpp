@@ -196,6 +196,10 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
     Builder.defineMacro("__riscv__");
     Builder.defineMacro("_riscv");
   }
+  // GAP9 GCC defines the chip macro for -march=...xgap9 (and -mchip=gap9).
+  // "xgap9" parses as extension "xgap", version 9.0 (see RISCVFeatures.td).
+  if (ISAInfo->hasExtension("xgap"))
+    Builder.defineMacro("__gap9__");
 
   if (ISAInfo->hasExtension("zmmul"))
     Builder.defineMacro("__riscv_mul");
