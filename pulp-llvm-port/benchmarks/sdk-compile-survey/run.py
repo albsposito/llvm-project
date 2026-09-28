@@ -15,7 +15,12 @@ Phases (idempotent; results cached under --work):
              include paths and defines the SDK build uses. A venv with
              kconfiglib/xxhash/fdt is created for the SDK's Kconfig and
              device-tree generators; the SFU host tool is faked (-DSFU=/bin/true).
-  db         merge the compile_commands.json files: one command per source.
+  db         merge the compile_commands.json files: one command per source,
+             into <work>/compile_db.json.gz (never over the tracked snapshot).
+             Later phases load <work>/compile_db.json.gz, else the tracked
+             snapshot compile_db.json.gz (work-dir paths stored as @WORK@);
+             if the cmake dirs it points at are missing (fresh --work, deleted
+             scratch dir), configure + db are run in --work automatically.
   inventory  enumerate the SDK's target C sources by area; files that no
              configured app compiles get the flags of the nearest covered file
              in the same directory tree plus their own include dirs
@@ -29,6 +34,18 @@ Phases (idempotent; results cached under --work):
   fp16probe  strict failures with float16 -> _Float16 (+zhinx), float16alt ->
              __bf16 (WRONG semantics, probe only) and CoreCount() -> 8: shows
              what remains behind the type errors.
+  gccsdk     GAP9 GCC with the SDK's own warning flags INCLUDING -Werror, on
+             the gcc-ok files (what the SDK build itself accepts).
+  sdkflags   our clang as the SDK build drives it through the wrapper
+             (../sdk-clang/bin/riscv32-unknown-elf-clang): -march=rv32imc_xgap9
+             (predefines __gap9__ etc., no macro shim), the SDK's -W flags incl.
+             -Werror (renamed/reordered as GCC resolves them), plus the
+             wrapper's GCC-7 flags (GCC7_CODEGEN = -ffp-contract=fast;
+             GCC7_DEFAULT_ERRORS without -Werror; CLANG_ONLY).  `strict` is unchanged: pure clang defaults.
+  sdknowerror  sdkflags without -Werror (CONFIG_DISABLE_WERROR builds).
+  parity     strict vs sdknowerror (both against gcc) and sdkflags (against
+             gccsdk) -> sdkflags_parity.json.  Not part of `results`.
+  dbsnapshot explicit only: refresh the tracked compile_db.json.gz snapshot.
   builtins   every __builtin_pulp_* the SDK uses, __has_builtin in our clang,
              call sites incl. #define wrappers (gap_*, Max/Min helpers).
   results    results.json, builtins.json, fix_ranking.json next to this script.
@@ -198,19 +215,81 @@ def phase_db(a):
             rel = f[len(SDK) + 1:]
             db.setdefault(rel, {'args': keep, 'dir': e['directory'].replace(mir, SDK + '/'),
                                 'apps': []})['apps'].append(app)
-    with gzip.open(os.path.join(HERE, 'compile_db.json.gz'), 'wt') as fh:
+    with gzip.open(os.path.join(w, 'compile_db.json.gz'), 'wt') as fh:
         json.dump(db, fh, sort_keys=True)
-    print('db: %d C sources with real compile commands' % len(db))
+    print('db: %d C sources with real compile commands -> %s/compile_db.json.gz' % (len(db), w))
 
 
-def load_db():
-    with gzip.open(os.path.join(HERE, 'compile_db.json.gz'), 'rt') as fh:
-        return json.load(fh)
+# The tracked compile_db.json.gz next to this script is a documented SNAPSHOT
+# only (for reading, and as a fallback): its work-dir paths are replaced by the
+# placeholder @WORK@ and substituted at load time.  Runs use the database the
+# db phase writes into --work; `dbsnapshot` refreshes the tracked copy on
+# explicit request only.
+SNAP_DB = os.path.join(HERE, 'compile_db.json.gz')
+WORK_TOKEN = '@WORK@'
+RX_BLD = re.compile(r'(/[^\s"]*?)/bld/')
 
 
-# ----------------------------------------------------------------- inventory
+def _subst_db(db, old, new):
+    for e in db.values():
+        e['args'] = [x.replace(old, new) for x in e['args']]
+        e['dir'] = e['dir'].replace(old, new)
+    return db
+
+
+def _bld_roots(argss, work):
+    """The cmake build dirs <work>/bld/<app> that -I options point into (their
+    generated devicetree/Kconfig headers; some -I subdirs such as BUILD_MODEL
+    only appear in a full build, so only the app dirs are checked)."""
+    pre = '-I' + work + '/bld/'
+    return {os.path.join(work, 'bld', x[len(pre):].split('/')[0])
+            for args in argss for x in args if x.startswith(pre)}
+
+
+def load_db(a):
+    """The database for --work: <work>/compile_db.json.gz if the db phase made
+    it, else the tracked snapshot with @WORK@ (or a legacy absolute work dir)
+    replaced by --work.  If the cmake build dirs it points at do not exist
+    (fresh --work, deleted scratch dir), the configure and db phases are run
+    in --work first."""
+    work = os.path.abspath(a.work)
+    wp = os.path.join(work, 'compile_db.json.gz')
+    for attempt in (0, 1):
+        src = wp if os.path.exists(wp) else SNAP_DB
+        with gzip.open(src, 'rt') as fh:
+            db = json.load(fh)
+        _subst_db(db, WORK_TOKEN + '/', work + '/')
+        # legacy snapshots recorded the absolute work dir they were made in
+        for o in {m.group(1) for e in db.values() for x in e['args'] + [e['dir']]
+                  for m in [RX_BLD.search(x)] if m} - {work}:
+            _subst_db(db, o + '/bld/', work + '/bld/')
+        missing = [d for d in _bld_roots((e['args'] for e in db.values()), work)
+                   if not os.path.isdir(d)]
+        if not missing:
+            return db
+        if attempt:
+            sys.exit('db: %d cmake build dirs still missing after configure, e.g. %s'
+                     % (len(missing), missing[0]))
+        print('db: %d cmake build dirs missing under %s (fresh or deleted work dir):'
+              ' running configure + db there' % (len(missing), work))
+        phase_configure(a)
+        phase_db(a)
+
+
+def phase_dbsnapshot(a):
+    """Explicit request only: refresh the tracked snapshot from --work, with
+    the work dir replaced by @WORK@ so it is portable."""
+    work = os.path.abspath(a.work)
+    with gzip.open(os.path.join(work, 'compile_db.json.gz'), 'rt') as fh:
+        db = json.load(fh)
+    _subst_db(db, work + '/', WORK_TOKEN + '/')
+    with gzip.open(SNAP_DB, 'wt') as fh:
+        json.dump(db, fh, sort_keys=True)
+    print('dbsnapshot: %d entries -> %s' % (len(db), SNAP_DB))
+
+
 def phase_inventory(a):
-    db = load_db()
+    db = load_db(a)
     files = set(db)
     for r in ENUM_ROOTS:
         for p in sh('cd %s && find %s -name "*.c"' % (SDK, r)).stdout.split():
@@ -252,6 +331,19 @@ def phase_inventory(a):
     print('inventory:', dict(c))
 
 
+def ensure_inventory(a):
+    """inventory.json of --work, (re)made when missing or when the generated-
+    header dirs it points at are gone (the db is then regenerated too)."""
+    p = os.path.join(a.work, 'inventory.json')
+    if os.path.exists(p):
+        inv = json.load(open(p))
+        dirs = _bld_roots((e['args'] for e in inv if e['scope'] == 'in'), a.work)
+        if all(os.path.isdir(d) for d in dirs):
+            return inv
+    phase_inventory(a)
+    return json.load(open(p))
+
+
 # ----------------------------------------------------------------- compile
 # probe only: bf16 is not Xf16alt, and CoreCount is folded the way GCC -mPE=8 does
 FP16_SHIM = ['-Dfloat16=_Float16', '-Dfloat16alt=__bf16', '-D__builtin_pulp_CoreCount()=8']
@@ -261,20 +353,47 @@ MODES = {
     'lenient': (True, True, False),     # reaches the backend despite missing builtins
     'nodefs': (False, False, False),    # strict without the compat defines
     'fp16probe': (True, True, True),    # what remains once float16 types + constant CoreCount exist
+    'sdkflags': None,                   # SDK warning flags incl. -Werror + GCC-7 compat, -march=rv32imc_xgap9
+    'sdknowerror': None,                # the same without -Werror (CONFIG_DISABLE_WERROR builds)
 }
 
 
-def gcc_cmd(args, out):
+# ---- sdkflags mode: the SDK's own build flags, as the clang wrapper
+# (../sdk-clang/bin/riscv32-unknown-elf-clang) passes them.
+# -march=rv32imc_xgap9 predefines __gap9__/__pulp__/__riscv__... itself, so no
+# macro shim.  The SDK's warning flags (-Wall -Wextra -Werror -Wno-...) are kept
+# (translated where clang spells them differently), and GCC7_COMPAT (defined in
+# the wrapper, the single source of truth) makes clang's diagnostics behave as
+# GAP9 GCC 7.1.1's do.
+SDK_ARCH = ['--target=riscv32-unknown-elf', '-march=rv32imc_xgap9', '-mabi=ilp32', '-mno-relax']
+SDK_WRAPPER = os.path.join(HERE, '..', 'sdk-clang', 'bin', 'riscv32-unknown-elf-clang')
+
+
+def _wrapper_mod():
+    import importlib.machinery, importlib.util
+    ld = importlib.machinery.SourceFileLoader('gap9_clang_wrapper', SDK_WRAPPER)
+    spec = importlib.util.spec_from_loader(ld.name, ld)
+    m = importlib.util.module_from_spec(spec)
+    ld.exec_module(m)
+    return m
+
+
+WRAP = _wrapper_mod()
+
+
+def gcc_cmd(args, out, werror=False):
     keep = []
     for x in args:
-        if x.startswith(('-march', '-mPE', '-mFC', '-mint64')) or x == '-Werror' \
-           or x.startswith('-Werror=') or re.match(r'^-O[0-9sgz]?$', x):
+        if x.startswith(('-march', '-mPE', '-mFC', '-mint64')) or re.match(r'^-O[0-9sgz]?$', x) \
+           or (not werror and (x == '-Werror' or x.startswith('-Werror='))):
             continue
         keep.append(x)
     return [GCC] + GCC_ARCH + keep + ['-O2', '-c', '-o', out]
 
 
 def llvm_flags(args, mode):
+    if mode in ('sdkflags', 'sdknowerror'):
+        return sdk_llvm_flags(args, werror=mode == 'sdkflags')
     keep, it = [], iter(args)
     for x in it:
         if x in ('-include', '-imacros', '-isystem', '-x'):
@@ -293,6 +412,26 @@ def llvm_flags(args, mode):
         arch[1] = '-march=rv32imc_zfinx_zhinx_xpulpv2'
         extra += FP16_SHIM
     return arch + LLVM_COMMON + extra + keep
+
+
+def sdk_llvm_flags(args, werror=True):
+    keep, ws, it = [], [], iter(args)
+    for x in it:
+        if x in ('-include', '-imacros', '-isystem', '-x'):
+            keep += [x, next(it)]
+            continue
+        if x.startswith(('-D', '-U', '-I', '-std=', '-include')):
+            keep.append(x)
+        elif x.startswith('-f') and x not in ('-fno-tree-loop-distribute-patterns',
+                                               '-fmessage-length=0'):
+            keep.append(x)
+        elif x.startswith('-W') and not x.startswith(('-Wl,', '-Wa,', '-Wp,')):
+            if werror or not (x == '-Werror' or x.startswith('-Werror=')):
+                ws.append(x)
+        # -march/-mPE/-mFC/-mint64/-mno-memcpy/-O/-g dropped (-O2 as for GCC)
+    return (SDK_ARCH + LLVM_COMMON + ['-Wno-unused-command-line-argument']
+            + WRAP.GCC7_CODEGEN + WRAP.gcc7_compat(ws) + WRAP.sdk_warning_flags(ws)
+            + keep)  # the wrapper's order
 
 
 def llvm_cmd(args, out, mode):
@@ -326,11 +465,11 @@ def read_log(work, which, rel):
 
 def phase_compile(a, which):
     w = a.work
-    inv = json.load(open(os.path.join(w, 'inventory.json')))
+    inv = ensure_inventory(a)
     resf = os.path.join(w, 'compile_%s.json' % which)
     res = json.load(open(resf)) if os.path.exists(resf) and not a.force else {}
     todo = [e for e in inv if e['scope'] == 'in']
-    if which != 'gcc':
+    if which not in ('gcc',):
         g = json.load(open(os.path.join(w, 'compile_gcc.json')))
         todo = [e for e in todo if g.get(e['file'], {}).get('rc') == 0]
     if which in ('nodefs', 'fp16probe', 'lenient'):
@@ -345,7 +484,10 @@ def phase_compile(a, which):
 
     def one(e):
         o = logpath(w, which, e['file'])[:-4] + '.o'
-        cmd = gcc_cmd(e['args'], o) if which == 'gcc' else llvm_cmd(e['args'], o, which)
+        if which in ('gcc', 'gccsdk'):
+            cmd = gcc_cmd(e['args'], o, werror=which == 'gccsdk')
+        else:
+            cmd = llvm_cmd(e['args'], o, which)
         return e['file'], {'rc': run_one(cmd, os.path.join(SDK, e['file']), e['cwd'],
                                          logpath(w, which, e['file']))}
     with ThreadPoolExecutor(a.jobs) as ex:
@@ -538,7 +680,7 @@ def phase_builtins(a):
 # ----------------------------------------------------------------- results
 def phase_results(a):
     w = a.work
-    inv = json.load(open(w + '/inventory.json'))
+    inv = ensure_inventory(a)
     comp = {m: (json.load(open('%s/compile_%s.json' % (w, m)))
                 if os.path.exists('%s/compile_%s.json' % (w, m)) else {})
             for m in ('gcc', 'strict', 'lenient', 'nodefs', 'fp16probe')}
@@ -676,6 +818,81 @@ def summarize(rows):
     print(collections.Counter(r['bucket'] for r in rows if r['gcc'] == 'ok').most_common())
 
 
+RX_WERROR = re.compile(r'\[-Werror,(-W[\w-]+)\]')
+
+
+def phase_parity(a):
+    """strict vs the SDK-flags modes, like for like:
+         strict      clang defaults, no -Werror          vs gcc    (no -Werror)
+         sdknowerror SDK -W flags, no -Werror, compat     vs gcc
+         sdkflags    SDK -W flags incl. -Werror, compat   vs gccsdk (GCC with the SDK's -Werror)
+    A file counts as ok only if clang exits 0 AND the log has no survey
+    category (so an unknown builtin demoted to a warning is still a failure).
+    Writes sdkflags_parity.json next to this script."""
+    w = a.work
+    inv = ensure_inventory(a)
+    comp = {}
+    for m in ('gcc', 'gccsdk', 'strict', 'sdkflags', 'sdknowerror'):
+        p = '%s/compile_%s.json' % (w, m)
+        comp[m] = json.load(open(p)) if os.path.exists(p) else {}
+
+    def ok(m, f):
+        r = comp[m].get(f)
+        if r is None:
+            return None
+        cats, _ = classify_llvm(r['rc'], read_log(w, m, f) or '')
+        return r['rc'] == 0 and not cats
+    rows, A = {}, collections.defaultdict(collections.Counter)
+    werror_only = collections.defaultdict(list)
+    for e in inv:
+        f = e['file']
+        if e['scope'] != 'in' or comp['gcc'].get(f, {}).get('rc') != 0:
+            continue
+        r = {'area': e['area'], 'gccsdk': comp['gccsdk'].get(f, {}).get('rc') == 0}
+        for m in ('strict', 'sdkflags', 'sdknowerror'):
+            r[m] = ok(m, f)
+        rows[f] = r
+        t = A[e['area']]
+        t['gcc'] += 1
+        t['gccsdk'] += r['gccsdk']
+        for m in ('strict', 'sdkflags', 'sdknowerror'):
+            t[m] += bool(r[m])
+        t['sdkflags_vs_gccsdk'] += bool(r['sdkflags']) and r['gccsdk']
+        if r['sdkflags'] is False and r['gccsdk']:
+            log = read_log(w, 'sdkflags', f) or ''
+            hard = [m_ for m_ in RX_DIAG.finditer(log) if m_.group('sev').endswith('error')
+                    and not RX_WERROR.search(m_.group('msg'))]
+            if not hard:
+                werror_only[' '.join(sorted(set(RX_WERROR.findall(log))))].append(f)
+    tot = collections.Counter()
+    for t in A.values():
+        tot.update(t)
+    hdr = '%-20s %5s %6s %6s %6s %6s %6s' % ('area', 'gcc', 'strict', 'nowerr', 'gccW', 'sdkfl', 'sdk/W')
+    print(hdr)
+    for k, t in sorted(A.items()) + [('TOTAL', tot)]:
+        print('%-20s %5d %6d %6d %6d %6d %6d' % (k, t['gcc'], t['strict'], t['sdknowerror'],
+              t['gccsdk'], t['sdkflags'], t['sdkflags_vs_gccsdk']))
+    pc = lambda n, d: round(100.0 * n / (d or 1), 1)
+    summ = {
+        'strict': {'ok': tot['strict'], 'of': tot['gcc'], 'parity': pc(tot['strict'], tot['gcc'])},
+        'sdknowerror': {'ok': tot['sdknowerror'], 'of': tot['gcc'],
+                        'parity': pc(tot['sdknowerror'], tot['gcc'])},
+        'sdkflags': {'ok': tot['sdkflags_vs_gccsdk'], 'of': tot['gccsdk'],
+                     'parity': pc(tot['sdkflags_vs_gccsdk'], tot['gccsdk']),
+                     'ok_any': tot['sdkflags']},
+        'sdkflags_fail_only_on_Werror': {k: sorted(v) for k, v in werror_only.items()},
+        'clang': json.load(open(os.path.join(w, 'snap', 'snap.json')))['version']
+        if os.path.exists(os.path.join(w, 'snap', 'snap.json')) else CLANG,
+    }
+    for k in ('strict', 'sdknowerror', 'sdkflags'):
+        print('%-12s %4d / %d = %.1f%%' % (k, summ[k]['ok'], summ[k]['of'], summ[k]['parity']))
+    for k, v in sorted(werror_only.items(), key=lambda kv: -len(kv[1])):
+        print('sdkflags fails only on -Werror %s: %d files' % (k, len(v)))
+    json.dump({'summary': summ, 'areas': {k: dict(t) for k, t in sorted(A.items())},
+               'files': rows}, open(os.path.join(HERE, 'sdkflags_parity.json'), 'w'),
+              indent=1, sort_keys=True)
+
+
 def phase_snapshot(a):
     """Copy the clang binary + resource headers into --work so a concurrent
     rebuild of the fixed-path build dir cannot change the compiler mid-run."""
@@ -704,10 +921,12 @@ def main():
     ap.add_argument('--work', default=os.environ.get('SURVEY_WORK', '/tmp/sdk-compile-survey-work'),
                     help='scratch dir (SDK app-tree copies, cmake dirs, objects, logs; ~1 GB)')
     ap.add_argument('--jobs', type=int, default=12)
-    ap.add_argument('--phases', default='snapshot,configure,db,inventory,gcc,strict,lenient,nodefs,fp16probe,builtins,results')
+    ap.add_argument('--phases', default='snapshot,configure,db,inventory,gcc,strict,lenient,nodefs,'
+                    'fp16probe,gccsdk,sdkflags,sdknowerror,builtins,results,parity')
     ap.add_argument('--only', help='regex: (re)compile only matching files')
     ap.add_argument('--force', action='store_true', help='ignore cached compile results')
     a = ap.parse_args()
+    a.work = os.path.abspath(a.work)
     os.makedirs(a.work, exist_ok=True)
     use_snapshot(a)
     for p in a.phases.split(','):
@@ -718,10 +937,14 @@ def main():
             phase_configure(a)
         elif p == 'db':
             phase_db(a)
+        elif p == 'dbsnapshot':
+            phase_dbsnapshot(a)
         elif p == 'inventory':
             phase_inventory(a)
-        elif p in ('gcc',) + tuple(MODES):
+        elif p in ('gcc', 'gccsdk') + tuple(MODES):
             phase_compile(a, p)
+        elif p == 'parity':
+            phase_parity(a)
         elif p == 'builtins':
             phase_builtins(a)
         elif p == 'results':

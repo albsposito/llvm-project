@@ -1,8 +1,14 @@
 {
  "status": "done",
  "branch": "work/20/F020",
- "commits": ["1aeafd0d2b51"],
- "commit_clusters": {"1aeafd0d2b51": "passes (llvm/lib/Target/RISCV/PULP/PULPHardwareLoops.cpp, computeCount only, +20 lines)"},
+ "commits": [
+  "d7a261db1c13",
+  "7780ad8c7dc1"
+ ],
+ "commit_clusters": {
+  "d7a261db1c13": "passes (PULPHardwareLoops.cpp computeCount: immediate substitution for unavailable registers; revision 1 rebased)",
+  "7780ad8c7dc1": "passes (PULPHardwareLoops.cpp computeCount: +9 lines, immediate range recheck after the count-down swap; revision 2)"
+ },
  "note": "notes/20/F020.md",
  "signature_gone": true,
  "b71_same_root_cause": true,
@@ -18,16 +24,27 @@
   "fuzz": "logs/20-F020/fuzz/summary.txt, res.9001-9300.txt: fresh seeds 9001-9300 x O2/O3/Os, 900/900 asm identical to int-20, no NEWFAIL/OBJFAIL/crash/hang; seed 9220 O2/O3/Os MISMATCH vs GCC with identical asm on int-20 (pre-existing)",
   "sdk_survey": "logs/20-F020/survey/summary.txt: strict 209/617 before and after (ImgIO.c still blocked in strict by the 2 missing PMSIS builtins); lenient ImgIO.c crash rc 134 -> OK (275 -> 276 ok), no other change, no new failure buckets",
   "gap9_sweep": "logs/20-F020-sweep/static_compare.txt: 54/54 objects byte-identical disassembly int20 vs mine; runtime_compare.txt: 54/54 kernel/opt pairs checksum = GAP9 GCC, cycles and kernel objects identical to int-20",
-  "lit": "logs/20-F020-lit.log: CodeGen/RISCV, MC/RISCV, clang CodeGen/RISCV, clang/test/Sema, clang/test/Driver/riscv*, fork tests: 5713 pass, 126 unsupported, 1 fail = rvv/vsetvli-insert-zve64f.mir (data/known-failures.txt)"
+  "lit": "logs/20-F020-lit.log: CodeGen/RISCV, MC/RISCV, clang CodeGen/RISCV, clang/test/Sema, clang/test/Driver/riscv*, fork tests: 5713 pass, 126 unsupported, 1 fail = rvv/vsetvli-insert-zve64f.mir (data/known-failures.txt)",
+  "rev2_boundary_gvsoc": "logs/20-F020/gv2 (b.ll, b_ref.c, bdrv.c, run.sh, run.log): 48 functions, end constants -2048/-2047/2047/2048 also returned after the loop, count-up slt/sle/ne and count-down sgt/sge/ne, guarded and unguarded, starts end-300..end+300, reference = host gcc -O0 of the same C semantics. Rev2: 28 hwloops at O2 and O3, 48/48 match. Rev1 (build/20-F020-rev): verifier 'Invalid immediate', and without the verifier it hangs on GVSoC. int-20: crash. Rev2 declines only f_sgt_m2048_g0/g1 compared with rev1. Reviewer m.ll: verify clean, no hwloop.",
+  "rev2_reverify": "Base int-20 ccfd68f6. Oracle asm at O2/O3/Os identical, with -verify-machineinstrs (logs/20-F020/oracle-asm/compare.txt). Fuzz fresh seeds 14001-14200 x O2/O3/Os with -verify-machineinstrs: 600/600 asm same, 600 OK (logs/20-F020/fuzz/res.14001-14200.txt). GAP9 static 54/54 disasm identical (logs/20-F020-sweep/static_compare2.txt). Runtime 54/54 cycles and checksums identical, = GCC (runtime_compare2.txt; object sha differs only by the version string). SDK survey (logs/20-F020/survey2): strict 209 both, lenient ImgIO.c 134 -> 0 and nothing else. Reproducers + k256 MIR verify clean. Lit logs/20-F020-lit2.log: 5713 pass, 1 known failure (vsetvli-insert-zve64f.mir). Build logs/20-F020-build3/4/5.log, cluster_errors 0."
  },
- "sdk_files_unblocked": {"strict": [], "lenient": ["libs/gap_lib/img_io/ImgIO.c"]},
+ "sdk_files_unblocked": {
+  "strict": [],
+  "lenient": [
+   "libs/gap_lib/img_io/ImgIO.c"
+  ]
+ },
  "new_failure_buckets": [],
  "unmapped_files": [],
- "proposed_test": "llvm/test/CodeGen/RISCV/xpulp-hwloop-inloop-const-end.ll: RUN: llc -mtriple=riscv32 -mattr=+xpulpv,+m,+c -O2 -verify-machineinstrs < %s | FileCheck %s. (a) The reduced GetInputImageInfos function with 'icmp ult i32 %inc, 256' (two-exit loop, not converted): must compile, CHECK-NOT: lp.setup. (b) Guarded single-exit loop 'exit: %r = phi i32 [256, %loop], [%i, %entry]' with icmp ult/sgt/ugt step -4 (logs/20-F020/gv/ir.ll): CHECK: lp.setup and the preheader count computed from 'li aN, 256'. Generated with update_llc_test_checks.py.",
+ "proposed_test": "llvm/test/CodeGen/RISCV/xpulp-hwloop-inloop-const-end.ll: RUN: llc -mtriple=riscv32 -mattr=+xpulpv,+m,+c -O2 -verify-machineinstrs < %s | FileCheck %s. (a) The reduced GetInputImageInfos function with 'icmp ult i32 %inc, 256' (two-exit loop, not converted): must compile, CHECK-NOT: lp.setup. (b) Guarded single-exit loop 'exit: %r = phi i32 [256, %loop], [%i, %entry]' with icmp ult/sgt/ugt step -4 (logs/20-F020/gv/ir.ll): CHECK: lp.setup and the preheader count computed from 'li aN, 256'. Generated with update_llc_test_checks.py. Plus (c) a count-down loop 'icmp sgt i32 %inc, -2048' with exit phi [-2048, %loop] (logs/20-F020-review/m.ll): must pass -verify-machineinstrs, CHECK-NOT: lp.setup; and the -2047/2047 variants: CHECK: lp.setup.",
  "other_errors_seen": [
   "Dead trip-count code left behind: getLoopTripCount/computeCount emit the count (and F007's guard) into the preheader before convertToHardwareLoop checks the exit blocks, so a loop rejected afterwards ('multiple loop exit blocks') keeps ~10 dead instructions in the final assembly (e.g. logs/20-F020/v_ult.ll bb.4: li/sub/sltu/neg/and/addi, never used). No DCE runs after the pass. Code size/cycle waste, pre-existing (ref-18 leaves the SUB too); P3.",
   "isDistanceCheckedOnEntry does not recognise a guard written against End-1 ('li a1,255; bltu a1,a0' for i < 256), so the F007 runtime guard is emitted although the guard already proves the distance (logs/20-F020/gv/ir.ll u_ult). Missed optimization, P3.",
   "hwloop fuzz seed 9220 O2/O3/Os: wrong result vs GAP9 GCC on GVSoC, asm identical on build/int-20 (pre-existing, not analysed).",
-  "Harness hazard caused by this worker: two 'pkill -f' / 'pgrep -f' calls used broad patterns ('run.py --work', 'gvrun'). At that moment ps showed no survey run of another task, and the only gvrun processes found afterwards were this task's own, but a concurrent worker's run.py or GVSoC simulation started in that second may have been killed (13:24 and about 13:31). If F016-F021 report an unexplained killed survey/sim around then, this is the cause."
- ]
+  "Harness hazard (rev1, this worker): broad pkill -f/pgrep -f patterns were used on 2026-09-28 about 13:24 and 13:31, before rule 13b existed. They may have killed another worker's run.py/gvrun. Revision 2 kills only its own PIDs.",
+  "Harness hazard: benchmarks/sdk-compile-survey/run.py phase 'db' rewrites the tracked benchmarks/sdk-compile-survey/compile_db.json.gz (HERE) with -I paths into the caller's scratch work dir. The main checkout's copy is currently modified and points into a deleted F021 scratch dir, so the phases after db fail ('dt.h' not found) for anyone who reuses it. Revision 2 ran a private copy of run.py (logs/20-F020/survey-tool) so that it would not overwrite the file again. Suggest writing compile_db into --work."
+ ],
+ "revision": 2,
+ "integration_head": "ccfd68f6ac7672ace360268bd0b4fac3b1e06d60",
+ "review_fix": "Reviewer finding (tasks/20/F020.review.json): the substituted end immediate -2048 in a count-down loop became Start after the swap and was emitted as ADDI x, 2048 (illegal, silently encoded as -2048, the loop hangs). Revision 2 repeats the immediate range check after the swap (Start: isInt<12>(imm) && isInt<12>(-imm); End: isInt<12>(imm)) and declines the loop otherwise. Only count-down loops with end constant exactly -2048 are affected. The note now says the substitution opens this new path (previously End immediates came only from imm5 branches, -16..15) and explains how it is range-checked."
 }

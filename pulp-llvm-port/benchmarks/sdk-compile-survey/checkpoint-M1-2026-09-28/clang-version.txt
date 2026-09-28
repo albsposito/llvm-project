@@ -1,0 +1,5 @@
+clang version 20.1.8 (https://github.com/albsposito/llvm-project.git 4851ef81477b78110edf1ec7d6e9df9d3620a49c)
+Target: riscv32-unknown-unknown-elf
+Thread model: posix
+InstalledDir: /tmp/claude-1000/-home-ubuntu-llvm-project/8aeebf17-9c73-413d-b44d-f6985f3428f5/scratchpad/m1/snap/bin
+Build config: +assertions

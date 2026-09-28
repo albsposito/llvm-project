@@ -1,0 +1,27 @@
+{
+ "status": "done",
+ "branch": "work/20/F029",
+ "integration_head_used": "ccfd68f6ac7672ace360268bd0b4fac3b1e06d60",
+ "commits": ["8087ee1b38b0"],
+ "commit_clusters": {"8087ee1b38b0": "insn-tablegen (RISCVInstrInfoXpulp.td; the task named codegen-core but the patterns live in the insn-tablegen file, so the fixup targets that cluster)"},
+ "note": "notes/20/F029.md",
+ "signature_gone": true,
+ "root_cause": "RISCVInstrInfoXpulp.td selected (and (vector_extract v4i8/v2i16, uimm6), 255/65535), which is a zero-extended lane, as the sign-extending PV_EXTRACT_B/H. Fixed by selecting PV_EXTRACTU_B/H (2-line change). Pre-existing since fork commit f1b7aebff8c2 '[LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms'. The variable-index path (pv.shuffle + p.extbz/p.exthz) and the sext_inreg/anyext patterns were already correct, so zext/sext/anyext of an extract now all match the DAG, for both element sizes and for split wider vectors.",
+ "upstream_reference": "llvmorg-20.1.8 RISCVInstrInfoXCV.td:427-430 (cv.extract/cv.extractu.{h,b}) and :792-795 (sext_inreg -> sign-extending, and 0xff/0xffff -> CV_EXTBZ/CV_EXTHZ). GAP9 GCC also emits pv.extractu.b/.h for unsigned lanes. Encodings of pv.extractu.b/.h are the same in llvm-mc and the GAP9 GCC assembler.",
+ "verification": {
+  "repro_log": "logs/20-F029.repro.log",
+  "lanes_exhaustive": "logs/20-F029/gen.py -> lanes.c: 794 groups (10 vector types incl. 8x8/4x16/16x8; eq/ne/lt/le/gt/ge; constant/variable indices; 0x7f/0x80/0xff and 0x7fff/0x8000/0xffff; get to int/unsigned/long long; gat.c count()). GVSoC vs host gcc -O0: int-20 Xpulpv2 -O2 168/794 wrong; fixed: 0/794 wrong for Xpulpv2 and generic rv32 at -O2/-O3/-Os/-O0 (logs/20-F029/lanes-results-fixed.txt)",
+  "coordinator_reproducers": "zext-extract.ll: pv.extractu.b / pv.extract.b / pv.extractu.h (was pv.extract.* for all three). mixt.c: was wrong at int-20 Xpulpv2 -O2, now matches host gcc -O0 at -O2/-O0. wc.c and t3.c need F019's __builtin_shuffle: IR from build/20-F019's front end, back end = F019's commit 4236d6510266 applied temporarily on top of this fix (then dropped). On F019's patched GVSoC every group matches host gcc -O0. With F019 alone, k2/k2u (128 x i8 run-time two-vector group) are wrong (logs/20-F029/extra-patched-gvsoc.txt, extra-f019-*.txt). On the SDK GVSoC only pv.shuffle2 groups differ (B113, simulator).",
+  "gap9_sweep": "scratch copy, base=int-20 vs mine: all 54 kernel objects (27 kernels x O2/O3) byte-identical; no cycle change",
+  "hwloop_fuzz": "seeds 29001-29200 (new), O2/O3/Os, NEW=this build, BASE=int-20: 0 MISMATCH, 0 crash, 0 CHANGED assembly (logs/20-F029/fuzz-29001-29200.txt)",
+  "lit": "LIT_PATHS + clang/test/Driver/riscv*: 4729 passed, 1 failed = known B41/T002 rvv/vsetvli-insert-zve64f.mir (logs/20-F029.lit.log)",
+  "policy_check": "0 FAIL, 0 WARN"
+ },
+ "proposed_test": "llvm/test/CodeGen/RISCV/xpulpv-extract-ext.ll (llc -mtriple=riscv32 -mattr=+m,+xpulpv -O2): zext/sext/anyext of extractelement <4 x i8> and <2 x i16> at constant index -> CHECK pv.extractu.b / pv.extract.b / pv.extractu.h / pv.extract.h; icmp eq of a constant-index lane with a variable-index lane (<4 x i8>) -> CHECK pv.extractu.b plus pv.shuffle.b + p.extbz; <8 x i8> zext lane 5 -> pv.extractu.b. Base it on logs/20-F029/zext-extract.ll and the c1.ll in logs/20-F029.repro.log.",
+ "unmapped_files": [],
+ "other_errors_seen": [
+  "int-20 back end (without F019's 4236d6510266) asserts 'APInt ... Value is not an N-bit signed value' on wc.c IR from F019's front end: this is the two-vector tryPulpVectorShuffle crash F019 already fixes.",
+  "wc.c at -O0 without Xpulpv (rv32imc_zfinx) does not fit in the ri5ky_testbench RAM (.text overflow by about 33 KB): test-harness limit, not a compiler bug.",
+  "Missed optimisation, not wrong: clang lowers some constant-index unsigned lane reads to slli+srli (2 instructions) where GCC uses a single pv.extractu.b; and signed lane equality compares as shifts+xor. Possible backlog item, not changed here."
+ ]
+}

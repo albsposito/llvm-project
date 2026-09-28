@@ -1,0 +1,31 @@
+{
+  "status": "done",
+  "branch": "work/20/F031",
+  "commits": ["02383d3a60a8"],
+  "cluster_commits": {"mc": "02383d3a60a8"},
+  "note": "notes/20/F031.md",
+  "signature_gone": true,
+  "unmapped_files": [],
+  "cause": "Pre-existing fork defect (B104) from fork commit f1b7aebff8c2 '[LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms': RISCVAsmBackend::shouldForceRelocation exempted fixup_pulpv2_loop_setup(i) with 'return false', so hardware-loop label distances were frozen at assembly time even with +relax; ld.lld relaxation (call->c.jal, lui/addi->gp, deletion of R_RISCV_ALIGN nops before inner lp.setup) then shrank loop bodies without updating the field. Repro on int-20: t4.s lp.setupi 0x7 instead of 0x4; logs/20-F031-evidence/kasm.s hangs on GVSoC with -mrelax; manyglob.c wrong result; GAP9 runtime sweep with -mrelax: 5/54 wrong (k01_fir_fix16 O2/O3, k02_fir_f32 O2/O3, k04_matmul_simple_f32 O3; in k01 lld deletes the alignment nop before the inner lp.setup so the outer lp.setup must change 0x66->0x64).",
+  "fix": "llvm/lib/Target/RISCV/MCTargetDesc/RISCVAsmBackend.cpp: the loop-fixup case in shouldForceRelocation now 'break's to upstream's shared rule 'return STI->hasFeature(RISCV::FeatureRelax) || ForceRelocs;' (RISCVAsmBackend.cpp:140 at llvmorg-20.1.8), the rule fixup_riscv_branch/R_RISCV_BRANCH follows. With relaxation the object carries R_PULPV2_LOOP_SETUP(66)/R_PULPV2_LOOP_SETUPI(67) against the loop label (field 0) and ld.lld (20/F027) computes it after relaxation; without relaxation nothing changes.",
+  "verification": {
+    "repro_log": "logs/20-F031.repro.log",
+    "verify_log": "logs/20-F031.verify.log",
+    "evidence_dir": "logs/20-F031-evidence/",
+    "t4": "object has R_PULPV2_LOOP_SETUPI .Lend0 + R_PULPV2_LOOP_SETUP .Lend1; ld.lld output lp.setupi x0,0x64,0x4 (correct; int-20 0x7). t4 without .option relax: object byte-identical to int-20.",
+    "gvsoc": "gvsoc-new.txt: kasm.s (calls inside lp.setup L1 / lp.setupi L0 at 62-byte limit / lp.setup L0 at 8190-byte limit / lp.starti+lp.endi L1 around nested lp.setupi) RES 4013948565 with -mrelax, -mrelax + --relax-gp, -mno-relax = GNU as + GNU ld 2.28 reference; linked loop instruction words identical to the GNU ld link. manyglob.c and relaxloop.c (also -pulp-loop-range-immediate=0) = host gcc -O0 result in all modes.",
+    "no_relax_identity": "GAP9 static sweep (-mno-relax): 54/54 LLVM objects byte-identical to int-20; kasm/manyglob/relaxloop -mno-relax objects byte-identical to int-20.",
+    "relax_sweep": "GAP9 runtime sweep with LLVM_FLAGS -mrelax + each compiler's ld.lld on GVSoC (sweep-relax-runtime.txt): this build 54/54 ok, GAP9 GCC 54/54, int-20 49/54 (5 WRONG RESULT). 134 loop relocations in the -mrelax objects.",
+    "fuzzer": "hwloop-fuzz seeds 7001-7120 O2/O3/Os, CLANG_EXTRA=-mrelax, ld.lld: 360 builds, 1219 lp.* instructions, 1184 R_PULPV2 relocations, 0 MISMATCH, 0 NEWFAIL/OBJFAIL, assembly same as int-20 in all.",
+    "gnu_ld": "gnu-ld.txt: GNU ld 2.28 rejects an LLVM -mrelax object with hardware loops ('unrecognized relocation (0x42)'); before this change it linked and ran wrong (int-20 -mrelax kasm via GNU ld: no output on GVSoC). -mno-relax objects still link with GNU ld and run correctly (RES 4013948565). Conclusion: -mrelax + GNU ld stays unsupported for hardware-loop code; use -mno-relax or ld.lld. GNU's 57/58 cannot be used (clash with upstream R_RISCV_32_PCREL/R_RISCV_IRELATIVE, see 20/F027).",
+    "lit": "logs/20-F031.lit.log + lit2.log (rerun after building llvm-readelf): llvm/test/MC/RISCV, llvm/test/CodeGen/RISCV, clang/test/CodeGen/RISCV, clang/test/Driver/riscv*, lld/test/ELF/riscv*, clang/test/Preprocessor/riscv-nofdiv.c, clang/test/Misc/target-invalid-cpu-note: 4791/4792 pass; only rvv/vsetvli-insert-zve64f.mir fails, known red on int-20 (notes/20/F025.md).",
+    "policy_check": "0 FAIL, 0 WARN"
+  },
+  "other_errors_seen": [
+    "Behaviour note, not an error: with +relax the assembler no longer range-checks loop distances it leaves to the linker (same as branches); ld.lld checks the final value (20/F027). A body over the limit before relaxation but within it after now links with lld instead of failing at assembly.",
+    "lld RISC-V gp relaxation needs --relax-gp (lld default off); the GVSoC link.ld defines __global_pointer$ but the sweep/fuzzer links do not pass --relax-gp."
+  ],
+  "proposed_test": "llvm/test/MC/RISCV/xpulp-hwloop-relax.s: RUN: llvm-mc -triple=riscv32 -mattr=+c,+xpulpv,+relax -filetype=obj %s | llvm-readobj -r - | FileCheck %s --check-prefix=RELAX ; RUN: llvm-mc -triple=riscv32 -mattr=+c,+xpulpv,-relax -filetype=obj %s | llvm-readobj -r - | FileCheck %s --check-prefix=NORELAX, input = t4.s body (lp.setupi with a call inside, lp.setup, lp.starti/lp.endi); RELAX checks R_PULPV2_LOOP_SETUPI .Lend0 and R_PULPV2_LOOP_SETUP .Lend1/.Ls/.Le, NORELAX checks no R_PULPV2 relocation. Plus lld/test/ELF/riscv-pulp-hwloop-relax.s: assemble with +relax, link with ld.lld, llvm-objdump -d checks lp.setupi x0, 0x64, 0x4 after call->c.jal relaxation.",
+  "question": null,
+  "evidence": null
+}

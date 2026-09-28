@@ -1,0 +1,29 @@
+{
+  "status": "done",
+  "branch": "work/20/F028",
+  "base": "ccfd68f6ac76",
+  "commits": ["104cf00bb403"],
+  "note": "notes/20/F028.md",
+  "signature_gone": true,
+  "files_changed": ["llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td"],
+  "unmapped_files": [],
+  "summary": "LOOP0setup/LOOP1setup/LOOP0setupi/LOOP1setupi marked isNotDuplicable (ARM precedent: ARMInstrThumb2.td:5588-5712 at llvmorg-20.1.8, a6fd919cb3f5; TailDuplicator.cpp:623 refuses such blocks, MachineBlockPlacement tail-dup uses the same check at :808). These are the only hwloop instructions that exist before PULPFixupHwLoops (lp.starti/endi/counti and PseudoLOOPend are created by the fixup, which runs in addPreEmitPass2 after the outliner). The machine outliner ignores isNotDuplicable but already refuses the setups: they are terminators of blocks with successors and have an MBB operand (TargetInstrInfo::getOutliningType -> Illegal). BranchFolding tail merging does not copy instructions. No PULPFixupHwLoops.cpp / PULPHardwareLoops.cpp edits.",
+  "baseline_used": "own build of work/20/F028 with the .td change reverted (tree == integration head ccfd68f6ac76), snapshot in logs/20-F028-work/base/bin; build/int-20 was not used (its clang binary differs from this build)",
+  "verification": {
+    "log": "logs/20-F028-work/VERIFY.txt",
+    "repro_log": "logs/20-F028.repro.log (first repro at d17dc7f4f2f9), logs/20-F028-work/repro-matrix.txt (at ccfd68f6ac76)",
+    "reduced_reproducer": "two-setups-one-loop.c on GVSoC: base 0xeb588f8a at O2/O3 (wrong), fix 0xeb29973a at O2/O3/Os = host gcc -O0",
+    "triage_seeds": "27 (NMK 7,4,1 / 6,7,3 / 7,8,4), 960 (2,3,1 / 2,2,2), 938 (1,4,5 = m=4; 1,9,5): base wrong at O2/O3 as in the triage, fix correct at O2/O3/Os vs host gcc -O0",
+    "multi_setup_scan_1_2000": "O2/O3/Os default flags: base 9 compiles (27 O2/O3, 318 O3, 371 O2/O3, 576 O2, 938 O3, 960 O3, 1470 O3), fix 0; also 0 in the 6000 fuzz-run assemblies (-pulp-loop-range-immediate=0)",
+    "fuzzer_1_2000": "benchmarks/hwloop-fuzz/run.sh 1 2000 (REF=host gcc -O0 + GAP9 GCC -mnohwloop cross-check, NSETS=3, O2/O3/Os): 0 MISMATCH, 0 REFDISAGREE, 0 NEWFAIL/OBJFAIL; assembly CHANGED vs base only for seeds 27 318 371 576 938 960 1470 (exactly the 9 two-setup compiles; each -1 lp.setup, -2 instructions)",
+    "gap9_sweep": "static: 54/54 kernel objects byte-identical base vs fix; runtime: 54/54 ELFs identical, GVSoC cycles/instrs/checksums identical (no kernel's assembly changes, so no cycle deltas to report)",
+    "f007_oracle": "1330/1330 OK at O2/O3/Os for base and fix; kern_c.s and kern_ir.s identical",
+    "lit": "logs/20-F028-lit2.log: llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, clang/test/CodeGen/RISCV + driver/preprocessor/misc set: 4729/4730 pass; only failure rvv/vsetvli-insert-zve64f.mir, listed in data/known-failures.txt",
+    "policy_check": "0 FAIL, 0 WARN (range ccfd68f6ac76..work/20/F028)"
+  },
+  "proposed_test": "llvm/test/CodeGen/RISCV/pulp-hwloop-no-taildup-setup.ll: llc -O2 -mtriple=riscv32 -mattr=+m,+c,+zfinx,+xpulpv on the IR of benchmarks/hwloop-fuzz/triage-2026-09-28/seed27/two-setups-one-loop.ll, CHECK exactly one 'lp.setup' per hardware loop (CHECK-COUNT-2 / CHECK-NOT a third) and that each setup's end label is the label of the loop's last body instruction. A MIR test with -run-pass=tailduplication on a block holding LOOP0setup (expect no duplication) is possible today; a -run-pass=hwloopsfixup test needs the pass registered first (triage side finding 1).",
+  "other_errors_seen": [
+    "Commit-message trailer placement: a blank line between Change-Note/Task and Co-Authored-By makes policy_check miss the Change-Note trailer (fixed in my commit by putting all trailers in the last paragraph; other workers may hit it)",
+    "Triage side findings still open (not fixed here): hwloopsfixup pass not registered with the pass registry (no -run-pass MIR test possible); dead software counter decrement left inside hardware loops; the B.1 guard in PULPFixupHwLoops (two setups sharing LastMBB) is a separate later task"
+  ]
+}

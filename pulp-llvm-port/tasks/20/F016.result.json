@@ -1,0 +1,43 @@
+{
+  "status": "done",
+  "branch": "work/20/F016",
+  "integration_head": "ccfd68f6ac7672ace360268bd0b4fac3b1e06d60",
+  "commits": [
+    "0697956aa4865ce53b45e1df35721a58ed332c3a",
+    "992ff0a332e853a5970175b523e01cc2adbd5dfe",
+    "c38a5c268f378574ea1431a363549dbacf6d3f80"
+  ],
+  "commit_clusters": {
+    "0697956aa486": "clang-builtins (clang/include/clang/Basic/BuiltinsRISCVXpulp.td)",
+    "992ff0a332e8": "intrinsics (llvm/include/llvm/IR/IntrinsicsRISCVXpulp.td)",
+    "c38a5c268f37": "insn-tablegen (llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td)"
+  },
+  "note": "notes/20/F016.md",
+  "signature_gone": true,
+  "unmapped_files": [],
+  "upstream_file_edits": [],
+  "summary": "Adds int __builtin_pulp_event_unit_read_fenced(void *, int) and void __builtin_pulp_OffsetedWritePtr(void *, void *, int), the prototypes GAP9 GCC uses. Each has its own intrinsic, linked to the builtin with ClangBuiltin, so clang's generic CGBuiltin path emits it and no clang codegen or Sema file is edited. ISel: imm offset -> p.elw / sw; reg offset -> add+p.elw / p.sw rr. The fenced intrinsic has no memory attribute plus IntrHasSideEffects, a full barrier like GCC's; OffsetedWritePtr uses the PulpWriteMemIntrinsic properties and is never dropped.",
+  "verification": {
+    "repro": "logs/20-F016.repro.log (unknown builtin before the fix)",
+    "build": "clang, llc, llvm-test-depends, clang-test-depends built at the rebased head (logs/20-F016-build2.log); cluster_errors: 0 clusters",
+    "sdk_survey": "strict: 476/617 = 77.1% (was 209/617 = 33.9%, int-20 baseline in benchmarks/sdk-compile-survey/results.json); 267 files newly OK, 0 regressions; 85 now blocked only by float16/float16alt types, 3 by clang-stricter implicit-function-declaration (virtualeeprom.c, udma_sdio/sdio.c, udma_timestamp.c: SDK trace macros SDIO_TRACE/TIMESTAMP_TRACE/bsp_virtual_eeprom_conf_init undeclared in that config). No new crash or hang bucket: the only crash is the pre-existing ImgIO.c LiveVariables assertion. Logs: logs/20-F016.survey.log, logs/20-F016-repro/survey-results.json, survey-newly-ok.json",
+    "asm_vs_gcc": "logs/20-F016-repro/cmp: in all 17 checked instructions at -O0/-O2/-Os, same instruction and addressing form as GAP9 GCC (identical encodings where the registers match, e.g. p.elw a0,60(a0)=03c56503 and p.sw a2,a1(a0)=00c565a3). Differences: register choice; clang compresses the imm-form store to c.sw where GCC emits a 4-byte sw; p.elw writes zero when the result is unused. The fenced barrier matches GCC: stores and loads are not moved across it and loads are not reused across it (t2.c dse/cse/glob). Two calls give two p.elw, a 4x-unrolled loop gives 4 p.elw, and inside a hardware loop the p.elw stays in the loop body. OffsetedWritePtr is kept even to a dead local array.",
+    "gvsoc": "ri5ky_testbench has no event unit, but its async_mem exercises p.elw's park/wake path. logs/20-F016-repro/elw.c (PMSIS evt_read32/GAP_WRITE_PTR shapes; imm, reg and >2047 offsets; fenced store-then-elw; loop): err=0 for clang -O0/-O2/-Os/-O3 and GCC -O2/-Os (logs/20-F016.gvsoc.log). Barrier semantics towards a real event unit are verified by assembly only.",
+    "gap9_sweep": "54 kernel objects (-O2/-O3): disassembly identical to the integration-head clang ccfd68f6ac76 (snapshot of build/int-20). Objects have the same size and differ only in 35 bytes, the version hash in .comment",
+    "lit": "scripts/wlit.sh over llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, clang/test/CodeGen/RISCV, clang/test/Sema, clang/test/Driver/riscv-arch.c, riscv-cpus.c, Preprocessor/riscv-nofdiv.c, Misc/target-invalid-cpu-note and every data/fork-tests.txt entry: 5903 tests, 2 failures. rvv/vsetvli-insert-zve64f.mir is the known failure (B41, data/known-failures.txt). Driver/riscv-arch.c failed once under heavy host load and passed alone and in 3 reruns of Driver/riscv-arch.c + clang/test/Sema + clang/test/CodeGen/RISCV (3238 tests, 0 failures each). The other clang/test/Driver/riscv* files were not run separately. Log: logs/20-F016.lit.log",
+    "policy_check": "0 FAIL, 0 WARN over ccfd68f6ac76..work/20/F016"
+  },
+  "proposed_test": [
+    "clang/test/CodeGen/RISCV/riscv-xpulpv2-gap9-builtins.c (update_cc_test_checks): -O0 and -O2 IR for __builtin_pulp_event_unit_read_fenced(void*, int) -> call i32 @llvm.riscv.pulp.event.unit.read.fenced(ptr, i32), and __builtin_pulp_OffsetedWritePtr -> call void @llvm.riscv.pulp.OffsetedWritePtr(ptr, ptr, i32); at -O2 check that two consecutive fenced calls stay two calls, that a store before and after a fenced call to the same address are both kept, and that OffsetedWritePtr to a local array survives.",
+    "clang/test/Sema/riscv-xpulpv2-gap9-builtins.c: accepted with void*/int*/uintptr-cast bases in C and C++; -Wint-conversion errors for an integer base or value; 'needs target feature xpulpv' without +xpulpv; wrong argument count errors.",
+    "llvm/test/CodeGen/RISCV/xpulp-elw-fenced.ll (update_llc_test_checks, -mattr=+xpulpv): p.elw imm form, simm12 boundary (2047 imm vs 2048 add+p.elw 0), reg offset add+p.elw 0, unused result, a loop keeping p.elw in the hardware-loop body, no reordering across the plain loads and stores around it; OffsetedWritePtr imm -> sw, reg -> p.sw rs2, rs3(rs1), >2047 -> lui+p.sw."
+  ],
+  "other_errors_seen": [
+    "GAP9 GCC emits an unassemblable 'p.elw a5,4100(a4)' for __builtin_pulp_event_unit_read_fenced offsets > 2047 (GCC bug, not ours; clang uses add + p.elw 0).",
+    "GAP9 GCC rejects a non-constant event_unit_read_fenced offset ('offset expected to be immediate value') unless inlining makes it constant; clang accepts it (add + p.elw), which is more permissive. Not a defect.",
+    "toolchains/ref-18 clang segfaults in PULPHardwareLoops::convertToHardwareLoop on a simple counted loop with a volatile load or p.elw (logs/20-F016-repro/t.c elw_loop); does not reproduce with the step-20 clang.",
+    "Existing fork intrinsic llvm.riscv.pulp.event.unit.read (non-fenced) is already a full barrier in LLVM while GCC's plain variant is not: clang is stricter than GCC (safe, possibly slower). Left unchanged.",
+    "Existing __builtin_pulp_OffsetedWrite/Read with a constant offset select li + p.sw/p.lw rr where GCC uses the reg-imm sw/lw form (one extra instruction). Pre-existing, left unchanged.",
+    "SDK survey: pre-existing LiveVariables assertion on libs/gap_lib/img_io/ImgIO.c (already in report.md)."
+  ]
+}

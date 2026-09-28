@@ -254,7 +254,7 @@ These are ranked by how many apps each one blocks and by how bad it is.
 
 8. **Back-end crashes in code that now reaches codegen:** ImgIO.c (B88 / F020, known) and **tlv320.c (NEW, PULP Hardware Loops `getReg` assertion)**.
 
-9. **`-Werror`:** clang-only warnings (section 5). Only `fll.c` stops the strict build today.
+9. **`-Werror`:** clang-only warnings (section 5). Only `fll.c` stops the strict build today. **Fixed in the wrapper on 2026-09-28 evening** (section 6).
 
 **Proposed backlog rows** (I did not edit BACKLOG.md):
 - **`CoreCount` fallback pattern wrong** (`RISCVInstrInfoXpulp.td:1875`, ANDI 0x12 instead of LW offset 18). A silent miscompile on GAP9 (0 cores; team fork runs nothing). P1, to fix together with F018.
@@ -284,7 +284,7 @@ These are ranked by how many apps each one blocks and by how bad it is.
   - `-Wincompatible-pointer-types-discards-qualifiers`: `cluster/driver/cluster.c:152,255`.
   - `-Wenum-conversion` (3).
   - The compile survey adds `implicit-function-declaration` / `int-conversion` errors in 7 more files.
-  - With clang the SDK needs these fixed, or `CONFIG_DISABLE_WERROR=y`; the prototype uses the latter.
+  - With clang the SDK needs these fixed, or `CONFIG_DISABLE_WERROR=y`; the prototype uses the latter. **Superseded:** since 2026-09-28 evening the wrapper handles all of them (section 6).
 - **Hand-written assembly** (blocker 3), edits 1-5 of `make_patched_mirror.sh`: drop `.func/.endfunc`; `%tiny(`→`%lo(`; `p.mul`→`mul`; `p.lw rd, imm(rs)`→`lw`; move `.weak default_handler` after its `.global`.
 - **Two weak `system_exit` definitions** (edit 6).
   - `rtos/pmsis/os/freeRTOS/vendors/gwt/libs/include/stdlib.h:32` declares `void __attribute__((weak)) system_exit(int32_t)`. This makes the real definition in `rtos/pmsis/implem/rtos/os/system_gap.c:395` (semihosting exit + corestatus) weak too.
@@ -298,6 +298,60 @@ These are ranked by how many apps each one blocks and by how bad it is.
   - `init_area()` overwrites the first 64 KB of the section, and `check_area()` expects that range to be `algo_data1`. GCC 7 emits `algo_data1` first (at `__my_algo_area_addr`); clang emits declaration order. So clang fails: `algo_data0[0]=0x0, expected: 0x0`. The message prints the wrong array too; the failing check is on `algo_data1`.
   - This is an app bug: layout within a section is not specified.
 - **GCC-isms in kernels:** `__builtin_shuffle` (use `__builtin_shufflevector` under `__clang__`), and implicitly declared builtins.
+
+## 6. 2026-09-28 evening: `-Werror` parity with GCC 7 (diagnostic policy in the wrapper)
+
+`bin/riscv32-unknown-elf-clang` now adds the flags that make clang stop an SDK build exactly where GAP9 GCC 7.1.1 would. Its "Diagnostics" block is the single source of truth and gives the reason for every flag; `clang-gap9.cmake` summarises it. The evidence is the compile survey (`../sdk-compile-survey/report.md`, dated section): its phases `gccsdk` (GCC with the SDK's own `-Werror`), `sdkflags` and `sdknowerror` run every SDK file through this wrapper's logic.
+
+**The flags:**
+- **Clang spellings of the SDK's own options:** `-Wno-discarded-qualifiers` becomes `-Wno-incompatible-pointer-types-discards-qualifiers`.
+- **GCC's precedence rule:** `-Wall`/`-Wextra` are moved in front of explicit `-Wno-X`. GCC lets an explicit option win over a group wherever the group appears; clang applies options in order, so mbedtls's repeated `-Wall -Wextra` re-enabled `unused-parameter`/`unused-function`.
+- **Without `-Werror` only:** `-Wno-error=` for `implicit-function-declaration`, `implicit-int`, `int-conversion`, `incompatible-function-pointer-types` and `return-mismatch`. Clang 20 makes these errors; GCC 7 only warns. With `-Werror` GCC fails on them too, so clang's default already matches.
+- **Always:**
+  - `-Wno-typedef-redefinition`: a C11 redefinition to the same type, which GCC accepts silently in gnu99; a redefinition to a different type is still an error.
+  - `-Wno-error=` for `unknown-attributes` (`tiny`, `optimize`), `enum-conversion`, `compound-token-split-by-macro`, `self-assign`, `header-guard`, `deprecated-non-prototype`, `implicit-const-int-float-conversion` (the `fll.c` stopper), `constant-conversion`, `pointer-bool-conversion`, `tautological-pointer-compare` and `empty-body`.
+  - Each of these fires in a file that GCC 7 compiles with the SDK's `-Werror`. They are demoted, so they still show in the build log.
+- **Guard:** clang reports "use of unknown builtin" under `implicit-function-declaration`, so the wrapper fails any compile that calls a `__builtin_*` clang does not know, and deletes the object.
+
+**Code generation:** `-ffp-contract=fast` is added, because it is GAP9 GCC's default (`-Q --help=optimizers`) and owner decision D6/Q5.
+
+**`-fno-math-errno` is deliberately not added:**
+- GAP9 GCC keeps `-fmath-errno`. At `-O2` it compiles `sqrtf` to `fsqrt.s` plus a `call sqrtf` errno fallback; at `-Os` it emits `tail sqrtf` into newlib libm, which SDK apps link.
+- Clang's default already emits the same `fsqrt.s` plus fallback.
+- GCC 7 has no `__builtin_sqrtf16`. Clang lowering it to a missing `sqrtf16` libcall is for the fp16 builtin work (F035/T6: use `llvm.sqrt`) to fix.
+
+**Deliberately left as errors:**
+- the uninitialized uses GCC 7 misses (`bsp/fs/read_fs/read_fs.c`, which 61 apps build, `bsp/fs/lfs/pi_lfs.c`, `bsp/ota/ota.c`, `bsp/ota/updater.c`);
+- `-Wunsequenced` in `CNN_Copy.c`;
+- `-Wformat` in `malloc_internal.c`, caused by `int32_t` being `int` in clang and `long int` in GCC;
+- the float16 consequences (`excess-initializers`, `literal-conversion`).
+
+**New environment variables:**
+- `GAP_CLANG_MARCH=rv32imc_xgap9`: uses F017's xgap9 and drops the macro shim. The default is still `rv32imc_zfinx_xpulpv2` plus the shim, for older snapshots.
+- `GAP_CLANG_GCC7COMPAT=0`: turns the policy off.
+- `GAP_CLANG_LENIENT` is now documented as exploratory and not GCC-equivalent.
+
+**Check** (snapshot of `build/int-20` at `4851ef81477b`, GVSoC2 stubbed because this was a build-only check):
+- `examples/gap9/basic/helloworld`, variant `clang-compat-gnuas-gnuld` with `GAP_CLANG_MARCH=rv32imc_xgap9`, builds and links **with the SDK's `-Werror`**, without `CONFIG_DISABLE_WERROR`.
+- The warnings are still printed: 50 `unknown-attributes`, 3 `enum-conversion`, 2 `compound-token-split-by-macro`, 2 `implicit-const-int-float-conversion`.
+- With `GAP_CLANG_GCC7COMPAT=0` the same build stops at `fll.c` with `[-Werror,-Wimplicit-const-int-float-conversion]`.
+- GCC builds the app as before.
+
+**Survey numbers:** strict 209/617 (33.9%); sdknowerror 213/617 (34.5%); sdkflags 208/609 (34.2%, compared with GCC under the SDK's `-Werror`).
+- Once F016, the fp16 types and CoreCount are in (projection), the policy takes a `-Werror` SDK build from 179/609 to 510/609 files.
+- The ladder variants `*-nowerror*` are no longer needed for clang-only warnings. Apps that link `read_fs.c` still need an SDK fix or `CONFIG_DISABLE_WERROR`.
+
+**Proposed backlog rows** (BACKLOG.md not edited):
+- **`int32_t`/`uint32_t` are `int` in clang but `long int` in GAP9 GCC** (`__INT32_TYPE__`, riscv32-unknown-elf).
+  - Effects: `-Wformat` mismatches, pointer incompatibility between `int32_t *` and `long *`, and C++ mangling.
+  - Upstream clang has the same definition, so matching GCC is a target decision to escalate.
+- **SDK bugs that clang finds and GCC 7 misses** (to report to the SDK owners, not a compiler task):
+  - uninitialized `vtable_desc` in `pi_lfs.c:147/156`;
+  - uninitialized `table` in `ota.c:271` / `updater.c:56`;
+  - uninitialized `vtable_desc` in `read_fs.c:184`;
+  - the unsequenced `pIn++` pair in `CNN_Copy.c:3628/3658`;
+  - the header-guard typo in `sai/pdm_*/wav_out.h`;
+  - `&file->fs` as a condition in `Emulation/at_api_pmsis.h:109` (always true).
 
 ## Caveats
 

@@ -1,0 +1,8 @@
+{
+  "branch": "work/20/F019",
+  "int_head_before": "4851ef81477b78110edf1ec7d6e9df9d3620a49c",
+  "verdict": "REJECTED",
+  "int_head_after": "4851ef81477b78110edf1ec7d6e9df9d3620a49c",
+  "reason": "cherry-pick conflict; worker must rebase onto the current integration HEAD",
+  "detail": "error: could not apply 3b28d2a7a21f... fixup! [pulp] clang-builtins: RISC-V builtins and their Sema checks\nhint: After resolving the conflicts, mark them with\nhint: \"git add/rm <pathspec>\", then run\nhint: \"git cherry-pick --continue\".\nhint: You can instead skip this commit with \"git cherry-pick --skip\".\nhint: To abort and get back to the state before \"git cherry-pick\",\nhint: run \"git cherry-pick --abort\".\nRecorded preimage for 'clang/include/clang/Basic/BuiltinsRISCVXpulp.td'"
+}

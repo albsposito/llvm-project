@@ -1,0 +1,424 @@
+GAP9 SDK compile survey: M1 checkpoint (steps/20/sdk100-queue.md item 6), 2026-09-28
+=====================================================================================
+
+Compiler: a snapshot of the integration toolchain build/int-20, copied before the run
+(bin/clang, clang-20, clang++, ld.lld, lld + lib/clang, same relative layout):
+  clang version 20.1.8 (https://github.com/albsposito/llvm-project.git 4851ef81477b78110edf1ec7d6e9df9d3620a49c)
+  (+assertions; built 2026-09-28 20:19; see clang-version.txt)
+It contains 20/F016 (__builtin_pulp_OffsetedWritePtr, __builtin_pulp_event_unit_read_fenced;
+checked with __has_builtin) and 20/F017 (-march=rv32imc_xgap9 predefines __gap9__ __pulp__
+__pulp _pulp __riscv__ _riscv and __riscv_xgap / __riscv_xpulpv; checked with -dM -E).
+It does not contain F018 (CoreCount/-mPE), F019 (__builtin_shuffle) or F020 (hardware-loop crash).
+
+SDK: /home/ubuntu/gap_sdk_release 5.21.14, unmodified. GCC: GAP9 GCC 7.1.1.
+
+Method: the same as ../report.md, strict mode. Run from a private copy of run.py (HEAD
+f7e039254cff version, plus the two modes in run-m1.patch) in a private work dir
+(configure, db, inventory and gcc redone from scratch; the tracked compile_db.json.gz and
+run.py were not touched). Configure: 215 apps, 190 with compile_commands.json; db: 618
+sources; inventory: 618 cmake + 175 inferred + 95 excluded; GCC: 617 ok / 176 fail, the same as
+the baseline. Every LLVM failure was compiled again with the lenient flags (-Wno-error=...) to
+look for back-end crashes behind front-end errors. Analysis: analyze.py (classification from run.py).
+
+  A = original survey flags: --target=riscv32-unknown-elf -march=rv32imc_zfinx_xpulpv2
+      -mabi=ilp32 -mno-relax + the macro shim (-D__gap9__ -D__pulp__ -D__pulp -D_pulp
+      -D__riscv__ -D_riscv)                                              (modes strict, lenient)
+  B = --target=riscv32-unknown-elf -march=rv32imc_xgap9 -mabi=ilp32 -mno-relax, no shim
+                                                                         (modes xgap9, xgap9lenient)
+  Both use -O2 -c + the SDK's per-file -D/-I/-f flags + the GAP newlib headers.
+
+HEADLINE
+--------
+  A: 476/617 = 77.1% parity   (baseline 209/617 = 33.9%; +267 files)
+  B: 476/617 = 77.1% parity   (identical to A, file by file: 0 files differ)
+
+- The two PMSIS builtins unlocked exactly the 267 files the baseline predicted ("after 2
+  builtins" = 476, 77.1%); each area matches that column of ../report.md.
+- No regressions: all 209 baseline successes still compile, in both configurations.
+- -march=rv32imc_xgap9 is accepted everywhere (0 option errors), and the F017 predefined
+  macros fully replace the shim: B needs no -D flags to reach A's result.
+- Missing __builtin_pulp_* names used by the SDK: 69 of 212 (baseline 71).
+
+TOTALS PER AREA (delta vs the baseline 209/617)
+-----------------------------------------------
+| area | GCC ok | baseline | A ok | A parity | delta A | B ok | B parity | delta B |
+|---|---|---|---|---|---|---|---|---|
+| rtos/freertos | 67 | 64 | 67 | 100% | +3 | 67 | 100% | +3 |
+| rtos/pmsis-implem | 57 | 7 | 55 | 96% | +48 | 55 | 96% | +48 |
+| rtos/pmsis-bsp | 69 | 22 | 68 | 99% | +46 | 68 | 99% | +46 |
+| rtos/other (tools, sfu) | 6 | 3 | 3 | 50% | +0 | 3 | 50% | +0 |
+| libs/mbedtls | 97 | 97 | 97 | 100% | +0 | 97 | 100% | +0 |
+| libs/other | 23 | 4 | 20 | 87% | +16 | 20 | 87% | +16 |
+| at/DSP_Libraries | 38 | 0 | 0 | 0% | +0 | 0 | 0% | +0 |
+| at/CNN_Libraries* | 68 | 0 | 0 | 0% | +0 | 0 | 0% | +0 |
+| at/other-kernels | 3 | 0 | 0 | 0% | +0 | 0 | 0% | +0 |
+| audio-framework | 50 | 5 | 39 | 78% | +34 | 39 | 78% | +34 |
+| examples/basic | 100 | 1 | 98 | 98% | +97 | 98 | 98% | +97 |
+| examples/dsp | 2 | 0 | 0 | 0% | +0 | 0 | 0% | +0 |
+| examples/audio | 5 | 3 | 5 | 100% | +2 | 5 | 100% | +2 |
+| examples/isp etc. | 11 | 0 | 6 | 55% | +6 | 6 | 55% | +6 |
+| nn_menu | 10 | 3 | 7 | 70% | +4 | 7 | 70% | +4 |
+| utils (ssbl, gap_cli) | 11 | 0 | 11 | 100% | +11 | 11 | 100% | +11 |
+| **total** | **617** | **209** | **476** | **77.1%** | **+267** | **476** | **77.1%** | **+267** |
+
+("examples/nn": 0 GCC-compilable files, so not listed.)
+
+REMAINING FAILURES: 141 files (the same 141 in A and B)
+------------------------------------------------------
+First error per file, bucketed:
+  132  unknown type 'float16' (GCC built-in type; 131 "unknown type name", 1 "undeclared identifier")
+         at/CNN_Libraries 68, at/DSP_Libraries 38, audio-framework 7, examples/isp etc. 5,
+         nn_menu 3, rtos/other 3, at/other-kernels 3, examples/basic 2, examples/dsp 2, libs/other 1
+    7  clang-stricter default error (GCC 7 accepts it): implicit function declaration
+         pi_malloc x3 (audio-framework ring.c, downmixer.c, passthrough.c), strtol (get_param.c),
+         bsp_virtual_eeprom_conf_init (virtualeeprom.c), SDIO_TRACE (udma_sdio/sdio.c),
+         TIMESTAMP_TRACE_ERR (udma_timestamp.c)
+    1  missing builtin: __builtin_pulp_trunch (libs/gap_lib/jpeg/dct.c, also needs mulfsN)
+    1  compiler crash: libs/gap_lib/img_io/ImgIO.c (see CRASHES)
+
+Primary bucket, survey order (crash > option > builtin > type > gcc-only > ...):
+   90  unsupported type (float16/float16alt)
+   43  missing builtin (40 files: fp scalar/vector builtins; 3 files: other builtins only -
+         jpeg/dct.c, MathFuncsFix.c (mul64hu), FftLibraryFix.c (complex/divN))
+    7  clang-stricter default error
+    1  crash
+    0  unknown -march/option, 0 inline asm, 0 timeout
+
+Everything each failing file needs (strict + lenient errors; what hides behind a float16
+error is only partly visible, since no fp16 probe was run at this checkpoint):
+  132  float16/float16alt types (+ v2h/v2ah)
+   68  __builtin_pulp_CoreCount() folded to a constant (-mPE) in a static initializer (all CNN kernels)  [F018]
+   26  __builtin_shuffle                                                                              [F019]
+   40  fp scalar/vector builtins: f32max 15, f16altmax 14, f32min 9, f16altmin 9, f16altmax2 8,
+       f16max 8, f32abs 7, f16max2 6, f16min 5, f32sqrt 5, f16min2 3, f16altmin2 3, rintsf2 2,
+       f16sqrt 1, f16altsqrt 1                                                                   [B97 batch A + fp16]
+   11  non-constant mulsN (9) / clip, clipu (2) arguments rejected by our Sema                       [B93]
+    7  clang-stricter default errors (flags only: -Wno-error=implicit-function-declaration)          [queue item 5]
+    6  other: parse errors behind float16 macros (CNN_Copy.c, gap9_*_fft.c), 'float_t' undeclared
+       (audio_framework.c, CNN_Pooling_BasicKernels_f16.c, CNN_SoftMax_f16.c)
+    4  other builtins, 1 file each: mulfsN, trunch, mul64hu, v2hftov2ohf, v2ohftov2hf, add2div2,
+       add2div4, sub2div2, sub2rotmj, cplx_conj, cplxmuls2, cplxmuls2div2, cplxmuls2div4          [B97 batch B/C]
+    1  hardware-loop crash (ImgIO.c)                                                                 [B88, F020]
+
+Files with a single blocker left: float16 types 38, clang-stricter errors 7, crash 1, trunch/mulfsN 1.
+
+Greedy order (grouped; parity over 617):
+  +38  float16/float16alt types             -> 514  83.3%
+  +24  CoreCount() constant (-mPE)          -> 538  87.2%
+  +34  fp scalar/vector builtins            -> 572  92.7%
+  +17  __builtin_shuffle                    -> 589  95.5%
+  +11  non-constant mulsN/clip/clipu args   -> 600  97.2%
+   +7  -Wno-error flags (implicit decl)     -> 607  98.4%
+   +5  "other" (float_t, parse errors)      -> 612  99.2%
+   +4  other builtins                       -> 616  99.8%
+   +1  hardware-loop crash                  -> 617 100%
+(Lower bound on the work: the fp16 files will reach the back end only once float16 exists,
+and the baseline fp16 probe already found an ISel hang there, see below.)
+
+CRASHES AND HANGS
+-----------------
+1 crash, 0 hangs/timeouts, in all four runs (A strict/lenient, B strict/lenient); it is the
+same crash as the baseline:
+  libs/gap_lib/img_io/ImgIO.c, @GetInputImageInfos:
+  LiveVariables.cpp:141 'MBB != &MF->front() && "Can't find reaching def for virtreg"';
+  -verify-machineinstrs: "Virtual register defs don't dominate all uses" after PULP Hardware Loops.
+  Reproducer (33 lines, freshly reduced with llvm-reduce from this build's IR):
+    checkpoint-M1-2026-09-28/crash-imgio-hwloops-M1.ll
+    build/int-20/bin/llc -O2 crash-imgio-hwloops-M1.ll -o /dev/null            # assertion
+    (also crashes with target-features +xpulpv,+m,+c, without zfinx)
+  NOTE: the older reproducer ../crash-pulp-hwloops-GetInputImageInfos.ll (which the queue/F020
+  may use as the regression test) NO LONGER crashes with int-20 llc 4851ef81477b, with or
+  without -verify-machineinstrs, while the full file still does. The difference: in the new
+  reduction the loop-entry value %i.5.i is a phi of a multi-way switch loop instead of a
+  function argument. A fix for B88 should be checked against the new .ll and the full file
+  (run.py --phases strict --only img_io/ImgIO --force).
+Not tested at this checkpoint: the Xpulpv2 fp16-pair ISel hang (../hang-isel-*-xpulpv.*);
+no float16 code gets past the front end yet.
+
+FILES THAT NEWLY COMPILE (267; the same list for A and B)
+---------------------------------------------------------
+  examples/gap9/audio_application/telephony/idc747.c
+  examples/gap9/audio_application/telephony_ANC/idc747.c
+  examples/gap9/basic/bsp/blink_led/blink_led.c
+  examples/gap9/basic/bsp/custom_bsp/custom_bsp/bsp/boards/bsp_customboard.c
+  examples/gap9/basic/bsp/custom_bsp/custom_bsp/bsp/drivers/customflash.c
+  examples/gap9/basic/bsp/custom_bsp/custom_bsp/bsp/drivers/customram.c
+  examples/gap9/basic/bsp/custom_bsp/main.c
+  examples/gap9/basic/bsp/display/ili9341/basic/main.c
+  examples/gap9/basic/bsp/display/ili9341/image/display_example.c
+  examples/gap9/basic/bsp/filesystem/hostfs/test.c
+  examples/gap9/basic/bsp/filesystem/little_fs/littles_features.c
+  examples/gap9/basic/bsp/filesystem/partition_reinit/partition_reinit.c
+  examples/gap9/basic/bsp/filesystem/readfs/readfs_example.c
+  examples/gap9/basic/bsp/filesystem/vfs/test.c
+  examples/gap9/basic/bsp/filesystem/writefs/writefs_stream.c
+  examples/gap9/basic/bsp/fxl6408/evk_blink/main.c
+  examples/gap9/basic/bsp/fxl6408/push_button/main.c
+  examples/gap9/basic/bsp/idc747/scan_devices/main.c
+  examples/gap9/basic/bsp/mram/readfs/mram_readfs.c
+  examples/gap9/basic/bsp/ssm6515/from_mem_in/pcm/ssm6515_pcm.c
+  examples/gap9/basic/bsp/wifi/tcp_client_image_stream/wifi_example.c
+  examples/gap9/basic/bsp/wifi/tcp_server/wifi_example.c
+  examples/gap9/basic/chip_identification/chip_id.c
+  examples/gap9/basic/custom_bsp_v2/flash/gd25lx/app_example/main.c
+  examples/gap9/basic/custom_bsp_v2/flash/gd25lx/custom_bsp/bsp/boards/bsp_mycustomboard.c
+  examples/gap9/basic/custom_bsp_v2/flash/gd25lx/custom_bsp/bsp/drivers/gd25lx256e.c
+  examples/gap9/basic/custom_bsp_v2/flash/gd25lx/custom_bsp/hardware/flasher/main.c
+  examples/gap9/basic/first_app/first_app1/first_app.c
+  examples/gap9/basic/first_app/first_app2/first_app.c
+  examples/gap9/basic/first_app/first_app3/first_app.c
+  examples/gap9/basic/first_app/first_app4/first_app.c
+  examples/gap9/basic/fll/i2c_open_loop/i2c_open_loop_test.c
+  examples/gap9/basic/fll/uart_open_loop/uart_test.c
+  examples/gap9/basic/full_custom_ld/lazy_memory_load.c
+  examples/gap9/basic/gpg_encrypted_lib/integration_app.c
+  examples/gap9/basic/gpg_encrypted_lib/library/src/precompiled_lib.c
+  examples/gap9/basic/gvsoc/i2s_control/test.c
+  examples/gap9/basic/gvsoc/i2s_control_stereo/test.c
+  examples/gap9/basic/gvsoc/mem_access/test.c
+  examples/gap9/basic/gvsoc/memcheck/memcheck.c
+  examples/gap9/basic/gvsoc/pcer/example.c
+  examples/gap9/basic/gvsoc/proxy/test.c
+  examples/gap9/basic/gvsoc/trace_control/test.c
+  examples/gap9/basic/gvsoc/uart_adapter/example.c
+  examples/gap9/basic/gvsoc/user_vcd/example.c
+  examples/gap9/basic/helloworld/helloworld.c
+  examples/gap9/basic/interfaces/i2c/i2c_scan/i2c_scan.c
+  examples/gap9/basic/interfaces/i2c/i2c_slave/i2c_slave_loopback.c
+  examples/gap9/basic/interfaces/i3c/i3c_scan/i3c_scan.c
+  examples/gap9/basic/interfaces/i3c/i3c_transfer/i3c_transfer.c
+  examples/gap9/basic/interfaces/pwm/pwm_ref_clk_out.c
+  examples/gap9/basic/interfaces/sai/i2s_stream_in_out/ak4332_pcm.c
+  examples/gap9/basic/interfaces/sai/i2s_stream_in_out/test.c
+  examples/gap9/basic/interfaces/sai/pdm_2inputs/wav_out.c
+  examples/gap9/basic/interfaces/sai/pdm_4inputs/wav_out.c
+  examples/gap9/basic/interfaces/sai/pdm_4inputs_2outputs_stereo/wav_out.c
+  examples/gap9/basic/interfaces/spi/spim_spis_loopback/multi_spi.c
+  examples/gap9/basic/interfaces/spi/spim_spis_loopback_full_duplex/multi_spi.c
+  examples/gap9/basic/interfaces/uart/uart_input/test_uart_input.c
+  examples/gap9/basic/interfaces/uart/uart_input_timeout/test_uart_input.c
+  examples/gap9/basic/interfaces/uart/uart_loopback/uart_loopback.c
+  examples/gap9/basic/interfaces/uart/uart_ref_clk/uart_fast_ref_clock.c
+  examples/gap9/basic/jpeg_compression/main.c
+  examples/gap9/basic/jtag_reenablement/firmware_update/jtag_update.c
+  examples/gap9/basic/lazy_memory_load/lazy_memory_load.c
+  examples/gap9/basic/malloc/example_malloc.c
+  examples/gap9/basic/mem_slab/test.c
+  examples/gap9/basic/os/kernel/counting_semaphore/main_Semaphore.c
+  examples/gap9/basic/os/kernel/debug_semaphore/debug_semaphore.c
+  examples/gap9/basic/os/kernel/eventgroup/main_EventGroup.c
+  examples/gap9/basic/os/kernel/multi_threads/multi_threads.c
+  examples/gap9/basic/os/kernel/multi_threads_vs_multi_tasks/multi_task.c
+  examples/gap9/basic/os/kernel/mutex/main_Mutex.c
+  examples/gap9/basic/os/kernel/notification/main_Notification.c
+  examples/gap9/basic/os/kernel/queue/main_Simple_Queue.c
+  examples/gap9/basic/os/kernel/queue_pi/main_pi_queue.c
+  examples/gap9/basic/os/kernel/sem_pi/main_pi_sem.c
+  examples/gap9/basic/os/kernel/semaphore/main_Semaphore.c
+  examples/gap9/basic/os/kernel/sw_irq/main_SW_IRQ.c
+  examples/gap9/basic/os/kernel/sw_timer/main_SW_Timer.c
+  examples/gap9/basic/os/kernel/thread_vs_callback/example.c
+  examples/gap9/basic/overlay/overlayed_audio_app/ssm6515_conf.c
+  examples/gap9/basic/overlay/overlayed_binary/overlay_binary.c
+  examples/gap9/basic/perf/perf.c
+  examples/gap9/basic/power/deep_sleep/deep_sleep.c
+  examples/gap9/basic/power/deep_sleep_retentive/deep_sleep_retentive.c
+  examples/gap9/basic/power/l2_banks_management/l2_banks_management.c
+  examples/gap9/basic/power/light_sleep/light_sleep.c
+  examples/gap9/basic/precompiled_library/integration_app.c
+  examples/gap9/basic/precompiled_library/library/src/precompiled_lib.c
+  examples/gap9/basic/sfu/output_mute/test.c
+  examples/gap9/basic/sfu/save_restore/save_restore_stream_i2s/buffer_ring.c
+  examples/gap9/basic/sfu/save_restore/save_restore_stream_timer_prng/buffer_ring.c
+  examples/gap9/basic/sfu/save_restore/save_restore_stream_timer_prng/prng.c
+  examples/gap9/basic/sleep/wakeup_from_uart/example.c
+  examples/gap9/basic/stack/stack_usage/stack_usage.c
+  examples/gap9/basic/timer/test.c
+  examples/gap9/basic/watchdog/auto_rearm/watchdog.c
+  examples/gap9/basic/watchdog/simple/watchdog.c
+  examples/gap9/isp/csi2_mux/test.c
+  examples/gap9/libs/g711/test.c
+  examples/gap9/libs/g722/test.c
+  examples/gap9/libs/jpeg_encoder/example.c
+  examples/gap9/libs/mbedtls/test.c
+  examples/gap9/libs/wav_io/test.c
+  libs/gap_lib/file_io/fileIO.c
+  libs/gap_lib/g722_encoder_decoder/example/test.c
+  libs/gap_lib/g722_encoder_decoder/example/test_2.c
+  libs/gap_lib/jpeg/cluster.c
+  libs/gap_lib/jpeg/jpeg_constants.c
+  libs/gap_lib/jpeg/jpeg_encoder.c
+  libs/gap_lib/testbench/testbench.c
+  libs/gap_lib/testbench/testlib.c
+  libs/gap_lib/testbench/testlib_hyper.c
+  libs/gap_lib/testbench/testlib_i2c.c
+  libs/gap_lib/testbench/testlib_i2s.c
+  libs/gap_lib/testbench/testlib_uart.c
+  libs/gap_lib/wav_io/wavIO.c
+  libs/gap_lib/wav_io/wav_header.c
+  libs/openmp/lib/omp.c
+  libs/openmp/lib/omp_gcc.c
+  nn_menu/object_detection/face_reid/gap_project/he.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/utils/draw.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/utils/img_flush.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/utils/jpeg_compress.c
+  rtos/pmsis/bsp/ble/ble.c
+  rtos/pmsis/bsp/bootloader/bootloader_utility.c
+  rtos/pmsis/bsp/bsp/gap9_evk_audio_addon.c
+  rtos/pmsis/bsp/bt/idc747/idc747.c
+  rtos/pmsis/bsp/camera/api/camera.c
+  rtos/pmsis/bsp/camera/himax/himax.c
+  rtos/pmsis/bsp/camera/hm0360/hm0360.c
+  rtos/pmsis/bsp/camera/ov5647/ov5647.c
+  rtos/pmsis/bsp/camera/ov9750/ov9750.c
+  rtos/pmsis/bsp/dac/ssm6515/ssm6515.c
+  rtos/pmsis/bsp/display/api/display.c
+  rtos/pmsis/bsp/display/ili9341/ili9341.c
+  rtos/pmsis/bsp/flash/gd25lq/gd25lq.c
+  rtos/pmsis/bsp/flash/hyperflash/hyperflash.c
+  rtos/pmsis/bsp/flash/mram/mram-v2.c
+  rtos/pmsis/bsp/flash/mt25q/mt25q.c
+  rtos/pmsis/bsp/flash/mx25u51245g/mx25u51245g.c
+  rtos/pmsis/bsp/flash/spiflash/spiflash.c
+  rtos/pmsis/bsp/fs/fs.c
+  rtos/pmsis/bsp/fs/host_fs/host_fs.c
+  rtos/pmsis/bsp/fs/lfs/lfs.c
+  rtos/pmsis/bsp/fs/lfs/lfs_util.c
+  rtos/pmsis/bsp/fs/lfs/pi_lfs.c
+  rtos/pmsis/bsp/fs/read_fs/read_fs.c
+  rtos/pmsis/bsp/fs/vfs.c
+  rtos/pmsis/bsp/fs/write_fs/write_fs.c
+  rtos/pmsis/bsp/gpio/fxl6408/fxl6408.c
+  rtos/pmsis/bsp/imu/imu.c
+  rtos/pmsis/bsp/ota/ota.c
+  rtos/pmsis/bsp/ota/ota_utility.c
+  rtos/pmsis/bsp/ota/updater.c
+  rtos/pmsis/bsp/partition/app_bin.c
+  rtos/pmsis/bsp/partition/app_boot.c
+  rtos/pmsis/bsp/partition/app_elf.c
+  rtos/pmsis/bsp/partition/flash_partition.c
+  rtos/pmsis/bsp/partition/flash_partition_v2.c
+  rtos/pmsis/bsp/partition/partition.c
+  rtos/pmsis/bsp/partition/secret_storage.c
+  rtos/pmsis/bsp/ram/api/alloc_extern.c
+  rtos/pmsis/bsp/ram/api/ram.c
+  rtos/pmsis/bsp/ram/aps256xxn/aps256xxn.c
+  rtos/pmsis/bsp/ram/hyperram/hyperram.c
+  rtos/pmsis/bsp/ram/spiram/spiram.c
+  rtos/pmsis/bsp/transport/transport.c
+  rtos/pmsis/bsp/transport/wifi/da16200/da16200.c
+  rtos/pmsis/bsp/transport/wifi/wifi.c
+  rtos/pmsis/implem/chips/gap9/cluster/driver/cl_dma_decompressor.c
+  rtos/pmsis/implem/chips/gap9/cluster/driver/cluster.c
+  rtos/pmsis/implem/chips/gap9/cluster/driver/uart_cl_internal.c
+  rtos/pmsis/implem/chips/gap9/dmacpy/driver/dmacpy.c
+  rtos/pmsis/implem/chips/gap9/efuse/driver/efuse.c
+  rtos/pmsis/implem/chips/gap9/fc_event/driver/fc_event.c
+  rtos/pmsis/implem/chips/gap9/ffc/driver/ffc.c
+  rtos/pmsis/implem/chips/gap9/gpio/driver/gpio.c
+  rtos/pmsis/implem/chips/gap9/i2c/driver/i2c.c
+  rtos/pmsis/implem/chips/gap9/i2c/driver/i2c_slave.c
+  rtos/pmsis/implem/chips/gap9/i2s/driver/i2s.c
+  rtos/pmsis/implem/chips/gap9/i3c/driver/i3c.c
+  rtos/pmsis/implem/chips/gap9/maestro/driver/maestro.c
+  rtos/pmsis/implem/chips/gap9/maestro/driver/maestro_irq.c
+  rtos/pmsis/implem/chips/gap9/pad/driver/pad.c
+  rtos/pmsis/implem/chips/gap9/pwm/driver/pwm.c
+  rtos/pmsis/implem/chips/gap9/pwm/driver/pwm_internal.c
+  rtos/pmsis/implem/chips/gap9/quiddikey/driver/quiddikey_internal.c
+  rtos/pmsis/implem/chips/gap9/rtc/driver/rtc.c
+  rtos/pmsis/implem/chips/gap9/rtc/driver/rtc_internal.c
+  rtos/pmsis/implem/chips/gap9/spim/driver/spim.c
+  rtos/pmsis/implem/chips/gap9/timer/driver/pi_timer.c
+  rtos/pmsis/implem/chips/gap9/timer_os/timer.c
+  rtos/pmsis/implem/chips/gap9/udma_aes/driver/aes.c
+  rtos/pmsis/implem/chips/gap9/udma_aes/driver/aes_internal.c
+  rtos/pmsis/implem/chips/gap9/udma_aes_dual_core/driver/aes_dual_core_internal.c
+  rtos/pmsis/implem/chips/gap9/udma_core/driver/udma_core.c
+  rtos/pmsis/implem/chips/gap9/udma_cpi/driver/cpi.c
+  rtos/pmsis/implem/chips/gap9/udma_cpi/driver/cpi_internal.c
+  rtos/pmsis/implem/chips/gap9/udma_csi2/driver/csi2.c
+  rtos/pmsis/implem/chips/gap9/udma_csi2/driver/csi2_internal.c
+  rtos/pmsis/implem/chips/gap9/udma_datamove/driver/udma_datamove.c
+  rtos/pmsis/implem/chips/gap9/udma_fifo/driver/udma_fifo.c
+  rtos/pmsis/implem/chips/gap9/udma_hyperbus/driver/hyperbus.c
+  rtos/pmsis/implem/chips/gap9/udma_hyperbus/driver/hyperbus_internal.c
+  rtos/pmsis/implem/chips/gap9/udma_octospi/driver/octospi.c
+  rtos/pmsis/implem/chips/gap9/udma_timeout/driver/udma_timeout.c
+  rtos/pmsis/implem/chips/gap9/udma_uart/driver/uart.c
+  rtos/pmsis/implem/chips/gap9/udma_uart/driver/uart_internal.c
+  rtos/pmsis/implem/chips/gap9/watchdog/driver/watchdog.c
+  rtos/pmsis/implem/chips/gap9/xip/driver/xip_internal.c
+  rtos/pmsis/implem/rtos/malloc/mem_slab.c
+  rtos/pmsis/implem/rtos/malloc/pi_cl_malloc.c
+  rtos/pmsis/implem/rtos/os/system_gap.c
+  rtos/pmsis/implem/utils/gap_io.c
+  rtos/pmsis/implem/utils/host_sync_access.c
+  rtos/pmsis/implem/utils/pi_pingpong.c
+  rtos/pmsis/implem/utils/time.c
+  rtos/pmsis/os/freeRTOS/freertos_kernel/event.c
+  rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/src/device/freertos_it.c
+  rtos/pmsis/os/freeRTOS/vendors/gwt/gap9/src/device/gap_it.c
+  tools/audio-framework/examples/applications/adaptive_ANC/lms_graph/gap9_audio_graph_lms.c
+  tools/audio-framework/examples/applications/adaptive_ANC/lms_graph/test_gap9_audio_graph_lms.c
+  tools/audio-framework/lib/bindings/fix2float/gap9_fc_fix2float/src/fix2float.c
+  tools/audio-framework/lib/bindings/fix2float/gap9_fc_fix2float/test/main_fix2float.c
+  tools/audio-framework/lib/bindings/float2fix/gap9_fc_float2fix/src/float2fix.c
+  tools/audio-framework/lib/bindings/float2fix/gap9_fc_float2fix/test/main_float2fix.c
+  tools/audio-framework/lib/bindings/mem_in/gap9_fc_mem_in/test/main.c
+  tools/audio-framework/lib/bindings/mem_out/gap9_fc_mem_out/test/main.c
+  tools/audio-framework/lib/bindings/ring/gap9_fc_ring/src/gap9_fc_ring.c
+  tools/audio-framework/lib/bindings/ring/gap9_fc_ring/test/main_gap9_fc_ring.c
+  tools/audio-framework/lib/common/src/warp_tools/main_test.c
+  tools/audio-framework/lib/common/src/warp_tools/warp_tools.c
+  tools/audio-framework/lib/components/denoiser/gap9_cluster_denoiser/test/main_gap9_cluster_denoiser.c
+  tools/audio-framework/lib/components/downmixer/gap9_fc_downmixer/src/gap9_fc_downmixer.c
+  tools/audio-framework/lib/components/downmixer/gap9_fc_downmixer/test/main_gap9_fc_downmixer.c
+  tools/audio-framework/lib/components/fft/gap9_cluster_fft/test/main_gap9_cluster_fft.c
+  tools/audio-framework/lib/components/fft/gap9_fc_fft/test/main_gap9_fc_fft.c
+  tools/audio-framework/lib/components/file_sink/gap9_fc_file_sink/src/gap9_fc_file_sink.c
+  tools/audio-framework/lib/components/file_sink/gap9_fc_file_sink/test/main_gap9_fc_file_sink.c
+  tools/audio-framework/lib/components/file_source/gap9_fc_file_source/test/main_gap9_fc_file_source.c
+  tools/audio-framework/lib/components/lms/gap9_cluster_lms/test/main_gap9_cluster_lms.c
+  tools/audio-framework/lib/components/mux/gap9_fc_mux/src/gap9_fc_mux.c
+  tools/audio-framework/lib/components/mux/gap9_fc_mux/test/main_gap9_fc_mux.c
+  tools/audio-framework/lib/components/passthrough/gap9_fc_passthrough/src/gap9_fc_passthrough.c
+  tools/audio-framework/lib/components/passthrough/gap9_fc_passthrough/test/main_gap9_fc_passthrough.c
+  tools/audio-framework/lib/components/pcm_sink_evk_audioaddon_48kHz/gap9_fc_pcm_sink_evk_audioaddon_48kHz/test/main_gap9_fc_pcm_sink_evk_audioaddon_48kHz.c
+  tools/audio-framework/lib/components/pcm_source/gap9_fc_pcm_source/src/idc747.c
+  tools/audio-framework/lib/components/pcm_source/gap9_fc_pcm_source/test/main_gap9_fc_pcm_source.c
+  tools/audio-framework/lib/components/sai/gap9_fc_sai/src/gap9_fc_sai.c
+  tools/audio-framework/lib/components/sai/gap9_fc_sai/test/main_gap9_fc_sai.c
+  tools/audio-framework/lib/components/sai_v2/gap9_fc_sai_v2/src/gap9_fc_sai_v2.c
+  tools/audio-framework/lib/components/tdm_source/gap9_fc_tdm_source/test/main_gap9_fc_tdm_source.c
+  tools/audio-framework/lib/components/tdm_source_sai/gap9_fc_tdm_source_sai/test/main_gap9_fc_tdm_source_sai.c
+  tools/audio-framework/lib/framework/gap9_fc_framework/src/core.c
+  utils/gap_cli/functionalities/cli_phy_layer/spis_cli_phy.c
+  utils/gap_cli/functionalities/cli_phy_layer/uart_cli_phy.c
+  utils/gap_cli/functionalities/src/cli.c
+  utils/gap_cli/functionalities/src/cli_host_sync.c
+  utils/gap_cli/functionalities/src/cli_ssbl.c
+  utils/gap_cli/functionalities/src/cli_watched_object.c
+  utils/gap_cli/protocol/src/cli_cmd.c
+  utils/gap_cli/protocol/src/cli_cmd_host_sync.c
+  utils/gap_cli/protocol/src/cli_cmd_ssbl.c
+  utils/ssbl/src/boot_app.c
+  utils/ssbl/src/ssbl.c
+
+FILES IN THIS DIRECTORY
+-----------------------
+  report.txt                  this report
+  results.json                meta + per-file results for A and B (first error, categories,
+                              lenient categories, bucket, missing builtins, baseline status)
+                              + summary (buckets, needs, newly compiling, regressions, crashes)
+  analysis.txt                full analysis dump (bucket details, first-error table per config)
+  analyze.py                  the analysis script (imports run.py for classification)
+  run-m1.patch                the two modes added to the private copy of run.py (xgap9, xgap9lenient)
+  clang-version.txt           clang --version of the snapshot
+  crash-imgio-hwloops-M1.ll   reduced reproducer of the ImgIO.c crash
+
+Reproduce: copy run.py (HEAD f7e039254cff) to a scratch dir, apply run-m1.patch, put the
+snapshot in <work>/snap/{bin,lib/clang}, then
+  python3 run.py --work <work> --phases configure,db,inventory,gcc,strict,xgap9,lenient,xgap9lenient,builtins
+  python3 analyze.py <work> <outdir> ../results.json
+(phase db writes compile_db.json.gz next to the copy of run.py, not into the repository).

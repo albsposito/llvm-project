@@ -1,0 +1,34 @@
+--- a/run.py (HEAD f7e039254cff)
++++ b/run.py (M1 checkpoint)
+@@ -261,7 +261,11 @@
+     'lenient': (True, True, False),     # reaches the backend despite missing builtins
+     'nodefs': (False, False, False),    # strict without the compat defines
+     'fp16probe': (True, True, True),    # what remains once float16 types + constant CoreCount exist
++    # M1 checkpoint: -march=rv32imc_xgap9 (F017 predefines __gap9__/PULP macros), no shim
++    'xgap9': (False, False, False),
++    'xgap9lenient': (False, True, False),
+ }
++XGAP9_MODES = ('xgap9', 'xgap9lenient')
+ 
+ 
+ def gcc_cmd(args, out):
+@@ -289,6 +293,8 @@
+     defs, len_, fp16 = MODES[mode]
+     arch = list(LLVM_ARCH)
+     extra = (COMPAT_DEFS if defs else []) + (LENIENT if len_ else [])
++    if mode in XGAP9_MODES:
++        arch[1] = '-march=rv32imc_xgap9'
+     if fp16:
+         arch[1] = '-march=rv32imc_zfinx_zhinx_xpulpv2'
+         extra += FP16_SHIM
+@@ -333,8 +339,8 @@
+     if which != 'gcc':
+         g = json.load(open(os.path.join(w, 'compile_gcc.json')))
+         todo = [e for e in todo if g.get(e['file'], {}).get('rc') == 0]
+-    if which in ('nodefs', 'fp16probe', 'lenient'):
+-        s = json.load(open(os.path.join(w, 'compile_strict.json')))
++    if which in ('nodefs', 'fp16probe', 'lenient', 'xgap9lenient'):
++        s = json.load(open(os.path.join(w, 'compile_%s.json' % ('xgap9' if which == 'xgap9lenient' else 'strict'))))
+         want_ok = which == 'nodefs'
+         todo = [e for e in todo if (s.get(e['file'], {}).get('rc') == 0) == want_ok]
+     if a.only:

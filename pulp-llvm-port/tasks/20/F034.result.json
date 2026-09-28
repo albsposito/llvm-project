@@ -1,0 +1,44 @@
+{
+ "status": "done",
+ "branch": "work/20/F034",
+ "commits": [
+  "7eff10b97092",
+  "e0b5e31ed91c"
+ ],
+ "note": "notes/20/F034.md",
+ "signature_gone": true,
+ "summary": "B109: 3 of the 5 GNU-as idioms now assemble with LLVM (p.mul; p.lb/lbu/lh/lhu/lw/sb/sh/sw imm(rs) and (rs) without '!'; .func/.endfunc). The other 2 are left as SDK edits on purpose: .weak followed by .global (upstream rejects it deliberately, 8f8b5e5587c3, generic MCELFStreamer.cpp) and %tiny (GAP-private relocations 59/60 that clash with upstream numbers; needs an owner decision, B105/B110).",
+ "files": {
+  "llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td": "insn-tablegen (InstAliases, placed after the instruction defs, away from LOOPsetup/F028)",
+  "llvm/lib/Target/RISCV/AsmParser/RISCVAsmParser.cpp": "mc (.func/.endfunc, gated on FeaturePULPExtV2)"
+ },
+ "per_idiom": {
+  "p.mul": "PULP alias (binutils Xpulpv2 row, MATCH_MUL; GNU gates on Xpulpv2 only). Implemented as InstAlias -> MUL.",
+  "p.lX/p.sX imm(rs) without !": "PULP alias (binutils 'd,o(s)'/'t,q(s)' rows with base MATCH_L*/S*). Implemented as InstAlias -> LB..SW, plus (rs) zero-offset forms. GNU emits plain lw/sw; same bytes.",
+  ".func/.endfunc": "Generic GNU-as STABS directive, no-op without --gstabs; never implemented upstream (not a deliberate rejection). Implemented in RISCVAsmParser as a no-op with GNU's pairing diagnostics, only when +xpulpv.",
+  ".weak then .global": "Generic; deliberately rejected upstream since 8f8b5e5587c3 [MC] Error for .globl/.local which change the symbol binding and warn for .weak (D90108). Not changed (generic file, upstream design). SDK edit: put .weak after the .global.",
+  "%tiny": "GAP binutils: absolute address in the 12-bit immediate, R_RISCV_12_I(59) for loads / R_RISCV_12_S(60) for stores; GNU ld accepts sym in [0,0x7FF], 'relocation truncated to fit' otherwise. 59/60 are upstream R_RISCV_PLT32/SET_ULEB128; the fork's RISCV.def already reserves R_RISCV_12_I/12_S as 68/69 but nothing emits them. Not implemented: needs a relocation-number/lld interop decision. SDK-side %tiny->%lo gives identical bytes for the SDK's symbols (range check lost)."
+ },
+ "verification": {
+  "repro_log": "logs/20-F034.repro.log",
+  "build_logs": [
+   "logs/20-F034-build.log",
+   "logs/20-F034.fix.log"
+  ],
+  "probe": "all aliases + existing PULP forms byte-identical to GNU as; out-of-range offsets rejected like GNU; RV64 rejects",
+  "sdk_S_files": "12 SDK .S files preprocessed with GAP9 GCC: int-20 clang 79 errors in 11 files; F034 leaves only %tiny (22 errors, 3 files) and .weak/.global (1, gap_iet.S). With only those 2 edits, every object is byte-identical (objdump -d) to int-20 clang on the fully edited make_patched_mirror.sh sources. Vs GNU as: 4 files byte-identical .text, 7 differ only by pre-existing generic differences (LLVM compresses jalr/li, resolves local branches GNU leaves for relaxation).",
+  "sdk_ladder_setup_B": "reduced mirror (logs/20-F034.make_min_mirror.sh: only %tiny->%lo, .weak reorder, system_exit header edit) = 5 .S files + 1 header instead of 12 + 1, 3 edits instead of 6. helloworld, perf, helloworld_cxx, os/kernel/queue, mem_slab, watchdog/simple build, link with ld.lld and run on GVSoC2 gap.gap9.evk with output identical to GCC (numbers/core order masked). Work dir: scratchpad f034/work.",
+  "lit": "llvm/test/MC/RISCV (incl. fork xpulp/), llvm/test/CodeGen/RISCV, clang/test/CodeGen/RISCV pass; only failure is known B41 rvv/vsetvli-insert-zve64f.mir (fails identically on int-20).",
+  "policy_check": "0 FAIL, 0 WARN"
+ },
+ "known_differences": [
+  "LLVM compresses the base instruction an alias expands to when registers allow (p.lw a0,0(a1) -> c.lw); GNU as 2.28 does not compress the p. spelling. No SDK use is affected (no compressible registers)."
+ ],
+ "proposed_test": "llvm/test/MC/RISCV/xpulp/xpulp-gnu-aliases.s: RUN llvm-mc -triple=riscv32 -mattr=+xpulpv -show-encoding, CHECK p.lw/p.lh/p.lhu/p.lb/p.lbu imm(rs) and (rs) -> lw/lh/.. with base encodings, p.sw/p.sh/p.sb -> sw/sh/sb, p.mul -> mul [0x33,0x85,0xc5,0x02]; unchanged encodings for p.lw 4(t0!) / t0(t1) / t0(t1!). Error test (not): p.lw a0, 2048(a1) out of range; RV64 'requires RV32I'; without +xpulpv p.mul unrecognized. Directive test: .func a / .endfunc / .func c, lab / .endfunc accepted with no output; nested .func -> '.endfunc missing for previous .func'; stray .endfunc -> 'missing .func'; without +xpulpv -> 'unknown directive'.",
+ "unmapped_files": [],
+ "harness_suggestion": "benchmarks/sdk-clang/make_patched_mirror.sh can drop edits 1, 3, 4 once this lands (the reduced version is logs/20-F034.make_min_mirror.sh); BACKLOG B109 can move to 'partially fixed' with %tiny tracked under B110 and .weak/.global as a documented SDK-side edit.",
+ "other_errors_seen": [
+  "Other Xpulpv2 GNU aliases not in the task and not added: p.div/p.divu/p.rem/p.remu (binutils Xpulpv2 rows with base MATCH_DIV/DIVU/REM/REMU encodings) are rejected by the fork ('unrecognized instruction mnemonic'); no SDK use found. Same InstAlias pattern would fix them.",
+  "Fork RISCV.def reserves R_RISCV_12_I/R_RISCV_12_S = 68/69, but no fork code emits or handles them (dead entries; GNU uses 59/60)."
+ ]
+}

@@ -1,0 +1,24 @@
+{
+ "status": "done",
+ "branch": "work/20/F032",
+ "commits": ["c1a08d8990b6"],
+ "cluster_commits": {"passes": "c1a08d8990b6"},
+ "note": "notes/20/F032.md",
+ "signature_gone": true,
+ "unmapped_files": [],
+ "cause": "Pre-existing fork defect (backlog B102) from fork commit f1b7aebff8c2 [LLVM/PULP/SNITCH] Support for PULP and Snitch cores/platforms: PULPFixupHwLoops ('hwloopsfixup') was registered only from its constructor, never in LLVMInitializeRISCVTarget, so llc's -run-pass/-stop-before/-stop-after/-start-before/-start-after lookups failed with 'pass is not registered' (logs/20-F032.repro.log).",
+ "fix": "RISCV.h: declare void initializePULPFixupHwLoopsPass(PassRegistry &); RISCVTargetMachine.cpp: call initializePULPFixupHwLoopsPass(*PR) in LLVMInitializeRISCVTarget after initializePULPHardwareLoopsPass. Same pattern as all upstream RISC-V passes (RISCVTargetMachine.cpp:120-146 @llvmorg-20.1.8). PULPFixupHwLoops.cpp (owned by F025) NOT edited: its INITIALIZE_PASS name 'hwloopsfixup' and duplicate llvm-namespace declaration are compatible, no change needed there.",
+ "other_passes_checked": "All INITIALIZE_PASS in llvm/lib/Target/RISCV compared against LLVMInitializeRISCVTarget: fork passes PULPExpandPseudo, PULPHardwareLoops, RISCVExpandSSR, RISCVExpandSDMA, SNITCHFrepLoops already registered; only PULPFixupHwLoops was missing. (Upstream-only RISCVExpandAtomicPseudo, RISCVLandingPadSetup, RISCVRedundantCopyElimination, RISCVZacasABIFix are also unregistered, same as upstream llvmorg-20.1.8; not touched.)",
+ "verification": {
+  "build": "logs/20-F032.build.log (llc clang), cluster_errors: 0 clusters",
+  "start_stop_run": "logs/20-F032.verify.log, evidence logs/20-F032-evidence/mir/: xpulp-hwloop{,-layout,-countdown,-obj}.ll with -mtriple=riscv32 -mattr=+xpulpv -O2: -stop-before/-stop-after/-run-pass/-start-before/-start-after=hwloopsfixup all exit 0; -run-pass=hwloopsfixup on stop-before MIR == stop-after bodies; MIR parse/print (-run-pass=none) reaches a fixed point; -start-before=hwloopsfixup from MIR -> objects byte-identical to a normal compile; normal llc output byte-identical to the pre-fix llc",
+  "gap9_sweep": "scratch copy, base=build/int-20 clang vs mine: 54/54 .o byte-identical (the .dis differ only in the object path header) - logs/20-F032-evidence/sweep.log",
+  "fuzz": "hwloop-fuzz seeds 9101-9140 x O2/O3/Os, NEW=build/20-F032 BASE=build/int-20: 120/120 'same' asm as base, 0 MISMATCH/NEWFAIL/REFDISAGREE (logs/20-F032-evidence/fuzz.txt, fuzz.sum)",
+  "lit": "logs/20-F032.lit.log: LIT_PATHS + data/fork-tests.txt, 4792/4793 pass; only rvv/vsetvli-insert-zve64f.mir fails (known, data/known-failures.txt); no test edited",
+  "policy_check": "0 fail, 0 warn"
+ },
+ "other_errors_seen": [
+  "-start-after=hwloopsfixup (and generally resuming from MIR after pulp-hwloops/hwloopsfixup/frep) yields asm that does not assemble: 'Undefined temporary symbol .LBB0_3'. The MIR format at llvmorg-20.1.8 does not serialize MachineBasicBlock::LabelMustBeEmitted, which the fork sets on loop-end blocks (PULPFixupHwLoops.cpp:746,867; PULPHardwareLoops.cpp:1598; SNITCHFrepLoops.cpp:561), so the lp.setup target label is not printed after reloading. -start-before=hwloopsfixup is unaffected (the pass re-sets the flag). Possible fix (owner decision): make the fork's AsmPrinter/passes derive the flag from lp.setup operands (e.g. mark every MBB used as an lp.setup/lp.setupi/frep target in a late pass or in RISCVAsmPrinter), or serialize the flag in MIR (upstream file edit). MIR tests that start after the fixup pass and check assembly are blocked by this; tests using -run-pass / -stop-after MIR checks are not."
+ ],
+ "proposed_test": "llvm/test/CodeGen/RISCV/xpulp-hwloop-fixup-mir.mir: RUN: llc -mtriple=riscv32 -mattr=+xpulpv -run-pass=hwloopsfixup %s -o - | FileCheck %s, input = the -stop-before=hwloopsfixup MIR of xpulp-hwloop-countdown.ll, CHECK the LOOP0setup operand moved to the new split block and PseudoLOOPend; plus a RUN line with llc -stop-after=hwloopsfixup on an .ll (update_mir_test_checks.py) to cover registration of the name."
+}

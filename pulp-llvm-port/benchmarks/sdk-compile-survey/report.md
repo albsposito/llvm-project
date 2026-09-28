@@ -173,3 +173,58 @@ Greedy order from `fix_ranking.json`; parity against the 617 GCC-compilable file
 - **Generated kernels:** AutoTiler/NNTool-generated `*Kernels.c` files do not exist without a full build and are not in the corpus.
 - **Back end mostly untested:** the 398 files blocked in the front end reached codegen only in the lenient/fp16probe runs with missing builtins as external calls. More back-end crashes are likely once steps 1-4 land. Re-run this survey after each step.
 - **Probe type:** `float16alt`→`__bf16` has the wrong semantics and is a probe only.
+
+## 2026-09-28 evening: SDK build flags that match GCC 7 (`sdkflags`)
+
+Queue item 5 of `steps/20/sdk100-queue.md`. Compiler: a snapshot of `build/int-20` clang, `ccfd68f6ac76` (xgap9 from F017 present, F016 not yet landed).
+
+**New phases** (`strict` is unchanged: pure clang defaults, no `-Werror`):
+- `gccsdk`: GAP9 GCC with the SDK's own warning flags, **including `-Werror`**.
+- `sdkflags`: clang as the SDK build drives it through the wrapper `../sdk-clang/bin/riscv32-unknown-elf-clang`. It uses `-march=rv32imc_xgap9`, which predefines `__gap9__` and the other GCC macros, so there is no macro shim. It passes the SDK's `-W` flags including `-Werror`, plus the wrapper's diagnostic policy (below).
+- `sdknowerror`: `sdkflags` without `-Werror`, as in a `CONFIG_DISABLE_WERROR` build.
+- `parity`: writes `sdkflags_parity.json`. A file counts as ok only if clang exits 0 **and** the survey classifier finds nothing in its log. So a missing builtin that was demoted to a warning still counts as a failure.
+
+| mode | clang flags | compared with | ok | parity |
+|---|---|---|---|---|
+| strict | clang defaults + macro shim, no `-Werror` | GCC, no `-Werror` (617) | 209 | 33.9% |
+| sdknowerror | SDK `-W` flags without `-Werror` + policy, xgap9 | GCC, no `-Werror` (617) | 213 | 34.5% |
+| sdkflags | SDK `-W` flags with `-Werror` + policy, xgap9 | GCC with the SDK's `-Werror` (609) | 208 | 34.2% |
+
+- **GCC 7 with the SDK's own `-Werror` rejects 8 of the 617 files.** They are the 7 "clang-stricter default error" files plus `RNN_BasicKernels_NE16.c`, and no configured app builds them.
+  - With `-Werror`, those 7 are SDK bugs that GCC rejects too, not clang gaps. That corrects step 5 of "What it would take".
+  - Without `-Werror`, the policy makes 4 of them compile: `ring.c`, `get_param.c`, `downmixer.c`, `passthrough.c`. The other 3 also need the F016 builtins.
+- **Only one file compiles in strict and fails in sdkflags:** `malloc_internal.c`. It uses `-Wformat` with `%lX` on a `uint32_t`, which is correct for GCC (`int32_t` is `long int`) and wrong for clang (`int32_t` is `int`). This is a real type difference, deliberately not hidden. No app builds this file (its flags are inferred).
+- **Projection, run once and not a phase:** with the F016 stop-gap header (`gap9_clang_compat.h`), the fp16 probe types and CoreCount set to 8, a `-Werror` SDK build compiles **179/609** files with the SDK's literal flags and **510/609** with the policy.
+  - The policy therefore removes the clang-only `-Werror` stoppers from 331 files.
+  - 5 files still fail on `-Werror` alone, all real problems: uninitialized uses in `bsp/fs/read_fs/read_fs.c` (61 apps), `bsp/fs/lfs/pi_lfs.c`, `bsp/ota/ota.c` and `bsp/ota/updater.c`, plus `malloc_internal.c`.
+  - Also still an error: `-Wunsequenced` in `CNN_Copy.c` (`gap_pack2f16((f16)*(pIn++), (f16)*(pIn++))`, where the lane order is unspecified). It shows up behind the fp16 errors.
+- **App check:** `examples/gap9/basic/helloworld` builds and links through the SDK's CMake with its `-Werror` and without `CONFIG_DISABLE_WERROR` (wrapper, `GAP_CLANG_MARCH=rv32imc_xgap9`, compat header, GNU as/ld). The warnings stay visible (50 `unknown-attributes`, 3 `enum-conversion`, 2 `compound-token-split-by-macro`, 2 `implicit-const-int-float-conversion`). With `GAP_CLANG_GCC7COMPAT=0` it stops at `fll.c`.
+
+**The policy** is defined in the wrapper, which is the single source of truth, with the reason for each flag:
+- **Spelling:** `-Wno-discarded-qualifiers` becomes `-Wno-incompatible-pointer-types-discards-qualifiers`, clang's name for the SDK's own option. Without it, 6 FreeRTOS kernel files fail.
+- **Precedence:** `-Wall`/`-Wextra` are moved in front of explicit `-Wno-X`. GCC lets an explicit option win wherever a group appears; clang applies options in order. The mbedtls flags repeat `-Wall -Wextra` after `-Wno-unused-parameter`, which breaks `aes.c` and `ecp.c`.
+- **Without `-Werror` only:** `-Wno-error=` for `implicit-function-declaration`, `implicit-int`, `int-conversion`, `incompatible-function-pointer-types` and `return-mismatch`.
+  - This is the complete set of C diagnostics that clang 20 makes errors by default and GCC 7.1.1 only warns about, each checked with both compilers.
+  - With `-Werror` GCC fails on them too, so clang's default already matches.
+- **Always:**
+  - `-Wno-typedef-redefinition`: a C11 redefinition to the same type, which GCC accepts silently in gnu99. A redefinition to a different type is still an error.
+  - `-Wno-error=` for `unknown-attributes` (`tiny`, `optimize`), `enum-conversion`, `compound-token-split-by-macro`, `self-assign`, `header-guard`, `deprecated-non-prototype`, `implicit-const-int-float-conversion`, `constant-conversion`, `pointer-bool-conversion`, `tautological-pointer-compare` and `empty-body`.
+  - Each of these fires in a file that GCC 7 compiles with the SDK's `-Werror`. They are demoted, not silenced, so the build log still shows them.
+- **Guard:** clang puts "use of unknown builtin" in the `implicit-function-declaration` group, so the wrapper fails any compile that calls a `__builtin_*` clang does not know.
+- **Code generation:** `-ffp-contract=fast`, which is GAP9 GCC's default (`-Q --help=optimizers`) and owner decision D6/Q5. It fuses `a*b+c` across statements, as GCC does.
+- **Not added: `-fno-math-errno`.**
+  - GAP9 GCC keeps `-fmath-errno`: there is no `__NO_MATH_ERRNO__`. At `-O2` it compiles `sqrtf` to `fsqrt.s` with a `call sqrtf` fallback; at `-Os` it is a plain `tail sqrtf` into newlib libm.
+  - Clang's default already does the same.
+  - GCC 7 has no `__builtin_sqrtf16`, so the `sqrtf16` libcall is a problem for the fp16 builtin work (F035/T6), not for the flags. The fix belongs there: lower the PULP fp16 sqrt builtins to `llvm.sqrt`.
+
+**Harness fix (compile database):** the tracked `compile_db.json.gz` pointed into a deleted scratch directory (`.../F021-survey/bld/...`), so every run failed with `'dt.h' file not found`.
+- The `db` phase now writes `<work>/compile_db.json.gz` and never overwrites the tracked file.
+- The tracked file is now a snapshot. Its work-dir paths are stored as `@WORK@` and replaced at load time; old absolute paths are also remapped. It is refreshed only by the explicit phase `dbsnapshot`.
+- Any phase that needs the database runs `configure` + `db` in `--work` automatically when the cmake build dirs it refers to are missing.
+- Checked from an empty `--work` with `--phases snapshot,gcc,strict`: configure ran by itself, and the result was GCC 617, strict 209, the same as the baseline.
+
+Reproduce:
+
+```
+python3 run.py --work DIR --phases snapshot,gcc,gccsdk,strict,sdkflags,sdknowerror,parity
+```

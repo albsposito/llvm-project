@@ -2,7 +2,7 @@
 
 Durable state of the port. The conductor updates this file at the end of every SOP step; after a context reset it is read before anything else.
 
-Current phase: Step 20: backlog push 2026-09-28 (evening, after a usage-limit pause and a server reboot). port/20 local head ccfd68f6ac76 (landed today since the push: F024, F021, F022, F027, F026, F017, F023 — NOT pushed). Resumed: F016 (B87), F018 (B91+B107), F019 rev2 (B92), F020 rev2 (B88/B71), F025 (B81), F028 (B03/B82). New wave 4: F029 (B112), F030 (B116), F031 (B104), F032 (B102), F033 (B76), F034 (B109), F035 (B90 T0+T1). Next landing before-files: tasks/20/work_20_F023.build.clusters.json / work_20_F023.lit_diff.json. Decisions D5/D6 recorded. Pushes need owner go-ahead. Steps 21-23 paused.
+Current phase: Step 20: PAUSED 2026-09-28 night (usage limit). SDK compile parity 476/617 = 77.1% (M1 checkpoint, benchmarks/sdk-compile-survey/checkpoint-M1-2026-09-28/). Local port/20 landed since the evening push: F016, F032 (head 2f24d0013ede); F035 then F034 were landing in a background chain at pause time — CHECK tasks/20/F035.integrate.json and F034.integrate.json first (verdict LANDED?) and mark B90(T0+T1)/B109 in BACKLOG. Nothing since ccfd68f6ac76 is pushed. Resume table: see 'Resume 2026-09-29' section below. Plan to 100%: steps/20/sdk100-queue.md. Pushes need owner go-ahead. Steps 21-23 paused.
 
 ## Steps
 
@@ -95,3 +95,24 @@ Open problems are tracked in **`BACKLOG.md`** (one entry per problem, with prior
 ## Overnight publication
 
 Direct atomic port-ref push rejected: GitHub OAuth lacks workflow scope. Exact24 refs preserved in verified steps/overnight-port-refs.bundle, included with separately pushed harness checkpoint. See HANDOVER.md for restore commands. No source history rewritten.
+
+## Resume 2026-09-29
+
+All agents were stopped at pause; their worktrees (wt/20-Fxxx) and build dirs keep the work. Resume each worker with a new worker/reviewer dispatch pointing at the same task file; a worker must first check `git status`/`git log` in its worktree and rebase onto the current wt/int-20 head.
+
+| Task | Backlog | State at pause | Next action |
+|---|---|---|---|
+| F035 | B90 T0+T1 | approved; landing chain running | verify landed; then launch fp16 T4 (type names) and T2 (MC defs) per sdk100-queue items 14-15 |
+| F034 | B109 | approved; lands after F035 in the same chain | verify landed |
+| F019 | B92 | approved rev 2; landing failed (conflict with F016); worker was mid-rebase (trivial union) | finish rebase (check wt/20-F019 for an in-progress rebase: `git status`), re-land |
+| F028 | B03/B82 | worker done; review was in progress | re-dispatch reviewer |
+| F029 | B112 | worker done; review was in progress | re-dispatch reviewer |
+| F031 | B104 | worker done; review was in progress | re-dispatch reviewer |
+| F020 | B88/B71 | rev 2 done; re-review in progress; MUST also fix new reproducer benchmarks/sdk-compile-survey/checkpoint-M1-2026-09-28/crash-imgio-hwloops-M1.ll and full ImgIO.c | re-dispatch reviewer |
+| F025 | B81 | rejected (segfault at -pulp-loop-range-immediate=0..3; note over-claims); rework not started | resume worker with the rejection (tasks/20/F025.review.json) |
+| F018 | B91+B107 (+CoreCount_m1) | worker mid-task (uncommitted work in wt/20-F018) | resume worker |
+| F030 | B116 | worker mid-task (running pressure ladder) | resume worker; B120 fix follows it (same file) |
+| F033 | B76 | approved code, ON HOLD until the B120 FREP accumulator fix | land together with/after B120 |
+| F036/F037/F038 | B97 batches A/C/B | workers mid-task | resume workers; they will conflict with each other and F018/F019 at landing -> rebase |
+| SDK flags harness | sdk100 item 5 | mid-task (run.py modes, db-phase path fix, -fno-math-errno/-ffp-contract=fast) | resume; the tracked compile_db.json.gz has stale scratch paths until this lands |
+| Attribution research | sdk100 item 22 | mid-task | resume |

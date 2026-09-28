@@ -1,0 +1,36 @@
+{
+  "status": "done",
+  "branch": "work/20/F035",
+  "integration_head": "ccfd68f6ac7672ace360268bd0b4fac3b1e06d60",
+  "commits": [
+    "384ddeb4c8c693790befc88ae8d29d1bbe6051be",
+    "441ded47bcd452b11219a684986f0dddc773eb5f"
+  ],
+  "commit_roles": {
+    "384ddeb4c8c6": "registration: FeatureVendorXpulpf16alt (xpulpf16alt 1.0, implies zfinx) and FeatureVendorXpulpfvec (xpulpfvec 1.0, implies xpulpv + zfinx) with HasVendor* predicates, no instructions; FeatureVendorXgap9 now also implies zhinx, xpulpf16alt, xpulpfvec (RISCVFeatures.td only)",
+    "441ded47bcd4": "registration unit test: two lines 'xpulpf16alt 1.0', 'xpulpfvec 1.0' in RISCVISAInfoTest CheckExtensions (Test-Regen: notes/20/F035-regen.md; owner pre-approval recorded in notes/20/owner-test-exceptions.md 'F035 xpulpf16alt/xpulpfvec')"
+  },
+  "note": "notes/20/F035.md",
+  "regen_report": "notes/20/F035-regen.md",
+  "signature_gone": true,
+  "name_choice": "Kept the design's xpulpf16alt / xpulpfvec: xpulp<subset> style of the PULP 22 branch (xpulpabs, xpulpvect, ...) and the fork's xpulpv; named after GCC's Xf16alt/Xfvec; end in a letter so the ISA parser reads no version (xpulpf16alt2 -> 'unsupported version number 2'); distinct from Snitch xfalthalf/xfvechalf/xfvecalthalf. Version 1.0 like CORE-V and the 22-branch vendor extensions.",
+  "implications": "xpulpf16alt -> zfinx; xpulpfvec -> xpulpv, zfinx (vfcpka.h.s reads f32 from GPRs); xgap9 -> xpulpv, zfinx, zhinx(+zhinxmin), xpulpf16alt, xpulpfvec. No Snitch xf* extension implied either way; Snitch instructions are predicated only on their own HasExtXf* (no Zhinx/Zfinx predicate), so xgap9 enables none.",
+  "verification": {
+    "repro": "logs/20-F035.repro.log (int-20 = integration head): -march=rv32imc_xgap9 has no __riscv_zhinx; arch rv32i2p1_m2p0_c2p0_zicsr2p0_zmmul1p0_zfinx1p0_xgap9p0_xpulpv2p0; xpulpf16alt rejected as unsupported",
+    "macros": "clang -march=rv32imc_xgap9 -dM -E adds __riscv_zhinx 1000000, __riscv_zhinxmin 1000000, __riscv_xpulpf16alt 1000000, __riscv_xpulpfvec 1000000 (plus __FLT16_* limits, already defined before); F017 macros unchanged; no __riscv_xf* (Snitch). logs/20-F035.verify.log",
+    "arch_attribute": "rv32i2p1_m2p0_c2p0_zicsr2p0_zmmul1p0_zfinx1p0_zhinx1p0_zhinxmin1p0_xgap9p0_xpulpf16alt1p0_xpulpfvec1p0_xpulpv2p0; explicit -march=rv32imc_zfinx_zhinx_xpulpv2_xpulpf16alt_xpulpfvec gives the same without xgap9p0; llc -mattr=+xpulpf16alt,+xpulpfvec prints rv32i2p1_zicsr2p0_zfinx1p0_xpulpf16alt1p0_xpulpfvec1p0_xpulpv2p0; rv32imfc_xpulpf16alt rejected (f/zfinx incompatible)",
+    "gvsoc_float16": "logs/20-F035-f16/: f16tiny.c (add/sub/mul/div/contracted fma/fms/neg/lt/le/eq/to-from float/to int,unsigned/from int,unsigned; 512 inputs incl. +-0, +-inf, NaN, subnormals, random bit patterns) and design tests/numeq.c; GAP9 GCC -DT=float16 -march=rv32imcxgap9 -mPE=8 -mFC=1 -O2 vs this clang -DT=_Float16 -march=rv32imc_xgap9 -ffp-contract=fast -O2 on ri5ky_testbench: IDENTICAL (16/16 and 12/12 lines). Clang asm uses fadd.h fsub.h fmul.h fdiv.h fmadd.h fmsub.h fneg.h flt.h fle.h feq.h fcvt.{s.h,h.s,w.h,wu.h,h.w,h.wu}, no libcalls (before: fadd.s etc. + 25 __extendhfsf2 / 11 __truncsfhf2, f16tiny-int20-before.s)",
+    "gap9_sweep": "scratch copy, both at -march=rv32imc_xgap9, base=int-20 clang vs mine: 54/54 disassemblies identical (27 kernels x O2/O3), the 5 already-failing kernels have identical stderr. logs/20-F035-sweep/",
+    "unit_tests": "TargetParserTests 583/583 PASS",
+    "lit": "logs/20-F035-lit.log: llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, clang/test/CodeGen/RISCV, clang/test/Driver/riscv-{arch,features,cpus}.c, clang/test/Preprocessor/riscv-{nofdiv,target-features}.c, clang/test/Misc/target-invalid-cpu-note: 4732/4733 pass, 1 known failure (vsetvli-insert-zve64f.mir, B41/T002). logs/20-F035-lit2.log: all clang/test/Driver/riscv*, clang/test/Preprocessor/riscv*, lld/test/ELF/riscv-attributes.s: 23/23 pass",
+    "policy_check": "ccfd68f6ac76..work/20/F035: 0 FAIL, 1 WARN (expected test-edit warning for the approved unit-test lines)"
+  },
+  "other_errors_seen": [
+    "Design T0 also lists f16 post-increment loads (setIndexedLoadAction(POST_INC, f16) under Zhinx+Xpulpv2 in RISCVISelLowering.cpp, codegen-core). Not done here (outside the registration cluster); it is a performance item (h_axpy gets p.lh like GCC), numerics already match.",
+    "clang/test/Driver/print-supported-extensions-riscv.c still fails as before (lists none of the fork's extensions, not in LIT_PATHS); xpulpf16alt/xpulpfvec not added to it, same as F017.",
+    "GAP9 GCC defines no __riscv_zhinx / fp16 feature macros for xgap9; clang now defines __riscv_zhinx, __riscv_zhinxmin, __riscv_xpulpf16alt, __riscv_xpulpfvec. Harmless (SDK tests none of them), but a difference from GCC.",
+    "The new extensions have no instructions yet: -march=..._xpulpf16alt / _xpulpfvec do not make llvm-mc accept .ah or vf* GAP9 instructions until design task T2; __bf16 is still promoted through f32 (T3/T4)."
+  ],
+  "proposed_test": "clang/test/Preprocessor/riscv-gap9-fp16.c: RUN clang --target=riscv32-unknown-elf -march=rv32imc_xgap9 -E -dM, CHECK-DAG __riscv_zhinx 1000000, __riscv_xpulpf16alt 1000000, __riscv_xpulpfvec 1000000, __riscv_zfinx, __riscv_xpulpv; CHECK-NOT __riscv_xfalthalf / __riscv_xfvechalf (Snitch). llvm/test/CodeGen/RISCV/attributes-xgap9.ll: llc -mtriple=riscv32 -mattr=+xgap -> .attribute 5 \"rv32i2p1_zicsr2p0_zfinx1p0_zhinx1p0_zhinxmin1p0_xgap9p0_xpulpf16alt1p0_xpulpfvec1p0_xpulpv2p0\"; -mattr=+xpulpf16alt,+xpulpfvec -> ..._zfinx1p0_xpulpf16alt1p0_xpulpfvec1p0_xpulpv2p0. llvm/test/CodeGen/RISCV/xgap9-half.ll: fadd/fmul/fma/fcmp olt/fpext/fptrunc/fptosi on half with -mattr=+xgap -> fadd.h/fmul.h/fmadd.h/flt.h/fcvt.s.h/fcvt.h.s/fcvt.w.h ..,rtz, no __extendhfsf2 calls.",
+  "unmapped_files": []
+}

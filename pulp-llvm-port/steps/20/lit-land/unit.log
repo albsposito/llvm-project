@@ -68,7 +68,7 @@ Note: Google Test filter = OrderedExtensionMap.*:ParseArchSTring.*:ParseArchStri
 [       OK ] TargetParserTest.AArch64ArchExtFeature (0 ms)
 [ RUN      ] TargetParserTest.AArch64PrintSupportedExtensions
 [       OK ] TargetParserTest.AArch64PrintSupportedExtensions (0 ms)
-[----------] 33 tests from TargetParserTest (0 ms total)
+[----------] 33 tests from TargetParserTest (4 ms total)
 
 [----------] 12 tests from ParseNormalizedArchString
 [ RUN      ] ParseNormalizedArchString.RejectsInvalidChars
@@ -197,5 +197,5 @@ Note: Google Test filter = OrderedExtensionMap.*:ParseArchSTring.*:ParseArchStri
 [----------] 1 test from RiscvExtensionsHelp (0 ms total)
 
 [----------] Global test environment tear-down
-[==========] 84 tests from 9 test suites ran. (1 ms total)
+[==========] 84 tests from 9 test suites ran. (8 ms total)
 [  PASSED  ] 84 tests.
