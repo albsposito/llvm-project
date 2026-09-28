@@ -234,3 +234,14 @@ let Attributes = [NoThrow] in {
 def pulp_event_unit_read_fenced : PULPBuiltin<"int(void *, int)", "xpulpv">;
 def pulp_OffsetedWritePtr : PULPBuiltin<"void(void *, void *, int)", "xpulpv">;
 } // Attributes = [NoThrow]
+
+//===----------------------------------------------------------------------===//
+// GCC's generic vector permute, __builtin_shuffle(v, mask) and
+// __builtin_shuffle(v1, v2, mask), which the GAP9 SDK kernels use on the
+// packed SIMD types. Type-checked in SemaRISCV.cpp; lowered in CGBuiltin.cpp
+// to shufflevector (constant mask), to the Xpulpv shuffle intrinsics (run-time
+// mask on 4 x 8-bit / 2 x 16-bit vectors), or to an element-wise sequence.
+//===----------------------------------------------------------------------===//
+let Attributes = [NoThrow, Const, CustomTypeChecking] in {
+def shuffle : PULPBuiltin<"void(...)">;
+} // Attributes = [NoThrow, Const, CustomTypeChecking]

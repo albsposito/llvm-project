@@ -10677,6 +10677,13 @@ def note_neon_vector_initializer_non_portable_q : Note<
   "constants">;
 def err_systemz_invalid_tabort_code : Error<
   "invalid transaction abort code">;
+def err_riscv_builtin_shuffle_operands : Error<
+  "%select{arguments to __builtin_shuffle must be vectors (got %1)|"
+  "vector arguments to __builtin_shuffle must have the same type (got %1 and %2)|"
+  "mask argument to __builtin_shuffle must be an integer vector (got %1)|"
+  "mask of __builtin_shuffle must have as many elements as the vector (%1 vs %2)|"
+  "mask elements of __builtin_shuffle must have the size of the vector elements "
+  "(%1 vs %2 bits)}0">;
 def err_riscv_pulp_builtin_bextract_range : Error<
   "size and offset arguments must be such that size + offset <= 32">;
 def err_riscv_pulp_builtin_clip_bounds : Error<

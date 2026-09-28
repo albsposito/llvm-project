@@ -23189,9 +23189,82 @@ Value *CodeGenFunction::EmitRISCVCpuIs(StringRef CPUStr) {
   return Result;
 }
 
+// PULP: GCC's __builtin_shuffle(v, mask) / __builtin_shuffle(v1, v2, mask),
+// checked in SemaRISCV.cpp. Result lane i is lane (mask[i] mod N) of v, or
+// lane (mask[i] mod 2N) of the concatenation v1:v2 (N = number of lanes).
+// A constant mask becomes a plain shufflevector. A run-time mask on a
+// 4 x 8-bit or 2 x 16-bit vector with Xpulpv becomes pv.shuffle.{b,h} or
+// pv.shuffle2.{b,h}, which read only the low 2/1 (3/2 with two vectors) bits
+// of each mask lane, which is exactly GCC's modulo rule. Anything else becomes
+// one extractelement/insertelement per lane.
+static Value *EmitPULPBuiltinShuffle(CodeGenFunction &CGF, const CallExpr *E) {
+  CGBuilderTy &Builder = CGF.Builder;
+  unsigned NumArgs = E->getNumArgs();
+  const Expr *MaskArg = E->getArg(NumArgs - 1);
+  Value *V1 = CGF.EmitScalarExpr(E->getArg(0));
+  Value *V2 = NumArgs == 3 ? CGF.EmitScalarExpr(E->getArg(1)) : nullptr;
+  auto *VecTy = cast<llvm::FixedVectorType>(V1->getType());
+  unsigned NumElts = VecTy->getNumElements();
+  unsigned NumSrcElts = V2 ? 2 * NumElts : NumElts;
+
+  Expr::EvalResult MaskVal;
+  if (MaskArg->EvaluateAsRValue(MaskVal, CGF.getContext()) &&
+      !MaskVal.HasSideEffects && MaskVal.Val.isVector()) {
+    SmallVector<int, 16> Indices;
+    for (unsigned I = 0; I != NumElts; ++I)
+      Indices.push_back(
+          MaskVal.Val.getVectorElt(I).getInt().getZExtValue() % NumSrcElts);
+    return Builder.CreateShuffleVector(
+        V1, V2 ? V2 : llvm::PoisonValue::get(VecTy), Indices);
+  }
+
+  Value *Mask = CGF.EmitScalarExpr(MaskArg);
+  unsigned EltBits = VecTy->getScalarSizeInBits();
+  if (CGF.getContext().getTargetInfo().hasFeature("xpulpv") &&
+      ((NumElts == 4 && EltBits == 8) || (NumElts == 2 && EltBits == 16))) {
+    auto *PulpTy = llvm::FixedVectorType::get(Builder.getIntNTy(EltBits),
+                                              NumElts);
+    Intrinsic::ID ID;
+    SmallVector<Value *, 3> Ops;
+    Ops.push_back(Builder.CreateBitCast(V1, PulpTy));
+    if (V2) {
+      // pv.shuffle2 rD, rs1, rs2 takes lanes with the selector bit clear from
+      // rD, so v1 goes in rD.
+      ID = NumElts == 4 ? Intrinsic::riscv_pulp_shuffle4b
+                        : Intrinsic::riscv_pulp_shuffle2h;
+      Ops.push_back(Builder.CreateBitCast(V2, PulpTy));
+    } else {
+      ID = NumElts == 4 ? Intrinsic::riscv_pulp_shuffleb
+                        : Intrinsic::riscv_pulp_shuffleh;
+    }
+    Ops.push_back(Builder.CreateBitCast(Mask, PulpTy));
+    Value *Res = Builder.CreateCall(CGF.CGM.getIntrinsic(ID), Ops);
+    return Builder.CreateBitCast(Res, VecTy);
+  }
+
+  Value *Src = V1;
+  if (V2) {
+    SmallVector<int, 32> Concat;
+    for (unsigned I = 0; I != NumSrcElts; ++I)
+      Concat.push_back(I);
+    Src = Builder.CreateShuffleVector(V1, V2, Concat);
+  }
+  Value *Res = llvm::PoisonValue::get(VecTy);
+  for (unsigned I = 0; I != NumElts; ++I) {
+    Value *Idx = Builder.CreateZExt(Builder.CreateExtractElement(Mask, I),
+                                    CGF.Int32Ty);
+    Idx = Builder.CreateURem(Idx, Builder.getInt32(NumSrcElts));
+    Res = Builder.CreateInsertElement(Res, Builder.CreateExtractElement(Src, Idx),
+                                      I);
+  }
+  return Res;
+}
+
 Value *CodeGenFunction::EmitRISCVBuiltinExpr(unsigned BuiltinID,
                                              const CallExpr *E,
                                              ReturnValueSlot ReturnValue) {
+  if (BuiltinID == RISCV::BI__builtin_shuffle)
+    return EmitPULPBuiltinShuffle(*this, E);
 
   if (BuiltinID == Builtin::BI__builtin_cpu_supports)
     return EmitRISCVCpuSupports(E);

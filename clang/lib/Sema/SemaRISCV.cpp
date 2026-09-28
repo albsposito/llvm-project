@@ -549,10 +549,69 @@ static bool CheckInvalidVLENandLMUL(const TargetInfo &TI, CallExpr *TheCall,
   return false;
 }
 
+// PULP: GCC's __builtin_shuffle(v, mask) and __builtin_shuffle(v1, v2, mask).
+// As in GCC, v1 and v2 are vectors of the same type, mask is an integer vector
+// with as many elements as v1, each the size of an element of v1, and the
+// result has the type of v1. The mask may be a run-time value; CodeGen takes
+// its elements modulo N (one vector) or 2N (two vectors).
+static bool CheckPULPBuiltinShuffle(Sema &S, CallExpr *TheCall) {
+  if (S.checkArgCountRange(TheCall, 2, 3))
+    return true;
+  unsigned NumArgs = TheCall->getNumArgs();
+  for (unsigned I = 0; I != NumArgs; ++I) {
+    ExprResult Arg = S.DefaultFunctionArrayLvalueConversion(TheCall->getArg(I));
+    if (Arg.isInvalid())
+      return true;
+    TheCall->setArg(I, Arg.get());
+  }
+  ASTContext &Ctx = S.getASTContext();
+  Expr *VecArg = TheCall->getArg(0);
+  Expr *MaskArg = TheCall->getArg(NumArgs - 1);
+  QualType VecTy = VecArg->getType().getUnqualifiedType();
+  const auto *VT = VecTy->getAs<VectorType>();
+  // GCC vectors only (vector_size / ext_vector_type), as in GCC; not the
+  // RVV fixed-length types or boolean vectors.
+  if (!VT || VT->getVectorKind() != VectorKind::Generic ||
+      VecTy->isExtVectorBoolType())
+    return S.Diag(VecArg->getBeginLoc(),
+                  diag::err_riscv_builtin_shuffle_operands)
+           << 0 << VecTy << VecArg->getSourceRange();
+  if (NumArgs == 3) {
+    Expr *Vec2Arg = TheCall->getArg(1);
+    if (!Ctx.hasSameUnqualifiedType(VecTy, Vec2Arg->getType()))
+      return S.Diag(Vec2Arg->getBeginLoc(),
+                    diag::err_riscv_builtin_shuffle_operands)
+             << 1 << VecTy << Vec2Arg->getType() << Vec2Arg->getSourceRange();
+  }
+  QualType MaskTy = MaskArg->getType();
+  const auto *MT = MaskTy->getAs<VectorType>();
+  if (!MT || MT->getVectorKind() != VectorKind::Generic ||
+      MaskTy->isExtVectorBoolType() ||
+      !MT->getElementType()->isIntegerType())
+    return S.Diag(MaskArg->getBeginLoc(),
+                  diag::err_riscv_builtin_shuffle_operands)
+           << 2 << MaskTy << MaskArg->getSourceRange();
+  if (MT->getNumElements() != VT->getNumElements())
+    return S.Diag(MaskArg->getBeginLoc(),
+                  diag::err_riscv_builtin_shuffle_operands)
+           << 3 << MT->getNumElements() << VT->getNumElements()
+           << MaskArg->getSourceRange();
+  uint64_t MaskEltBits = Ctx.getTypeSize(MT->getElementType());
+  uint64_t VecEltBits = Ctx.getTypeSize(VT->getElementType());
+  if (MaskEltBits != VecEltBits)
+    return S.Diag(MaskArg->getBeginLoc(),
+                  diag::err_riscv_builtin_shuffle_operands)
+           << 4 << MaskEltBits << VecEltBits << MaskArg->getSourceRange();
+  TheCall->setType(VecTy);
+  return false;
+}
+
 bool SemaRISCV::CheckBuiltinFunctionCall(const TargetInfo &TI,
                                          unsigned BuiltinID,
                                          CallExpr *TheCall) {
   ASTContext &Context = getASTContext();
+  if (BuiltinID == RISCV::BI__builtin_shuffle)
+    return CheckPULPBuiltinShuffle(SemaRef, TheCall);
   // vmulh.vv, vmulh.vx, vmulhu.vv, vmulhu.vx, vmulhsu.vv, vmulhsu.vx,
   // vsmul.vv, vsmul.vx are not included for EEW=64 in Zve64*.
   switch (BuiltinID) {
