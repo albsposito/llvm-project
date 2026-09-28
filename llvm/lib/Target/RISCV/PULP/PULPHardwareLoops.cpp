@@ -18,6 +18,7 @@
 #include "../RISCVInstrInfo.h"
 #include "../RISCVRegisterInfo.h"
 #include "../RISCVSubtarget.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/ADT/StringRef.h"
@@ -186,6 +187,22 @@ private:
   CountValue *computeCount(MachineLoop *Loop, const MachineOperand *Start,
                            const MachineOperand *End, unsigned IVReg,
                            int64_t IVBump, Comparison::Kind Cmp) const;
+
+  /// Return true if the loop is only entered when Start < End (Start <= End
+  /// if HasEqual), with the given signedness, so that the iteration count
+  /// needs no runtime guard.
+  bool isDistanceCheckedOnEntry(MachineLoop *L, const MachineOperand *Start,
+                                const MachineOperand *End, bool StartIsImm,
+                                int64_t StartImm, bool EndIsImm,
+                                int64_t EndImm, bool IsUnsigned,
+                                bool HasEqual) const;
+
+  /// Return true if a conditional branch that dominates the loop entry
+  /// establishes "A K B" for a comparison kind K accepted by \p Accept.
+  bool isRelationTrueOnEntry(MachineLoop *L, const MachineOperand *A,
+                             bool AIsImm, int64_t AImm, const MachineOperand *B,
+                             bool BIsImm, int64_t BImm,
+                             function_ref<bool(Comparison::Kind)> Accept) const;
 
   /// Return true if the instruction is not valid within a hardware
   /// loop.
@@ -586,7 +603,7 @@ PULPHardwareLoops::Comparison::Kind PULPHardwareLoops::getComparisonKind(
     Cmp = Comparison::GEs;
     break;
   case RISCV::BGEU:
-    Cmp = Comparison::GEs;
+    Cmp = Comparison::GEu;
     break;
   case RISCV::P_BNEIMM:
     Cmp = Comparison::NE;
@@ -624,8 +641,10 @@ PULPHardwareLoops::Comparison::Kind PULPHardwareLoops::getComparisonKindFromCC(
     Cmp = Comparison::LTu;
     break;
   case RISCVCC::COND_GE:
-  case RISCVCC::COND_GEU:
     Cmp = Comparison::GEs;
+    break;
+  case RISCVCC::COND_GEU:
+    Cmp = Comparison::GEu;
     break;
   };
   return Cmp;
@@ -728,6 +747,13 @@ PULPHardwareLoops::getLoopTripCount(MachineLoop *L,
     return nullptr;
   }
 
+  // As in HexagonHardwareLoops: if the taken target TB is not the header,
+  // the loop continues on the not-taken path, i.e. while the condition is
+  // false, so the comparison has to be negated. RISC-V conditional branches
+  // have no negated-predicate form (Hexagon's predOpcodeHasNot), so the
+  // branch direction is the only source of negation.
+  bool Negated = TB != Header;
+
   // We now know there are two terminators, one conditional and one
   // unconditional. Double check to be sure.
   MachineBasicBlock::iterator firstTerm = Latch->getFirstTerminator();
@@ -771,6 +797,8 @@ PULPHardwareLoops::getLoopTripCount(MachineLoop *L,
   if (!Cmp) {
     return nullptr;
   }
+  if (Negated)
+    Cmp = Comparison::getNegatedComparison(Cmp);
   if (isSwapped)
     Cmp = Comparison::getSwappedComparison(Cmp);
 
@@ -821,11 +849,23 @@ PULPHardwareLoops::getLoopTripCount(MachineLoop *L,
 /// number of times a loop iterates.  The function takes the operands that
 /// represent the loop start value, loop end value, and induction value.
 /// Based upon these operands, the function attempts to compute the trip count.
+///
+/// The loop is a do/while loop: its body runs once before the latch compares
+/// the bumped induction value with End. Cmp is the relation under which the
+/// loop continues, "IV.next Cmp End" (already negated for a latch that
+/// branches to the exit and swapped when the IV is the second operand).
+/// Like HexagonHardwareLoops::computeCount this returns exactly that number of
+/// iterations, and 1 when the first comparison already fails; for the ordered
+/// comparisons the register path emits a runtime guard for the latter case.
 CountValue *PULPHardwareLoops::computeCount(MachineLoop *Loop,
                                             const MachineOperand *Start,
                                             const MachineOperand *End,
                                             unsigned IVReg, int64_t IVBump,
                                             Comparison::Kind Cmp) const {
+  LLVM_DEBUG(dbgs() << "Initial Value: " << *Start << "\n");
+  LLVM_DEBUG(dbgs() << "End Value: " << *End << "\n");
+  LLVM_DEBUG(dbgs() << "Inc/Dec Value: " << IVBump << "\n");
+  LLVM_DEBUG(dbgs() << "Comparison: " << Cmp << "\n");
 
   // Get the preheader
   MachineBasicBlock *PH = MLI->findLoopPreheader(Loop, SpecPreheader);
@@ -850,79 +890,107 @@ CountValue *PULPHardwareLoops::computeCount(MachineLoop *Loop,
     }
   }
 
+  // Cannot handle comparison EQ, i.e. while (A == B): such a loop runs once
+  // or twice, it is not a counting loop (same as HexagonHardwareLoops).
+  if (Cmp == Comparison::EQ)
+    return nullptr;
+
+  if (!Start->isReg() && !startIsImm)
+    return nullptr;
+  if (!End->isReg() && !endIsImm)
+    return nullptr;
+  // An immediate operand is used in a single ADDI below (negated for Start).
+  if ((Start->isImm() && (!isInt<12>(immStart) || !isInt<12>(-immStart))) ||
+      (End->isImm() && !isInt<12>(immEnd)))
+    return nullptr;
+
   bool CmpLess = Cmp & Comparison::L;
   bool CmpGreater = Cmp & Comparison::G;
   bool CmpHasEqual = Cmp & Comparison::EQ;
 
-  // Sanity check
-  if (!Start->isReg() && !startIsImm) {
+  if (IVBump == 0)
     return nullptr;
-  }
-  if (!End->isReg() && !endIsImm) {
-    return nullptr;
-  }
 
   // Avoid certain wrap-arounds.  This doesn't detect all wrap-arounds.
-  if (CmpLess && IVBump < 0) {
+  if (CmpLess && IVBump < 0)
     // Loop going while iv is "less" with the iv value going down.  Must wrap.
     return nullptr;
-  }
 
-  if (CmpGreater && IVBump > 0) {
+  if (CmpGreater && IVBump > 0)
     // Loop going while iv is "greater" with the iv value going up.  Must wrap.
     return nullptr;
-  }
-
-  if (IVBump == 0) {
-    return nullptr;
-  }
-
-  if (startIsImm && endIsImm) {
-
-    if (!CmpHasEqual) {
-      return nullptr;
-    }
-
-    // Both, start and end are immediates.
-    int64_t Dist = std::max(immStart, immEnd) - std::min(immStart, immEnd);
-    if (Dist == 0) {
-      return nullptr;
-    }
-
-    if (Cmp != Comparison::EQ) {
-      return nullptr;
-    }
-
-    bool Exact = (Dist % IVBump) == 0;
-    if (!Exact) {
-      return nullptr;
-    }
-
-    // Normalize distance to step
-    uint64_t Count = Dist / std::abs(IVBump);
-
-    if (Count > 0xFFFFFFFFULL) {
-      return nullptr;
-    }
-
-    return new CountValue(CountValue::CV_Immediate, Count);
-  }
-
-  // Below here, we know that at least one of Start and End is a register.
 
   // Phis that may feed into the loop.
   LoopFeederMap LoopFeederPhi;
 
-  // PULP: when dealing with xPULP hwloops, the following doesn't apply.
-  // // Check if the initial value may be zero and can be decremented in the
-  // first
-  // // iteration. If the value is zero, the endloop instruction will not
-  // decrement
-  // // the loop counter, so we shouldn't generate a hardware loop in this case.
-  // if (loopCountMayWrapOrUnderFlow(Start, End, Loop->getLoopPreheader(), Loop,
-  //                                 LoopFeederPhi)) {
-  //   return nullptr;
-  // }
+  // Check if the initial value may be equal to the final value of a "!="
+  // loop. The iteration count computed below would then be 0, while the
+  // loop really wraps around the whole 32-bit range; a PULP hardware loop
+  // with a count of 0 runs its body only once. The ordered comparisons do not
+  // need this check: a zero or negative distance is handled by the runtime
+  // guard below, which gives the one iteration that the do/while body runs.
+  // A dominating branch that establishes Start != End (or a strict order
+  // between them) settles it without the heuristic.
+  if (Cmp == Comparison::NE &&
+      !isRelationTrueOnEntry(Loop, Start, startIsImm, immStart, End, endIsImm,
+                             immEnd,
+                             [](Comparison::Kind K) {
+                               return K == Comparison::NE ||
+                                      ((K & (Comparison::L | Comparison::G)) &&
+                                       !(K & Comparison::EQ));
+                             }) &&
+      loopCountMayWrapOrUnderFlow(Start, End, Loop->getLoopPreheader(), Loop,
+                                  LoopFeederPhi))
+    return nullptr;
+
+  if (startIsImm && endIsImm) {
+    // Both, start and end are immediates. Compare them with the signedness
+    // of the comparison, as the 32-bit registers would.
+    int64_t StartV, EndV;
+    if (Comparison::isUnsigned(Cmp)) {
+      StartV = static_cast<uint32_t>(immStart);
+      EndV = static_cast<uint32_t>(immEnd);
+    } else {
+      StartV = static_cast<int32_t>(immStart);
+      EndV = static_cast<int32_t>(immEnd);
+    }
+    int64_t Dist = EndV - StartV;
+    if (Dist == 0)
+      return nullptr;
+
+    bool Exact = (Dist % IVBump) == 0;
+
+    if (Cmp == Comparison::NE) {
+      if (!Exact)
+        return nullptr;
+      if ((Dist < 0) ^ (IVBump < 0))
+        return nullptr;
+    }
+
+    // For comparisons that include the final value (i.e. include equality
+    // with the final value), we need to increase the distance by 1.
+    if (CmpHasEqual)
+      Dist = Dist > 0 ? Dist + 1 : Dist - 1;
+
+    // For the loop to iterate, CmpLess should imply Dist > 0.  Similarly,
+    // CmpGreater should imply Dist < 0.  These conditions could actually
+    // fail, for example, in unreachable code (which may still appear to be
+    // reachable in the CFG).
+    if ((CmpLess && Dist < 0) || (CmpGreater && Dist > 0))
+      return nullptr;
+
+    // "Normalized" distance, i.e. with the bump set to +-1.
+    int64_t Dist1 = (IVBump > 0) ? (Dist + (IVBump - 1)) / IVBump
+                                 : (-Dist + (-IVBump - 1)) / (-IVBump);
+    assert(Dist1 > 0 && "Fishy thing.  Both operands have the same sign.");
+
+    uint64_t Count = Dist1;
+
+    if (Count > 0xFFFFFFFFULL)
+      return nullptr;
+
+    return new CountValue(CountValue::CV_Immediate, Count);
+  }
 
   // A general case: Start and End are some values, but the actual
   // iteration count may not be available.  If it is not, insert
@@ -930,141 +998,283 @@ CountValue *PULPHardwareLoops::computeCount(MachineLoop *Loop,
 
   // If the induction variable bump is not a power of 2, quit.
   // Othwerise we'd need a general integer division.
-  if (!isPowerOf2_64(std::abs(IVBump))) {
+  if (!isPowerOf2_64(std::abs(IVBump)))
     return nullptr;
-  }
-
-  // If Start is an immediate and End is a register, the trip count
-  // will be "reg - imm".  PULP's "subtract immediate" instruction
-  // is actually "reg + -imm".
 
   // If the loop IV is going downwards, i.e. if the bump is negative,
   // then the iteration count (computed as End-Start) will need to be
   // negated.  To avoid the negation, just swap Start and End.
-  if (IVBump < 0) {
+  bool Swapped = IVBump < 0;
+  if (Swapped) {
     std::swap(Start, End);
+    std::swap(startIsImm, endIsImm);
+    std::swap(immStart, immEnd);
     IVBump = -IVBump;
+    std::swap(CmpLess, CmpGreater);
   }
-  // Cmp may now have a wrong direction, e.g.  LEs may now be GEs.
-  // Signedness, and "including equality" are preserved.
+  // Now the IV conceptually counts up from Start towards End: the loop is
+  // either a "!=" loop, or (CmpLess) it continues while the distance
+  // End - Start is positive (non-negative when CmpHasEqual). Signedness is
+  // preserved in Cmp.
+  assert((Cmp == Comparison::NE || CmpLess) && "Unexpected comparison");
 
-  bool RegToImm = Start->isReg() && End->isImm(); // for (reg..imm)
-  bool RegToReg = Start->isReg() && End->isReg(); // for (reg..reg)
+  // Is the ordered loop's distance known to be in range at the loop entry,
+  // so that no runtime guard is needed?
+  bool NeedGuard =
+      CmpLess && !isDistanceCheckedOnEntry(Loop, Start, End, startIsImm,
+                                           immStart, endIsImm, immEnd,
+                                           Comparison::isUnsigned(Cmp),
+                                           CmpHasEqual);
 
-  int64_t StartV = 0, EndV = 0;
-  if (Start->isImm()) {
-    StartV = Start->getImm();
-  }
-  if (End->isImm()) {
-    EndV = End->getImm();
-  }
+  // The guard adds IVBump with an ADDI.
+  if (NeedGuard && !isInt<12>(IVBump))
+    return nullptr;
 
-  int64_t AdjV = 0;
-  // FIXME: We need some logic based on the comparison to figure out if we need
-  //        to add or remove some iterations from DistR (which we will put in
-  //        adjusted distance (AdjR/V).
-
-  // Compute DistR (register with the distance between Start and End).
-  unsigned DistR, DistSR;
-
-  // Check if the start is zero.
-  // First check if it is an immediate zero.
-  bool startIsImmZeroOrZeroReg = (Start->isImm() && StartV == 0);
-  // If it wasn't, check if it is a register
-  if (!startIsImmZeroOrZeroReg && Start->isReg()) {
-    // If it is a register, check if it is the zero register.
-    int64_t startImm;
-    if (checkForImmediate(*Start, startImm)) {
-      startIsImmZeroOrZeroReg = (startImm == 0);
+  // Emit Dst = Op1 <Opc> Op2 (register, register) or Dst = Op1 <Opc> Imm.
+  auto emitRR = [&](unsigned Opc, Register A, unsigned ASub, Register B,
+                    unsigned BSub) -> Register {
+    Register R = MRI->createVirtualRegister(IntRC);
+    BuildMI(*PH, InsertPos, DL, TII->get(Opc), R)
+        .addReg(A, 0, ASub)
+        .addReg(B, 0, BSub);
+    return R;
+  };
+  auto emitRI = [&](unsigned Opc, Register A, unsigned ASub,
+                    int64_t Imm) -> Register {
+    Register R = MRI->createVirtualRegister(IntRC);
+    BuildMI(*PH, InsertPos, DL, TII->get(Opc), R)
+        .addReg(A, 0, ASub)
+        .addImm(Imm);
+    return R;
+  };
+  // The value of a start/end operand in a register.
+  auto getValueReg = [&](const MachineOperand *MO, int64_t Imm,
+                         unsigned &Sub) -> Register {
+    if (MO->isReg()) {
+      Sub = MO->getSubReg();
+      return MO->getReg();
     }
-  }
+    Sub = 0;
+    if (Imm == 0)
+      return RISCV::X0;
+    return emitRI(RISCV::ADDI, RISCV::X0, 0, Imm);
+  };
 
-  // Avoid special case, where the start value is an imm(0).
-  if (startIsImmZeroOrZeroReg) {
-    DistR = End->getReg();
-    DistSR = End->getSubReg();
-  } else {
-    const MCInstrDesc &SubD = RegToReg
-                                  ? TII->get(RISCV::SUB)
-                                  : (RegToImm ? TII->get(RISCV::SUB) /* TODO */
-                                              : TII->get(RISCV::ADDI));
-    if (RegToReg || RegToImm) {
-      llvm::Register SubR = MRI->createVirtualRegister(IntRC);
-      MachineInstrBuilder SubIB = BuildMI(*PH, InsertPos, DL, SubD, SubR);
-      if (RegToReg) {
-        SubIB.addReg(End->getReg(), 0, End->getSubReg())
-            .addReg(Start->getReg(), 0, Start->getSubReg());
-      } else {
-        MachineBasicBlock::iterator ThisInsertPos = InsertPos;
-        ThisInsertPos--;
-
-        llvm::Register ImmToRegReg = MRI->createVirtualRegister(IntRC);
-        MachineInstrBuilder ImmToReg =
-            BuildMI(*PH, ThisInsertPos, DL, TII->get(RISCV::ADDI), ImmToRegReg);
-        ImmToReg.addReg(RISCV::X0).addImm(EndV);
-        SubIB.addReg(ImmToReg->getOperand(0).getReg())
-            .addReg(Start->getReg(), 0, Start->getSubReg());
-      }
-      DistR = SubR;
+  // Compute DistR = End - Start (modulo 2^32).
+  Register DistR;
+  unsigned DistSR = 0;
+  if (startIsImm && immStart == 0) {
+    // Avoid special case, where the start value is zero (an immediate or a
+    // register holding zero, e.g. $x0).
+    DistR = getValueReg(End, immEnd, DistSR);
+  } else if (Start->isImm()) {
+    // End is a register (both immediates were handled above).
+    // If the loop has been unrolled, we should use the original loop count
+    // instead of recalculating the value. This will avoid additional
+    // 'Add' instruction.
+    const MachineInstr *EndValInstr = MRI->getVRegDef(End->getReg());
+    if (EndValInstr && EndValInstr->getOpcode() == RISCV::ADDI &&
+        EndValInstr->getOperand(1).isReg() &&
+        EndValInstr->getOperand(1).getSubReg() == 0 &&
+        EndValInstr->getOperand(2).isImm() &&
+        EndValInstr->getOperand(2).getImm() == immStart) {
+      DistR = EndValInstr->getOperand(1).getReg();
     } else {
-      // If the loop has been unrolled, we should use the original loop count
-      // instead of recalculating the value. This will avoid additional
-      // 'Add' instruction.
-      const MachineInstr *EndValInstr = MRI->getVRegDef(End->getReg());
-      if (EndValInstr->getOpcode() == RISCV::ADDI &&
-          EndValInstr->getOperand(1).getSubReg() == 0 &&
-          EndValInstr->getOperand(2).getImm() == StartV) {
-        DistR = EndValInstr->getOperand(1).getReg();
-      } else {
-        llvm::Register SubR = MRI->createVirtualRegister(IntRC);
-        MachineInstrBuilder SubIB = BuildMI(*PH, InsertPos, DL, SubD, SubR);
-        SubIB.addReg(End->getReg(), 0, End->getSubReg()).addImm(-StartV);
-        DistR = SubR;
-      }
+      DistR = emitRI(RISCV::ADDI, End->getReg(), End->getSubReg(), -immStart);
     }
-    DistSR = 0;
-  }
-
-  // From DistR, compute AdjR (register with the adjusted distance).
-  unsigned AdjR, AdjSR;
-
-  if (AdjV == 0) {
-    AdjR = DistR;
-    AdjSR = DistSR;
   } else {
-    // Generate CountR = ADD DistR, AdjVal
-    llvm::Register AddR = MRI->createVirtualRegister(IntRC);
-    MCInstrDesc const &AddD = TII->get(RISCV::ADDI);
-    BuildMI(*PH, InsertPos, DL, AddD, AddR)
-        .addReg(DistR, 0, DistSR)
-        .addImm(AdjV);
-
-    AdjR = AddR;
-    AdjSR = 0;
+    unsigned ESub;
+    Register ER = getValueReg(End, immEnd, ESub);
+    DistR = emitRR(RISCV::SUB, ER, ESub, Start->getReg(), Start->getSubReg());
   }
 
-  // From AdjR, compute CountR (register with the final count).
-  unsigned CountR, CountSR;
+  // For "!=" the count is Dist / IVBump. For the ordered comparisons it is
+  //   Count = (End - Start + (IVBump-1)) / IVBump
+  // or, when CmpHasEqual:
+  //   Count = (End - Start + (IVBump-1)+1) / IVBump
+  // (HexagonHardwareLoops::computeCount), computed here in the equivalent
+  // form ((Dist - 1) >> Shift) + 1, resp. (Dist >> Shift) + 1, which only
+  // overflows for a count of 2^32 (that no 32-bit loop counter can hold).
+  unsigned Shift = Log2_64(IVBump);
+  Register CountR = DistR;
+  unsigned CountSR = DistSR;
 
-  if (IVBump == 1) {
-    CountR = AdjR;
-    CountSR = AdjSR;
-  } else {
-    // The IV bump is a power of two. Log_2(IV bump) is the shift amount.
-    unsigned Shift = Log2_32(IVBump);
-
-    // Generate NormR = LSR DistR, Shift.
-    llvm::Register LsrR = MRI->createVirtualRegister(IntRC);
-    const MCInstrDesc &LsrD = TII->get(RISCV::SRLI);
-    BuildMI(*PH, InsertPos, DL, LsrD, LsrR)
-        .addReg(AdjR, 0, AdjSR)
-        .addImm(Shift);
-
-    CountR = LsrR;
-    CountSR = 0;
+  if (Cmp == Comparison::NE) {
+    if (Shift != 0) {
+      CountR = emitRI(RISCV::SRLI, DistR, DistSR, Shift);
+      CountSR = 0;
+    }
+    return new CountValue(CountValue::CV_Register, CountR, CountSR);
   }
 
-  return new CountValue(CountValue::CV_Register, CountR, CountSR);
+  if (!NeedGuard && Shift == 0 && !CmpHasEqual)
+    // ((Dist - 1) >> 0) + 1 == Dist.
+    return new CountValue(CountValue::CV_Register, CountR, CountSR);
+
+  // X = Dist - 1 (strict comparison) or Dist; Q = X >> Shift.
+  Register QR = DistR;
+  unsigned QSR = DistSR;
+  if (!CmpHasEqual) {
+    QR = emitRI(RISCV::ADDI, DistR, DistSR, -1);
+    QSR = 0;
+  }
+  if (Shift != 0) {
+    QR = emitRI(RISCV::SRLI, QR, QSR, Shift);
+    QSR = 0;
+  }
+
+  if (NeedGuard) {
+    // The body runs once before the first comparison, which tests the bumped
+    // induction value First against the final value. If that comparison
+    // fails, the loop runs exactly once. Otherwise the distance is valid and
+    // gives the count above; this also covers a first bump that wraps around
+    // (e.g. an unsigned initial value of 0xffffffff counting up, or 0
+    // counting down). In the Start/End terms used here (counting up):
+    //   Valid = Start + IVBump < End     (<= when CmpHasEqual), or, if the
+    //   IV really counts down and Start/End were swapped above,
+    //   Valid = Start < End - IVBump     (<= when CmpHasEqual).
+    // This is HexagonHardwareLoops' "DistCheck/MUX" guard, which tests the
+    // sign of End - Start instead. RISC-V has no mux, so the comparison is
+    // made with SLT/SLTU (swapped and inverted with XORI 1 for <=) and
+    //   Q = Q & -Valid
+    // makes the final count below Q + 1 = 1 when the distance is invalid.
+    unsigned SltOpc = Comparison::isUnsigned(Cmp) ? RISCV::SLTU : RISCV::SLT;
+    unsigned LSub, RSub;
+    Register LR = getValueReg(Start, immStart, LSub);
+    Register RR = getValueReg(End, immEnd, RSub);
+    if (Swapped) {
+      RR = emitRI(RISCV::ADDI, RR, RSub, -IVBump);
+      RSub = 0;
+    } else {
+      LR = emitRI(RISCV::ADDI, LR, LSub, IVBump);
+      LSub = 0;
+    }
+    // Valid = LR < RR, or !(RR < LR) when CmpHasEqual.
+    Register ValidR;
+    if (CmpHasEqual) {
+      Register InvR = emitRR(SltOpc, RR, RSub, LR, LSub);
+      ValidR = emitRI(RISCV::XORI, InvR, 0, 1);
+    } else {
+      ValidR = emitRR(SltOpc, LR, LSub, RR, RSub);
+    }
+    Register MaskR = emitRR(RISCV::SUB, RISCV::X0, 0, ValidR, 0);
+    QR = emitRR(RISCV::AND, QR, QSR, MaskR, 0);
+    QSR = 0;
+  }
+
+  CountR = emitRI(RISCV::ADDI, QR, QSR, 1);
+  return new CountValue(CountValue::CV_Register, CountR, 0);
+}
+
+/// Return true if "A K B" is known to hold whenever the loop is entered, for
+/// some comparison kind K accepted by \p Accept. This looks for a conditional
+/// branch comparing A with B in a block D that dominates the preheader, one
+/// of whose outgoing edges D->S dominates the preheader (S has D as its only
+/// predecessor and dominates the preheader): every path into the loop takes
+/// that edge, so the edge's condition holds on entry (A and B are SSA values
+/// or constants, so they cannot change in between).
+bool PULPHardwareLoops::isRelationTrueOnEntry(
+    MachineLoop *L, const MachineOperand *A, bool AIsImm, int64_t AImm,
+    const MachineOperand *B, bool BIsImm, int64_t BImm,
+    function_ref<bool(Comparison::Kind)> Accept) const {
+  MachineBasicBlock *PH = MLI->findLoopPreheader(L, SpecPreheader);
+  if (!PH || !MDT->getNode(PH))
+    return false;
+
+  // Does the branch operand X hold the same value as the operand Y?
+  auto sameValue = [&](const MachineOperand &X, const MachineOperand *Y,
+                       bool YIsImm, int64_t YImm) -> bool {
+    int64_t XImm;
+    if (checkForImmediate(X, XImm))
+      return YIsImm && static_cast<int32_t>(XImm) == static_cast<int32_t>(YImm);
+    if (YIsImm || !X.isReg() || !Y->isReg())
+      return false;
+    return X.getReg() == Y->getReg() && X.getSubReg() == Y->getSubReg();
+  };
+  auto edgeDominatesPreheader = [&](MachineBasicBlock *S) {
+    return S->pred_size() == 1 && MDT->dominates(S, PH);
+  };
+
+  unsigned Depth = 0;
+  for (MachineDomTreeNode *N = MDT->getNode(PH); N && Depth < 32;
+       N = N->getIDom(), ++Depth) {
+    MachineBasicBlock *D = N->getBlock();
+    MachineBasicBlock *TBB = nullptr, *FBB = nullptr;
+    SmallVector<MachineOperand, 4> Cond;
+    if (TII->analyzeBranch(*D, TBB, FBB, Cond, false) || Cond.size() != 3 ||
+        !Cond[0].isImm() || !TBB || D->succ_size() != 2)
+      continue;
+    // The not-taken successor: FBB, or the fall-through block.
+    MachineBasicBlock *NTBB = FBB;
+    if (!NTBB)
+      for (MachineBasicBlock *S : D->successors())
+        if (S != TBB)
+          NTBB = S;
+    if (!NTBB || NTBB == TBB)
+      continue;
+    bool Taken;
+    if (edgeDominatesPreheader(TBB))
+      Taken = true;
+    else if (edgeDominatesPreheader(NTBB))
+      Taken = false;
+    else
+      continue;
+    Comparison::Kind K =
+        getComparisonKindFromCC(Cond[0].getImm(), nullptr, nullptr, 0);
+    if (!K)
+      continue;
+    if (!Taken)
+      K = Comparison::getNegatedComparison(K);
+    // Now "Cond[1] K Cond[2]" holds on entry.
+    if (sameValue(Cond[1], A, AIsImm, AImm) &&
+        sameValue(Cond[2], B, BIsImm, BImm)) {
+      if (Accept(K))
+        return true;
+    } else if (sameValue(Cond[1], B, BIsImm, BImm) &&
+               sameValue(Cond[2], A, AIsImm, AImm)) {
+      if (Accept(Comparison::getSwappedComparison(K)))
+        return true;
+    }
+  }
+  return false;
+}
+
+/// Return true if the loop is entered only when its distance is in range,
+/// i.e. Start < End (Start <= End if HasEqual) with the given signedness:
+/// either a dominating branch establishes it (the usual guard of a rotated
+/// loop), or Start is End with some low bits cleared (Start = End & Mask, the
+/// remainder loop after an unrolled one), which gives Start <= End, together
+/// with a dominating "Start != End" branch when the comparison is strict.
+bool PULPHardwareLoops::isDistanceCheckedOnEntry(
+    MachineLoop *L, const MachineOperand *Start, const MachineOperand *End,
+    bool StartIsImm, int64_t StartImm, bool EndIsImm, int64_t EndImm,
+    bool IsUnsigned, bool HasEqual) const {
+  // Start = ANDI End, Imm: AND never increases an unsigned value, and with
+  // a negative (sign-extended) mask it keeps the sign bit and only clears
+  // lower bits, so it does not increase a signed value either.
+  bool StartNotAboveEnd = false;
+  if (!StartIsImm && !EndIsImm && Start->isReg() && End->isReg() &&
+      Start->getReg().isVirtual()) {
+    const MachineInstr *Def = MRI->getVRegDef(Start->getReg());
+    if (Def && Def->getOpcode() == RISCV::ANDI && Def->getOperand(1).isReg() &&
+        Def->getOperand(1).getReg() == End->getReg() &&
+        Def->getOperand(1).getSubReg() == End->getSubReg() &&
+        Def->getOperand(2).isImm() &&
+        (IsUnsigned || Def->getOperand(2).getImm() < 0))
+      StartNotAboveEnd = true;
+  }
+  if (HasEqual && StartNotAboveEnd)
+    return true;
+
+  return isRelationTrueOnEntry(
+      L, Start, StartIsImm, StartImm, End, EndIsImm, EndImm,
+      [&](Comparison::Kind K) {
+        if (K == Comparison::NE)
+          return StartNotAboveEnd;
+        // Start < End implies Start <= End, but not the other way round.
+        return (K & Comparison::L) && Comparison::isUnsigned(K) == IsUnsigned &&
+               (HasEqual || !(K & Comparison::EQ));
+      });
 }
 
 /// Return true if the operation is invalid within hardware loop.
@@ -1472,14 +1682,18 @@ bool PULPHardwareLoops::loopCountMayWrapOrUnderFlow(
   if (!InitVal->isReg())
     return false;
 
-  if (!EndVal->isImm())
+  // On RISC-V the final value is rarely an immediate operand: a comparison
+  // with 0 uses $x0 and other constants are loaded into a register. Accept
+  // any known constant, as checkForImmediate does.
+  int64_t EndImm;
+  if (!checkForImmediate(*EndVal, EndImm))
     return false;
 
   // A register value that is assigned an immediate is a known value, and it
   // won't underflow in the first iteration.
   int64_t Imm;
   if (checkForImmediate(*InitVal, Imm))
-    return (EndVal->getImm() == Imm);
+    return static_cast<int32_t>(EndImm) == static_cast<int32_t>(Imm);
 
   Register Reg = InitVal->getReg();
 
@@ -1504,19 +1718,19 @@ bool PULPHardwareLoops::loopCountMayWrapOrUnderFlow(
   // Iterate over the uses of the initial value. If the initial value is used
   // in a compare, then we assume this is a range check that ensures the loop
   // doesn't underflow. This is not an exact test and should be improved.
+  // RISC-V has no separate compare instruction (analyzeCompare is not
+  // implemented): the compare is the conditional branch itself, comparing
+  // its operands 0 and 1.
   for (MachineRegisterInfo::use_instr_nodbg_iterator
            I = MRI->use_instr_nodbg_begin(Reg),
            E = MRI->use_instr_nodbg_end();
        I != E; ++I) {
     MachineInstr *MI = &*I;
-    Register CmpReg1 = 0, CmpReg2 = 0;
-    int64_t CmpMask = 0, CmpValue = 0;
-
-    if (!TII->analyzeCompare(*MI, CmpReg1, CmpReg2, CmpMask, CmpValue))
+    if (!MI->isConditionalBranch())
       continue;
 
     MachineBasicBlock *TBB = nullptr, *FBB = nullptr;
-    SmallVector<MachineOperand, 2> Cond;
+    SmallVector<MachineOperand, 4> Cond;
     if (TII->analyzeBranch(*MI->getParent(), TBB, FBB, Cond, false))
       continue;
 
@@ -1524,9 +1738,12 @@ bool PULPHardwareLoops::loopCountMayWrapOrUnderFlow(
         getComparisonKind(MI->getOpcode(), nullptr, nullptr, 0);
     if (Cmp == 0)
       continue;
-    // if (TII->predOpcodeHasNot(Cond) ^ (TBB != MBB)) // TODO
-    //   Cmp = Comparison::getNegatedComparison(Cmp);
-    if (CmpReg2 != 0 && CmpReg2 == Reg)
+    // As in HexagonHardwareLoops, without its predOpcodeHasNot term: RISC-V
+    // branches have no negated predicates.
+    if (TBB != MBB)
+      Cmp = Comparison::getNegatedComparison(Cmp);
+    const MachineOperand &CmpOp2 = MI->getOperand(1);
+    if (CmpOp2.isReg() && CmpOp2.getReg() == Reg)
       Cmp = Comparison::getSwappedComparison(Cmp);
 
     // Signed underflow is undefined.
