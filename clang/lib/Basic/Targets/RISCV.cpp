@@ -200,6 +200,23 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
   // "xgap9" parses as extension "xgap", version 9.0 (see RISCVFeatures.td).
   if (ISAInfo->hasExtension("xgap"))
     Builder.defineMacro("__gap9__");
+  // GAP9 GCC predeclares the half-precision type names float16 (IEEE
+  // binary16) and float16alt (bfloat16) in every translation unit; the SDK
+  // uses them as plain type names and builds v2h/v2ah on them (autotiler
+  // Emulation/Gap.h, on its __gap9__ path). Map them onto the standard clang
+  // types that have the same layout: _Float16 (native through Zhinx) and
+  // __bf16 (see HasFullBFloat16 below). A macro, not a predeclared typedef:
+  // the target can only add macros here, and the SDK never uses the names as
+  // identifiers or tests them with #ifdef. Only in the PULP half-precision
+  // configuration (the GAP9 extensions xpulpf16alt/xpulpfvec, implied by
+  // xgap9), so that plain Zhinx users do not see a macro named float16.
+  if (ISAInfo->hasExtension("xpulpf16alt") ||
+      ISAInfo->hasExtension("xpulpfvec")) {
+    if (ISAInfo->hasExtension("zhinx"))
+      Builder.defineMacro("float16", "_Float16");
+    if (ISAInfo->hasExtension("xpulpf16alt"))
+      Builder.defineMacro("float16alt", "__bf16");
+  }
 
   if (ISAInfo->hasExtension("zmmul"))
     Builder.defineMacro("__riscv_mul");
@@ -370,6 +387,14 @@ bool RISCVTargetInfo::handleTargetFeatures(std::vector<std::string> &Features,
 
   if (ISAInfo->hasExtension("zfh") || ISAInfo->hasExtension("zhinx"))
     HasLegalHalfType = true;
+
+  // PULP: GAP9 float16alt (bfloat16) arithmetic rounds to bfloat16 after
+  // every operation (GCC emits one fadd.ah/fmul.ah per C operator). Without
+  // this, clang keeps __bf16 intermediates in float (excess precision) and
+  // rounds once per expression, which gives different results. Same switch
+  // as X86 (avx10.2) and ARM (bf16) use for targets with bfloat16 arithmetic.
+  if (ISAInfo->hasExtension("xpulpf16alt"))
+    HasFullBFloat16 = true;
 
   FastScalarUnalignedAccess =
       llvm::is_contained(Features, "+unaligned-scalar-mem");
