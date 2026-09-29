@@ -2036,7 +2036,10 @@ def : Pat<(int_riscv_pulp_read_base_off_v (i32 GPR:$rs1), (i32 GPR:$rs2)), (P_LW
 def : Pat<(int_riscv_pulp_write_base_off_v (i32 GPR:$rs2), (i32 GPR:$rs1), (i32 GPR:$rs3)), (P_SW_rr (i32 GPR:$rs2), (i32 GPR:$rs1), (i32 GPR:$rs3))>;
 
 def : Pat<(int_riscv_pulp_CoreId), (ANDI (CSRRS MHARTID.Encoding, (XLenVT X0)), 0b1111)>;
-def : Pat<(int_riscv_pulp_CoreCount), (ANDI (LW (LUI 0x1A103), 0), 0x12)>;
+// Same as GCC (GAP9 GCC 7.1.1 without -mPE=): load the word at 0x1A103000 + 18.
+// 18 (0x12) is the load offset, not an AND mask.
+def : Pat<(int_riscv_pulp_CoreCount), (LW (LUI 0x1A103), 18)>;
+def : Pat<(int_riscv_pulp_CoreCount_m1), (ADDI (LW (LUI 0x1A103), 18), -1)>;
 def : Pat<(int_riscv_pulp_ClusterId), (SRLI (ANDI (CSRRS MHARTID.Encoding, (XLenVT X0)), 0b11111100000), 5)>;
 def : Pat<(int_riscv_pulp_IsFc), (SRLI (ANDI (CSRRS MHARTID.Encoding, (XLenVT X0)), 0b10000000000), 10)>;
 // Symbols below must be provided by the platform, no CSR involved
