@@ -1759,6 +1759,28 @@ def : Pat<(v4i8 (bitconvert (i32 GPR:$rs1))), (v4i8 GPRAV4:$rs1)>;
 def : Pat<(i32 (bitconvert GPRAV2:$rs1)), (i32 (i32 GPR:$rs1))>;
 def : Pat<(i32 (bitconvert GPRAV4:$rs1)), (i32 (i32 GPR:$rs1))>;
 
+// Bitcasts between f32 and the GPR-held packed vectors (v2i16, v4i8; v2f16 and
+// v2bf16 are legalized to v2i16). They mirror the upstream f32 <-> i32 bitcast
+// patterns in RISCVInstrInfoF.td: with F the float sits in an F register and
+// needs fmv.x.w / fmv.w.x, with Zfinx it already sits in the GPR (sub_32 of
+// the X register) and the bitcast is only a register class change.
+foreach VTRC = [[v2i16, GPRAV2], [v4i8, GPRAV4]] in {
+  defvar VT = !cast<ValueType>(VTRC[0]);
+  defvar RC = !cast<RegisterClass>(VTRC[1]);
+  let Predicates = [HasPULPExtV2, HasStdExtF, IsRV32] in {
+    def : Pat<(VT (bitconvert (f32 FPR32:$rs1))),
+              (COPY_TO_REGCLASS (i32 (FMV_X_W FPR32:$rs1)), RC)>;
+    def : Pat<(f32 (bitconvert (VT RC:$rs1))),
+              (FMV_W_X (i32 (COPY_TO_REGCLASS RC:$rs1, GPR)))>;
+  }
+  let Predicates = [HasPULPExtV2, HasStdExtZfinx, IsRV32] in {
+    def : Pat<(VT (bitconvert (f32 FPR32INX:$rs1))),
+              (INSERT_SUBREG (VT (IMPLICIT_DEF)), FPR32INX:$rs1, sub_32)>;
+    def : Pat<(f32 (bitconvert (VT RC:$rs1))),
+              (EXTRACT_SUBREG RC:$rs1, sub_32)>;
+  }
+}
+
 // Patterns for load/store instructions
 
 // post increment loads need custom selection, because tablegen can't deal with
