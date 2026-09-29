@@ -267,3 +267,20 @@ def pulp_cplxmuls2div2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vect
 def pulp_cplxmuls2div4 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xgap">;
 def pulp_cplxmuls2div8 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xgap">;
 } // Attributes = [NoThrow, Const]
+
+// GAP9 f32 scalar builtins (task 20/F036, backlog B97 batch A). Prototypes
+// are GAP9 GCC's. They map to standard F/Zfinx instructions (GAP9 is Zfinx):
+//  - f32max/f32min: fmax.s/fmin.s (IEEE 754-2019 maximumNumber/minimumNumber:
+//    a NaN operand yields the other operand, -0.0 < +0.0)
+//  - f32abs: fabs.s; f32sqrt: fsqrt.s (dynamic rounding mode)
+//  - rintsf2/rdownsf2/rupsf2: fcvt.w.s with rounding mode rmm/rdn/rup
+//    (saturating: NaN and too large give INT_MAX, too small gives INT_MIN)
+let Attributes = [NoThrow, Const] in {
+def pulp_f32max : PULPBuiltin<"float(float, float)", "xpulpv,(f|zfinx)">;
+def pulp_f32min : PULPBuiltin<"float(float, float)", "xpulpv,(f|zfinx)">;
+def pulp_f32abs : PULPBuiltin<"float(float)", "xpulpv,(f|zfinx)">;
+def pulp_f32sqrt : PULPBuiltin<"float(float)", "xpulpv,(f|zfinx)">;
+def pulp_rintsf2 : PULPBuiltin<"int(float)", "xpulpv,(f|zfinx)">;
+def pulp_rdownsf2 : PULPBuiltin<"int(float)", "xpulpv,(f|zfinx)">;
+def pulp_rupsf2 : PULPBuiltin<"int(float)", "xpulpv,(f|zfinx)">;
+} // Attributes = [NoThrow, Const]
