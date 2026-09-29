@@ -678,6 +678,12 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
       setOperationAction(ISD::VECREDUCE_ADD, VT, Legal);
       setOperationPromotedToType(ISD::LOAD, VT, MVT::i32);
       setOperationPromotedToType(ISD::STORE, VT, MVT::i32);
+      // A scalar-condition select of a packed vector is a select of the GPR
+      // that holds it: bitcast to i32 and use the XLenVT select lowering
+      // (lowerSELECT -> RISCVISD::SELECT_CC -> Select_GPR_Using_CC_GPR).
+      // SELECT_CC is expanded to SETCC + SELECT, as upstream does for XLenVT.
+      setOperationPromotedToType(ISD::SELECT, VT, MVT::i32);
+      setOperationAction(ISD::SELECT_CC, VT, Expand);
       setOperationAction(ISD::VSELECT, VT, Expand);
       setOperationAction(ISD::MUL, VT, Expand);
       setOperationAction(ISD::SDIV, VT, Expand);
