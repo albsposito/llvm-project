@@ -385,4 +385,31 @@ let TargetPrefix = "riscv" in {
                                 [IntrNoMem, IntrSpeculatable]>;
   defm rupsf2 : PulpIntrinsic<[llvm_i32_ty], [llvm_float_ty],
                               [IntrNoMem, IntrSpeculatable]>;
+  // GAP9 half-precision builtins (task 20/F042). float16 scalars are half.
+  // bfloat16 scalars (float16alt) are passed as their 16 bits (i16) and the
+  // packed pairs (v2h, v2ah) as their 32 bits (i32, lane 0 in bits 15:0);
+  // clang's builtin call bitcasts the C types. Until the backend has
+  // bfloat16 and packed half-precision instructions, a bfloat or vector
+  // value in the IR can be kept as f32 between blocks and rounded back
+  // through the libcall __truncsfbf2 (missing from GAP9's libgcc) or fail to
+  // select; integer types keep the builtins free of both. Lowered in
+  // RISCVISelLowering.cpp (lowerPULPFP16Intrinsic).
+  defm f16max : PulpIntrinsic<[llvm_half_ty], [llvm_half_ty, llvm_half_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
+  defm f16min : PulpIntrinsic<[llvm_half_ty], [llvm_half_ty, llvm_half_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
+  defm f16sqrt : PulpIntrinsic<[llvm_half_ty], [llvm_half_ty],
+                               [IntrNoMem, IntrSpeculatable]>;
+  defm f16altmax : PulpIntrinsic<[llvm_i16_ty], [llvm_i16_ty, llvm_i16_ty],
+                                 [IntrNoMem, IntrSpeculatable]>;
+  defm f16altmin : PulpIntrinsic<[llvm_i16_ty], [llvm_i16_ty, llvm_i16_ty],
+                                 [IntrNoMem, IntrSpeculatable]>;
+  defm f16altsqrt : PulpIntrinsic<[llvm_i16_ty], [llvm_i16_ty],
+                                  [IntrNoMem, IntrSpeculatable]>;
+  defm f16max2 : PulpBinary32;
+  defm f16min2 : PulpBinary32;
+  defm f16altmax2 : PulpBinary32;
+  defm f16altmin2 : PulpBinary32;
+  defm v2hftov2ohf : PulpUnary32;
+  defm v2ohftov2hf : PulpUnary32;
 }
