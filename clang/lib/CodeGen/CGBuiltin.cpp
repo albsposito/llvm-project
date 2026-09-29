@@ -23276,20 +23276,29 @@ Value *CodeGenFunction::EmitRISCVBuiltinExpr(unsigned BuiltinID,
   // each 16-bit lane and nothing else (GCC: fabs.h, fabs.ah, vfabs.h,
   // vfabs.ah; no FP exception, NaN payloads kept).
   //  - f16abs: generic llvm.fabs.f16, selected as fabs.h (Zhinx).
-  //  - f16abs2 / f16altabs2: the pair is one 32-bit register; AND it with
-  //    0x7fff7fff (bits 15 and 31 are the two sign bits).
-  //  - f16altabs: p.bclr of bit 15 through the Xpulpv bclr intrinsic. Not
-  //    llvm.fabs.bf16 nor an i16 AND (which InstCombine turns into
-  //    llvm.fabs.bf16): LLVM 20 legalizes a bfloat fabs through float and
-  //    __truncsfbf2, which quiets signalling NaNs and is missing from GAP9's
-  //    libgcc (fixed upstream after LLVM 20 by 11571a005a38).
+  //  - f16abs2: the pair is one 32-bit register; AND it with 0x7fff7fff
+  //    (bits 15 and 31 are the two sign bits). InstCombine may refold this
+  //    into llvm.fabs.f16 on an extracted lane, which is fine (fabs.h).
+  //  - f16altabs, f16altabs2: p.bclr of bit 15 (and of bit 31 for the pair)
+  //    through the Xpulpv bclr intrinsic, which InstCombine cannot see
+  //    through. Never llvm.fabs.bf16 nor a plain AND (InstCombine narrows an
+  //    AND on an extracted lane to i16 and turns it into llvm.fabs.bf16):
+  //    LLVM 20 legalizes a bfloat fabs through float and __truncsfbf2, which
+  //    quiets signalling NaNs and is missing from GAP9's libgcc (fixed
+  //    upstream after LLVM 20 by 11571a005a38).
   switch (BuiltinID) {
   case RISCV::BI__builtin_pulp_f16abs:
     return emitBuiltinWithOneOverloadedType<1>(*this, E, Intrinsic::fabs);
-  case RISCV::BI__builtin_pulp_f16abs2:
-  case RISCV::BI__builtin_pulp_f16altabs2: {
+  case RISCV::BI__builtin_pulp_f16abs2: {
     Value *Pair = Builder.CreateBitCast(EmitScalarExpr(E->getArg(0)), Int32Ty);
     Value *Abs = Builder.CreateAnd(Pair, Builder.getInt32(0x7fff7fff));
+    return Builder.CreateBitCast(Abs, ConvertType(E->getType()));
+  }
+  case RISCV::BI__builtin_pulp_f16altabs2: {
+    Function *BClr = CGM.getIntrinsic(Intrinsic::riscv_pulp_bclr);
+    Value *Pair = Builder.CreateBitCast(EmitScalarExpr(E->getArg(0)), Int32Ty);
+    Value *Lo = Builder.CreateCall(BClr, {Pair, Builder.getInt32(0xffff7fff)});
+    Value *Abs = Builder.CreateCall(BClr, {Lo, Builder.getInt32(0x7fffffff)});
     return Builder.CreateBitCast(Abs, ConvertType(E->getType()));
   }
   case RISCV::BI__builtin_pulp_f16altabs: {
