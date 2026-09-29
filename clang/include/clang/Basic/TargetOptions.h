@@ -105,6 +105,10 @@ public:
   // architectures.
   uint64_t LargeDataThreshold;
 
+  /// PULP: number of cluster cores given with -mPE=<N> (GCC compatibility).
+  /// __builtin_pulp_CoreCount() folds to it; 0 means unknown (run-time read).
+  unsigned PULPClusterCores = 0;
+
   /// The version of the SDK which was used during the compilation.
   /// The option is used for two different purposes:
   /// * on darwin the version is propagated to LLVM where it's used

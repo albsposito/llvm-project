@@ -58,8 +58,13 @@ def sdma_wait_for_idle : PULPBuiltin<"void()", "xdma">;
 let Attributes = [NoThrow, Const] in {
 def bitinsert : PULPBuiltin<"int(int, int, _Constant unsigned int, _Constant unsigned int)", "xpulpv">; // NOTE: normal builtin in GCC
 } // Attributes = [NoThrow, Const]
-let Attributes = [NoThrow] in {
+// Constexpr: fold to the -mPE=<N> value (N - 1 for _m1) when one is given
+// (ExprConstant.cpp).
+let Attributes = [NoThrow, Constexpr] in {
 def pulp_CoreCount : PULPBuiltin<"int()", "xpulpv">;
+def pulp_CoreCount_m1 : PULPBuiltin<"int()", "xpulpv">; // CoreCount() - 1, as GCC
+} // Attributes = [NoThrow, Constexpr]
+let Attributes = [NoThrow] in {
 def pulp_CoreId : PULPBuiltin<"int()", "xpulpv">;
 def pulp_ClusterId : PULPBuiltin<"int()", "xpulpv">;
 def pulp_IsFc : PULPBuiltin<"int()", "xpulpv">;

@@ -13818,6 +13818,20 @@ bool IntExprEvaluator::VisitBuiltinCallExpr(const CallExpr *E,
     return Success(CarryOut, E);
   }
 
+  case clang::RISCV::BI__builtin_pulp_CoreCount:
+  case clang::RISCV::BI__builtin_pulp_CoreCount_m1: {
+    // PULP: GCC folds these to its -mPE=<N> value (N - 1 for _m1); without it
+    // (0), or without Xpulpv (the builtin is then rejected), the call is not a
+    // constant and is read at run time.
+    const TargetInfo &TI = Info.Ctx.getTargetInfo();
+    unsigned Cores = TI.getTargetOpts().PULPClusterCores;
+    if (!Cores || !TI.hasFeature("xpulpv"))
+      return false;
+    if (BuiltinOp == clang::RISCV::BI__builtin_pulp_CoreCount_m1)
+      --Cores;
+    return Success(Cores, E);
+  }
+
   case clang::X86::BI__builtin_ia32_bextr_u32:
   case clang::X86::BI__builtin_ia32_bextr_u64:
   case clang::X86::BI__builtin_ia32_bextri_u32:
