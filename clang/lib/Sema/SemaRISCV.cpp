@@ -606,6 +606,38 @@ static bool CheckPULPBuiltinShuffle(Sema &S, CallExpr *TheCall) {
   return false;
 }
 
+// PULP (20/F043): index of the first immediate argument of the builtins whose
+// immediates GAP9 GCC checks only after optimisation (all following arguments
+// are immediates too), or 0 for any other builtin. Must match
+// getPulpDeferredImmIntrinsic in clang/lib/CodeGen/CGBuiltin.cpp.
+static unsigned getPulpDeferredImmArgStart(unsigned BuiltinID) {
+  switch (BuiltinID) {
+  default:
+    return 0;
+  case RISCV::BI__builtin_pulp_clip:
+  case RISCV::BI__builtin_pulp_clipu:
+    return 1;
+  case RISCV::BI__builtin_pulp_mulsN:
+  case RISCV::BI__builtin_pulp_muluN:
+  case RISCV::BI__builtin_pulp_mulhhsN:
+  case RISCV::BI__builtin_pulp_mulhhuN:
+  case RISCV::BI__builtin_pulp_mulsRN:
+  case RISCV::BI__builtin_pulp_muluRN:
+  case RISCV::BI__builtin_pulp_mulhhsRN:
+  case RISCV::BI__builtin_pulp_mulhhuRN:
+    return 2;
+  case RISCV::BI__builtin_pulp_macsN:
+  case RISCV::BI__builtin_pulp_macuN:
+  case RISCV::BI__builtin_pulp_machhsN:
+  case RISCV::BI__builtin_pulp_machhuN:
+  case RISCV::BI__builtin_pulp_macsRN:
+  case RISCV::BI__builtin_pulp_macuRN:
+  case RISCV::BI__builtin_pulp_machhsRN:
+  case RISCV::BI__builtin_pulp_machhuRN:
+    return 3;
+  }
+}
+
 bool SemaRISCV::CheckBuiltinFunctionCall(const TargetInfo &TI,
                                          unsigned BuiltinID,
                                          CallExpr *TheCall) {
@@ -680,6 +712,22 @@ bool SemaRISCV::CheckBuiltinFunctionCall(const TargetInfo &TI,
 
     break;
   }
+  }
+  // PULP (20/F043): GAP9 GCC checks the normalisation/rounding immediates of
+  // __builtin_pulp_{mul,mac}{s,u,hhs,hhu}[R]N and the clip/clipu bounds only
+  // after optimisation, so it accepts e.g. `int n = 10; mulsN(x, y, n)` or a
+  // bound that inlining makes constant, and rejects a true run-time value.
+  // When every such argument is an integer constant expression the checks
+  // below run unchanged. Otherwise they are left to the back end
+  // (RISCVISelLowering, llvm.riscv.pulp.*.deferred), which applies the same
+  // rules to the value after optimisation.
+  if (unsigned FirstImm = getPulpDeferredImmArgStart(BuiltinID)) {
+    for (unsigned I = FirstImm, E = TheCall->getNumArgs(); I != E; ++I) {
+      const Expr *Arg = TheCall->getArg(I);
+      if (Arg->isTypeDependent() || Arg->isValueDependent() ||
+          !Arg->isIntegerConstantExpr(Context))
+        return false;
+    }
   }
   auto ArgValue = [&](int ArgNum) -> int {
     llvm::APSInt Result;
