@@ -2785,6 +2785,77 @@ static RValue EmitHipStdParUnsupportedBuiltin(CodeGenFunction *CGF,
   return RValue::get(CGF->Builder.CreateCall(UBF, Args));
 }
 
+// PULP (20/F043): the mul/mac N/RN and clip/clipu builtins, whose immediates
+// GAP9 GCC checks only after optimisation (see SemaRISCV.cpp,
+// getPulpDeferredImmArgStart, which must list the same builtins). Returns the
+// intrinsic with immediate (ImmArg) operands, the llvm.riscv.pulp.*.deferred
+// intrinsic without them, and the index of the first immediate argument; all
+// arguments from that index on are immediates.
+static bool getPulpDeferredImmIntrinsic(unsigned BuiltinID,
+                                        Intrinsic::ID &ImmID,
+                                        Intrinsic::ID &DeferredID,
+                                        unsigned &FirstImm) {
+  switch (BuiltinID) {
+  default:
+    return false;
+#define PULP_DEFERRED(NAME, FIRST)                                             \
+  case clang::RISCV::BI__builtin_pulp_##NAME:                                  \
+    ImmID = Intrinsic::riscv_pulp_##NAME;                                      \
+    DeferredID = Intrinsic::riscv_pulp_##NAME##_deferred;                      \
+    FirstImm = FIRST;                                                          \
+    return true;
+    PULP_DEFERRED(clip, 1)
+    PULP_DEFERRED(clipu, 1)
+    PULP_DEFERRED(mulsN, 2)
+    PULP_DEFERRED(muluN, 2)
+    PULP_DEFERRED(mulhhsN, 2)
+    PULP_DEFERRED(mulhhuN, 2)
+    PULP_DEFERRED(mulsRN, 2)
+    PULP_DEFERRED(muluRN, 2)
+    PULP_DEFERRED(mulhhsRN, 2)
+    PULP_DEFERRED(mulhhuRN, 2)
+    PULP_DEFERRED(macsN, 3)
+    PULP_DEFERRED(macuN, 3)
+    PULP_DEFERRED(machhsN, 3)
+    PULP_DEFERRED(machhuN, 3)
+    PULP_DEFERRED(macsRN, 3)
+    PULP_DEFERRED(macuRN, 3)
+    PULP_DEFERRED(machhsRN, 3)
+    PULP_DEFERRED(machhuRN, 3)
+#undef PULP_DEFERRED
+  }
+}
+
+// If every immediate argument is an integer constant expression, emit the
+// ImmArg intrinsic with those constants (what the generic ClangBuiltin path
+// emitted while the prototype marked them _Constant). Otherwise emit the
+// deferred intrinsic with the argument values as they are; the back end
+// checks them after optimisation.
+static Value *EmitPULPDeferredImmBuiltin(CodeGenFunction &CGF,
+                                         unsigned BuiltinID,
+                                         const CallExpr *E) {
+  Intrinsic::ID ImmID, DeferredID;
+  unsigned FirstImm;
+  if (!CGF.getTarget().getTriple().isRISCV() ||
+      CGF.getContext().BuiltinInfo.isAuxBuiltinID(BuiltinID) ||
+      !getPulpDeferredImmIntrinsic(BuiltinID, ImmID, DeferredID, FirstImm))
+    return nullptr;
+  ASTContext &Ctx = CGF.getContext();
+  bool AllConstant = true;
+  for (unsigned I = FirstImm, N = E->getNumArgs(); I != N; ++I)
+    AllConstant &= E->getArg(I)->isIntegerConstantExpr(Ctx);
+  SmallVector<Value *, 5> Args;
+  for (unsigned I = 0, N = E->getNumArgs(); I != N; ++I) {
+    if (AllConstant && I >= FirstImm)
+      Args.push_back(llvm::ConstantInt::get(
+          CGF.getLLVMContext(), *E->getArg(I)->getIntegerConstantExpr(Ctx)));
+    else
+      Args.push_back(CGF.EmitScalarExpr(E->getArg(I)));
+  }
+  return CGF.Builder.CreateCall(
+      CGF.CGM.getIntrinsic(AllConstant ? ImmID : DeferredID), Args);
+}
+
 RValue CodeGenFunction::EmitBuiltinExpr(const GlobalDecl GD, unsigned BuiltinID,
                                         const CallExpr *E,
                                         ReturnValueSlot ReturnValue) {
@@ -6442,6 +6513,10 @@ RValue CodeGenFunction::EmitBuiltinExpr(const GlobalDecl GD, unsigned BuiltinID,
   // generic builtins start to require generic target features then we
   // can move this up to the beginning of the function.
   checkTargetFeatures(E, FD);
+
+  // PULP (20/F043): must come before the generic ClangBuiltin path below.
+  if (Value *V = EmitPULPDeferredImmBuiltin(*this, BuiltinID, E))
+    return RValue::get(V);
 
   if (unsigned VectorWidth = getContext().BuiltinInfo.getRequiredVectorWidth(BuiltinID))
     LargestVectorWidth = std::max(LargestVectorWidth, VectorWidth);
