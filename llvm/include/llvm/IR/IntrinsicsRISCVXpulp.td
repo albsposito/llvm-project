@@ -330,6 +330,24 @@ let TargetPrefix = "riscv" in {
                 [llvm_ptr_ty, llvm_ptr_ty, llvm_i32_ty],
                 [IntrWriteMem, WriteOnly<ArgIndex<1>>, NoCapture<ArgIndex<1>>]>;
 
+  // GAP9 fractional-multiply aliases, 64-bit high multiplies and truncations
+  // (task 20/F037). mulf*/macf* are the mul*/mac* operations under GAP9 GCC's
+  // second name and select the same instructions (RISCVInstrInfoXpulp.td).
+  defm mulfs : PulpBinary32;
+  defm mulfu : PulpBinary32;
+  defm macfs : PulpTernary32;
+  defm macfu : PulpTernary32;
+  defm fs : mul_mac_N_RN; // mulfsN, mulfsRN, macfsN, macfsRN
+  defm fu : mul_mac_N_RN; // mulfuN, mulfuRN, macfuN, macfuRN
+  defm mul64hs : PulpBinary32;
+  defm mul64hu : PulpBinary32;
+  defm mul64hus : PulpBinary32;
+  // (short)x and (char)x: the result types match the builtins' C return types
+  // (clang only bitcasts), and the RISC-V lowering turns them into a plain
+  // truncate during type legalization.
+  defm trunch : PulpIntrinsic<[llvm_i16_ty], [llvm_i32_ty], [IntrNoMem]>;
+  defm truncb : PulpIntrinsic<[llvm_i8_ty], [llvm_i32_ty], [IntrNoMem]>;
+
   def int_riscv_pulp_bitinsert
     : ClangBuiltin<"__builtin_bitinsert">, // NOTE: GCC has no pulp here
       Intrinsic<[llvm_i32_ty],
