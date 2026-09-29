@@ -324,4 +324,23 @@ let TargetPrefix = "riscv" in {
   defm cplxmuls2div2 : PulpBinaryV2;
   defm cplxmuls2div4 : PulpBinaryV2;
   defm cplxmuls2div8 : PulpBinaryV2;
+
+  // GAP9 f32 scalar builtins (task 20/F036). Lowered in
+  // RISCVTargetLowering::LowerINTRINSIC_WO_CHAIN to the generic nodes for
+  // fmax.s/fmin.s/fabs.s/fsqrt.s and to RISCVISD::FCVT_X (saturating
+  // fcvt.w.s) with a fixed rounding mode.
+  defm f32max : PulpIntrinsic<[llvm_float_ty], [llvm_float_ty, llvm_float_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
+  defm f32min : PulpIntrinsic<[llvm_float_ty], [llvm_float_ty, llvm_float_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
+  defm f32abs : PulpIntrinsic<[llvm_float_ty], [llvm_float_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
+  defm f32sqrt : PulpIntrinsic<[llvm_float_ty], [llvm_float_ty],
+                               [IntrNoMem, IntrSpeculatable]>;
+  defm rintsf2 : PulpIntrinsic<[llvm_i32_ty], [llvm_float_ty],
+                               [IntrNoMem, IntrSpeculatable]>;
+  defm rdownsf2 : PulpIntrinsic<[llvm_i32_ty], [llvm_float_ty],
+                                [IntrNoMem, IntrSpeculatable]>;
+  defm rupsf2 : PulpIntrinsic<[llvm_i32_ty], [llvm_float_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
 }
