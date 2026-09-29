@@ -21357,6 +21357,12 @@ RISCVTargetLowering::getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
   if (Constraint.size() == 1) {
     switch (Constraint[0]) {
     case 'r':
+      // PULP (Xpulpv2, and Xpulpfvec which implies it): a 32-bit packed SIMD
+      // vector (v2i16, v4i8, v2f16, v2bf16) lives in one GPR, as in GAP9 GCC.
+      // The generic inline-asm code bitcasts the operand to the class's i32.
+      if (VT.isFixedLengthVector() && Subtarget.hasPULPExtV2() &&
+          !Subtarget.is64Bit() && VT.getFixedSizeInBits() == 32)
+        return std::make_pair(0U, &RISCV::GPRNoX0RegClass);
       // TODO: Support fixed vectors up to XLen for P extension?
       if (VT.isVector())
         break;
