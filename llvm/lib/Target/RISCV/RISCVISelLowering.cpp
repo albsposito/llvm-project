@@ -9848,11 +9848,113 @@ static inline bool isValidEGW(int EGS, EVT VT,
          EGS * VT.getScalarSizeInBits();
 }
 
+// PULP (20/F043): llvm.riscv.pulp.<op>.deferred is emitted by clang for a
+// mul/mac N/RN or clip/clipu builtin whose immediate arguments are not integer
+// constant expressions. GAP9 GCC checks those arguments after optimisation,
+// with these rules: normalisation N <= 31; for the RN forms 1 <= N <= 31 and
+// rounding == 2^(N-1); clip bounds -2^(N-1) and 2^(N-1)-1 (clipu: 0 and
+// 2^(N-1)-1) with 1 <= N <= 30 (the same rules clang/lib/Sema/SemaRISCV.cpp
+// applies to constant expressions). If the operands are now constants that
+// pass, this becomes the ImmArg intrinsic llvm.riscv.pulp.<op>, selected by
+// the existing patterns; otherwise it reports an error, like GCC.
+static SDValue lowerPulpDeferredImmIntrinsic(SDValue Op, SelectionDAG &DAG,
+                                             unsigned IntNo, MVT XLenVT) {
+  enum { Norm, NormRound, Clip, ClipU } Kind;
+  unsigned ImmID;
+  switch (IntNo) {
+  default:
+    return SDValue();
+#define PULP_DEFERRED(NAME, KIND)                                              \
+  case Intrinsic::riscv_pulp_##NAME##_deferred:                                \
+    ImmID = Intrinsic::riscv_pulp_##NAME;                                      \
+    Kind = KIND;                                                               \
+    break;
+    PULP_DEFERRED(clip, Clip)
+    PULP_DEFERRED(clipu, ClipU)
+    PULP_DEFERRED(mulsN, Norm)
+    PULP_DEFERRED(muluN, Norm)
+    PULP_DEFERRED(mulhhsN, Norm)
+    PULP_DEFERRED(mulhhuN, Norm)
+    PULP_DEFERRED(mulsRN, NormRound)
+    PULP_DEFERRED(muluRN, NormRound)
+    PULP_DEFERRED(mulhhsRN, NormRound)
+    PULP_DEFERRED(mulhhuRN, NormRound)
+    PULP_DEFERRED(macsN, Norm)
+    PULP_DEFERRED(macuN, Norm)
+    PULP_DEFERRED(machhsN, Norm)
+    PULP_DEFERRED(machhuN, Norm)
+    PULP_DEFERRED(macsRN, NormRound)
+    PULP_DEFERRED(macuRN, NormRound)
+    PULP_DEFERRED(machhsRN, NormRound)
+    PULP_DEFERRED(machhuRN, NormRound)
+#undef PULP_DEFERRED
+  }
+  SDLoc DL(Op);
+  EVT VT = Op.getValueType();
+  // Operand 0 is the intrinsic ID; the immediates are the trailing operands.
+  unsigned NumOps = Op.getNumOperands();
+  unsigned FirstImm = (Kind == Clip || Kind == ClipU) ? 2
+                      : Kind == NormRound             ? NumOps - 2
+                                                      : NumOps - 1;
+  std::string Builtin =
+      ("__builtin_pulp_" +
+       Intrinsic::getBaseName(ImmID).drop_front(strlen("llvm.riscv.pulp.")))
+          .str();
+  auto Fail = [&](const Twine &Msg) {
+    std::string Text = Msg.str();
+    DAG.getContext()->diagnose(DiagnosticInfoUnsupported(
+        DAG.getMachineFunction().getFunction(), Text, DL.getDebugLoc()));
+    return DAG.getUNDEF(VT);
+  };
+  for (unsigned I = FirstImm; I != NumOps; ++I)
+    if (!isa<ConstantSDNode>(Op.getOperand(I)))
+      return Fail("argument " + Twine(I) + " to '" + Builtin +
+                  "' must be a constant integer (it is not constant after "
+                  "optimization)");
+  auto Imm = [&](unsigned I) { return Op.getConstantOperandAPInt(I); };
+  if (Kind == Norm || Kind == NormRound) {
+    uint64_t N = Imm(FirstImm).getZExtValue();
+    if (Kind == Norm && N > 31)
+      return Fail("normalization argument to '" + Builtin +
+                  "' must be in range [0, 31] (got " + Twine(N) + ")");
+    if (Kind == NormRound) {
+      uint64_t R = Imm(FirstImm + 1).getZExtValue();
+      if (N < 1 || N > 31 || R != (UINT64_C(1) << (N - 1)))
+        return Fail("arguments to '" + Builtin +
+                    "' must be a normalization N in range [1, 31] and a "
+                    "rounding value 2^(N-1) (got " +
+                    Twine(N) + " and " + Twine(R) + ")");
+    }
+  } else {
+    int64_t L = Imm(FirstImm).getSExtValue();
+    int64_t H = Imm(FirstImm + 1).getSExtValue();
+    if (!(H >= 0 && H <= (INT64_C(1) << 29) - 1 && isPowerOf2_64(H + 1) &&
+          L == (Kind == Clip ? -(H + 1) : 0)))
+      return Fail("bounds of '" + Builtin + "' must be " +
+                  (Kind == Clip ? "-2^(N-1)" : "0") +
+                  " and 2^(N-1)-1 with 1 <= N <= 30 (got " + Twine(L) +
+                  " and " + Twine(H) + ")");
+  }
+  SmallVector<SDValue, 6> Ops;
+  Ops.push_back(DAG.getTargetConstant(ImmID, DL, XLenVT));
+  for (unsigned I = 1; I != NumOps; ++I) {
+    SDValue V = Op.getOperand(I);
+    if (I >= FirstImm)
+      V = DAG.getTargetConstant(Imm(I), DL, V.getValueType());
+    Ops.push_back(V);
+  }
+  return DAG.getNode(ISD::INTRINSIC_WO_CHAIN, DL, VT, Ops);
+}
+
 SDValue RISCVTargetLowering::LowerINTRINSIC_WO_CHAIN(SDValue Op,
                                                      SelectionDAG &DAG) const {
   unsigned IntNo = Op.getConstantOperandVal(0);
   SDLoc DL(Op);
   MVT XLenVT = Subtarget.getXLenVT();
+
+  // PULP (20/F043)
+  if (SDValue V = lowerPulpDeferredImmIntrinsic(Op, DAG, IntNo, XLenVT))
+    return V;
 
   switch (IntNo) {
   default:
