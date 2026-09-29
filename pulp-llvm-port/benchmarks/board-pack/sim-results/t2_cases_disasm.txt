@@ -1,0 +1,351 @@
+1c010ac0 <c2_A>:
+1c010ac0:	00000693          	li	a3,0
+1c010ac4:	00000713          	li	a4,0
+1c010ac8:	00000793          	li	a5,0
+
+1c010acc <c2_A_lp>:
+1c010acc:	003540fb          	lp.setup	x1,a0,1c010ad2 <c2_A_body+0x2>
+
+1c010ad0 <c2_A_body>:
+1c010ad0:	0685                	addi	a3,a3,1
+1c010ad2:	070d                	addi	a4,a4,3
+1c010ad4:	00d5a023          	sw	a3,0(a1)
+1c010ad8:	00e5a223          	sw	a4,4(a1)
+1c010adc:	00f5a423          	sw	a5,8(a1)
+1c010ae0:	00008067          	ret
+
+1c010ae4 <c2_M>:
+1c010ae4:	00000693          	li	a3,0
+1c010ae8:	00000713          	li	a4,0
+1c010aec:	00000793          	li	a5,0
+1c010af0:	0001                	nop
+
+1c010af2 <c2_M_lp>:
+1c010af2:	003540fb          	lp.setup	x1,a0,1c010af8 <c2_M_body+0x2>
+
+1c010af6 <c2_M_body>:
+1c010af6:	0685                	addi	a3,a3,1
+1c010af8:	070d                	addi	a4,a4,3
+1c010afa:	00d5a023          	sw	a3,0(a1)
+1c010afe:	00e5a223          	sw	a4,4(a1)
+1c010b02:	00f5a423          	sw	a5,8(a1)
+1c010b06:	00008067          	ret
+	...
+
+1c010b0c <w2_A>:
+1c010b0c:	00000693          	li	a3,0
+1c010b10:	00000713          	li	a4,0
+1c010b14:	00000793          	li	a5,0
+
+1c010b18 <w2_A_lp>:
+1c010b18:	004540fb          	lp.setup	x1,a0,1c010b20 <w2_A_body+0x4>
+
+1c010b1c <w2_A_body>:
+1c010b1c:	00168693          	addi	a3,a3,1
+1c010b20:	00370713          	addi	a4,a4,3
+1c010b24:	00d5a023          	sw	a3,0(a1)
+1c010b28:	00e5a223          	sw	a4,4(a1)
+1c010b2c:	00f5a423          	sw	a5,8(a1)
+1c010b30:	00008067          	ret
+
+1c010b34 <w2_M>:
+1c010b34:	00000693          	li	a3,0
+1c010b38:	00000713          	li	a4,0
+1c010b3c:	00000793          	li	a5,0
+1c010b40:	0001                	nop
+
+1c010b42 <w2_M_lp>:
+1c010b42:	004540fb          	lp.setup	x1,a0,1c010b4a <w2_M_body+0x4>
+
+1c010b46 <w2_M_body>:
+1c010b46:	00168693          	addi	a3,a3,1
+1c010b4a:	00370713          	addi	a4,a4,3
+1c010b4e:	00d5a023          	sw	a3,0(a1)
+1c010b52:	00e5a223          	sw	a4,4(a1)
+1c010b56:	00f5a423          	sw	a5,8(a1)
+1c010b5a:	00008067          	ret
+	...
+
+1c010b60 <cw_A>:
+1c010b60:	00000693          	li	a3,0
+1c010b64:	00000713          	li	a4,0
+1c010b68:	00000793          	li	a5,0
+
+1c010b6c <cw_A_lp>:
+1c010b6c:	003540fb          	lp.setup	x1,a0,1c010b72 <cw_A_body+0x2>
+
+1c010b70 <cw_A_body>:
+1c010b70:	0685                	addi	a3,a3,1
+1c010b72:	00370713          	addi	a4,a4,3
+1c010b76:	00d5a023          	sw	a3,0(a1)
+1c010b7a:	00e5a223          	sw	a4,4(a1)
+1c010b7e:	00f5a423          	sw	a5,8(a1)
+1c010b82:	00008067          	ret
+	...
+
+1c010b88 <cw_M>:
+1c010b88:	00000693          	li	a3,0
+1c010b8c:	00000713          	li	a4,0
+1c010b90:	00000793          	li	a5,0
+1c010b94:	0001                	nop
+
+1c010b96 <cw_M_lp>:
+1c010b96:	003540fb          	lp.setup	x1,a0,1c010b9c <cw_M_body+0x2>
+
+1c010b9a <cw_M_body>:
+1c010b9a:	0685                	addi	a3,a3,1
+1c010b9c:	00370713          	addi	a4,a4,3
+1c010ba0:	00d5a023          	sw	a3,0(a1)
+1c010ba4:	00e5a223          	sw	a4,4(a1)
+1c010ba8:	00f5a423          	sw	a5,8(a1)
+1c010bac:	00008067          	ret
+
+1c010bb0 <wc_A>:
+1c010bb0:	00000693          	li	a3,0
+1c010bb4:	00000713          	li	a4,0
+1c010bb8:	00000793          	li	a5,0
+
+1c010bbc <wc_A_lp>:
+1c010bbc:	004540fb          	lp.setup	x1,a0,1c010bc4 <wc_A_body+0x4>
+
+1c010bc0 <wc_A_body>:
+1c010bc0:	00168693          	addi	a3,a3,1
+1c010bc4:	070d                	addi	a4,a4,3
+1c010bc6:	00d5a023          	sw	a3,0(a1)
+1c010bca:	00e5a223          	sw	a4,4(a1)
+1c010bce:	00f5a423          	sw	a5,8(a1)
+1c010bd2:	00008067          	ret
+	...
+
+1c010bd8 <wc_M>:
+1c010bd8:	00000693          	li	a3,0
+1c010bdc:	00000713          	li	a4,0
+1c010be0:	00000793          	li	a5,0
+1c010be4:	0001                	nop
+
+1c010be6 <wc_M_lp>:
+1c010be6:	004540fb          	lp.setup	x1,a0,1c010bee <wc_M_body+0x4>
+
+1c010bea <wc_M_body>:
+1c010bea:	00168693          	addi	a3,a3,1
+1c010bee:	070d                	addi	a4,a4,3
+1c010bf0:	00d5a023          	sw	a3,0(a1)
+1c010bf4:	00e5a223          	sw	a4,4(a1)
+1c010bf8:	00f5a423          	sw	a5,8(a1)
+1c010bfc:	00008067          	ret
+
+1c010c00 <mix3_A>:
+1c010c00:	00000693          	li	a3,0
+1c010c04:	00000713          	li	a4,0
+1c010c08:	00000793          	li	a5,0
+
+1c010c0c <mix3_A_lp>:
+1c010c0c:	005540fb          	lp.setup	x1,a0,1c010c16 <mix3_A_body+0x6>
+
+1c010c10 <mix3_A_body>:
+1c010c10:	0685                	addi	a3,a3,1
+1c010c12:	00370713          	addi	a4,a4,3
+1c010c16:	97b6                	add	a5,a5,a3
+1c010c18:	00d5a023          	sw	a3,0(a1)
+1c010c1c:	00e5a223          	sw	a4,4(a1)
+1c010c20:	00f5a423          	sw	a5,8(a1)
+1c010c24:	00008067          	ret
+
+1c010c28 <mix3_M>:
+1c010c28:	00000693          	li	a3,0
+1c010c2c:	00000713          	li	a4,0
+1c010c30:	00000793          	li	a5,0
+1c010c34:	0001                	nop
+
+1c010c36 <mix3_M_lp>:
+1c010c36:	005540fb          	lp.setup	x1,a0,1c010c40 <mix3_M_body+0x6>
+
+1c010c3a <mix3_M_body>:
+1c010c3a:	0685                	addi	a3,a3,1
+1c010c3c:	00370713          	addi	a4,a4,3
+1c010c40:	97b6                	add	a5,a5,a3
+1c010c42:	00d5a023          	sw	a3,0(a1)
+1c010c46:	00e5a223          	sw	a4,4(a1)
+1c010c4a:	00f5a423          	sw	a5,8(a1)
+1c010c4e:	00008067          	ret
+	...
+
+1c010c54 <ld_A>:
+1c010c54:	00000693          	li	a3,0
+1c010c58:	00000713          	li	a4,0
+1c010c5c:	00000793          	li	a5,0
+
+1c010c60 <ld_A_lp>:
+1c010c60:	004540fb          	lp.setup	x1,a0,1c010c68 <ld_A_body+0x4>
+
+1c010c64 <ld_A_body>:
+1c010c64:	0046228b          	p.lw	t0,4(a2!)
+1c010c68:	9796                	add	a5,a5,t0
+1c010c6a:	00d5a023          	sw	a3,0(a1)
+1c010c6e:	00e5a223          	sw	a4,4(a1)
+1c010c72:	00f5a423          	sw	a5,8(a1)
+1c010c76:	00008067          	ret
+	...
+
+1c010c7c <ld_M>:
+1c010c7c:	00000693          	li	a3,0
+1c010c80:	00000713          	li	a4,0
+1c010c84:	00000793          	li	a5,0
+1c010c88:	0001                	nop
+
+1c010c8a <ld_M_lp>:
+1c010c8a:	004540fb          	lp.setup	x1,a0,1c010c92 <ld_M_body+0x4>
+
+1c010c8e <ld_M_body>:
+1c010c8e:	0046228b          	p.lw	t0,4(a2!)
+1c010c92:	9796                	add	a5,a5,t0
+1c010c94:	00d5a023          	sw	a3,0(a1)
+1c010c98:	00e5a223          	sw	a4,4(a1)
+1c010c9c:	00f5a423          	sw	a5,8(a1)
+1c010ca0:	00008067          	ret
+
+1c010ca4 <seti_A>:
+1c010ca4:	00000693          	li	a3,0
+1c010ca8:	00000713          	li	a4,0
+1c010cac:	00000793          	li	a5,0
+
+1c010cb0 <seti_A_lp>:
+1c010cb0:	0071d0fb          	lp.setupi	x1,7,1c010cb6 <seti_A_body+0x2>
+
+1c010cb4 <seti_A_body>:
+1c010cb4:	0685                	addi	a3,a3,1
+1c010cb6:	070d                	addi	a4,a4,3
+1c010cb8:	00d5a023          	sw	a3,0(a1)
+1c010cbc:	00e5a223          	sw	a4,4(a1)
+1c010cc0:	00f5a423          	sw	a5,8(a1)
+1c010cc4:	00008067          	ret
+
+1c010cc8 <seti_M>:
+1c010cc8:	00000693          	li	a3,0
+1c010ccc:	00000713          	li	a4,0
+1c010cd0:	00000793          	li	a5,0
+1c010cd4:	0001                	nop
+
+1c010cd6 <seti_M_lp>:
+1c010cd6:	0071d0fb          	lp.setupi	x1,7,1c010cdc <seti_M_body+0x2>
+
+1c010cda <seti_M_body>:
+1c010cda:	0685                	addi	a3,a3,1
+1c010cdc:	070d                	addi	a4,a4,3
+1c010cde:	00d5a023          	sw	a3,0(a1)
+1c010ce2:	00e5a223          	sw	a4,4(a1)
+1c010ce6:	00f5a423          	sw	a5,8(a1)
+1c010cea:	00008067          	ret
+	...
+
+1c010cf0 <long_A>:
+1c010cf0:	00000693          	li	a3,0
+1c010cf4:	00000713          	li	a4,0
+1c010cf8:	00000793          	li	a5,0
+
+1c010cfc <long_A_lp>:
+1c010cfc:	006000fb          	lp.starti	x1,1c010d08 <long_A_body>
+1c010d00:	005010fb          	lp.endi	x1,1c010d0a <long_A_body+0x2>
+1c010d04:	000520fb          	lp.count	x1,a0
+
+1c010d08 <long_A_body>:
+1c010d08:	0685                	addi	a3,a3,1
+1c010d0a:	070d                	addi	a4,a4,3
+1c010d0c:	00d5a023          	sw	a3,0(a1)
+1c010d10:	00e5a223          	sw	a4,4(a1)
+1c010d14:	00f5a423          	sw	a5,8(a1)
+1c010d18:	00008067          	ret
+
+1c010d1c <long_M>:
+1c010d1c:	00000693          	li	a3,0
+1c010d20:	00000713          	li	a4,0
+1c010d24:	00000793          	li	a5,0
+
+1c010d28 <long_M_lp>:
+1c010d28:	007000fb          	lp.starti	x1,1c010d36 <long_M_body>
+1c010d2c:	006010fb          	lp.endi	x1,1c010d38 <long_M_body+0x2>
+1c010d30:	000520fb          	lp.count	x1,a0
+1c010d34:	0001                	nop
+
+1c010d36 <long_M_body>:
+1c010d36:	0685                	addi	a3,a3,1
+1c010d38:	070d                	addi	a4,a4,3
+1c010d3a:	00d5a023          	sw	a3,0(a1)
+1c010d3e:	00e5a223          	sw	a4,4(a1)
+1c010d42:	00f5a423          	sw	a5,8(a1)
+1c010d46:	00008067          	ret
+	...
+
+1c010d4c <nest_AA>:
+1c010d4c:	00000693          	li	a3,0
+1c010d50:	00000713          	li	a4,0
+1c010d54:	00000793          	li	a5,0
+
+1c010d58 <nest_AA_lp>:
+1c010d58:	008540fb          	lp.setup	x1,a0,1c010d68 <nest_AA_body+0x4>
+1c010d5c:	00300313          	li	t1,3
+
+1c010d60 <nest_AA_lpi>:
+1c010d60:	0033407b          	lp.setup	x0,t1,1c010d66 <nest_AA_body+0x2>
+
+1c010d64 <nest_AA_body>:
+1c010d64:	0685                	addi	a3,a3,1
+1c010d66:	0709                	addi	a4,a4,2
+1c010d68:	0785                	addi	a5,a5,1
+1c010d6a:	00d5a023          	sw	a3,0(a1)
+1c010d6e:	00e5a223          	sw	a4,4(a1)
+1c010d72:	00f5a423          	sw	a5,8(a1)
+1c010d76:	00008067          	ret
+	...
+
+1c010d7c <nest_AM>:
+1c010d7c:	00000693          	li	a3,0
+1c010d80:	00000713          	li	a4,0
+1c010d84:	00000793          	li	a5,0
+
+1c010d88 <nest_AM_lp>:
+1c010d88:	009540fb          	lp.setup	x1,a0,1c010d9a <nest_AM_body+0x4>
+1c010d8c:	00300313          	li	t1,3
+1c010d90:	0001                	nop
+
+1c010d92 <nest_AM_lpi>:
+1c010d92:	0033407b          	lp.setup	x0,t1,1c010d98 <nest_AM_body+0x2>
+
+1c010d96 <nest_AM_body>:
+1c010d96:	0685                	addi	a3,a3,1
+1c010d98:	0709                	addi	a4,a4,2
+1c010d9a:	0785                	addi	a5,a5,1
+1c010d9c:	00d5a023          	sw	a3,0(a1)
+1c010da0:	00e5a223          	sw	a4,4(a1)
+1c010da4:	00f5a423          	sw	a5,8(a1)
+1c010da8:	00008067          	ret
+
+1c010dac <nest_MA>:
+1c010dac:	00000693          	li	a3,0
+1c010db0:	00000713          	li	a4,0
+1c010db4:	00000793          	li	a5,0
+1c010db8:	0001                	nop
+
+1c010dba <nest_MA_lp>:
+1c010dba:	008540fb          	lp.setup	x1,a0,1c010dca <nest_MA_body+0x4>
+1c010dbe:	00300313          	li	t1,3
+
+1c010dc2 <nest_MA_lpi>:
+1c010dc2:	0033407b          	lp.setup	x0,t1,1c010dc8 <nest_MA_body+0x2>
+
+1c010dc6 <nest_MA_body>:
+1c010dc6:	0685                	addi	a3,a3,1
+1c010dc8:	0709                	addi	a4,a4,2
+1c010dca:	0785                	addi	a5,a5,1
+1c010dcc:	00d5a023          	sw	a3,0(a1)
+1c010dd0:	00e5a223          	sw	a4,4(a1)
+1c010dd4:	00f5a423          	sw	a5,8(a1)
+1c010dd8:	00008067          	ret
+
+1c010ddc <nest_MM>:
+1c010ddc <nest_MM>:
+1c010ddc:	00000693          	li	a3,0
+1c010de0:	00000713          	li	a4,0
+1c010de4:	00000793          	li	a5,0
+1c010de8:	0001                	nop
+

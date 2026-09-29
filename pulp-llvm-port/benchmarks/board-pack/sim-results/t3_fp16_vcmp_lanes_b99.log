@@ -1,0 +1,118 @@
+
+=== BOARD-PACK t3_fp16_vcmp_lanes_b99 (pack 2026-09-29) ===
+INFO compiler of this file: 7.1.1 20170509
+INFO platform: board
+INFO cluster task runs on cluster 0 core 8 (the cluster controller)
+RESULT t3 core=cl op=vfeq.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000000
+RESULT t3 core=cl op=vfeq.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000000
+RESULT t3 core=cl op=vfeq.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vfeq.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=cl op=vfne.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000003
+RESULT t3 core=cl op=vfne.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000003
+RESULT t3 core=cl op=vfne.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vfne.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=cl op=vflt.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vflt.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vflt.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vflt.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=cl op=vfle.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vfle.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vfle.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000003
+RESULT t3 core=cl op=vfle.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=cl op=vfgt.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vfgt.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vfgt.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000000
+RESULT t3 core=cl op=vfgt.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=cl op=vfge.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vfge.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vfge.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vfge.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=cl op=vfeq.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000000
+RESULT t3 core=cl op=vfeq.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000000
+RESULT t3 core=cl op=vfeq.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vfeq.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=cl op=vfne.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000003
+RESULT t3 core=cl op=vfne.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000003
+RESULT t3 core=cl op=vfne.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vfne.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=cl op=vflt.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vflt.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vflt.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vflt.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=cl op=vfle.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vfle.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vfle.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000003
+RESULT t3 core=cl op=vfle.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=cl op=vfgt.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vfgt.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vfgt.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000000
+RESULT t3 core=cl op=vfgt.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=cl op=vfge.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000002
+RESULT t3 core=cl op=vfge.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vfge.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000001
+RESULT t3 core=cl op=vfge.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=cl gcc_c_compare(a<b, a={1,3} b={2,2}) lanes=0x00000001
+RESULT t3 core=cl gcc_c_select=0x40004000 (C semantics want 0x40003c00; GVSoC gives 0x40004000)
+VERDICT Q2 compare result format on cl: bitmask (lane i -> bit i) (matches of 36 non-NaN results: bitmask 36, lane0/1 18, lane0/-1 6)
+VERDICT Q2 NaN on cl: vfne.h(NaN)=0x00000000 vfne.ah(NaN)=0x00000000 (IEEE unordered '!=' is true in both lanes; GVSoC gives 0)
+CHECK t3.cl.format_is_bitmask_like_gvsoc PASS got=0x00000000 want=0x00000000
+CHECK t3.cl.vfne_h_nan_like_gvsoc PASS got=0x00000000 want=0x00000000
+CHECK t3.cl.gcc_select_like_gvsoc PASS got=0x40004000 want=0x40004000
+INFO starting the FC part; if the output stops here, the FC does not implement the packed fp16 compares (the cluster results above are the answer)
+RESULT t3 core=fc op=vfeq.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000000
+RESULT t3 core=fc op=vfeq.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000000
+RESULT t3 core=fc op=vfeq.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vfeq.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=fc op=vfne.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000003
+RESULT t3 core=fc op=vfne.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000003
+RESULT t3 core=fc op=vfne.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vfne.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=fc op=vflt.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vflt.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vflt.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vflt.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=fc op=vfle.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vfle.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vfle.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000003
+RESULT t3 core=fc op=vfle.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=fc op=vfgt.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vfgt.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vfgt.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000000
+RESULT t3 core=fc op=vfgt.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=fc op=vfge.h pair="a={1,3} b={2,2}" a=0x42003c00 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vfge.h pair="a={3,1} b={2,2}" a=0x3c004200 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vfge.h pair="a={2,1} b={2,2}" a=0x3c004000 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vfge.h pair="a={nan,1} b={1,nan}" a=0x3c007e00 b=0x7e003c00 rd=0x00000000
+RESULT t3 core=fc op=vfeq.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000000
+RESULT t3 core=fc op=vfeq.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000000
+RESULT t3 core=fc op=vfeq.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vfeq.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=fc op=vfne.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000003
+RESULT t3 core=fc op=vfne.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000003
+RESULT t3 core=fc op=vfne.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vfne.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=fc op=vflt.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vflt.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vflt.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vflt.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=fc op=vfle.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vfle.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vfle.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000003
+RESULT t3 core=fc op=vfle.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=fc op=vfgt.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vfgt.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vfgt.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000000
+RESULT t3 core=fc op=vfgt.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=fc op=vfge.ah pair="a={1,3} b={2,2}" a=0x40403f80 b=0x40004000 rd=0x00000002
+RESULT t3 core=fc op=vfge.ah pair="a={3,1} b={2,2}" a=0x3f804040 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vfge.ah pair="a={2,1} b={2,2}" a=0x3f804000 b=0x40004000 rd=0x00000001
+RESULT t3 core=fc op=vfge.ah pair="a={nan,1} b={1,nan}" a=0x3f807fc0 b=0x7fc03f80 rd=0x00000000
+RESULT t3 core=fc gcc_c_compare(a<b, a={1,3} b={2,2}) lanes=0x00000001
+RESULT t3 core=fc gcc_c_select=0x40004000 (C semantics want 0x40003c00; GVSoC gives 0x40004000)
+VERDICT Q2 compare result format on fc: bitmask (lane i -> bit i) (matches of 36 non-NaN results: bitmask 36, lane0/1 18, lane0/-1 6)
+VERDICT Q2 NaN on fc: vfne.h(NaN)=0x00000000 vfne.ah(NaN)=0x00000000 (IEEE unordered '!=' is true in both lanes; GVSoC gives 0)
+CHECK t3.fc.format_is_bitmask_like_gvsoc PASS got=0x00000000 want=0x00000000
+CHECK t3.fc.vfne_h_nan_like_gvsoc PASS got=0x00000000 want=0x00000000
+CHECK t3.fc.gcc_select_like_gvsoc PASS got=0x40004000 want=0x40004000
+=== END t3_fp16_vcmp_lanes_b99 pass=6 fail=0
+[run_app] exit code: 0

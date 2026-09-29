@@ -1,0 +1,59 @@
+
+=== BOARD-PACK t6_kernels_clang_vs_gcc (pack 2026-09-29) ===
+INFO compiler of this file: 7.1.1 20170509
+INFO platform: board
+INFO kernel library: gcc -O3: 7.1.1 20170509
+INFO kernels in the library: 12 of 12
+INFO running 12 kernels on FC
+RESULT t6 core=fc lib=gcc-O3 kernel=k01_fir_fix16 cycles=15143 instrs=14356 checksum=0x0b3c9219 reps=4 total_cycles=60575 pccr_cycles=60596
+CHECK t6.fc.gcc-O3.k01_fir_fix16 PASS got=0x0b3c9219 want=0x0b3c9219
+RESULT t6 core=fc lib=gcc-O3 kernel=k02_fir_f32 cycles=37658 instrs=37390 checksum=0x1e0987a3 reps=4 total_cycles=150633 pccr_cycles=150664
+CHECK t6.fc.gcc-O3.k02_fir_f32 PASS got=0x1e0987a3 want=0x1e0987a3
+RESULT t6 core=fc lib=gcc-O3 kernel=k03_matmul_worker_i16 cycles=113150 instrs=113087 checksum=0xae63bc89 reps=4 total_cycles=452602 pccr_cycles=452623
+CHECK t6.fc.gcc-O3.k03_matmul_worker_i16 PASS got=0xae63bc89 want=0xae63bc89
+RESULT t6 core=fc lib=gcc-O3 kernel=k04_matmul_simple_f32 cycles=111076 instrs=111012 checksum=0x39339370 reps=4 total_cycles=444307 pccr_cycles=444323
+CHECK t6.fc.gcc-O3.k04_matmul_simple_f32 PASS got=0x39339370 want=0x39339370
+RESULT t6 core=fc lib=gcc-O3 kernel=k05_matmul_dsp_fix16 cycles=41843 instrs=41315 checksum=0x56c64fd1 reps=4 total_cycles=167373 pccr_cycles=167389
+CHECK t6.fc.gcc-O3.k05_matmul_dsp_fix16 PASS got=0x56c64fd1 want=0x56c64fd1
+RESULT t6 core=fc lib=gcc-O3 kernel=k06_matvect_dsp_f32 cycles=50479 instrs=50224 checksum=0xbf3cac76 reps=4 total_cycles=201917 pccr_cycles=201938
+CHECK t6.fc.gcc-O3.k06_matvect_dsp_f32 PASS got=0xbf3cac76 want=0xbf3cac76
+RESULT t6 core=fc lib=gcc-O3 kernel=k09_cmplx_fix cycles=1557 instrs=1556 checksum=0x53d098a0 reps=4 total_cycles=6229 pccr_cycles=6250
+CHECK t6.fc.gcc-O3.k09_cmplx_fix PASS got=0x53d098a0 want=0x53d098a0
+RESULT t6 core=fc lib=gcc-O3 kernel=k10a_fft_radix2_scalar cycles=21673 instrs=21659 checksum=0xdeebe4e7 reps=4 total_cycles=86693 pccr_cycles=86719
+CHECK t6.fc.gcc-O3.k10a_fft_radix2_scalar PASS got=0xdeebe4e7 want=0xdeebe4e7
+RESULT t6 core=fc lib=gcc-O3 kernel=k11_dotprod_i8 cycles=792 instrs=790 checksum=0x8bcd1bce reps=4 total_cycles=3170 pccr_cycles=3191
+CHECK t6.fc.gcc-O3.k11_dotprod_i8 PASS got=0x8bcd1bce want=0x8bcd1bce
+RESULT t6 core=fc lib=gcc-O3 kernel=clip cycles=17443 instrs=11296 checksum=0x5ec4255d reps=4 total_cycles=69772 pccr_cycles=69788
+CHECK t6.fc.gcc-O3.clip PASS got=0x5ec4255d want=0x5ec4255d
+RESULT t6 core=fc lib=gcc-O3 kernel=k12_dot16_loop cycles=3095 instrs=3094 checksum=0x90e2a3b2 reps=4 total_cycles=12381 pccr_cycles=12407
+CHECK t6.fc.gcc-O3.k12_dot16_loop PASS got=0x90e2a3b2 want=0x90e2a3b2
+RESULT t6 core=fc lib=gcc-O3 kernel=k12_copy_loop cycles=12309 instrs=12307 checksum=0xcf418d3b reps=4 total_cycles=49238 pccr_cycles=49259
+CHECK t6.fc.gcc-O3.k12_copy_loop PASS got=0xcf418d3b want=0xcf418d3b
+INFO cluster task runs on cluster 0 core 8 (the cluster controller)
+INFO running 12 kernels on the cluster controller core
+RESULT t6 core=cl lib=gcc-O3 kernel=k01_fir_fix16 cycles=35982 instrs=14356 checksum=0x0b3c9219 reps=4 total_cycles=143931 pccr_cycles=143954
+CHECK t6.cl.gcc-O3.k01_fir_fix16 PASS got=0x0b3c9219 want=0x0b3c9219
+RESULT t6 core=cl lib=gcc-O3 kernel=k02_fir_f32 cycles=51544 instrs=37390 checksum=0x1e0987a3 reps=4 total_cycles=206176 pccr_cycles=206199
+CHECK t6.cl.gcc-O3.k02_fir_f32 PASS got=0x1e0987a3 want=0x1e0987a3
+RESULT t6 core=cl lib=gcc-O3 kernel=k03_matmul_worker_i16 cycles=309759 instrs=113087 checksum=0xae63bc89 reps=4 total_cycles=1239039 pccr_cycles=1239060
+CHECK t6.cl.gcc-O3.k03_matmul_worker_i16 PASS got=0xae63bc89 want=0xae63bc89
+RESULT t6 core=cl lib=gcc-O3 kernel=k04_matmul_simple_f32 cycles=307688 instrs=111012 checksum=0x39339370 reps=4 total_cycles=1230754 pccr_cycles=1230770
+CHECK t6.cl.gcc-O3.k04_matmul_simple_f32 PASS got=0x39339370 want=0x39339370
+RESULT t6 core=cl lib=gcc-O3 kernel=k05_matmul_dsp_fix16 cycles=80875 instrs=41315 checksum=0x56c64fd1 reps=4 total_cycles=323502 pccr_cycles=323520
+CHECK t6.cl.gcc-O3.k05_matmul_dsp_fix16 PASS got=0x56c64fd1 want=0x56c64fd1
+RESULT t6 core=cl lib=gcc-O3 kernel=k06_matvect_dsp_f32 cycles=140595 instrs=50224 checksum=0xbf3cac76 reps=4 total_cycles=562383 pccr_cycles=562406
+CHECK t6.cl.gcc-O3.k06_matvect_dsp_f32 PASS got=0xbf3cac76 want=0xbf3cac76
+RESULT t6 core=cl lib=gcc-O3 kernel=k09_cmplx_fix cycles=4626 instrs=1556 checksum=0x53d098a0 reps=4 total_cycles=18505 pccr_cycles=18526
+CHECK t6.cl.gcc-O3.k09_cmplx_fix PASS got=0x53d098a0 want=0x53d098a0
+RESULT t6 core=cl lib=gcc-O3 kernel=k10a_fft_radix2_scalar cycles=42798 instrs=21659 checksum=0xdeebe4e7 reps=4 total_cycles=171195 pccr_cycles=171223
+CHECK t6.cl.gcc-O3.k10a_fft_radix2_scalar PASS got=0xdeebe4e7 want=0xdeebe4e7
+RESULT t6 core=cl lib=gcc-O3 kernel=k11_dotprod_i8 cycles=2330 instrs=790 checksum=0x8bcd1bce reps=4 total_cycles=9320 pccr_cycles=9341
+CHECK t6.cl.gcc-O3.k11_dotprod_i8 PASS got=0x8bcd1bce want=0x8bcd1bce
+RESULT t6 core=cl lib=gcc-O3 kernel=clip cycles=22563 instrs=11296 checksum=0x5ec4255d reps=4 total_cycles=90252 pccr_cycles=90268
+CHECK t6.cl.gcc-O3.clip PASS got=0x5ec4255d want=0x5ec4255d
+RESULT t6 core=cl lib=gcc-O3 kernel=k12_dot16_loop cycles=9239 instrs=3094 checksum=0x90e2a3b2 reps=4 total_cycles=36959 pccr_cycles=36985
+CHECK t6.cl.gcc-O3.k12_dot16_loop PASS got=0x90e2a3b2 want=0x90e2a3b2
+RESULT t6 core=cl lib=gcc-O3 kernel=k12_copy_loop cycles=36883 instrs=12307 checksum=0xcf418d3b reps=4 total_cycles=147532 pccr_cycles=147553
+CHECK t6.cl.gcc-O3.k12_copy_loop PASS got=0xcf418d3b want=0xcf418d3b
+=== END t6_kernels_clang_vs_gcc pass=24 fail=0
+[run_app] exit code: 0

@@ -1,0 +1,11 @@
+
+=== BOARD-PACK t7_corecount_b107 (pack 2026-09-29) ===
+INFO compiler of this file: Clang 20.1.8 (https://github.com/albsposito/llvm-project.git 75b4639bf455b3b7cf909c9759d018dcebaf9647)
+INFO platform: board
+INFO cluster task runs on cluster 0 core 8 (the cluster controller)
+RESULT t7 __builtin_pulp_CoreCount()=0 pi_cl_cluster_nb_cores()=0 cores_that_ran=0
+VERDICT B107 cluster team fork: NO core ran (the B107 CoreCount bug)
+CHECK t7.cores_that_ran FAIL got=0x00000000 want=0x00000008
+=== END t7_corecount_b107 pass=0 fail=1
+Input error: Platform returned an error (exitcode: 1)
+[run_app] exit code: 1

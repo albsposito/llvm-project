@@ -1,0 +1,28 @@
+
+
+	 *** PMSIS HelloWorld ***
+
+Entering main controller
+[0 9] Hello World!
+Cluster master core entry
+[0 7] Hello World!
+[0 2] Hello World!
+[0 5] Hello World!
+[0 6] Hello World!
+[0 4] Hello World!
+[0 3] Hello World!
+[0 1] Hello World!
+[0 0] Hello World!
+Cluster master core exit
+Perf : 21257 cycles Timer : 32045 cycles
+[0 9] Perf : 13734 cycles
+[0 0] Perf : 4330 cycles
+[0 1] Perf : 4174 cycles
+[0 2] Perf : 3411 cycles
+[0 3] Perf : 4035 cycles
+[0 4] Perf : 3873 cycles
+[0 5] Perf : 3570 cycles
+[0 6] Perf : 3735 cycles
+[0 7] Perf : 3282 cycles
+Done.
+[run_app] exit code: 0

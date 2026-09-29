@@ -1,0 +1,59 @@
+
+=== BOARD-PACK t6_kernels_clang_vs_gcc (pack 2026-09-29) ===
+INFO compiler of this file: 7.1.1 20170509
+INFO platform: board
+INFO kernel library: clang -O2: Clang 20.1.8 (https://github.com/albsposito/llvm-project.git 75b4639bf455b3b7cf909c9759d018dcebaf9647)
+INFO kernels in the library: 12 of 12
+INFO running 12 kernels on FC
+RESULT t6 core=fc lib=clang-O2 kernel=k01_fir_fix16 cycles=14971 instrs=14770 checksum=0x0b3c9219 reps=4 total_cycles=59885 pccr_cycles=59910
+CHECK t6.fc.clang-O2.k01_fir_fix16 PASS got=0x0b3c9219 want=0x0b3c9219
+RESULT t6 core=fc lib=clang-O2 kernel=k02_fir_f32 cycles=39481 instrs=39344 checksum=0x1e0987a3 reps=4 total_cycles=157924 pccr_cycles=157954
+CHECK t6.fc.clang-O2.k02_fir_f32 PASS got=0x1e0987a3 want=0x1e0987a3
+RESULT t6 core=fc lib=clang-O2 kernel=k03_matmul_worker_i16 cycles=124289 instrs=123167 checksum=0xae63bc89 reps=4 total_cycles=497156 pccr_cycles=497181
+CHECK t6.fc.clang-O2.k03_matmul_worker_i16 PASS got=0xae63bc89 want=0xae63bc89
+RESULT t6 core=fc lib=clang-O2 kernel=k04_matmul_simple_f32 cycles=110030 instrs=109988 checksum=0x39339370 reps=4 total_cycles=440120 pccr_cycles=440150
+CHECK t6.fc.clang-O2.k04_matmul_simple_f32 PASS got=0x39339370 want=0x39339370
+RESULT t6 core=fc lib=clang-O2 kernel=k05_matmul_dsp_fix16 cycles=41441 instrs=40375 checksum=0x56c64fd1 reps=4 total_cycles=165767 pccr_cycles=165792
+CHECK t6.fc.clang-O2.k05_matmul_dsp_fix16 PASS got=0x56c64fd1 want=0x56c64fd1
+RESULT t6 core=fc lib=clang-O2 kernel=k06_matvect_dsp_f32 cycles=66741 instrs=66608 checksum=0xbf3cac76 reps=4 total_cycles=266965 pccr_cycles=266990
+CHECK t6.fc.clang-O2.k06_matvect_dsp_f32 PASS got=0xbf3cac76 want=0xbf3cac76
+RESULT t6 core=fc lib=clang-O2 kernel=k09_cmplx_fix cycles=1565 instrs=1563 checksum=0x53d098a0 reps=4 total_cycles=6260 pccr_cycles=6285
+CHECK t6.fc.clang-O2.k09_cmplx_fix PASS got=0x53d098a0 want=0x53d098a0
+RESULT t6 core=fc lib=clang-O2 kernel=k10a_fft_radix2_scalar cycles=22807 instrs=22792 checksum=0xdeebe4e7 reps=4 total_cycles=91229 pccr_cycles=91254
+CHECK t6.fc.clang-O2.k10a_fft_radix2_scalar PASS got=0xdeebe4e7 want=0xdeebe4e7
+RESULT t6 core=fc lib=clang-O2 kernel=k11_dotprod_i8 cycles=796 instrs=793 checksum=0x8bcd1bce reps=4 total_cycles=3187 pccr_cycles=3212
+CHECK t6.fc.clang-O2.k11_dotprod_i8 PASS got=0x8bcd1bce want=0x8bcd1bce
+RESULT t6 core=fc lib=clang-O2 kernel=clip cycles=21539 instrs=13347 checksum=0x5ec4255d reps=4 total_cycles=86156 pccr_cycles=86181
+CHECK t6.fc.clang-O2.clip PASS got=0x5ec4255d want=0x5ec4255d
+RESULT t6 core=fc lib=clang-O2 kernel=k12_dot16_loop cycles=3102 instrs=3098 checksum=0x90e2a3b2 reps=4 total_cycles=12408 pccr_cycles=12438
+CHECK t6.fc.clang-O2.k12_dot16_loop PASS got=0x90e2a3b2 want=0x90e2a3b2
+RESULT t6 core=fc lib=clang-O2 kernel=k12_copy_loop cycles=24597 instrs=16404 checksum=0xcf418d3b reps=4 total_cycles=98390 pccr_cycles=98415
+CHECK t6.fc.clang-O2.k12_copy_loop PASS got=0xcf418d3b want=0xcf418d3b
+INFO cluster task runs on cluster 0 core 8 (the cluster controller)
+INFO running 12 kernels on the cluster controller core
+RESULT t6 core=cl lib=clang-O2 kernel=k01_fir_fix16 cycles=36448 instrs=14770 checksum=0x0b3c9219 reps=4 total_cycles=145793 pccr_cycles=145820
+CHECK t6.cl.clang-O2.k01_fir_fix16 PASS got=0x0b3c9219 want=0x0b3c9219
+RESULT t6 core=cl lib=clang-O2 kernel=k02_fir_f32 cycles=61543 instrs=39344 checksum=0x1e0987a3 reps=4 total_cycles=246175 pccr_cycles=246209
+CHECK t6.cl.clang-O2.k02_fir_f32 PASS got=0x1e0987a3 want=0x1e0987a3
+RESULT t6 core=cl lib=clang-O2 kernel=k03_matmul_worker_i16 cycles=326019 instrs=123167 checksum=0xae63bc89 reps=4 total_cycles=1304077 pccr_cycles=1304102
+CHECK t6.cl.clang-O2.k03_matmul_worker_i16 PASS got=0xae63bc89 want=0xae63bc89
+RESULT t6 core=cl lib=clang-O2 kernel=k04_matmul_simple_f32 cycles=306639 instrs=109988 checksum=0x39339370 reps=4 total_cycles=1226556 pccr_cycles=1226586
+CHECK t6.cl.clang-O2.k04_matmul_simple_f32 PASS got=0x39339370 want=0x39339370
+RESULT t6 core=cl lib=clang-O2 kernel=k05_matmul_dsp_fix16 cycles=81796 instrs=40375 checksum=0x56c64fd1 reps=4 total_cycles=327185 pccr_cycles=327212
+CHECK t6.cl.clang-O2.k05_matmul_dsp_fix16 PASS got=0x56c64fd1 want=0x56c64fd1
+RESULT t6 core=cl lib=clang-O2 kernel=k06_matvect_dsp_f32 cycles=148664 instrs=66608 checksum=0xbf3cac76 reps=4 total_cycles=594658 pccr_cycles=594683
+CHECK t6.cl.clang-O2.k06_matvect_dsp_f32 PASS got=0xbf3cac76 want=0xbf3cac76
+RESULT t6 core=cl lib=clang-O2 kernel=k09_cmplx_fix cycles=4634 instrs=1563 checksum=0x53d098a0 reps=4 total_cycles=18536 pccr_cycles=18561
+CHECK t6.cl.clang-O2.k09_cmplx_fix PASS got=0x53d098a0 want=0x53d098a0
+RESULT t6 core=cl lib=clang-O2 kernel=k10a_fft_radix2_scalar cycles=42261 instrs=22792 checksum=0xdeebe4e7 reps=4 total_cycles=169046 pccr_cycles=169071
+CHECK t6.cl.clang-O2.k10a_fft_radix2_scalar PASS got=0xdeebe4e7 want=0xdeebe4e7
+RESULT t6 core=cl lib=clang-O2 kernel=k11_dotprod_i8 cycles=2332 instrs=793 checksum=0x8bcd1bce reps=4 total_cycles=9331 pccr_cycles=9356
+CHECK t6.cl.clang-O2.k11_dotprod_i8 PASS got=0x8bcd1bce want=0x8bcd1bce
+RESULT t6 core=cl lib=clang-O2 kernel=clip cycles=24615 instrs=13347 checksum=0x5ec4255d reps=4 total_cycles=98462 pccr_cycles=98487
+CHECK t6.cl.clang-O2.clip PASS got=0x5ec4255d want=0x5ec4255d
+RESULT t6 core=cl lib=clang-O2 kernel=k12_dot16_loop cycles=9246 instrs=3098 checksum=0x90e2a3b2 reps=4 total_cycles=36984 pccr_cycles=37016
+CHECK t6.cl.clang-O2.k12_dot16_loop PASS got=0x90e2a3b2 want=0x90e2a3b2
+RESULT t6 core=cl lib=clang-O2 kernel=k12_copy_loop cycles=36885 instrs=16404 checksum=0xcf418d3b reps=4 total_cycles=147541 pccr_cycles=147566
+CHECK t6.cl.clang-O2.k12_copy_loop PASS got=0xcf418d3b want=0xcf418d3b
+=== END t6_kernels_clang_vs_gcc pass=24 fail=0
+[run_app] exit code: 0

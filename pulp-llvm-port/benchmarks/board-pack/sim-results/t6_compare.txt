@@ -1,0 +1,65 @@
+# Simulator result: prebuilt/board/t6_kernels.*.elf on GVSoC2 gap.gap9.evk (the sim-results logs; "built here" = these logs)
+
+## built here: core=fc -O2   (cycles per call; ratio = clang/gcc, < 1 means clang is faster)
+kernel                           gcc     clang   ratio  checksums
+k01_fir_fix16                  15003     14971   0.998  same
+k02_fir_f32                    42396     39481   0.931  same
+k03_matmul_worker_i16         113243    124289   1.098  same
+k04_matmul_simple_f32         111110    110030   0.990  same
+k05_matmul_dsp_fix16           41842     41441   0.990  same
+k06_matvect_dsp_f32            50294     66741   1.327  same
+k09_cmplx_fix                   1557      1565   1.005  same
+k10a_fft_radix2_scalar         23071     22807   0.989  same
+k11_dotprod_i8                   792       796   1.005  same
+clip                           17440     21539   1.235  same
+k12_dot16_loop                  3096      3102   1.002  same
+k12_copy_loop                  12308     24597   1.998  same
+geomean clang/gcc                                1.104  (12 kernels)
+
+## built here: core=fc -O3   (cycles per call; ratio = clang/gcc, < 1 means clang is faster)
+kernel                           gcc     clang   ratio  checksums
+k01_fir_fix16                  15143     14965   0.988  same
+k02_fir_f32                    37658     39478   1.048  same
+k03_matmul_worker_i16         113150    124290   1.098  same
+k04_matmul_simple_f32         111076    108977   0.981  same
+k05_matmul_dsp_fix16           41843     41576   0.994  same
+k06_matvect_dsp_f32            50479     66354   1.314  same
+k09_cmplx_fix                   1557      1565   1.005  same
+k10a_fft_radix2_scalar         21673     22816   1.053  same
+k11_dotprod_i8                   792       796   1.005  same
+clip                           17443     21539   1.235  same
+k12_dot16_loop                  3095      3102   1.002  same
+k12_copy_loop                  12309     24597   1.998  same
+geomean clang/gcc                                1.119  (12 kernels)
+
+## built here: core=cl -O2   (cycles per call; ratio = clang/gcc, < 1 means clang is faster)
+kernel                           gcc     clang   ratio  checksums
+k01_fir_fix16                  35935     36448   1.014  same
+k02_fir_f32                    65494     61543   0.940  same
+k03_matmul_worker_i16         309853    326019   1.052  same
+k04_matmul_simple_f32         307721    306639   0.996  same
+k05_matmul_dsp_fix16           80871     81796   1.011  same
+k06_matvect_dsp_f32           140409    148664   1.059  same
+k09_cmplx_fix                   4626      4634   1.002  same
+k10a_fft_radix2_scalar         45477     42261   0.929  same
+k11_dotprod_i8                  2329      2332   1.001  same
+clip                           22563     24615   1.091  same
+k12_dot16_loop                  9241      9246   1.001  same
+k12_copy_loop                  36881     36885   1.000  same
+geomean clang/gcc                                1.007  (12 kernels)
+
+## built here: core=cl -O3   (cycles per call; ratio = clang/gcc, < 1 means clang is faster)
+kernel                           gcc     clang   ratio  checksums
+k01_fir_fix16                  35982     36445   1.013  same
+k02_fir_f32                    51544     61550   1.194  same
+k03_matmul_worker_i16         309759    326019   1.052  same
+k04_matmul_simple_f32         307688    305586   0.993  same
+k05_matmul_dsp_fix16           80875     81637   1.009  same
+k06_matvect_dsp_f32           140595    148276   1.055  same
+k09_cmplx_fix                   4626      4634   1.002  same
+k10a_fft_radix2_scalar         42798     42910   1.003  same
+k11_dotprod_i8                  2330      2332   1.001  same
+clip                           22563     24614   1.091  same
+k12_dot16_loop                  9239      9246   1.001  same
+k12_copy_loop                  36883     36885   1.000  same
+geomean clang/gcc                                1.033  (12 kernels)

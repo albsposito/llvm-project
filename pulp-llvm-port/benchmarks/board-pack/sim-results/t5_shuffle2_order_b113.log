@@ -1,0 +1,38 @@
+
+=== BOARD-PACK t5_shuffle2_order_b113 (pack 2026-09-29) ===
+INFO compiler of this file: 7.1.1 20170509
+INFO platform: board
+INFO CHECK PASS = same as GVSoC. Expected on silicon: FAIL (silicon follows the RI5CY manual and GCC)
+RESULT t5 core=fc sel=0 shuffle2.b=0x55555555 shuffle2.h(sel&3)=0x66556655
+RESULT t5 core=fc sel=1 shuffle2.b=0x66666666 shuffle2.h(sel&3)=0x88778877
+RESULT t5 core=fc sel=2 shuffle2.b=0x77777777 shuffle2.h(sel&3)=0x22112211
+RESULT t5 core=fc sel=3 shuffle2.b=0x88888888 shuffle2.h(sel&3)=0x44334433
+RESULT t5 core=fc sel=4 shuffle2.b=0x11111111 shuffle2.h(sel&3)=0x66556655
+RESULT t5 core=fc sel=5 shuffle2.b=0x22222222 shuffle2.h(sel&3)=0x88778877
+RESULT t5 core=fc sel=6 shuffle2.b=0x33333333 shuffle2.h(sel&3)=0x22112211
+RESULT t5 core=fc sel=7 shuffle2.b=0x44444444 shuffle2.h(sel&3)=0x44334433
+VERDICT B113 pv.shuffle2.b on fc: bit set -> rD (same as stock GVSoC; GCC's code would be wrong)
+VERDICT B113 pv.shuffle2.h on fc: bit set -> rD (same as stock GVSoC)
+RESULT t5 core=fc gcc_builtin_shuffle2.b {0,4,1,5}=0x22661155 (C semantics 0x66225511) shuffle2.h {1,2}=0x11116666 (C semantics 0x55552222)
+CHECK t5.fc.shuffle2b_sel4_like_gvsoc PASS got=0x11111111 want=0x11111111
+CHECK t5.fc.shuffle2h_sel2_like_gvsoc PASS got=0x22112211 want=0x22112211
+CHECK t5.fc.gcc_shuffle2b_like_gvsoc PASS got=0x22661155 want=0x22661155
+CHECK t5.fc.gcc_shuffle2h_like_gvsoc PASS got=0x11116666 want=0x11116666
+INFO cluster task runs on cluster 0 core 8 (the cluster controller)
+RESULT t5 core=cl sel=0 shuffle2.b=0x55555555 shuffle2.h(sel&3)=0x66556655
+RESULT t5 core=cl sel=1 shuffle2.b=0x66666666 shuffle2.h(sel&3)=0x88778877
+RESULT t5 core=cl sel=2 shuffle2.b=0x77777777 shuffle2.h(sel&3)=0x22112211
+RESULT t5 core=cl sel=3 shuffle2.b=0x88888888 shuffle2.h(sel&3)=0x44334433
+RESULT t5 core=cl sel=4 shuffle2.b=0x11111111 shuffle2.h(sel&3)=0x66556655
+RESULT t5 core=cl sel=5 shuffle2.b=0x22222222 shuffle2.h(sel&3)=0x88778877
+RESULT t5 core=cl sel=6 shuffle2.b=0x33333333 shuffle2.h(sel&3)=0x22112211
+RESULT t5 core=cl sel=7 shuffle2.b=0x44444444 shuffle2.h(sel&3)=0x44334433
+VERDICT B113 pv.shuffle2.b on cl: bit set -> rD (same as stock GVSoC; GCC's code would be wrong)
+VERDICT B113 pv.shuffle2.h on cl: bit set -> rD (same as stock GVSoC)
+RESULT t5 core=cl gcc_builtin_shuffle2.b {0,4,1,5}=0x22661155 (C semantics 0x66225511) shuffle2.h {1,2}=0x11116666 (C semantics 0x55552222)
+CHECK t5.cl.shuffle2b_sel4_like_gvsoc PASS got=0x11111111 want=0x11111111
+CHECK t5.cl.shuffle2h_sel2_like_gvsoc PASS got=0x22112211 want=0x22112211
+CHECK t5.cl.gcc_shuffle2b_like_gvsoc PASS got=0x22661155 want=0x22661155
+CHECK t5.cl.gcc_shuffle2h_like_gvsoc PASS got=0x11116666 want=0x11116666
+=== END t5_shuffle2_order_b113 pass=8 fail=0
+[run_app] exit code: 0

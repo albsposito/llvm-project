@@ -1,0 +1,12 @@
+# Test 2 (B68): hardware-loop alignment. GCC-only test (assembly + GAP9 GCC C variants).
+cmake_minimum_required(VERSION 3.19)
+set(TARGET_NAME "t2_hwloop_align_b68")
+include($ENV{GAP_SDK_HOME}/utils/cmake/setup.cmake)
+project(${TARGET_NAME} C ASM)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../common/pack.cmake)
+add_executable(${TARGET_NAME} main.c hwl_cases.S hwl_c_O2.c hwl_c_O2_hwloopalign.c hwl_c_O2_hwloopnorvc.c hwl_c_O2_nohwloop.c)
+pack_opt(hwl_c_O2.c -O2)
+pack_opt(hwl_c_O2_hwloopalign.c -O2 -mhwloopalign)
+pack_opt(hwl_c_O2_hwloopnorvc.c -O2 -mhwloopnorvc)
+pack_opt(hwl_c_O2_nohwloop.c -O2 -mnohwloop)
+pack_app(${TARGET_NAME})

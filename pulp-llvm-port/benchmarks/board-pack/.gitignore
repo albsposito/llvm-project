@@ -1,0 +1,11 @@
+# local build and result directories of the board pack
+build/
+results/
+t*/build-*/
+*/sdkconfig
+*/sdkconfig.old
+# the clang toolchain tarball is large (66 MB): copied by hand, not committed
+toolchain/*.tar.xz
+toolchain/clang-snap/
+# the prebuilt ELFs are part of the pack (pulp-llvm-port/.gitignore ignores *.elf)
+!prebuilt/board/*.elf

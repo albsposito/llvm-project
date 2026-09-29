@@ -1,0 +1,336 @@
+#!/usr/bin/env python3
+"""GCC-compatible driver wrapper that makes the GAP9 SDK build with our clang.
+
+The SDK's CMake (utils/cmake/gcc_flags.cmake, macros.cmake:setupcrosscompile)
+calls one program, GAP_RISCV_CC, for C, assembler-with-cpp and the final link,
+and passes GAP9 GCC 7 options.  This wrapper:
+
+  * drops GCC-only options clang does not know (-march=rv32imcxgap9, -mPE=N,
+    -mFC=N, -mint64, -fno-tree-loop-distribute-patterns, ...), and adds our
+    target options (--target, -march=rv32imc_zfinx_xpulpv2, -mabi, -mno-relax);
+  * adds the GAP newlib headers (GCC finds them in its sysroot, clang does not);
+  * adds the macros GAP9 GCC predefines (-D__gap9__ ...); not needed, and not
+    added, with GAP_CLANG_MARCH=rv32imc_xgap9 (F017: xgap9 predefines them);
+  * makes clang's diagnostics stop the build exactly where GAP9 GCC 7.1.1
+    would (see "Diagnostics" below: WARN_RENAME, WARN_GROUPS,
+    GCC7_DEFAULT_ERRORS, CLANG_ONLY), and fails any compile that calls a
+    __builtin_* clang does not know; adds GCC's -ffp-contract=fast default
+    (GCC7_CODEGEN);
+  * optionally force-includes gap9_clang_compat.h (GAP_CLANG_COMPAT=1), which
+    supplies SDK-used builtins our clang lacks (until F016 lands);
+  * links with ld.lld (default) or GNU ld of the GAP toolchain
+    (GAP_CLANG_LINKER=gnu), with the GAP9 multilib libgcc.a;
+  * optionally hands .S files to GAP9 GCC (GAP_CLANG_AS=gnu) instead of clang's
+    integrated assembler.
+
+Environment:
+  GAP_CLANG_ROOT     dir holding bin/clang, bin/ld.lld (default: snapshot next
+                     to this script's work dir, see ../README in report.md)
+  GAP_GCC_TC         GAP9 GCC toolchain (default /home/ubuntu/gap_riscv_toolchain_ubuntu)
+  GAP_CLANG_LINKER   lld (default) | gnu
+  GAP_CLANG_AS       clang (default) | gnu
+  GAP_CLANG_COMPAT   1 = force-include gap9_clang_compat.h
+  GAP_CLANG_MARCH    -march value (default rv32imc_zfinx_xpulpv2 + macro shim;
+                     rv32imc_xgap9 with a clang that has F017)
+  GAP_CLANG_GCC7COMPAT 0 = do not add the GCC-7 diagnostic/codegen flags (default on)
+  GAP_CLANG_LENIENT  1 = exploratory, NOT GCC-equivalent: also demotes
+                     warnings GCC 7 does emit (incompatible-pointer-types,
+                     int-to-pointer-cast, ...) under -Werror
+  GAP_CLANG_FP16PROBE 1 = probe only: float16=_Float16 (+zhinx), float16alt=__bf16
+  GAP_CLANG_EXTRA    extra options appended to every compile
+  GAP_CLANG_LOG      file to append every translated command line to
+"""
+import os, shlex, subprocess, sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.environ.get('GAP_CLANG_ROOT') or os.path.join(HERE, '..', 'snap')
+GCC_TC = os.environ.get('GAP_GCC_TC', '/home/ubuntu/gap_riscv_toolchain_ubuntu')
+CLANG = os.path.join(ROOT, 'bin', 'clang')
+GCC = os.path.join(GCC_TC, 'bin', 'riscv32-unknown-elf-gcc')
+GNU_LD = os.path.join(GCC_TC, 'bin', 'riscv32-unknown-elf-ld')
+LIBGCC_DIR = os.path.join(GCC_TC, 'lib/gcc/riscv32-unknown-elf/7.1.1/rv32imcxgap9/ilp32')
+NEWLIB_INC = os.path.join(GCC_TC, 'riscv32-unknown-elf/include')
+COMPAT_H = os.path.join(HERE, '..', 'gap9_clang_compat.h')
+
+TARGET = ['--target=riscv32-unknown-elf', '-march=rv32imc_zfinx_xpulpv2',
+          '-mabi=ilp32', '-mno-relax']
+DEFS = ['-D__gap9__', '-D__pulp__', '-D__pulp', '-D_pulp', '-D__riscv__', '-D_riscv']
+# clang warns (and -Werror makes it fatal) about GCC options it merely ignores.
+QUIET = ['-Wno-unknown-warning-option', '-Wno-ignored-optimization-argument',
+         '-Wno-unused-command-line-argument']
+LENIENT = ['-Wno-error=implicit-function-declaration', '-Wno-error=implicit-int',
+           '-Wno-error=int-conversion', '-Wno-error=incompatible-pointer-types',
+           '-Wno-error=incompatible-function-pointer-types', '-Wno-error=return-type',
+           '-Wno-error=int-to-pointer-cast', '-Wno-error=pointer-to-int-cast']
+
+# ---------------------------------------------------------------------------
+# Diagnostics: make clang stop (or not stop) an SDK build exactly where GAP9
+# GCC 7.1.1 would, and nowhere else.  Evidence: the SDK compile survey
+# (../sdk-compile-survey/run.py phases gccsdk / sdkflags / sdknowerror and
+# report.md, section 2026-09-28 "SDK flags").  Rules:
+#   * nothing is silenced that could be a bug: clang-only warnings are demoted
+#     with -Wno-error=X, so they are still printed, they just do not stop a
+#     -Werror build that GCC 7 completes (one exception, see CLANG_ONLY);
+#   * a diagnostic GCC 7 also emits for the same code keeps clang's severity;
+#   * an unknown __builtin_* is never accepted (see UNKNOWN_BUILTIN below).
+
+# GCC warning options that clang spells differently.  This is the SDK's own
+# intent (gcc_flags.cmake passes -Wno-discarded-qualifiers), not a leniency;
+# clang would otherwise ignore the unknown name and then fail -Werror on the
+# 6 FreeRTOS kernel files that discard qualifiers.
+WARN_RENAME = {
+    '-Wno-discarded-qualifiers': '-Wno-incompatible-pointer-types-discards-qualifiers',
+    '-Wdiscarded-qualifiers': '-Wincompatible-pointer-types-discards-qualifiers',
+}
+
+# GCC warning groups.  GCC gives an explicit -W[no-]X precedence over the
+# setting a group implies, wherever the group appears; clang applies options
+# in order.  The SDK's mbedtls flags repeat "-Wall -Wextra" after
+# "-Wno-unused-parameter -Wno-unused-function", which clang reads as
+# re-enabling both (aes.c, ecp.c fail -Werror; GCC 7 does not warn).  So
+# groups are moved in front of the explicit options (sdk_warning_flags).
+WARN_GROUPS = ('-Wall', '-Wextra', '-W', '-Wpedantic', '-pedantic', '-Wformat=2')
+
+# Clang 20 makes these errors by default; GCC 7.1.1 reports each as a plain
+# warning (checked with both compilers on one-line tests: implicit
+# declaration, implicit int, int-to-pointer assignment, incompatible function
+# pointer, "return;" in a non-void function).  This is the complete list of
+# clang's DefaultError C diagnostics that GCC 7 only warns about; the SDK
+# uses the first two (7 files in the survey).  Added only when the command
+# has no -Werror: with -Werror GCC 7 fails on them too (the survey's 8 GCC
+# -Werror failures are exactly these files), so clang's default already
+# matches.  CONFIG_DISABLE_WERROR builds get them.
+GCC7_DEFAULT_ERRORS = [
+    '-Wno-error=implicit-function-declaration',  # GCC 7: warning (on by default, C99)
+    '-Wno-error=implicit-int',                   # GCC 7: warning
+    '-Wno-error=int-conversion',                 # GCC 7: "makes pointer from integer without a cast"
+    '-Wno-error=incompatible-function-pointer-types',  # GCC 7: -Wincompatible-pointer-types warning
+    '-Wno-error=return-mismatch',                # GCC 7: "'return' with no value" warning
+]
+
+# Warnings clang emits under the SDK's flags (-Wall -Wextra -Werror ...) that
+# GCC 7.1.1 does not emit for the same SDK code: each one fires in a file that
+# GCC 7 compiles with the SDK's -Werror (survey phase gccsdk).  Either GCC 7
+# has no such warning, or its warning of the same family does not cover the
+# construct.  Nothing that fires only as a consequence of a missing clang
+# feature (float16 types -> excess-initializers, literal-conversion) is here:
+# those errors must stay until the feature exists.
+CLANG_ONLY = [
+    # C11 typedef redefinition (same type) in -std=gnu99: GCC accepts it
+    # silently by design (-Wpedantic only); a redefinition with a DIFFERENT
+    # type is still a hard error in clang.  29 per PMSIS TU, pure noise, so
+    # this one is silenced rather than demoted.
+    '-Wno-typedef-redefinition',
+    # __attribute__((tiny)) (45 per PMSIS build) and ((optimize)) are GCC
+    # attributes clang does not implement.  Kept visible: `tiny` data is still
+    # placed by its section attribute but accessed with lui+lw, not x0-relative.
+    '-Wno-error=unknown-attributes',
+    # GCC 7 has no C -Wenum-conversion (added in GCC 10): ssm6515_conf.c, ssbl.c.
+    '-Wno-error=enum-conversion',
+    # GCC has no equivalent: statement expression braces from different macro
+    # expansions (FreeRTOS event_kernel.c, sync_obj.c).
+    '-Wno-error=compound-token-split-by-macro',
+    # GCC 7 has no -Wself-assign for C (CNN_Conv_DW_USQ8.c).
+    '-Wno-error=self-assign',
+    # GCC 7 has no header-guard check (sai/pdm_* wav_out.h).
+    '-Wno-error=header-guard',
+    # C23 portability note; GCC 7 has no equivalent in -Wall/-Wextra
+    # (audio-framework file_sink/pcm_source *_int.h).
+    '-Wno-error=deprecated-non-prototype',
+    # GCC 7's -Wfloat-conversion is not enabled by the SDK flags (fll.c
+    # CONFIG_FAST_OSC_FREQUENCY -> float, float2fix.c INT_MAX -> float).
+    '-Wno-error=implicit-const-int-float-conversion',
+    # GCC 7's -Woverflow does not cover 32768 -> short (fits the unsigned
+    # type); -Wconversion, which would, is off (CNN_Activation_SQ8.c).
+    '-Wno-error=constant-conversion',
+    # GCC 7's -Waddress does not cover &p->member used as a condition
+    # (Emulation/at_api_pmsis.h, in 118 AutoTiler TUs) ...
+    '-Wno-error=pointer-bool-conversion',
+    # ... nor an array compared with NULL (FFTRunTest.c, main_Semaphore.c).
+    '-Wno-error=tautological-pointer-compare',
+    # GCC 7's -Wempty-body covers if/else only, not "while (x);"
+    # (CNN_Pooling_SQ8.c).
+    '-Wno-error=empty-body',
+]
+# Deliberately NOT here (they keep failing a -Werror build, as they should):
+#   -Wsometimes-uninitialized / -Wuninitialized: real uninitialized uses GCC 7
+#     misses (bsp/fs/read_fs/read_fs.c, bsp/fs/lfs/pi_lfs.c, bsp/ota/ota.c,
+#     bsp/ota/updater.c);
+#   -Wunsequenced: CNN_Copy.c gap_pack2f16((f16)*(pIn++), (f16)*(pIn++)), whose
+#     lane order is unspecified, so clang and GCC may legitimately differ;
+#   -Wformat in malloc_internal.c: "%lX" with uint32_t is right for GCC
+#     (int32_t = long) and wrong for clang (int32_t = int) - a target type
+#     difference to fix in clang, not to hide;
+#   -Wexcess-initializers / -Wliteral-conversion: only a consequence of the
+#     missing float16/float16alt types (they vanish with the types);
+#   warnings GCC 7 also emits under -Werror (sign-compare, pointer-sign,
+#     unused-value, ... in the 8 files GCC 7 -Werror rejects).
+
+
+# Code-generation defaults of GAP9 GCC 7.1.1 that differ from clang's
+# (checked with `riscv32-unknown-elf-gcc -march=rv32imcxgap9 -O2 -Q --help=optimizers`).
+GCC7_CODEGEN = [
+    # GCC's default in GNU C modes is -ffp-contract=fast: a*b+c is fused into
+    # fmadd.s/fmadd.h even across statements.  Clang's default is "on"
+    # (within one expression only).  Owner decision D6/Q5: match GCC's fusion.
+    '-ffp-contract=fast',
+]
+# NOT added: -fno-math-errno.  GAP9 GCC keeps GCC's default -fmath-errno (no
+# __NO_MATH_ERRNO__; `-Q --help=optimizers` shows it enabled): at -O2 sqrtf()
+# is fsqrt.s with a `call sqrtf` fallback for the errno case, at -Os just
+# `tail sqrtf` (newlib libm, which SDK apps link with `m`).  Clang with its
+# default -fmath-errno emits the same fsqrt.s + fallback, so clang already
+# matches.  GCC 7 has no __builtin_sqrtf16 at all (implicit declaration), so
+# no SDK code can depend on it; that clang lowers it to a `sqrtf16` libcall
+# (which newlib lacks) is a matter for the fp16 builtin work (F035/T6: lower
+# the PULP fp16 sqrt builtins to llvm.sqrt, which never sets errno), not a
+# reason to change errno semantics for every math call in the SDK.
+
+
+def sdk_warning_flags(ws):
+    """The command's -W options, renamed to clang spellings and reordered so
+    that clang resolves them as GCC does (WARN_RENAME, WARN_GROUPS)."""
+    ws = [WARN_RENAME.get(w, w) for w in ws]
+    return [w for w in ws if w in WARN_GROUPS] + [w for w in ws if w not in WARN_GROUPS]
+
+
+def gcc7_compat(args):
+    """Diagnostic flags making clang behave like GAP9 GCC 7.1.1 for a command
+    whose options are args (GCC7_DEFAULT_ERRORS only without -Werror)."""
+    werror = '-Werror' in args
+    return ([] if werror else list(GCC7_DEFAULT_ERRORS)) + list(CLANG_ONLY)
+
+
+# With -Wno-error=implicit-function-declaration, clang would also accept a
+# call to an unknown __builtin_* ("use of unknown builtin", same warning group)
+# and emit an external call.  GCC 7 would too, but every __builtin_pulp_* the
+# SDK uses is known to GAP9 GCC, so an unknown one is always a missing clang
+# builtin: the wrapper fails the compile (and removes the object).
+UNKNOWN_BUILTIN = "use of unknown builtin '__builtin_"
+
+
+# GCC-only options: dropped (with the given number of following args).
+DROP = {'-mint64': 0, '-fno-tree-loop-distribute-patterns': 0, '-flto': 0,
+        '-mno-memcpy': 0, '-gstrict-dwarf': 0}
+DROP_PREFIX = ('-march=', '-mPE=', '-mFC=', '-mabi=', '-mcpu=', '-mtune=')
+
+
+def log(cmd):
+    p = os.environ.get('GAP_CLANG_LOG')
+    if p:
+        with open(p, 'a') as f:
+            f.write(' '.join(shlex.quote(x) for x in cmd) + '\n')
+
+
+def main(argv):
+    args = argv[1:]
+    if not args:
+        return subprocess.call([CLANG] + TARGET + ['--version'])
+    # Queries CMake or the SDK may issue.
+    if args[0] in ('--version', '-v', '-dumpversion', '-dumpmachine'):
+        return subprocess.call([CLANG] + TARGET + args)
+    if any(a.startswith('-print-') for a in args):
+        if '-print-libgcc-file-name' in args:
+            print(os.path.join(LIBGCC_DIR, 'libgcc.a'))
+            return 0
+        return subprocess.call([GCC] + args)
+
+    pe = None
+    compile_only = any(a in ('-c', '-S', '-E', '-M', '-MM') for a in args)
+    out, i = [], 0
+    is_asm = False
+    xlang = None
+    while i < len(args):
+        a = args[i]
+        if a in DROP:
+            i += 1 + DROP[a]
+            continue
+        if a.startswith('-mPE='):
+            pe = a[5:]
+        if a.startswith(DROP_PREFIX):
+            i += 1
+            continue
+        if a == '-x' and i + 1 < len(args):
+            xlang = args[i + 1]
+        if not compile_only and a in ('-MD', '-MP'):
+            i += 1
+            continue
+        if not compile_only and a == '-MT':
+            # The SDK passes a bare "-MT" in its link flags (gcc_flags.cmake);
+            # GCC ignores it at link time.  Drop it; its "argument" is the
+            # next option, which is kept.
+            i += 1
+            continue
+        if a.endswith(('.S', '.s', '.sx')) and not a.startswith('-'):
+            is_asm = True
+        out.append(a)
+        i += 1
+    if xlang and xlang.startswith('assembler'):
+        is_asm = True
+
+    if compile_only and is_asm and os.environ.get('GAP_CLANG_AS') == 'gnu':
+        cmd = [GCC] + [a for a in args]
+        log(cmd)
+        return subprocess.call(cmd)
+
+    target, defs = TARGET, DEFS
+    march = os.environ.get('GAP_CLANG_MARCH')
+    if march:
+        target = [t if not t.startswith('-march=') else '-march=' + march for t in TARGET]
+        if 'xgap9' in march:
+            defs = []       # xgap9 predefines __gap9__, __pulp__, __riscv__, ...
+    if os.environ.get('GAP_CLANG_FP16PROBE') == '1':
+        target = [t.replace('_xpulpv2', '_zhinx_xpulpv2').replace('_xgap9', '_zhinx_xgap9')
+                  for t in target]
+    cmd = [CLANG] + target + defs + QUIET + ['-isystem', NEWLIB_INC]
+    check_builtins = False
+    if compile_only and not is_asm:
+        ws = [a for a in out if a.startswith('-W') and not a.startswith(('-Wl,', '-Wa,', '-Wp,'))]
+        rest = [a for a in out if a not in ws]
+        out = sdk_warning_flags(ws) + rest
+        if os.environ.get('GAP_CLANG_GCC7COMPAT', '1') != '0':
+            extra = gcc7_compat(ws)
+            cmd += GCC7_CODEGEN + extra
+            check_builtins = GCC7_DEFAULT_ERRORS[0] in extra
+    if compile_only:
+        if os.environ.get('GAP_CLANG_COMPAT') == '1' and not is_asm:
+            if pe:
+                cmd += ['-D__GAP9_CLANG_PE__=' + pe]
+            if os.environ.get('GAP_CLANG_FP16PROBE') == '1':
+                cmd += ['-D__GAP9_CLANG_FP16PROBE__']
+            cmd += ['-include', os.path.abspath(COMPAT_H)]
+        if os.environ.get('GAP_CLANG_LENIENT') == '1':
+            cmd += LENIENT
+        cmd += shlex.split(os.environ.get('GAP_CLANG_EXTRA', ''))
+        cmd += out
+    else:
+        linker = os.environ.get('GAP_CLANG_LINKER', 'lld')
+        if linker == 'gnu':
+            cmd += ['--ld-path=' + GNU_LD]
+        else:
+            # The GAP9 linker scripts place .data_tiny_fc (FC view, L2_priv0
+            # aliased at 0x4) and .data_tiny_l1 (cluster view, L1 aliased at
+            # 0x4) at the same VMA on purpose: each core sees its own memory
+            # there.  GNU ld does not check VMA overlap, lld does.
+            cmd += ['-fuse-ld=lld', '-Wl,--no-check-sections']
+        cmd += ['-L' + LIBGCC_DIR] + out
+    log(cmd)
+    if not check_builtins:
+        return subprocess.call(cmd)
+    r = subprocess.run(cmd, stderr=subprocess.PIPE, errors='replace', text=True)
+    sys.stderr.write(r.stderr)
+    if r.returncode == 0 and UNKNOWN_BUILTIN in r.stderr:
+        sys.stderr.write('riscv32-unknown-elf-clang: error: a __builtin_ unknown to clang was '
+                         'called (see "use of unknown builtin" above); GAP9 GCC knows every '
+                         'builtin the SDK uses, so this is a clang gap, not GCC-7 leniency\n')
+        if '-o' in out and out.index('-o') + 1 < len(out):
+            try:
+                os.remove(out[out.index('-o') + 1])
+            except OSError:
+                pass
+        return 1
+    return r.returncode
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))

@@ -1,0 +1,18 @@
+
+=== BOARD-PACK t7_corecount_b107 (pack 2026-09-29) ===
+INFO compiler of this file: 7.1.1 20170509
+INFO platform: board
+INFO cluster task runs on cluster 0 core 8 (the cluster controller)
+[0 0] Hello from a cluster core
+[0 2] Hello from a cluster core
+[0 5] Hello from a cluster core
+[0 6] Hello from a cluster core
+[0 7] Hello from a cluster core
+[0 4] Hello from a cluster core
+[0 3] Hello from a cluster core
+[0 1] Hello from a cluster core
+RESULT t7 __builtin_pulp_CoreCount()=8 pi_cl_cluster_nb_cores()=8 cores_that_ran=8
+VERDICT B107 cluster team fork: 8 cores ran (correct)
+CHECK t7.cores_that_ran PASS got=0x00000008 want=0x00000008
+=== END t7_corecount_b107 pass=1 fail=0
+[run_app] exit code: 0

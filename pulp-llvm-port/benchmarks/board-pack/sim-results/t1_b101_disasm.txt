@@ -1,0 +1,97 @@
+1c011784 <checksum_O2>:
+1c011784:	c585                	beqz	a1,1c0117ac <checksum_O2+0x28>
+1c011786:	4795                	li	a5,5
+1c011788:	ca01                	beqz	a2,1c011798 <checksum_O2+0x14>
+1c01178a:	c605                	beqz	a2,1c0117b2 <checksum_O2+0x2e>
+1c01178c:	004640fb          	lp.setup	x1,a2,1c011794 <checksum_O2+0x10>
+1c011790:	04f7c793          	xori	a5,a5,79
+1c011794:	0001                	nop
+1c011796:	c989                	beqz	a1,1c0117a8 <checksum_O2+0x24>
+1c011798:	4701                	li	a4,0
+1c01179a:	c195                	beqz	a1,1c0117be <checksum_O2+0x3a>
+1c01179c:	001250fb          	lp.setupi	x1,1,1c0117a4 <checksum_O2+0x20>
+1c0117a0:	0015468b          	p.lbu	a3,1(a0!)
+1c0117a4:	9736                	add	a4,a4,a3
+1c0117a6:	8fb9                	xor	a5,a5,a4
+1c0117a8:	853e                	mv	a0,a5
+1c0117aa:	8082                	ret
+1c0117ac:	4781                	li	a5,0
+1c0117ae:	de6d                	beqz	a2,1c0117a8 <checksum_O2+0x24>
+1c0117b0:	fe71                	bnez	a2,1c01178c <checksum_O2+0x8>
+1c0117b2:	4605                	li	a2,1
+1c0117b4:	04f7c793          	xori	a5,a5,79
+1c0117b8:	167d                	addi	a2,a2,-1
+1c0117ba:	fa69                	bnez	a2,1c01178c <checksum_O2+0x8>
+1c0117bc:	bfe9                	j	1c011796 <checksum_O2+0x12>
+1c0117be:	bff9                	j	1c01179c <checksum_O2+0x18>
+
+1c0117c0 <kern_O2>:
+1c0117c0:	c19d                	beqz	a1,1c0117e6 <kern_O2+0x26>
+1c0117c2:	4515                	li	a0,5
+1c0117c4:	ca01                	beqz	a2,1c0117d4 <kern_O2+0x14>
+1c0117c6:	c21d                	beqz	a2,1c0117ec <kern_O2+0x2c>
+1c0117c8:	004640fb          	lp.setup	x1,a2,1c0117d0 <kern_O2+0x10>
+1c0117cc:	04f54513          	xori	a0,a0,79
+1c0117d0:	0001                	nop
+1c0117d2:	cd81                	beqz	a1,1c0117ea <kern_O2+0x2a>
+1c0117d4:	4781                	li	a5,0
+1c0117d6:	4701                	li	a4,0
+1c0117d8:	c185                	beqz	a1,1c0117f8 <kern_O2+0x38>
+1c0117da:	0011d0fb          	lp.setupi	x1,1,1c0117e0 <kern_O2+0x20>
+1c0117de:	973e                	add	a4,a4,a5
+1c0117e0:	0785                	addi	a5,a5,1
+1c0117e2:	8d39                	xor	a0,a0,a4
+1c0117e4:	8082                	ret
+1c0117e6:	4501                	li	a0,0
+1c0117e8:	fe79                	bnez	a2,1c0117c6 <kern_O2+0x6>
+1c0117ea:	8082                	ret
+1c0117ec:	4605                	li	a2,1
+1c0117ee:	04f54513          	xori	a0,a0,79
+1c0117f2:	167d                	addi	a2,a2,-1
+1c0117f4:	fa71                	bnez	a2,1c0117c8 <kern_O2+0x8>
+1c0117f6:	bff1                	j	1c0117d2 <kern_O2+0x12>
+1c0117f8:	b7cd                	j	1c0117da <kern_O2+0x1a>
+
+1c0117fa <checksum_O2_nohwloop>:
+1c0117fa:	c595                	beqz	a1,1c011826 <checksum_O2_nohwloop+0x2c>
+1c0117fc:	4715                	li	a4,5
+1c0117fe:	ca01                	beqz	a2,1c01180e <checksum_O2_nohwloop+0x14>
+1c011800:	4781                	li	a5,0
+1c011802:	0785                	addi	a5,a5,1
+1c011804:	04f74713          	xori	a4,a4,79
+1c011808:	fec7ede3          	bltu	a5,a2,1c011802 <checksum_O2_nohwloop+0x8>
+1c01180c:	c999                	beqz	a1,1c011822 <checksum_O2_nohwloop+0x28>
+1c01180e:	87aa                	mv	a5,a0
+1c011810:	4681                	li	a3,0
+1c011812:	0017c80b          	p.lbu	a6,1(a5!)
+1c011816:	40a78633          	sub	a2,a5,a0
+1c01181a:	96c2                	add	a3,a3,a6
+1c01181c:	feb66be3          	bltu	a2,a1,1c011812 <checksum_O2_nohwloop+0x18>
+1c011820:	8f35                	xor	a4,a4,a3
+1c011822:	853a                	mv	a0,a4
+1c011824:	8082                	ret
+1c011826:	4701                	li	a4,0
+1c011828:	fe61                	bnez	a2,1c011800 <checksum_O2_nohwloop+0x6>
+1c01182a:	853a                	mv	a0,a4
+1c01182c:	8082                	ret
+
+1c01182e <kern_O2_nohwloop>:
+1c01182e:	c195                	beqz	a1,1c011852 <kern_O2_nohwloop+0x24>
+1c011830:	4515                	li	a0,5
+1c011832:	ca01                	beqz	a2,1c011842 <kern_O2_nohwloop+0x14>
+1c011834:	4781                	li	a5,0
+1c011836:	0785                	addi	a5,a5,1
+1c011838:	04f54513          	xori	a0,a0,79
+1c01183c:	fec7ede3          	bltu	a5,a2,1c011836 <kern_O2_nohwloop+0x8>
+1c011840:	c999                	beqz	a1,1c011856 <kern_O2_nohwloop+0x28>
+1c011842:	4781                	li	a5,0
+1c011844:	4701                	li	a4,0
+1c011846:	973e                	add	a4,a4,a5
+1c011848:	0785                	addi	a5,a5,1
+1c01184a:	feb7eee3          	bltu	a5,a1,1c011846 <kern_O2_nohwloop+0x18>
+1c01184e:	8d39                	xor	a0,a0,a4
+1c011850:	8082                	ret
+1c011852:	4501                	li	a0,0
+1c011854:	f265                	bnez	a2,1c011834 <kern_O2_nohwloop+0x6>
+1c011856:	8082                	ret
+

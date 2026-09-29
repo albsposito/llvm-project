@@ -1,0 +1,37 @@
+
+=== BOARD-PACK t4_shuffle_sci_h_b114 (pack 2026-09-29) ===
+INFO compiler of this file: 7.1.1 20170509
+INFO platform: board
+RESULT t4 core=fc imm= 0.. 7: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=fc imm= 8..15: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=fc imm=16..23: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=fc imm=24..31: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=fc imm=32..39: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=fc imm=40..47: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=fc imm=48..55: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=fc imm=56..63: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+VERDICT B114 pv.shuffle.sci.h on fc: lane0 selector = imm bit 0, lane1 selector = imm bit 1
+VERDICT B114 meaning: lane1 bit 1 = LLVM/GVSoC encoding is right, GCC wrong; lane1 bit 4 = GCC right, LLVM/GVSoC wrong
+RESULT t4 core=fc gcc_builtin_shuffle v={0x1111,0x2222}: {1,1}=0x11112222 (want 0x22222222) {1,0}=0x11112222 (want 0x11112222) {0,0}=0x11111111 (want 0x11111111)
+RESULT t4 core=fc pv.shuffle.h reg mask {1,1} on 0xBBBBAAAA = 0xbbbbbbbb (want 0xbbbbbbbb)
+CHECK t4.fc.sel_bits_like_gvsoc PASS got=0x00000100 want=0x00000100
+CHECK t4.fc.gcc_shuffle11_like_gvsoc PASS got=0x11112222 want=0x11112222
+CHECK t4.fc.reg_shuffle_h PASS got=0xbbbbbbbb want=0xbbbbbbbb
+INFO cluster task runs on cluster 0 core 8 (the cluster controller)
+RESULT t4 core=cl imm= 0.. 7: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=cl imm= 8..15: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=cl imm=16..23: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=cl imm=24..31: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=cl imm=32..39: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=cl imm=40..47: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=cl imm=48..55: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+RESULT t4 core=cl imm=56..63: aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb aaaaaaaa aaaabbbb bbbbaaaa bbbbbbbb
+VERDICT B114 pv.shuffle.sci.h on cl: lane0 selector = imm bit 0, lane1 selector = imm bit 1
+VERDICT B114 meaning: lane1 bit 1 = LLVM/GVSoC encoding is right, GCC wrong; lane1 bit 4 = GCC right, LLVM/GVSoC wrong
+RESULT t4 core=cl gcc_builtin_shuffle v={0x1111,0x2222}: {1,1}=0x11112222 (want 0x22222222) {1,0}=0x11112222 (want 0x11112222) {0,0}=0x11111111 (want 0x11111111)
+RESULT t4 core=cl pv.shuffle.h reg mask {1,1} on 0xBBBBAAAA = 0xbbbbbbbb (want 0xbbbbbbbb)
+CHECK t4.cl.sel_bits_like_gvsoc PASS got=0x00000100 want=0x00000100
+CHECK t4.cl.gcc_shuffle11_like_gvsoc PASS got=0x11112222 want=0x11112222
+CHECK t4.cl.reg_shuffle_h PASS got=0xbbbbbbbb want=0xbbbbbbbb
+=== END t4_shuffle_sci_h_b114 pass=6 fail=0
+[run_app] exit code: 0

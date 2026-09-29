@@ -1,0 +1,178 @@
+
+=== BOARD-PACK t2_hwloop_align_b68 (pack 2026-09-29) ===
+INFO compiler of this file: 7.1.1 20170509
+INFO platform: board
+INFO hwloops O2_nohwloop.sum_u8: none
+INFO hwloops O2_nohwloop.dot_i16: none
+INFO hwloops O2_nohwloop.mm_i32: none
+INFO hwloops O2_nohwloop.lcg: none
+INFO hwloops O2.sum_u8: lp.setup@+0x6(mod4=2)
+INFO hwloops O2.dot_i16: lp.setup@+0x10(mod4=2)
+INFO hwloops O2.mm_i32: lp.setup@+0x2e(mod4=2) lp.setup@+0x42(mod4=2)
+INFO hwloops O2.lcg: lp.setup@+0x2(mod4=2)
+INFO hwloops O2_hwloopalign.sum_u8: lp.setup@+0x6(mod4=2)
+INFO hwloops O2_hwloopalign.dot_i16: lp.setup@+0x10(mod4=2)
+INFO hwloops O2_hwloopalign.mm_i32: lp.setup@+0x30(mod4=0) lp.setup@+0x44(mod4=0)
+INFO hwloops O2_hwloopalign.lcg: lp.setup@+0x2(mod4=2)
+INFO hwloops O2_hwloopnorvc.sum_u8: lp.setup@+0x6(mod4=2)
+INFO hwloops O2_hwloopnorvc.dot_i16: lp.setup@+0x10(mod4=0)
+INFO hwloops O2_hwloopnorvc.mm_i32: lp.setup@+0x2e(mod4=0) lp.setup@+0x4e(mod4=0)
+INFO hwloops O2_hwloopnorvc.lcg: lp.setup@+0x2(mod4=2)
+INFO running on FC
+INFO case c2_A lp_mod4=0 body_mod4=0
+CHECK t2.fc.asm.c2_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=c2_A n=100 cycles=241 instrs=220
+INFO case c2_M lp_mod4=2 body_mod4=2
+CHECK t2.fc.asm.c2_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=c2_M n=100 cycles=247 instrs=221
+INFO case w2_A lp_mod4=0 body_mod4=0
+CHECK t2.fc.asm.w2_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=w2_A n=100 cycles=251 instrs=220
+INFO case w2_M lp_mod4=2 body_mod4=2
+CHECK t2.fc.asm.w2_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=w2_M n=100 cycles=242 instrs=221
+INFO case cw_A lp_mod4=0 body_mod4=0
+CHECK t2.fc.asm.cw_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=cw_A n=100 cycles=241 instrs=220
+INFO case cw_M lp_mod4=2 body_mod4=2
+CHECK t2.fc.asm.cw_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=cw_M n=100 cycles=242 instrs=221
+INFO case wc_A lp_mod4=0 body_mod4=0
+CHECK t2.fc.asm.wc_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=wc_A n=100 cycles=241 instrs=220
+INFO case wc_M lp_mod4=2 body_mod4=2
+CHECK t2.fc.asm.wc_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=wc_M n=100 cycles=242 instrs=221
+INFO case mix3_A lp_mod4=0 body_mod4=0
+CHECK t2.fc.asm.mix3_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=mix3_A n=100 cycles=341 instrs=320
+INFO case mix3_M lp_mod4=2 body_mod4=2
+CHECK t2.fc.asm.mix3_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=mix3_M n=100 cycles=342 instrs=321
+INFO case ld_A lp_mod4=0 body_mod4=0
+CHECK t2.fc.asm.ld_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=ld_A n=100 cycles=241 instrs=220
+INFO case ld_M lp_mod4=2 body_mod4=2
+CHECK t2.fc.asm.ld_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=ld_M n=100 cycles=242 instrs=221
+INFO case seti_A lp_mod4=0 body_mod4=0
+CHECK t2.fc.asm.seti_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=seti_A n=100 cycles=55 instrs=34
+INFO case seti_M lp_mod4=2 body_mod4=2
+CHECK t2.fc.asm.seti_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=seti_M n=100 cycles=56 instrs=35
+INFO case long_A lp_mod4=0 body_mod4=0
+CHECK t2.fc.asm.long_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=long_A n=100 cycles=243 instrs=222
+INFO case long_M lp_mod4=0 body_mod4=2
+CHECK t2.fc.asm.long_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=long_M n=100 cycles=244 instrs=223
+INFO case nest_AA lp_mod4=0 body_mod4=0
+CHECK t2.fc.asm.nest_AA PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=nest_AA n=100 cycles=941 instrs=920
+INFO case nest_AM lp_mod4=0 body_mod4=2
+CHECK t2.fc.asm.nest_AM PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=nest_AM n=100 cycles=1041 instrs=1020
+INFO case nest_MA lp_mod4=2 body_mod4=2
+CHECK t2.fc.asm.nest_MA PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=nest_MA n=100 cycles=942 instrs=921
+INFO case nest_MM lp_mod4=2 body_mod4=0
+CHECK t2.fc.asm.nest_MM PASS got=0x00000001 want=0x00000001
+RESULT t2 core=fc part=asm case=nest_MM n=100 cycles=1042 instrs=1021
+RESULT t2 core=fc part=c variant=O2_nohwloop sum_u8=0x00007f80/1301 dot_i16=0xda153f40/796 mm_i32=0x9b58b5c5/3727 lcg=0xc3b97ec1/7022 (value/cycles)
+RESULT t2 core=fc part=c variant=O2 sum_u8=0x00007f80/535 dot_i16=0xda153f40/417 mm_i32=0x9b58b5c5/2509 lcg=0xc3b97ec1/3024 (value/cycles)
+CHECK t2.fc.c.O2.sum_u8 PASS got=0x00007f80 want=0x00007f80
+CHECK t2.fc.c.O2.dot_i16 PASS got=0xda153f40 want=0xda153f40
+CHECK t2.fc.c.O2.mm_i32 PASS got=0x9b58b5c5 want=0x9b58b5c5
+CHECK t2.fc.c.O2.lcg PASS got=0xc3b97ec1 want=0xc3b97ec1
+RESULT t2 core=fc part=c variant=O2_hwloopalign sum_u8=0x00007f80/535 dot_i16=0xda153f40/417 mm_i32=0x9b58b5c5/2517 lcg=0xc3b97ec1/3024 (value/cycles)
+CHECK t2.fc.c.O2_hwloopalign.sum_u8 PASS got=0x00007f80 want=0x00007f80
+CHECK t2.fc.c.O2_hwloopalign.dot_i16 PASS got=0xda153f40 want=0xda153f40
+CHECK t2.fc.c.O2_hwloopalign.mm_i32 PASS got=0x9b58b5c5 want=0x9b58b5c5
+CHECK t2.fc.c.O2_hwloopalign.lcg PASS got=0xc3b97ec1 want=0xc3b97ec1
+RESULT t2 core=fc part=c variant=O2_hwloopnorvc sum_u8=0x00007f80/535 dot_i16=0xda153f40/417 mm_i32=0x9b58b5c5/2509 lcg=0xc3b97ec1/3024 (value/cycles)
+CHECK t2.fc.c.O2_hwloopnorvc.sum_u8 PASS got=0x00007f80 want=0x00007f80
+CHECK t2.fc.c.O2_hwloopnorvc.dot_i16 PASS got=0xda153f40 want=0xda153f40
+CHECK t2.fc.c.O2_hwloopnorvc.mm_i32 PASS got=0x9b58b5c5 want=0x9b58b5c5
+CHECK t2.fc.c.O2_hwloopnorvc.lcg PASS got=0xc3b97ec1 want=0xc3b97ec1
+INFO cluster task runs on cluster 0 core 8 (the cluster controller)
+INFO running on the cluster controller core
+INFO case c2_A lp_mod4=0 body_mod4=0
+CHECK t2.cl.asm.c2_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=c2_A n=100 cycles=241 instrs=220
+INFO case c2_M lp_mod4=2 body_mod4=2
+CHECK t2.cl.asm.c2_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=c2_M n=100 cycles=241 instrs=221
+INFO case w2_A lp_mod4=0 body_mod4=0
+CHECK t2.cl.asm.w2_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=w2_A n=100 cycles=242 instrs=220
+INFO case w2_M lp_mod4=2 body_mod4=2
+CHECK t2.cl.asm.w2_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=w2_M n=100 cycles=236 instrs=221
+INFO case cw_A lp_mod4=0 body_mod4=0
+CHECK t2.cl.asm.cw_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=cw_A n=100 cycles=236 instrs=220
+INFO case cw_M lp_mod4=2 body_mod4=2
+CHECK t2.cl.asm.cw_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=cw_M n=100 cycles=235 instrs=221
+INFO case wc_A lp_mod4=0 body_mod4=0
+CHECK t2.cl.asm.wc_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=wc_A n=100 cycles=232 instrs=220
+INFO case wc_M lp_mod4=2 body_mod4=2
+CHECK t2.cl.asm.wc_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=wc_M n=100 cycles=233 instrs=221
+INFO case mix3_A lp_mod4=0 body_mod4=0
+CHECK t2.cl.asm.mix3_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=mix3_A n=100 cycles=332 instrs=320
+INFO case mix3_M lp_mod4=2 body_mod4=2
+CHECK t2.cl.asm.mix3_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=mix3_M n=100 cycles=333 instrs=321
+INFO case ld_A lp_mod4=0 body_mod4=0
+CHECK t2.cl.asm.ld_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=ld_A n=100 cycles=532 instrs=220
+INFO case ld_M lp_mod4=2 body_mod4=2
+CHECK t2.cl.asm.ld_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=ld_M n=100 cycles=533 instrs=221
+INFO case seti_A lp_mod4=0 body_mod4=0
+CHECK t2.cl.asm.seti_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=seti_A n=100 cycles=50 instrs=34
+INFO case seti_M lp_mod4=2 body_mod4=2
+CHECK t2.cl.asm.seti_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=seti_M n=100 cycles=47 instrs=35
+INFO case long_A lp_mod4=0 body_mod4=0
+CHECK t2.cl.asm.long_A PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=long_A n=100 cycles=238 instrs=222
+INFO case long_M lp_mod4=0 body_mod4=2
+CHECK t2.cl.asm.long_M PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=long_M n=100 cycles=235 instrs=223
+INFO case nest_AA lp_mod4=0 body_mod4=0
+CHECK t2.cl.asm.nest_AA PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=nest_AA n=100 cycles=934 instrs=920
+INFO case nest_AM lp_mod4=0 body_mod4=2
+CHECK t2.cl.asm.nest_AM PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=nest_AM n=100 cycles=1034 instrs=1020
+INFO case nest_MA lp_mod4=2 body_mod4=2
+CHECK t2.cl.asm.nest_MA PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=nest_MA n=100 cycles=933 instrs=921
+INFO case nest_MM lp_mod4=2 body_mod4=0
+CHECK t2.cl.asm.nest_MM PASS got=0x00000001 want=0x00000001
+RESULT t2 core=cl part=asm case=nest_MM n=100 cycles=1035 instrs=1021
+RESULT t2 core=cl part=c variant=O2_nohwloop sum_u8=0x00007f80/2075 dot_i16=0xda153f40/1567 mm_i32=0x9b58b5c5/6994 lcg=0xc3b97ec1/7026 (value/cycles)
+RESULT t2 core=cl part=c variant=O2 sum_u8=0x00007f80/1307 dot_i16=0xda153f40/1190 mm_i32=0x9b58b5c5/5784 lcg=0xc3b97ec1/3028 (value/cycles)
+CHECK t2.cl.c.O2.sum_u8 PASS got=0x00007f80 want=0x00007f80
+CHECK t2.cl.c.O2.dot_i16 PASS got=0xda153f40 want=0xda153f40
+CHECK t2.cl.c.O2.mm_i32 PASS got=0x9b58b5c5 want=0x9b58b5c5
+CHECK t2.cl.c.O2.lcg PASS got=0xc3b97ec1 want=0xc3b97ec1
+RESULT t2 core=cl part=c variant=O2_hwloopalign sum_u8=0x00007f80/1307 dot_i16=0xda153f40/1188 mm_i32=0x9b58b5c5/5790 lcg=0xc3b97ec1/3028 (value/cycles)
+CHECK t2.cl.c.O2_hwloopalign.sum_u8 PASS got=0x00007f80 want=0x00007f80
+CHECK t2.cl.c.O2_hwloopalign.dot_i16 PASS got=0xda153f40 want=0xda153f40
+CHECK t2.cl.c.O2_hwloopalign.mm_i32 PASS got=0x9b58b5c5 want=0x9b58b5c5
+CHECK t2.cl.c.O2_hwloopalign.lcg PASS got=0xc3b97ec1 want=0xc3b97ec1
+RESULT t2 core=cl part=c variant=O2_hwloopnorvc sum_u8=0x00007f80/1307 dot_i16=0xda153f40/1190 mm_i32=0x9b58b5c5/5788 lcg=0xc3b97ec1/3028 (value/cycles)
+CHECK t2.cl.c.O2_hwloopnorvc.sum_u8 PASS got=0x00007f80 want=0x00007f80
+CHECK t2.cl.c.O2_hwloopnorvc.dot_i16 PASS got=0xda153f40 want=0xda153f40
+CHECK t2.cl.c.O2_hwloopnorvc.mm_i32 PASS got=0x9b58b5c5 want=0x9b58b5c5
+CHECK t2.cl.c.O2_hwloopnorvc.lcg PASS got=0xc3b97ec1 want=0xc3b97ec1
+VERDICT B68 misaligned hardware loops: all aligned and misaligned cases correct (padding not needed for correctness)
+=== END t2_hwloop_align_b68 pass=64 fail=0
+[run_app] exit code: 0

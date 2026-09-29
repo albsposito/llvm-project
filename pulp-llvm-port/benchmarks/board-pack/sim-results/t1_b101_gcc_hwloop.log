@@ -1,0 +1,42 @@
+
+=== BOARD-PACK t1_b101_gcc_hwloop (pack 2026-09-29) ===
+INFO compiler of this file: 7.1.1 20170509
+INFO platform: board
+INFO correct values: checksum=0x40 kern=0x4c; a CHECK PASS means 'same as GVSoC'
+INFO running on FC
+RESULT t1 variant=Os flags="-Os (SDK default)" checksum=0x40 kern=0x4c
+CHECK t1.fc.Os.checksum PASS got=0x00000040 want=0x00000040
+CHECK t1.fc.Os.kern PASS got=0x0000004c want=0x0000004c
+RESULT t1 variant=O2 flags="-O2" checksum=0x4b kern=0x4a
+CHECK t1.fc.O2.checksum PASS got=0x0000004b want=0x0000004b
+CHECK t1.fc.O2.kern PASS got=0x0000004a want=0x0000004a
+RESULT t1 variant=O2_nohwloop flags="-O2 -mnohwloop" checksum=0x40 kern=0x4c
+CHECK t1.fc.O2_nohwloop.checksum PASS got=0x00000040 want=0x00000040
+CHECK t1.fc.O2_nohwloop.kern PASS got=0x0000004c want=0x0000004c
+RESULT t1 variant=O3 flags="-O3" checksum=0x4b kern=0x4a
+CHECK t1.fc.O3.checksum PASS got=0x0000004b want=0x0000004b
+CHECK t1.fc.O3.kern PASS got=0x0000004a want=0x0000004a
+RESULT t1 variant=O3_nohwloop flags="-O3 -mnohwloop" checksum=0x40 kern=0x4c
+CHECK t1.fc.O3_nohwloop.checksum PASS got=0x00000040 want=0x00000040
+CHECK t1.fc.O3_nohwloop.kern PASS got=0x0000004c want=0x0000004c
+VERDICT B101 GCC hwloop bug on FC: REPRODUCED (wrong results) (2 wrong variants, simulator had 2)
+INFO cluster task runs on cluster 0 core 8 (the cluster controller)
+INFO running on the cluster controller core
+RESULT t1 variant=Os flags="-Os (SDK default)" checksum=0x40 kern=0x4c
+CHECK t1.cl.Os.checksum PASS got=0x00000040 want=0x00000040
+CHECK t1.cl.Os.kern PASS got=0x0000004c want=0x0000004c
+RESULT t1 variant=O2 flags="-O2" checksum=0x4b kern=0x4a
+CHECK t1.cl.O2.checksum PASS got=0x0000004b want=0x0000004b
+CHECK t1.cl.O2.kern PASS got=0x0000004a want=0x0000004a
+RESULT t1 variant=O2_nohwloop flags="-O2 -mnohwloop" checksum=0x40 kern=0x4c
+CHECK t1.cl.O2_nohwloop.checksum PASS got=0x00000040 want=0x00000040
+CHECK t1.cl.O2_nohwloop.kern PASS got=0x0000004c want=0x0000004c
+RESULT t1 variant=O3 flags="-O3" checksum=0x4b kern=0x4a
+CHECK t1.cl.O3.checksum PASS got=0x0000004b want=0x0000004b
+CHECK t1.cl.O3.kern PASS got=0x0000004a want=0x0000004a
+RESULT t1 variant=O3_nohwloop flags="-O3 -mnohwloop" checksum=0x40 kern=0x4c
+CHECK t1.cl.O3_nohwloop.checksum PASS got=0x00000040 want=0x00000040
+CHECK t1.cl.O3_nohwloop.kern PASS got=0x0000004c want=0x0000004c
+VERDICT B101 GCC hwloop bug on cluster: REPRODUCED (wrong results) (2 wrong variants, simulator had 2)
+=== END t1_b101_gcc_hwloop pass=20 fail=0
+[run_app] exit code: 0
