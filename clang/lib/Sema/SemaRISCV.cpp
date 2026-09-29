@@ -1516,6 +1516,8 @@ bool SemaRISCV::CheckBuiltinFunctionCall(const TargetInfo &TI,
   case RISCV::BI__builtin_pulp_mulhhsRN:
   case RISCV::BI__builtin_pulp_mulhhuRN:
   case RISCV::BI__builtin_pulp_mulsRN:
+  case RISCV::BI__builtin_pulp_mulfsRN: // 20/F037: GAP9 aliases of mulsRN/muluRN
+  case RISCV::BI__builtin_pulp_mulfuRN:
   case RISCV::BI__builtin_pulp_muluRN: RoundArgNum = 3; LLVM_FALLTHROUGH;
   case RISCV::BI__builtin_pulp_addN:
   case RISCV::BI__builtin_pulp_adduN:
@@ -1524,14 +1526,20 @@ bool SemaRISCV::CheckBuiltinFunctionCall(const TargetInfo &TI,
   case RISCV::BI__builtin_pulp_mulsN:
   case RISCV::BI__builtin_pulp_muluN:
   case RISCV::BI__builtin_pulp_mulhhsN:
+  case RISCV::BI__builtin_pulp_mulfsN: // 20/F037: GAP9 aliases of mulsN/muluN
+  case RISCV::BI__builtin_pulp_mulfuN:
   case RISCV::BI__builtin_pulp_mulhhuN: NormArgNum = 2; break;
   case RISCV::BI__builtin_pulp_machhsRN:
   case RISCV::BI__builtin_pulp_machhuRN:
   case RISCV::BI__builtin_pulp_macsRN:
+  case RISCV::BI__builtin_pulp_macfsRN: // 20/F037: GAP9 aliases of macsRN/macuRN
+  case RISCV::BI__builtin_pulp_macfuRN:
   case RISCV::BI__builtin_pulp_macuRN: RoundArgNum = 4; LLVM_FALLTHROUGH;
   case RISCV::BI__builtin_pulp_machhsN:
   case RISCV::BI__builtin_pulp_machhuN:
   case RISCV::BI__builtin_pulp_macsN:
+  case RISCV::BI__builtin_pulp_macfsN: // 20/F037: GAP9 aliases of macsN/macuN
+  case RISCV::BI__builtin_pulp_macfuN:
   case RISCV::BI__builtin_pulp_macuN: NormArgNum = 3; break;
   case RISCV::BI__builtin_pulp_bset: MaskArgNum = 1; break;
   case RISCV::BI__builtin_pulp_bclr: NegMaskArgNum = 1; break;

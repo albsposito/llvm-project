@@ -298,3 +298,32 @@ def pulp_f16altabs : PULPBuiltin<"__bf16(__bf16)", "xpulpv,xpulpf16alt">;
 def pulp_f16abs2 : PULPBuiltin<"_Vector<2, _Float16>(_Vector<2, _Float16>)", "xpulpfvec,zhinx">;
 def pulp_f16altabs2 : PULPBuiltin<"_Vector<2, __bf16>(_Vector<2, __bf16>)", "xpulpfvec,xpulpf16alt">;
 } // Attributes = [NoThrow, Const]
+
+// GAP9 fractional-multiply aliases, 64-bit high multiplies and truncations
+// (task 20/F037). Prototypes are the ones GAP9 GCC declares (all int), except
+// that the N and R arguments are unsigned _Constant int like their siblings
+// mulsN/mulsRN/macsN/macsRN, so the same Sema range checks apply.
+//  - mulf*/macf*: the same operation and instruction as mul*/mac* (p.muls,
+//    p.mulsN, ..., p.macuRN); GAP9 GCC emits identical code for both names.
+//  - mul64hs/mul64hu/mul64hus: high word of the 64-bit product (mulh, mulhu,
+//    mulhsu with the signed second argument in rs1).
+//  - trunch/truncb: (short)x and (char)x.
+let Attributes = [NoThrow, Const] in {
+def pulp_mulfs : PULPBuiltin<"int(int, int)", "xpulpv">;
+def pulp_mulfu : PULPBuiltin<"int(int, int)", "xpulpv">;
+def pulp_mulfsN : PULPBuiltin<"int(int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_mulfsRN : PULPBuiltin<"int(int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_mulfuN : PULPBuiltin<"int(int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_mulfuRN : PULPBuiltin<"int(int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_macfs : PULPBuiltin<"int(int, int, int)", "xpulpv">;
+def pulp_macfu : PULPBuiltin<"int(int, int, int)", "xpulpv">;
+def pulp_macfsN : PULPBuiltin<"int(int, int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_macfsRN : PULPBuiltin<"int(int, int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_macfuN : PULPBuiltin<"int(int, int, int, unsigned _Constant int)", "xpulpv">;
+def pulp_macfuRN : PULPBuiltin<"int(int, int, int, unsigned _Constant int, unsigned _Constant int)", "xpulpv">;
+def pulp_mul64hs : PULPBuiltin<"int(int, int)", "xpulpv,m">;
+def pulp_mul64hu : PULPBuiltin<"int(int, int)", "xpulpv,m">;
+def pulp_mul64hus : PULPBuiltin<"int(int, int)", "xpulpv,m">;
+def pulp_trunch : PULPBuiltin<"short(int)", "xpulpv">;
+def pulp_truncb : PULPBuiltin<"char(int)", "xpulpv">;
+} // Attributes = [NoThrow, Const]
