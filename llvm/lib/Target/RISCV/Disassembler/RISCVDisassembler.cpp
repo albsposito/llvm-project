@@ -740,6 +740,12 @@ DecodeStatus RISCVDisassembler::getInstruction32(MCInst &MI, uint64_t &Size,
                         "Qualcomm uC Conditional Move custom opcode table");
   TRY_TO_DECODE_FEATURE(RISCV::FeatureVendorXqciint, DecoderTableXqciint32,
                         "Qualcomm uC Interrupts custom opcode table");
+  // GAP9 half-precision ops in GPRs. Kept apart from the default table, which
+  // holds Snitch's F-register twins of several of these encodings.
+  TRY_TO_DECODE(STI.hasFeature(RISCV::FeatureVendorXpulpf16alt) ||
+                    STI.hasFeature(RISCV::FeatureVendorXpulpfvec),
+                DecoderTableXpulpfloat32,
+                "Xpulpfloat custom opcode table (GAP9 half-precision)");
   TRY_TO_DECODE_FEATURE(RISCV::FeaturePULPExtV2, DecoderTableRV32Xpulp32,
                         "RV32Xpulp custom opcode table (PULP extensions)");
   TRY_TO_DECODE(true, DecoderTable32, "RISCV32 table");
