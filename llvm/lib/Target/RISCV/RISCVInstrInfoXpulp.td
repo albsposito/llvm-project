@@ -2047,3 +2047,70 @@ def : Pat<(int_riscv_pulp_IsFc), (SRLI (ANDI (CSRRS MHARTID.Encoding, (XLenVT X0
 def : Pat<(int_riscv_pulp_HasFc), (ANDI (XLenVT X0), 0)>;
 
 } // Predicates = [IsRV32, HasPULPExtV2]
+
+//===----------------------------------------------------------------------===//
+// GAP9 complex / divide-by-N packed-SIMD instructions (task 20/F038)
+//===----------------------------------------------------------------------===//
+// GAP9 additions on top of PULPv2 (GVSoC gap9_isa.py, "Gap9" ISA subset), so
+// they are gated on the GAP9 extension (xgap9, FeatureVendorXgap9), not on
+// xpulpv: RI5CY/PULPv2 cores lack them. OP-V R-type, GPR operands; encodings
+// from GAP9 GNU as. Own decoder table (RV32Xgap9), tried before RV32Xpulp.
+// Reference: the CORE-V equivalents cv.cplxmul.r/i, cv.cplxconj, cv.subrotmj,
+// cv.add/sub.divN (RISCVInstrInfoXCV.td:467-491 at llvmorg-20.1.8), where the
+// .r/.i complex multiplies are tied-rd (CVSIMDRRWb): they write one half of
+// rd and keep the other, so rd is also an input. Pulp_ALU_rr_wb is the fork's
+// equivalent class.
+let Predicates = [IsRV32, HasVendorXgap9], DecoderNamespace = "RV32Xgap9" in {
+def PV_ADD_H_DIV2 : Pulp_ALU_rr<0b0111010, 0b010, OPC_OP_V, "pv.add.h.div2", GPRAV2>;
+def PV_ADD_H_DIV4 : Pulp_ALU_rr<0b0111010, 0b100, OPC_OP_V, "pv.add.h.div4", GPRAV2>;
+def PV_ADD_H_DIV8 : Pulp_ALU_rr<0b0111010, 0b110, OPC_OP_V, "pv.add.h.div8", GPRAV2>;
+
+def PV_SUB_H_DIV2 : Pulp_ALU_rr<0b0110010, 0b010, OPC_OP_V, "pv.sub.h.div2", GPRAV2>;
+def PV_SUB_H_DIV4 : Pulp_ALU_rr<0b0110010, 0b100, OPC_OP_V, "pv.sub.h.div4", GPRAV2>;
+def PV_SUB_H_DIV8 : Pulp_ALU_rr<0b0110010, 0b110, OPC_OP_V, "pv.sub.h.div8", GPRAV2>;
+
+def PV_SUBROTMJ_H      : Pulp_ALU_rr<0b0110110, 0b000, OPC_OP_V, "pv.subrotmj.h", GPRAV2>;
+def PV_SUBROTMJ_H_DIV2 : Pulp_ALU_rr<0b0110110, 0b010, OPC_OP_V, "pv.subrotmj.h.div2", GPRAV2>;
+def PV_SUBROTMJ_H_DIV4 : Pulp_ALU_rr<0b0110110, 0b100, OPC_OP_V, "pv.subrotmj.h.div4", GPRAV2>;
+def PV_SUBROTMJ_H_DIV8 : Pulp_ALU_rr<0b0110110, 0b110, OPC_OP_V, "pv.subrotmj.h.div8", GPRAV2>;
+
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, rs2 = 0 in
+def PV_CPLXCONJ_H : RVInstR<0b0101110, 0b000, OPC_OP_V,
+                            (outs GPRAV2:$rd), (ins GPRAV2:$rs1),
+                            "pv.cplxconj.h", "$rd, $rs1">,
+                    Sched<[WriteIALU, ReadIALU]>;
+
+def PV_CPLXMUL_H_R      : Pulp_ALU_rr_wb<0b0101010, 0b000, OPC_OP_V, "pv.cplxmul.h.r", GPRAV2>;
+def PV_CPLXMUL_H_R_DIV2 : Pulp_ALU_rr_wb<0b0101010, 0b010, OPC_OP_V, "pv.cplxmul.h.r.div2", GPRAV2>;
+def PV_CPLXMUL_H_R_DIV4 : Pulp_ALU_rr_wb<0b0101010, 0b100, OPC_OP_V, "pv.cplxmul.h.r.div4", GPRAV2>;
+def PV_CPLXMUL_H_R_DIV8 : Pulp_ALU_rr_wb<0b0101010, 0b110, OPC_OP_V, "pv.cplxmul.h.r.div8", GPRAV2>;
+def PV_CPLXMUL_H_I      : Pulp_ALU_rr_wb<0b0101011, 0b000, OPC_OP_V, "pv.cplxmul.h.i", GPRAV2>;
+def PV_CPLXMUL_H_I_DIV2 : Pulp_ALU_rr_wb<0b0101011, 0b010, OPC_OP_V, "pv.cplxmul.h.i.div2", GPRAV2>;
+def PV_CPLXMUL_H_I_DIV4 : Pulp_ALU_rr_wb<0b0101011, 0b100, OPC_OP_V, "pv.cplxmul.h.i.div4", GPRAV2>;
+def PV_CPLXMUL_H_I_DIV8 : Pulp_ALU_rr_wb<0b0101011, 0b110, OPC_OP_V, "pv.cplxmul.h.i.div8", GPRAV2>;
+} // Predicates = [IsRV32, HasVendorXgap9], DecoderNamespace = "RV32Xgap9"
+
+// Builtins (element 0 = bits 15:0 = real part, element 1 = imaginary part).
+let Predicates = [IsRV32, HasVendorXgap9] in {
+def : PatV2V2<int_riscv_pulp_add2div2, PV_ADD_H_DIV2>;
+def : PatV2V2<int_riscv_pulp_add2div4, PV_ADD_H_DIV4>;
+def : PatV2V2<int_riscv_pulp_sub2div2, PV_SUB_H_DIV2>;
+def : PatV2V2<int_riscv_pulp_sub2div4, PV_SUB_H_DIV4>;
+def : PatV2V2<int_riscv_pulp_sub2rotmj, PV_SUBROTMJ_H>;
+def : Pat<(int_riscv_pulp_cplx_conj GPRAV2:$rs1), (PV_CPLXCONJ_H GPRAV2:$rs1)>;
+
+// A full complex product is GCC's pair: .r writes the real half of rd, then
+// .i writes the imaginary half of the same rd. The first rd input is
+// undefined because .r overwrites the half .i does not.
+multiclass CplxMulBuiltin<string intrin, string suffix> {
+  def : Pat<(!cast<Intrinsic>("int_riscv_pulp_" # intrin) GPRAV2:$rs1, GPRAV2:$rs2),
+            (!cast<RVInst>("PV_CPLXMUL_H_I" # suffix)
+               (!cast<RVInst>("PV_CPLXMUL_H_R" # suffix)
+                  (v2i16 (IMPLICIT_DEF)), GPRAV2:$rs1, GPRAV2:$rs2),
+               GPRAV2:$rs1, GPRAV2:$rs2)>;
+}
+defm : CplxMulBuiltin<"cplxmuls2", "">;
+defm : CplxMulBuiltin<"cplxmuls2div2", "_DIV2">;
+defm : CplxMulBuiltin<"cplxmuls2div4", "_DIV4">;
+defm : CplxMulBuiltin<"cplxmuls2div8", "_DIV8">;
+} // Predicates = [IsRV32, HasVendorXgap9]
