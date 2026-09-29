@@ -746,6 +746,8 @@ DecodeStatus RISCVDisassembler::getInstruction32(MCInst &MI, uint64_t &Size,
                     STI.hasFeature(RISCV::FeatureVendorXpulpfvec),
                 DecoderTableXpulpfloat32,
                 "Xpulpfloat custom opcode table (GAP9 half-precision)");
+  TRY_TO_DECODE_FEATURE(RISCV::FeatureVendorXgap9, DecoderTableRV32Xgap932,
+                        "RV32Xgap9 custom opcode table (GAP9 extensions)");
   TRY_TO_DECODE_FEATURE(RISCV::FeaturePULPExtV2, DecoderTableRV32Xpulp32,
                         "RV32Xpulp custom opcode table (PULP extensions)");
   TRY_TO_DECODE(true, DecoderTable32, "RISCV32 table");
