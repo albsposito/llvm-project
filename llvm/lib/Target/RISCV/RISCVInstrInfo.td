@@ -2173,6 +2173,7 @@ include "RISCVInstrInfoXdma.td"
 include "RISCVInstrInfoXssr.td"
 include "RISCVInstrInfoXsmallfloat.td"
 include "RISCVInstrInfoXpulp.td"
+include "RISCVInstrInfoXpulpfloat.td"
 
 //===----------------------------------------------------------------------===//
 // Global ISel
