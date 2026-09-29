@@ -2228,6 +2228,21 @@ void Clang::AddRISCVTargetArgs(const ArgList &Args,
           << A->getSpelling() << Val;
     }
   }
+
+  // PULP: -mPE=<N>, the number of cluster cores (GCC compatibility). Like GCC,
+  // accept a decimal or 0x-prefixed hexadecimal non-negative integer.
+  if (const Arg *A = Args.getLastArg(options::OPT_mPE_EQ)) {
+    StringRef Val = A->getValue();
+    unsigned Cores = 0;
+    bool Bad = Val.starts_with_insensitive("0x")
+                   ? Val.drop_front(2).getAsInteger(16, Cores)
+                   : Val.getAsInteger(10, Cores);
+    if (Bad || Cores > INT32_MAX)
+      getToolChain().getDriver().Diag(diag::err_drv_unsupported_option_argument)
+          << A->getSpelling() << Val;
+    else
+      CmdArgs.push_back(Args.MakeArgString("-mPE=" + Twine(Cores)));
+  }
 }
 
 void Clang::AddSparcTargetArgs(const ArgList &Args,

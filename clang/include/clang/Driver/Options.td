@@ -5018,6 +5018,11 @@ def mrvv_vector_bits_EQ : Joined<["-"], "mrvv-vector-bits=">, Group<m_Group>,
     " (RISC-V only)")>;
 def mno_fdiv : Flag<["-"], "mno-fdiv">, Group<m_riscv_Features_Group>,
   HelpText<"Don't use hardware floating-point divide and square root instructions (RISC-V only)">;
+def mPE_EQ : Joined<["-"], "mPE=">, Group<m_Group>,
+  Visibility<[ClangOption, CC1Option]>, MetaVarName<"<N>">,
+  HelpText<"Number of PULP cluster cores: __builtin_pulp_CoreCount() becomes "
+           "the constant <N> (0: read at run time) (RISC-V PULP only, GCC compatible)">,
+  MarshallingInfoInt<TargetOpts<"PULPClusterCores">, "0">;
 
 def munaligned_access : Flag<["-"], "munaligned-access">, Group<m_Group>,
   HelpText<"Allow memory accesses to be unaligned (AArch32/MIPSr6 only)">;
