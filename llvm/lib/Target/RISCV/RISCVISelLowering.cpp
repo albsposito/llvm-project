@@ -643,6 +643,10 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
   setOperationAction(ISD::INTRINSIC_WO_CHAIN, MVT::Other, Custom);
   if (Subtarget.is64Bit())
     setOperationAction(ISD::INTRINSIC_WO_CHAIN, MVT::i32, Custom);
+  // GAP9 bfloat16 builtins (lowerPULPFP16Intrinsic) return i16, which is
+  // type-legalized through ReplaceNodeResults.
+  if (Subtarget.hasVendorXpulpf16alt())
+    setOperationAction(ISD::INTRINSIC_WO_CHAIN, MVT::i16, Custom);
 
   if (Subtarget.hasStdExtZicbop()) {
     setOperationAction(ISD::PREFETCH, MVT::Other, Legal);
@@ -9949,6 +9953,155 @@ static SDValue lowerPulpDeferredImmIntrinsic(SDValue Op, SelectionDAG &DAG,
   return DAG.getNode(ISD::INTRINSIC_WO_CHAIN, DL, VT, Ops);
 }
 
+// GAP9 half-precision builtins (__builtin_pulp_f16max, ..., task 20/F042).
+// Each is one GAP9 instruction: fmax/fmin (.h, .ah, vfmax/vfmin) are IEEE
+// 754-2019 maximumNumber/minimumNumber, fsqrt is fsqrt, vfcvt.ah.h/vfcvt.h.ah
+// convert each lane with one rounding. max/min use RISCVISD::FMAX/FMIN (the
+// fmax/fmin instruction), not the generic fmaximumnum/fminimumnum: the DAG
+// combiner folds fmaximumnum(X, NaN constant) to X, which returns a NaN X
+// unchanged where the instruction returns the canonical NaN. The backend has
+// no bfloat16 or packed half-precision instructions yet, so:
+//  - float16 scalars (f16): fmax.h/fmin.h/fsqrt.h.
+//  - packed pairs (i32, lane 0 in bits 15:0): one scalar operation per lane.
+//  - bfloat16 (i16 bits): the operation on f32, with integer operations and
+//    no bf16 node, because a bf16 node is rounded back from f32 through the
+//    libcall __truncsfbf2, which GAP9's libgcc does not have. A bfloat16 in
+//    the high half of an f32 is that value as an f32 (exact). fmax.s/fmin.s
+//    return one of their inputs or the canonical NaN 0x7fc00000, so the upper
+//    half of the result is already the bfloat16 result (canonical NaN
+//    0x7fc0). fsqrt.s and f16->f32 results are rounded to nearest-even with
+//    integer arithmetic; the only NaN they produce is the canonical one,
+//    which that rounding keeps.
+static SDValue lowerPULPFP16Intrinsic(SDNode *N, SelectionDAG &DAG) {
+  SDLoc DL(N);
+  EVT VT = N->getValueType(0);
+  unsigned IntNo = N->getConstantOperandVal(0);
+  auto C = [&](uint32_t V) { return DAG.getConstant(V, DL, MVT::i32); };
+  // Operand I as an i32 (i16 operands are any-extended), result as VT.
+  auto Arg = [&](unsigned I) {
+    SDValue V = N->getOperand(I);
+    return V.getValueType() == MVT::i32
+               ? V
+               : DAG.getNode(ISD::ANY_EXTEND, DL, MVT::i32, V);
+  };
+  auto Ret = [&](SDValue X) {
+    return VT == MVT::i32 ? X : DAG.getNode(ISD::TRUNCATE, DL, VT, X);
+  };
+  // Lane 0 / lane 1 of X as an f16 (Zhinx: the low half of the register).
+  auto HalfLane = [&](SDValue X, unsigned Lane) {
+    if (Lane)
+      X = DAG.getNode(ISD::SRL, DL, MVT::i32, X, C(16));
+    return DAG.getNode(RISCVISD::FMV_H_X, DL, MVT::f16, X);
+  };
+  // Lane 0 / lane 1 bfloat16 of X as an f32.
+  auto Bf16Lane = [&](SDValue X, unsigned Lane) {
+    return DAG.getBitcast(
+        MVT::f32, Lane == 0 ? DAG.getNode(ISD::SHL, DL, MVT::i32, X, C(16))
+                            : DAG.getNode(ISD::AND, DL, MVT::i32, X,
+                                          C(0xffff0000)));
+  };
+  // Two f16 results packed into an i32.
+  auto PackHalves = [&](SDValue Lo, SDValue Hi) {
+    SDValue L = DAG.getNode(RISCVISD::FMV_X_ANYEXTH, DL, MVT::i32, Lo);
+    SDValue H = DAG.getNode(RISCVISD::FMV_X_ANYEXTH, DL, MVT::i32, Hi);
+    return DAG.getNode(ISD::OR, DL, MVT::i32,
+                       DAG.getNode(ISD::AND, DL, MVT::i32, L, C(0xffff)),
+                       DAG.getNode(ISD::SHL, DL, MVT::i32, H, C(16)));
+  };
+  // f32 -> bfloat16 bits (bits 15:0, upper bits zero), round to nearest,
+  // ties to even.
+  auto RoundToBf16 = [&](SDValue F) {
+    SDValue U = DAG.getBitcast(MVT::i32, F);
+    SDValue Odd = DAG.getNode(ISD::AND, DL, MVT::i32,
+                              DAG.getNode(ISD::SRL, DL, MVT::i32, U, C(16)),
+                              C(1));
+    SDValue Bias = DAG.getNode(ISD::ADD, DL, MVT::i32, Odd, C(0x7fff));
+    return DAG.getNode(ISD::SRL, DL, MVT::i32,
+                       DAG.getNode(ISD::ADD, DL, MVT::i32, U, Bias), C(16));
+  };
+
+  switch (IntNo) {
+  default:
+    return SDValue();
+  case Intrinsic::riscv_pulp_f16max:
+    return DAG.getNode(RISCVISD::FMAX, DL, VT, N->getOperand(1),
+                       N->getOperand(2));
+  case Intrinsic::riscv_pulp_f16min:
+    return DAG.getNode(RISCVISD::FMIN, DL, VT, N->getOperand(1),
+                       N->getOperand(2));
+  case Intrinsic::riscv_pulp_f16sqrt:
+    return DAG.getNode(ISD::FSQRT, DL, VT, N->getOperand(1));
+  case Intrinsic::riscv_pulp_f16max2:
+  case Intrinsic::riscv_pulp_f16min2: {
+    unsigned Opc = IntNo == Intrinsic::riscv_pulp_f16max2 ? RISCVISD::FMAX
+                                                          : RISCVISD::FMIN;
+    SDValue X = Arg(1), Y = Arg(2);
+    return Ret(PackHalves(
+        DAG.getNode(Opc, DL, MVT::f16, HalfLane(X, 0), HalfLane(Y, 0)),
+        DAG.getNode(Opc, DL, MVT::f16, HalfLane(X, 1), HalfLane(Y, 1))));
+  }
+  case Intrinsic::riscv_pulp_f16altmax:
+  case Intrinsic::riscv_pulp_f16altmin:
+  case Intrinsic::riscv_pulp_f16altmax2:
+  case Intrinsic::riscv_pulp_f16altmin2: {
+    unsigned Opc = (IntNo == Intrinsic::riscv_pulp_f16altmax ||
+                    IntNo == Intrinsic::riscv_pulp_f16altmax2)
+                       ? RISCVISD::FMAX
+                       : RISCVISD::FMIN;
+    SDValue X = Arg(1), Y = Arg(2);
+    SDValue R0 = DAG.getBitcast(
+        MVT::i32,
+        DAG.getNode(Opc, DL, MVT::f32, Bf16Lane(X, 0), Bf16Lane(Y, 0)));
+    SDValue Lo = DAG.getNode(ISD::SRL, DL, MVT::i32, R0, C(16));
+    if (IntNo == Intrinsic::riscv_pulp_f16altmax ||
+        IntNo == Intrinsic::riscv_pulp_f16altmin)
+      return Ret(Lo);
+    SDValue R1 = DAG.getBitcast(
+        MVT::i32,
+        DAG.getNode(Opc, DL, MVT::f32, Bf16Lane(X, 1), Bf16Lane(Y, 1)));
+    return Ret(DAG.getNode(
+        ISD::OR, DL, MVT::i32, Lo,
+        DAG.getNode(ISD::AND, DL, MVT::i32, R1, C(0xffff0000))));
+  }
+  case Intrinsic::riscv_pulp_f16altsqrt:
+    return Ret(RoundToBf16(
+        DAG.getNode(ISD::FSQRT, DL, MVT::f32, Bf16Lane(Arg(1), 0))));
+  case Intrinsic::riscv_pulp_v2hftov2ohf: {
+    SDValue X = Arg(1);
+    SDValue Lo = RoundToBf16(
+        DAG.getNode(ISD::FP_EXTEND, DL, MVT::f32, HalfLane(X, 0)));
+    SDValue Hi = RoundToBf16(
+        DAG.getNode(ISD::FP_EXTEND, DL, MVT::f32, HalfLane(X, 1)));
+    return Ret(DAG.getNode(ISD::OR, DL, MVT::i32, Lo,
+                           DAG.getNode(ISD::SHL, DL, MVT::i32, Hi, C(16))));
+  }
+  case Intrinsic::riscv_pulp_v2ohftov2hf: {
+    SDValue X = Arg(1);
+    // Fold a constant here: the generic fp_round constant fold keeps a NaN's
+    // payload, while fcvt.h.s (like vfcvt.h.ah) returns the canonical NaN.
+    if (auto *CX = dyn_cast<ConstantSDNode>(X)) {
+      uint64_t V = CX->getZExtValue(), R = 0;
+      for (unsigned L = 0; L != 2; ++L) {
+        APFloat F(APFloat::BFloat(), APInt(16, (V >> (16 * L)) & 0xffff));
+        uint64_t H = 0x7e00;
+        if (!F.isNaN()) {
+          bool LosesInfo;
+          F.convert(APFloat::IEEEhalf(), APFloat::rmNearestTiesToEven,
+                    &LosesInfo);
+          H = F.bitcastToAPInt().getZExtValue();
+        }
+        R |= H << (16 * L);
+      }
+      return Ret(C(R));
+    }
+    SDValue Zero = DAG.getIntPtrConstant(0, DL, /*isTarget=*/true);
+    return Ret(PackHalves(
+        DAG.getNode(ISD::FP_ROUND, DL, MVT::f16, Bf16Lane(X, 0), Zero),
+        DAG.getNode(ISD::FP_ROUND, DL, MVT::f16, Bf16Lane(X, 1), Zero)));
+  }
+  }
+}
+
 SDValue RISCVTargetLowering::LowerINTRINSIC_WO_CHAIN(SDValue Op,
                                                      SelectionDAG &DAG) const {
   unsigned IntNo = Op.getConstantOperandVal(0);
@@ -9962,6 +10115,19 @@ SDValue RISCVTargetLowering::LowerINTRINSIC_WO_CHAIN(SDValue Op,
   switch (IntNo) {
   default:
     break; // Don't custom lower most intrinsics.
+  case Intrinsic::riscv_pulp_f16max:
+  case Intrinsic::riscv_pulp_f16min:
+  case Intrinsic::riscv_pulp_f16sqrt:
+  case Intrinsic::riscv_pulp_f16altmax:
+  case Intrinsic::riscv_pulp_f16altmin:
+  case Intrinsic::riscv_pulp_f16altsqrt:
+  case Intrinsic::riscv_pulp_f16max2:
+  case Intrinsic::riscv_pulp_f16min2:
+  case Intrinsic::riscv_pulp_f16altmax2:
+  case Intrinsic::riscv_pulp_f16altmin2:
+  case Intrinsic::riscv_pulp_v2hftov2ohf:
+  case Intrinsic::riscv_pulp_v2ohftov2hf:
+    return lowerPULPFP16Intrinsic(Op.getNode(), DAG);
   case Intrinsic::riscv_tuple_insert: {
     SDValue Vec = Op.getOperand(1);
     SDValue SubVec = Op.getOperand(2);
@@ -13717,6 +13883,21 @@ void RISCVTargetLowering::ReplaceNodeResults(SDNode *N,
     default:
       llvm_unreachable(
           "Don't know how to custom type legalize this intrinsic!");
+    case Intrinsic::riscv_pulp_f16max:
+    case Intrinsic::riscv_pulp_f16min:
+    case Intrinsic::riscv_pulp_f16sqrt:
+    case Intrinsic::riscv_pulp_f16altmax:
+    case Intrinsic::riscv_pulp_f16altmin:
+    case Intrinsic::riscv_pulp_f16altsqrt:
+    case Intrinsic::riscv_pulp_f16max2:
+    case Intrinsic::riscv_pulp_f16min2:
+    case Intrinsic::riscv_pulp_f16altmax2:
+    case Intrinsic::riscv_pulp_f16altmin2:
+    case Intrinsic::riscv_pulp_v2hftov2ohf:
+    case Intrinsic::riscv_pulp_v2ohftov2hf:
+      // The bfloat16 scalar builtins return i16.
+      Results.push_back(lowerPULPFP16Intrinsic(N, DAG));
+      return;
     case Intrinsic::experimental_get_vector_length: {
       SDValue Res = lowerGetVectorLength(N, DAG, Subtarget);
       Results.push_back(DAG.getNode(ISD::TRUNCATE, DL, MVT::i32, Res));
