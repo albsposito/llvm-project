@@ -250,3 +250,20 @@ def pulp_OffsetedWritePtr : PULPBuiltin<"void(void *, void *, int)", "xpulpv">;
 let Attributes = [NoThrow, Const, CustomTypeChecking] in {
 def shuffle : PULPBuiltin<"void(...)">;
 } // Attributes = [NoThrow, Const, CustomTypeChecking]
+
+// GAP9 complex / divide-by-N builtins (task 20/F038). Prototypes are GAP9
+// GCC's (all __vector(2) short). They need the GAP9 extension (xgap9, target
+// feature "xgap"): their instructions are GAP9 additions that PULPv2 cores
+// lack. Element 0 (bits 15:0) is the real part, element 1 the imaginary part.
+let Attributes = [NoThrow, Const] in {
+def pulp_add2div2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xgap">;
+def pulp_add2div4 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xgap">;
+def pulp_sub2div2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xgap">;
+def pulp_sub2div4 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xgap">;
+def pulp_sub2rotmj : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xgap">;
+def pulp_cplx_conj : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>)", "xgap">;
+def pulp_cplxmuls2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xgap">;
+def pulp_cplxmuls2div2 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xgap">;
+def pulp_cplxmuls2div4 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xgap">;
+def pulp_cplxmuls2div8 : PULPBuiltin<"_Vector<2, short>(_Vector<2, short>, _Vector<2, short>)", "xgap">;
+} // Attributes = [NoThrow, Const]
