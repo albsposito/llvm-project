@@ -23272,6 +23272,38 @@ Value *CodeGenFunction::EmitRISCVBuiltinExpr(unsigned BuiltinID,
   if (BuiltinID == RISCV::BI__builtin_shuffle)
     return EmitPULPBuiltinShuffle(*this, E);
 
+  // GAP9 half-precision absolute value (task 20/F041): clear the sign bit of
+  // each 16-bit lane and nothing else (GCC: fabs.h, fabs.ah, vfabs.h,
+  // vfabs.ah; no FP exception, NaN payloads kept).
+  //  - f16abs: generic llvm.fabs.f16, selected as fabs.h (Zhinx).
+  //  - f16abs2 / f16altabs2: the pair is one 32-bit register; AND it with
+  //    0x7fff7fff (bits 15 and 31 are the two sign bits).
+  //  - f16altabs: p.bclr of bit 15 through the Xpulpv bclr intrinsic. Not
+  //    llvm.fabs.bf16 nor an i16 AND (which InstCombine turns into
+  //    llvm.fabs.bf16): LLVM 20 legalizes a bfloat fabs through float and
+  //    __truncsfbf2, which quiets signalling NaNs and is missing from GAP9's
+  //    libgcc (fixed upstream after LLVM 20 by 11571a005a38).
+  switch (BuiltinID) {
+  case RISCV::BI__builtin_pulp_f16abs:
+    return emitBuiltinWithOneOverloadedType<1>(*this, E, Intrinsic::fabs);
+  case RISCV::BI__builtin_pulp_f16abs2:
+  case RISCV::BI__builtin_pulp_f16altabs2: {
+    Value *Pair = Builder.CreateBitCast(EmitScalarExpr(E->getArg(0)), Int32Ty);
+    Value *Abs = Builder.CreateAnd(Pair, Builder.getInt32(0x7fff7fff));
+    return Builder.CreateBitCast(Abs, ConvertType(E->getType()));
+  }
+  case RISCV::BI__builtin_pulp_f16altabs: {
+    Value *Bits = Builder.CreateBitCast(EmitScalarExpr(E->getArg(0)), Int16Ty);
+    Value *Abs = Builder.CreateCall(
+        CGM.getIntrinsic(Intrinsic::riscv_pulp_bclr),
+        {Builder.CreateZExt(Bits, Int32Ty), Builder.getInt32(0xffff7fff)});
+    return Builder.CreateBitCast(Builder.CreateTrunc(Abs, Int16Ty),
+                                 ConvertType(E->getType()));
+  }
+  default:
+    break;
+  }
+
   if (BuiltinID == Builtin::BI__builtin_cpu_supports)
     return EmitRISCVCpuSupports(E);
   if (BuiltinID == Builtin::BI__builtin_cpu_init)
