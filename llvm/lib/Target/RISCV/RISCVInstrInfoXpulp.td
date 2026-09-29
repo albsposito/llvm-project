@@ -1950,6 +1950,24 @@ defm : int_mul_mac_N_RN<"u",   "U">;
 defm : int_mul_mac_N_RN<"hhs", "HHS">;
 defm : int_mul_mac_N_RN<"hhu", "HHU">;
 
+// GAP9 fractional-multiply aliases (task 20/F037): GAP9 GCC emits for
+// mulf*/macf* exactly the instruction of mul*/mac* (p.muls ... p.macuRN), so
+// they reuse the same instructions and pattern multiclass.
+def : PatGprGpr<int_riscv_pulp_mulfs, P_MULS>;
+def : PatGprGpr<int_riscv_pulp_mulfu, P_MULU>;
+def : Pat<(int_riscv_pulp_macfs (i32 GPR:$rs1), (i32 GPR:$rs2), (i32 GPR:$rd)), (P_MACS (i32 GPR:$rd), (i32 GPR:$rs1), (i32 GPR:$rs2))>;
+def : Pat<(int_riscv_pulp_macfu (i32 GPR:$rs1), (i32 GPR:$rs2), (i32 GPR:$rd)), (P_MACU (i32 GPR:$rd), (i32 GPR:$rs1), (i32 GPR:$rs2))>;
+defm : int_mul_mac_N_RN<"fs", "S">;
+defm : int_mul_mac_N_RN<"fu", "U">;
+// High word of the 64-bit product: standard M mulh/mulhu/mulhsu (GAP9 GCC
+// prints them as p.mulh*, same encodings). mul64hus(x, y) has x unsigned and
+// y signed; mulhsu takes the signed operand in rs1, so the operands swap.
+let Predicates = [IsRV32, HasPULPExtV2, HasStdExtM] in {
+def : PatGprGpr<int_riscv_pulp_mul64hs, MULH>;
+def : PatGprGpr<int_riscv_pulp_mul64hu, MULHU>;
+def : Pat<(int_riscv_pulp_mul64hus (i32 GPR:$x), (i32 GPR:$y)), (MULHSU (i32 GPR:$y), (i32 GPR:$x))>;
+}
+
 multiclass int_N_RN_r<string intrin, string instr> {
   // <op>N: op with normalization factor as immediate
   def : Pat<(!cast<Intrinsic>("int_riscv_pulp_" # intrin # "N")
