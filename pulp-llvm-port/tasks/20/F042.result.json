@@ -1,0 +1,51 @@
+{
+ "status": "done",
+ "branch": "work/20/F042",
+ "integration_head": "4b76df2c70d0",
+ "commits": [
+  "acf40cebd2758f9aefb07094581a9c17cb2fec30",
+  "f2d080c081fdc826998915ee6af786d8f7d9444e",
+  "fe11d8d5057d605383cca877cfc38869bb0a40de"
+ ],
+ "note": "notes/20/F042.md",
+ "signature_gone": true,
+ "summary": "12 GAP9 fp16 builtins as ClangBuiltin intrinsics (half / i16 bits / i32 bits) lowered in RISCVISelLowering: max/min via RISCVISD::FMAX/FMIN (not folded; review round 1), fmax.h/fmin.h/fsqrt.h for float16, per-lane ops for packed, bf16 via f32 + integer RNE (no bf16 nodes, no __truncsfbf2), constant v2ohftov2hf folded with canonical NaN. No CGBuiltin/Sema edits.",
+ "clusters": {
+  "clang-builtins": "clang/include/clang/Basic/BuiltinsRISCVXpulp.td",
+  "intrinsics": "llvm/include/llvm/IR/IntrinsicsRISCVXpulp.td",
+  "codegen-core": "llvm/lib/Target/RISCV/RISCVISelLowering.cpp"
+ },
+ "verification": {
+  "prefix_builds": "clang+llc at each commit acf40cebd275, f2d080c081fd, fe11d8d5057d: 0 errors (logs/20-F042.prefix{1,2,3}.log)",
+  "diagnostics_vs_gcc": "29 probes identical accept/reject (logs/20-F042-repro/diag/)",
+  "gvsoc": "final build: reviewer t.c (noinline+inlined, O0..Oz) == GCC; reviewer t3.c (NaN constants) == GCC -O0/hardware at O0..Oz (GCC -O2 ICEs on it); f16b.c 13034 lines incl. exhaustive conversions == GCC == host model at O0..Os+inlined O3; red.c == GCC; all linked with GAP9 libgcc only (logs/20-F042-repro/gvsoc-final.txt, logs/20-F042-repro/nan/)",
+  "sdk_survey": "head 4b76df2c70d0 without vs with F042: pe8 586 -> 610/617 (+24, 0 regressions, incl. CNN_Copy.c and CNN_Pooling_BasicKernels_fp16/f16a.c now compiling with F045), xgap9 534 -> 542; remaining 7 = clang-only implicit-decl files; 0 crashes (logs/20-F042-survey/final-on-4b76df2/)",
+  "gap9_sweep": "60 kernel objects O2/O3 vs int-20 at 4b76df2c70d0: disassembly identical",
+  "lit": "LIT_PATHS + clang/test/Sema + clang/test/CodeGen/builtins-riscv.c: 5838 tests, only failure rvv/vsetvli-insert-zve64f.mir (known, B41/T002) (logs/20-F042.lit.log)",
+  "policy_check": "0 FAIL, 1 WARN (commented-code false positive on prose comment, accepted by reviewer)"
+ },
+ "other_errors_seen": [
+  "F036's __builtin_pulp_f32max/f32min lower to ISD::FMAXIMUMNUM/FMINIMUMNUM (RISCVISelLowering.cpp ~10207 on this branch) and so have the same DAGCombiner fold as F042 round 1: fmax(X var, NaN const) returns X's NaN payload unchanged where fmax.s returns the canonical NaN. Fix would be RISCVISD::FMAX/FMIN; not changed here (rule 5).",
+  "General T3 limitation: float16alt values live across basic blocks are kept as f32 and rounded back via __truncsfbf2 (not in GAP9 libgcc), with or without these builtins (logs/20-F042-repro/red1.c).",
+  "Known upstream crash B100: __builtin_convertvector(v2h, v2ah) asserts 'Invalid cast!'.",
+  "Resolved since round 1: the 'Cannot select v2i16 = bitcast f32' gap is fixed by F045; the 3 affected SDK files now compile."
+ ],
+ "notes_for_conductor": [
+  "Feature gates chosen: float16 scalar 'xpulpv,(zhinx|zfh)'; float16alt 'xpulpf16alt'; v2h 'xpulpfvec,zhinx'; v2ah 'xpulpfvec,xpulpf16alt'; conversions 'xpulpfvec,zhinx,xpulpf16alt'. F041 (f16abs2) may want to match.",
+  "INTRINSIC_WO_CHAIN is set Custom for MVT::i16 when xpulpf16alt is on (for the i16-returning f16alt intrinsics); F037 or others adding i16 intrinsics must add their IDs to ReplaceNodeResults.",
+  "INTRINSIC_WO_CHAIN i16 Custom: F037 sets it under hasPULPExtV2, F042 under hasVendorXpulpf16alt (xpulpf16alt does not imply xpulpv); both share ReplaceNodeResults, no conflict."
+ ],
+ "proposed_test": [
+  "clang/test/CodeGen/RISCV/pulp-fp16-builtins.c: -march=rv32imc_xgap9 -emit-llvm, CHECK each builtin calls llvm.riscv.pulp.<name> with half / i16 / i32 types and the bitcasts",
+  "clang/test/Sema/riscv-pulp-fp16-builtins.c: 'needs target feature' without xgap9; incompatible-type errors for pointer/int/scalar-for-vector; float->float16alt accepted",
+  "llvm/test/CodeGen/RISCV/pulp-fp16-builtins.ll: llc -mattr=+zfinx,+zhinx,+xpulpv,+xpulpf16alt,+xpulpfvec, CHECK fmax.h/fmin.h/fsqrt.h, bf16 slli/fmax.s/srli sequence, altsqrt rounding sequence, packed per-lane ops, CHECK-NOT: __truncsfbf2; plus a loop-carried f16altmax2 case"
+ ],
+ "review_round_addressed": 1,
+ "round1_fixes": [
+  "max/min: ISD::FMAXIMUMNUM/FMINIMUMNUM -> RISCVISD::FMAX/FMIN on all paths (f16 scalar, bf16-via-f32 scalar and packed, v2h per lane); upstream reference llvmorg-20.1.8 RISCVISelLowering.cpp:6223",
+  "v2ohftov2hf with a constant operand folded in the lowering with canonical NaN (reviewer non-blocking observation)",
+  "rebased onto 4b76df2c70d0 (via 7ddac1d3b507, 6b5a58ce5a09): all blocks kept whole, F042 last in each file; diff vs head is additions only",
+  "gcc-summary.txt generic_types entry corrected (gcc_rc=0); 29/29 probes same accept/reject as GCC",
+  "note: 'bit for bit' and canonical-NaN statements now backed by the reviewer's t.c/t3.c; GCC's own constant-fold difference documented"
+ ]
+}

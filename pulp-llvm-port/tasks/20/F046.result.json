@@ -1,0 +1,28 @@
+{
+ "status": "done",
+ "branch": "work/20/F046",
+ "integration_head": "4b76df2c70d0",
+ "commits": [
+  "a4229b80e2be"
+ ],
+ "commit_clusters": {
+  "a4229b80e2be": "codegen-core (RISCVISelLowering.cpp): v2i16/v4i8 ISD::SELECT promoted to i32, ISD::SELECT_CC expanded"
+ },
+ "note": "notes/20/F046.md",
+ "signature_gone": true,
+ "unmapped_files": [],
+ "upstream_file_edits": [],
+ "summary": "B144: v2i16/v4i8 had no SELECT/SELECT_CC action since fork commit f1b7aebff8c2, so they reached ISel as 'legal' and crashed. Fix: setOperationPromotedToType(ISD::SELECT, VT, i32) + SELECT_CC Expand in the fork's v2i16/v4i8 block (6 lines, no .td change, RISCVInstrInfoXpulp.td untouched). The i32 select then follows the upstream XLenVT path (lowerSELECT -> RISCVISD::SELECT_CC -> Select_GPR_Using_CC_GPR). Promote chosen over Custom+pseudo because upstream lowerSELECT turns vector SELECT into splat-VSELECT (RISCVISelLowering.cpp:8344 at llvmorg-20.1.8); precedent AMDGPUISelLowering.cpp:553-554.",
+ "checks": {
+  "matrix": "logs/20-F046-matrix: 30 fns x 3 configs x O0/O2/O3/Os, -verify-machineinstrs: before 120/360 crash, after 360/360 pass; the 240 previously passing outputs byte-identical",
+  "gvsoc": "logs/20-F046-gvsoc: 13 branchy SIMD kernels, clang xgap9 + zfinx_xpulpv2 at O0/O2/O3/Os == host gcc -O0 == GAP9 GCC -mnohwloop O0/O2/O3/Os; base clang crashes at O2/O3/Os; imfc_xpulpv2 compile-only",
+  "non_pulp": "logs/20-F046-nonpulp/compare.txt: 26 upstream select/zicond/condops tests x 7 non-PULP configs, 182 compiles, 0 diffs vs baseline",
+  "gap9_sweep": "60/60 objects identical disassembly base vs mine (logs/20-F046-checks/sweep-compare.txt)",
+  "hwloop_fuzz": "seeds 46001-46030: 0 mismatch, 0 crash, all 'same' (logs/20-F046-checks/fuzz.txt)",
+  "lit": "4749 tests, 1 failure = known B41 rvv/vsetvli-insert-zve64f.mir (logs/20-F046-lit.log)",
+  "policy_check": "0 fail 0 warn"
+ },
+ "proposed_test": "llvm/test/CodeGen/RISCV/xpulp-select-packed.ll: the 30 matrix functions (logs/20-F046-matrix/all.ll) for -mattr=+xgap and +m,+f,+c,+xpulpv at O0/O2, CHECK lines by update_llc_test_checks.py",
+ "other_errors_seen": [],
+ "notes_for_conductor": "The shared session scratchpad dir 'sweep/gap9-sweep' (created earlier by another agent) was accidentally rsynced over from benchmarks/gap9-sweep and its run.py H= line set to the absolute harness path; my own runs used scratchpad/f046-sweep."
+}

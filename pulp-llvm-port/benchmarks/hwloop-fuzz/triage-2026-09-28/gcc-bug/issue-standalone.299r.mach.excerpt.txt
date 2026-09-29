@@ -1,0 +1,53 @@
+ Iter reg is defined once and only once:
+(insn 116 111 161 15 (set (reg:SI 11 a1 [125])
+        (const_int 1 [0x1])) 527 {*movsi_internal}
+     (nil))
+
+ Iter count is: 1
+  Init iter output is used by insn:
+(jump_insn 138 64 68 8 (parallel [
+            (set (pc)
+                (if_then_else (ne (reg:SI 11 a1 [125])
+                        (const_int 1 [0x1]))
+                    (label_ref 65)
+                    (pc)))
+            (set (reg:SI 11 a1 [125])
+                (plus (reg:SI 11 a1 [125])
+                    (const_int -1 [0xffffffffffffffff])))
+            (unspec [
+                    (const_int 0 [0])
+                ] UNSPEC_LSETUP_END)
+        ]) "issue-standalone.c":13 1066 {loop_end}
+     (int_list:REG_BR_PROB 8500 (nil))
+ -> 65)
+  Init iter output is used by insn:
+(jump_insn 138 64 68 8 (parallel [
+            (set (pc)
+                (if_then_else (ne (reg:SI 11 a1 [125])
+                        (const_int 1 [0x1]))
+                    (label_ref 65)
+                    (pc)))
+            (set (reg:SI 11 a1 [125])
+                (plus (reg:SI 11 a1 [125])
+                    (const_int -1 [0xffffffffffffffff])))
+            (unspec [
+                    (const_int 0 [0])
+                ] UNSPEC_LSETUP_END)
+        ]) "issue-standalone.c":13 1066 {loop_end}
+     (int_list:REG_BR_PROB 8500 (nil))
+ -> 65)
+
+ Init can be removed
+------- END OF Processing loop end insn uses ---
+207:;; replacing loop 1 initializer with
+208-(insn 166 0 0 (parallel [
+209-            (set (reg:SI 67 lc1)
+210-                (unspec_volatile:SI [
+211-                        (const_int 1 [0x1])
+212-                    ] UNSPECV_LC_SET))
+213-            (set (reg:SI 69 le1)
+214-                (label_ref (label_ref:SI 0)))
+215-            (use (const_int 1 [0x1]))
+216-        ]) -1
+217-     (nil))
+--

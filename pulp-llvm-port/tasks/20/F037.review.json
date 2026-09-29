@@ -1,0 +1,27 @@
+{
+  "task": "20/F037",
+  "revision": 2,
+  "branch": "work/20/F037",
+  "commits_reviewed": ["583b50ff11ba", "9959695054ac", "1caa54065f32", "7aff51998e83"],
+  "base": "7ddac1d3b507",
+  "verdict": "APPROVE",
+  "reasons": [],
+  "previous_verdict": "REJECT (revision 1, 7a984c9b66bc..5e145c904feb on e7f97bbd0f05). Only the commit order and the note were at fault: (1) the insn-tablegen commit came before the intrinsics it uses, so it did not build on its own; (2) the note said CGBuiltin.cpp was not fork-touched, which was false. The code had passed every technical check.",
+  "rev2_checks": {
+    "code_unchanged": "git range-diff e7f97bbd0f05..5e145c904feb 7ddac1d3b507..work/20/F037 shows all four patches '=' (identical), reordered to intrinsics, insn-tablegen, codegen-core, clang-builtins. The head tree 7aff51998e83 has an empty diff against the tree I built and tested in revision 1 (00cf446984eb = 7ddac1d3b507 + F037). So the revision-1 GVSoC, survey and diagnostics results on 7ddac1d3b507 carry over unchanged: 584 -> 586/617 in M2a P, dct.c and MathFuncsFix.c newly OK, 0 regressions, O2/O3 hashes identical to GAP9 GCC.",
+    "prefix_builds": "My check: for every prefix, llvm-tblgen -gen-dag-isel (RISCV.td) and -gen-intrinsic-enums, plus clang-tblgen -gen-clang-builtins, give 0 errors for 583b50ff11ba, 9959695054ac, 1caa54065f32 and 7aff51998e83. Revision 1 failed at the first of these steps. Beyond TableGen, each prefix changes only files the head build compiles, or leaves them at base 7ddac1d3b507, which builds. The worker's logs agree: logs/20-F037-prefix-<commit>.log are 'scripts/build.sh ... clang llc' for each prefix, and logs/20-F037-prefix.log reports rc=0 and 0 'error:' lines for all four.",
+    "note": "notes/20/F037.md line 27 now says the task asked for no clang CodeGen edits unless a builtin needs custom handling. It says CGBuiltin.cpp is fork-touched and mapped to clang-builtins, and that concurrent tasks were editing it, so the fork's ClangBuiltin-intrinsic route was used and gives the same instructions as the CORE-V sext/zext-of-trunc route. This is accurate. F019 and F043 (7ddac1d3b507, +75 lines) both edit CGBuiltin.cpp. The result file's integration_head is 7ddac1d3b507.",
+    "policy_check": "scripts/policy_check.py --range 7ddac1d3b507..7aff51998e83 --stack-base llvmorg-20.1.8: 4 commits, 0 FAIL, 0 WARN (logs/20-F037-review/policy-rev2.json). The trailers Change-Note: 20/F037.md and Task: 20/F037 are in the last paragraph.",
+    "build_and_lit": "build/20-F037-rev was rebuilt from the clean worktree at 7aff51998e83 ('clang version ... 7aff51998e83'), exit 0 (logs/20-F037-review/build-rev2.log). scripts/wlit.sh over llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, clang/test/CodeGen/RISCV, clang/test/Sema, Driver/riscv-cpus.c and the de-duplicated data/fork-tests.txt entries (which include Driver/riscv-arch.c): 5885 tests, 1 failure, rvv/vsetvli-insert-zve64f.mir (B41, data/known-failures.txt) (logs/20-F037-review/lit-rev2.log).",
+    "applies_to_current_head": "The integration head is now 6b5a58ce5a09 (F045: +22 lines of f32 <-> v2i16/v4i8 bitcast patterns in RISCVInstrInfoXpulp.td, unrelated to F037). All four commits cherry-pick cleanly one by one (git merge-tree --write-tree --merge-base=<c>~1; final tree 0652b8a2e2fd). The diff against 6b5a58ce5a09 is exactly F037's +82 lines in 5 files. llvm-tblgen -gen-dag-isel on the rebased prefixes (after intrinsics, after insn-tablegen, final) gives 0 errors, so there are no duplicate or conflicting patterns with F045."
+  },
+  "verified_ok_rev1_still_valid": "Everything under verified_ok in the revision-1 review still holds, because the code is identical. Build; builtins td blocks closed; char/short return types matching GCC under -fsigned-char and -funsigned-char; mulhsu with signed y in rs1; GVSoC results for all 17 builtins at O0/O2/O3/Os identical to GAP9 GCC and to a host reference; aliases identical to their siblings; the GCC macfs/macfu 4-operand output rejected by gas; diagnostics and gating matching the sibling checks; ISel hunk limited to Xpulpv; M2a survey 576 -> 578 on e7f97bbd0f05 and 584 -> 586 on 7ddac1d3b507; GAP9 sweep 60/60 identical.",
+  "follow_up_not_blocking": [
+    "After F043, the sibling mul/mac N/RN builtins accept an immediate that becomes constant only after optimisation, but F037's 8 aliases (mulf{s,u}{N,RN}, macf{s,u}{N,RN}) keep '_Constant' prototypes. So 'int n=5; __builtin_pulp_mulfsN(a,b,n)' is rejected while __builtin_pulp_mulsN compiles, and GAP9 GCC -O2 accepts both. No SDK file needs this. Proposed BACKLOG.md item: add the aliases to F043's deferred list.",
+    "GCC side (benchmarks/gcc-bugs): GAP9 GCC -O3 gives GVSoC results for the sibling macsRN/macuRN/mulsRN that differ from its own -O0/-O2/-Os (logs/20-F037-review/gvsoc/). Not investigated."
+  ],
+  "warnings_checked": [
+    "policy_check revision 2: 0 WARN, 0 FAIL."
+  ],
+  "review_artifacts": "logs/20-F037-review/ (policy-rev2.json, build-rev2.log, lit-rev2.log; revision-1 evidence gvsoc/, survey/, lit.log)."
+}

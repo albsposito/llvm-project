@@ -1,0 +1,5 @@
+clang version 20.1.8 (https://github.com/albsposito/llvm-project.git d7c901b049e9118d0fe2746b7997ca1db3bccebf)
+Target: riscv32-unknown-unknown-elf
+Thread model: posix
+Build config: +assertions
+InstalledDir: <work>/snap/bin (snapshot of build/int-20-M3, built from wt/int-20 d7c901b049e9)

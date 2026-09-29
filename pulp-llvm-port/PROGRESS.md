@@ -2,7 +2,7 @@
 
 Durable state of the port. The conductor updates this file at the end of every SOP step; after a context reset it is read before anything else.
 
-Current phase: Step 20: PAUSED 2026-09-28 night (usage limit). SDK compile parity 476/617 = 77.1% (M1 checkpoint, benchmarks/sdk-compile-survey/checkpoint-M1-2026-09-28/). Local port/20 landed since the evening push: F016, F032 (head 2f24d0013ede); F035 then F034 were landing in a background chain at pause time — CHECK tasks/20/F035.integrate.json and F034.integrate.json first (verdict LANDED?) and mark B90(T0+T1)/B109 in BACKLOG. Nothing since ccfd68f6ac76 is pushed. Resume table: see 'Resume 2026-09-29' section below. Plan to 100%: steps/20/sdk100-queue.md. Pushes need owner go-ahead. Steps 21-23 paused.
+Current phase: Step 20: 2026-09-29 evening — 100% SDK compilation reached (owner goal). Checkpoint M3 (int-20 d7c901b049e9, -march=rv32imc_xgap9 -mPE=8): 610/617 = 98.9%; 609/609 = 100% of the files GAP9 GCC compiles with the SDK's own -Werror flags; the 7 remaining files are SDK implicit-declaration bugs GCC also rejects under SDK flags. Landed today: F044, F038, F036, F041, F043, F045, F037, F042, F046 (int-20 head 26e7268c3127). Link readiness 575/617: B133 (__truncsfbf2, 32 objects, owner decision), B149 (2 missing builtins, 5 silent false passes), B150 (OpenMP runtime). Next landing before-files: tasks/20/work_20_F046.build.clusters.json / work_20_F046.lit_diff.json. Pushes need owner go-ahead. Steps 21-23 paused.
 
 ## Steps
 
@@ -114,5 +114,5 @@ All agents were stopped at pause; their worktrees (wt/20-Fxxx) and build dirs ke
 | F030 | B116 | worker mid-task (running pressure ladder) | resume worker; B120 fix follows it (same file) |
 | F033 | B76 | approved code, ON HOLD until the B120 FREP accumulator fix | land together with/after B120 |
 | F036/F037/F038 | B97 batches A/C/B | workers mid-task | resume workers; they will conflict with each other and F018/F019 at landing -> rebase |
-| SDK flags harness | sdk100 item 5 | mid-task (run.py modes, db-phase path fix, -fno-math-errno/-ffp-contract=fast) | resume; the tracked compile_db.json.gz has stale scratch paths until this lands |
+| SDK flags harness | sdk100 item 5 | done 2026-09-29 (run.py modes gccsdk/sdkflags/sdknowerror/parity; db-phase path fix) | — |
 | Attribution research | sdk100 item 22 | mid-task | resume |

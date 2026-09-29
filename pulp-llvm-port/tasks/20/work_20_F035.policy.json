@@ -1,0 +1,14 @@
+{
+  "range": "ccfd68f6ac7672ace360268bd0b4fac3b1e06d60..work/20/F035",
+  "commits": 2,
+  "fail": 0,
+  "warn": 1,
+  "findings": [
+    {
+      "commit": "441ded47bcd4",
+      "level": "WARN",
+      "rule": "test-edit",
+      "msg": "test file regenerated, reviewer must check the regen report: llvm/unittests/TargetParser/RISCVISAInfoTest.cpp"
+    }
+  ]
+}

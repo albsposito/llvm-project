@@ -353,6 +353,12 @@ These are ranked by how many apps each one blocks and by how bad it is.
   - the header-guard typo in `sai/pdm_*/wav_out.h`;
   - `&file->fs` as a condition in `Emulation/at_api_pmsis.h:109` (always true).
 
+**2026-09-29 update** (compiler `de8abd20c921`, which includes F016 and F018):
+- **`-mPE=N`:** the wrapper passes it natively when `GAP_CLANG_MPE=1`, the default when `GAP_CLANG_MARCH` names xgap9, and then does not add the compat header's `-D__GAP9_CLANG_PE__`.
+- **New guard:** after every `-c` compile the wrapper runs `nm -u` and fails the compile if the object references an undefined `__builtin_*`. SDK headers such as `FastFloatApprox16.h` silence the implicit-declaration warning with a pragma, so an unknown builtin can otherwise compile silently.
+- **Check:** `examples/gap9/basic/helloworld`, variant `clang-gnuas-gnuld`, with `GAP_CLANG_MARCH=rv32imc_xgap9` and **no compat header**, builds and links with the SDK's `-Werror` (56 compiles with `-mPE=8`). Warnings are still printed. With `GAP_CLANG_GCC7COMPAT=0` it stops at `fll.c`.
+- **Survey, fresh work dir:** strict 477/617 (77.3%), pe8 520/617 (84.3%), sdknowerror 527/617 (85.4%), sdkflags 515/609 (84.6%).
+
 ## Caveats
 
 - **The compat header is a stop-gap, not the fix.** Re-run without `GAP_CLANG_COMPAT` once F016 and F018 land. The `p.elw` inline asm and the volatile store follow GCC's output but are not the compiler builtins.

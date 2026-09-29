@@ -1,0 +1,36 @@
+{
+ "status": "done",
+ "branch": "work/20/F039",
+ "integration_head": "75b4639bf455b3b7cf909c9759d018dcebaf9647",
+ "commits": [
+  "a949f9533ab82236443a8246d805d0c87d88a176"
+ ],
+ "commit_roles": {
+  "a949f9533ab8": "clang-driver: clang/lib/Basic/Targets/RISCV.cpp only. getTargetDefines: '#define float16 _Float16' (when zhinx and (xpulpf16alt or xpulpfvec)) and '#define float16alt __bf16' (when xpulpf16alt); both on for -march=rv32imc_xgap9. handleTargetFeatures: HasFullBFloat16 = true under xpulpf16alt (per-operation bfloat16 rounding, no excess precision)."
+ },
+ "note": "notes/20/F039.md",
+ "signature_gone": true,
+ "mechanism_choice": "Predefined macros, not a predeclared typedef. GAP9 GCC treats the names as predeclared typedefs (shadowable), but a real implicit typedef needs Sema::Initialize (clang/lib/Sema/Sema.cpp, upstream file the fork does not touch, rule 11); TargetInfo can only add macros. For every SDK use (declarations, casts, sizeof, compound literals, vector_size typedefs in Emulation/Gap.h) both behave the same; grep of the SDK (outside gvsoc) finds no identifier use, no #ifdef test and no redundant typedef on a __gap9__ path. Design decision 6.4. Known corner cases: identifier reuse and a redundant 'typedef _Float16 float16;' become errors (hit by the gap9-sweep harness shim, see other_errors_seen).",
+ "bf16_rounding": "HasFullBFloat16 under xpulpf16alt makes -fbfloat16-excess-precision=none behaviour the default (clang emits fadd/fmul bfloat, the backend still promotes each op to f32 and rounds through __truncsfbf2 until T3). This is the GCC-equivalent setting measured in the design (equals GCC -ffp-contract=off on every arithmetic numeq line). Same switch as upstream X86 (avx10.2-256, X86.cpp:309) and ARM (bf16, ARM.cpp:611). The -Xclang -fbfloat16-excess-precision=standard option no longer re-enables excess precision under xpulpf16alt (as on X86/ARM with full bf16).",
+ "verification": {
+  "repro": "logs/20-F039.repro.log: int-20 clang -march=rv32imc_xgap9: \"unknown type name 'float16'\"",
+  "frontend": "-dM -E: xgap9 -> float16=_Float16, float16alt=__bf16; rv32imc_zfinx_zhinx / rv32imc_xpulpv2 / rv32imc_zfinx_zhinx_xpulpv2 -> neither; +xpulpfvec -> float16 only; rv32imc_zfinx_xpulpf16alt -> float16alt only. float16 a*b+a -> 'fmadd.h a0,a0,a1,a0'. float16alt (a+b)*a -> IR fadd/fmul bfloat (no fpext/fptrunc), asm fadd.s + __truncsfbf2 per op. Gap.h-style v2h/v2ah typedefs, sizeof/_Alignof 2, types_compatible_p(float16,float16alt)=0. logs/20-F039-evidence/{t.c,v.c}",
+  "numeq_gvsoc": "design tests/numeq.c with -DT=float16/-DT=float16alt, -march=rv32imc_xgap9, vs GAP9 GCC on ri5ky_testbench: float16 -ffp-contract=fast = gcc-f16 on all 12 lines; float16alt = gcc-f16alt-nocontract on expr/div/dot/dot_sep/fromf/fromi/tof/cmp (with and without -ffp-contract=fast); remaining diffs vs default GCC float16alt: FMA fusion (T3) and (int) cast rounding (T3, D6 Q1). logs/20-F039-evidence/numeq/table.txt",
+  "dsp_kernels_gvsoc": "SDK DSP_Libraries/MatrixFunctions/MatAddDSP.c and MatMulDSP.c unchanged, SDK per-file flags, single-core wrapper (gap_coreid=0, gap_ncore=1, no barrier). KerParMatAdd_DSP_f16, KerParMatMulDSP_f16, KerParMatMulDSPT_f16 (even and odd sizes): GCC vs clang (-march=rv32imc_xgap9 -O2 -ffp-contract=fast) output buffers bit-identical 5/5. float16alt: MatAdd_f16a identical, MatMul*_f16a differ (FMA, T3). Clang build needed -D__builtin_pulp_f16abs2/f16altabs2 shims only so an unused inline in FastFloatApprox16.h parses (missing builtins, T6). logs/20-F039-evidence/dsp/",
+  "sdk_survey": "private run.py copy + private work dirs, mode xgap9 = -march=rv32imc_xgap9 no shim (M1 config B). Before (int-20 snapshot 75b4639bf455): 477/617 ok, 140 fail, 132 float16-blocked. After: 515/617. 38 of the 132 now compile (DSP_Libraries 18, audio-framework 7, rtos/other 3, examples 6, nn_menu 2, libs/other 1, other-kernels 1) = the survey's predicted +38. 0 regressions, 0 crashes/timeouts (strict and lenient). Remaining 94, first error: 77 unknown __builtin_pulp_f16abs2/f16altabs2 (implicit int passed as v2h/v2ah), 12 other unknown fp builtin, 5 CoreCount() not constant in static initializer. Needs across all errors: fp builtins 86 files, CoreCount const 68 (F018), non-constant mulsN/clip args 11, other builtins 2 (mul64hu, sub2rotmj, cplx*, add2div*, sub2div2). No __builtin_shuffle errors. logs/20-F039-evidence/survey/analysis.txt",
+  "gap9_sweep": "scratch copies, base = int-20 snapshot, mine = this build. Default flags: 172/172 outputs identical (O2+O3). With -march=rv32imc_xgap9: all disassemblies identical; only the error text of the 3 already-failing '-file' kernels changed. logs/20-F039-evidence/sweep.txt",
+  "hang_reproducers": "benchmarks/sdk-compile-survey/hang-isel-{f16,bf16}-pair-xpulpv.c finish instantly with -march=rv32imc_xgap9",
+  "lit": "scripts/wlit.sh: LIT_PATHS + clang/test/Sema + clang/test/CodeGen/RISCV + clang/test/Preprocessor/riscv* + clang/test/Driver/riscv*: 7989 tests, 7862 pass, 126 unsupported (Sema, host), 1 fail = LLVM :: CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (known failure B41). tasks/20/work_20_F039.lit.json, logs/20-F039-lit.log",
+  "policy_check": "0 FAIL 0 WARN (tasks/20/work_20_F039.policy.json)"
+ },
+ "vector_types": "v2h/v2ah need nothing from T4: Gap.h builds them on float16/float16alt; accepted and compiled (scalarized to Zhinx / f32+__truncsfbf2). Native vfadd.h/vfmac.h etc. is T5; the v2h/v2ah builtins (f16abs2, f16max2, v2hftov2ohf, ...) are T6.",
+ "other_errors_seen": [
+  "benchmarks/gap9-sweep/src/shim/at_api.h:11-13 does 'typedef _Float16 float16; typedef _Float16 float16alt;' under #ifdef __clang__; with -march=rv32imc_xgap9 the new macros turn it into 'typedef _Float16 _Float16' (error). Harness fix: '#if defined(__clang__) && !defined(float16)'. Not triggered by the sweep's own -march=rv32imc_zfinx_xpulpv2 flags.",
+  "Missing fp builtins now the first blocker for 89 of the remaining 94 float16 files: __builtin_pulp_f16abs2/f16altabs2 (77 files, used in inline functions of FastFloatApprox16.h, so every includer fails), f32max/min/abs/sqrt, f16(alt)max/min(2), f16(alt)sqrt, rintsf2, v2hftov2ohf, v2ohftov2hf (T6 / B97).",
+  "__bf16 arithmetic still links against compiler-rt __truncsfbf2 (GAP9 libgcc lacks it) until T3.",
+  "HasFullBFloat16 means -Xclang -fbfloat16-excess-precision=standard cannot restore once-per-expression rounding under xpulpf16alt (intended; same as X86/ARM)."
+ ],
+ "unmapped_files": [],
+ "upstream_file_edit": null,
+ "proposed_test": "clang/test/Preprocessor/riscv-pulp-fp16-types.c (new): RUN -march=rv32imc_xgap9 -dM -E: CHECK '#define float16 _Float16', '#define float16alt __bf16'; RUN -march=rv32imc_zfinx_zhinx and rv32imc_xpulpv2: CHECK-NOT float16. Plus clang/test/CodeGen/RISCV/pulp-float16alt.c: -march=rv32imc_xgap9 -emit-llvm of 'float16alt f(float16alt a, float16alt b, float16alt c){return (a+b)*c;}' CHECK 'fadd bfloat' then 'fmul bfloat', CHECK-NOT fpext; and 'float16 g(float16 a){return a+a;}' CHECK 'fadd half'."
+}

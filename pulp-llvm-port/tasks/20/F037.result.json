@@ -1,0 +1,65 @@
+{
+  "status": "done",
+  "branch": "work/20/F037",
+  "integration_head": "7ddac1d3b507",
+  "commits": [
+    "583b50ff11ba1f3a8f2839fd74ad2e27d63f9e09",
+    "9959695054ac13f25841f8278a44a1a168575ed2",
+    "1caa54065f3217ff10660ea0f37936a52024b614",
+    "7aff51998e83945e353ba943c7db1aa04840f90b"
+  ],
+  "commit_clusters": {
+    "583b50ff11ba": "intrinsics (IntrinsicsRISCVXpulp.td: 17 ClangBuiltin intrinsics, trunch i16(i32), truncb i8(i32))",
+    "9959695054ac": "insn-tablegen (RISCVInstrInfoXpulp.td: mulf*/macf* patterns reuse P_MULS..P_MACURN via int_mul_mac_N_RN<fs/fu>; mul64hs/hu/hus -> MULH/MULHU/MULHSU(y,x) under HasStdExtM)",
+    "1caa54065f32": "codegen-core (RISCVISelLowering.cpp: INTRINSIC_WO_CHAIN i8/i16 Custom under Xpulpv; ReplaceNodeResults turns trunch/truncb into ISD::TRUNCATE)",
+    "7aff51998e83": "clang-builtins (BuiltinsRISCVXpulp.td new block of 17 builtins; SemaRISCV.cpp: 8 case labels added to the existing N/RN range-check groups)"
+  },
+  "note": "notes/20/F037.md",
+  "signature_gone": true,
+  "builtins_added": [
+    "mulfs",
+    "mulfu",
+    "mulfsN",
+    "mulfsRN",
+    "mulfuN",
+    "mulfuRN",
+    "macfs",
+    "macfu",
+    "macfsN",
+    "macfsRN",
+    "macfuN",
+    "macfuRN",
+    "mul64hs",
+    "mul64hu",
+    "mul64hus",
+    "trunch",
+    "truncb"
+  ],
+  "unmapped_files": [],
+  "upstream_file_edits": [],
+  "summary": "Pre-existing fork gap (B97 batch C). Added the 16 spec builtins plus mulfuRN (GAP9 GCC has it; created by the mul_mac_N_RN multiclass). mulf*/macf* are exact aliases of mul*/mac* (same instructions and Sema checks); mul64h* select M mulh/mulhu/mulhsu (mul64hus swaps operands: signed y in rs1, as GCC); trunch/truncb are a plain truncate (p.exths / p.extbz / sh / sb at the use). No clang CodeGen edit. GCC defects (B98): macfs/macfu GCC output does not assemble -> clang emits p.macs/p.macu rd(acc),rs1,rs2; mulfsN N=32/-1 GCC ICE -> clang range error [0,31]; NEW: macfsRN(a,b,c,0,1) also ICEs GCC; mulfsRN ignores R in GCC (and GCC's own mulsRN rejects bad R and N=0) -> clang applies the existing mulsRN check to both spellings.",
+  "verification": {
+    "repro": "logs/20-F037.repro.log: int-20 clang 'use of unknown builtin' for all 16 spec test files",
+    "asm_vs_gcc": "logs/20-F037-repro/cmp/side-by-side.txt, encodings.txt: every builtin emits GCC's instruction with identical encoding (e.g. mulhsu a0,a1,a0 = 02a5a533, p.mulsN/RN, p.macsN/RN...). Differences: registers; macfs/macfu correct 3-operand p.macs/p.macu (GCC's is unassemblable); truncb selects p.extbz a0,a0 where GCC writes andi a0,a0,0xff (same result, both 4 bytes); constant mul64h* not folded by clang (GCC folds); trunch/truncb of a constant are folded by clang.",
+    "diagnostics": "logs/20-F037-repro/diag/summary.txt: all 16 GCC diag probes behave as the spec asks (non-const N/R -> 'must be a constant integer'; N=32/-1 -> out of range [0,31]; bad R -> range error; N=0 accepted; long long arg truncated; pointer arg -> -Wint-conversion error in clang (warning in GCC 7, SDK flag-parity item)). types.c: _Generic confirms short/char/int results, C++ accepted, GCC accepts the same file. Without xpulpv: 'needs target feature xpulpv'; mul64h* without m: 'needs target feature xpulpv,m'.",
+    "gvsoc": "logs/20-F037-repro/sem/sem.c, logs/20-F037.gvsoc.log: 17 builtins x (22x22 edge triples + 1500 xorshift triples), N in {0,1,5,11,15,16,30,31}; trunch/truncb used as int, stored and compared. Per-builtin FNV hashes equal to host gcc -O0 -funsigned-char reference at clang -O0/-O2/-Os/-O3. The reference was cross-checked with GAP9 GCC -O0/-O2 on GVSoC (N!=0 because GCC ICEs on macfsRN N=0; macs/macu substituted for macfs/macfu): identical. Finding: GVSoC's *RN instructions do the rounding add in 64 bits for the signed forms and macuRN (int.h lib_*_NR_R: int32 + 1ULL<<(n-1), 64-bit shift), in 32 bits for muluRN; this is existing instruction behaviour (same as mulsRN etc.), the reference models it.",
+    "sdk_survey": "logs/20-F037.survey.log: private copy of run.py (bc82384aaee0 + checkpoint-M2a run-m2a.patch) in a scratch work dir, configure/db/inventory/gcc redone there; same-session A/B vs a snapshot of build/int-20 at e7f97bbd0f05. Mode P (-march=rv32imc_xgap9 -mPE=8): 576 -> 578/617 (93.7%), newly OK libs/gap_lib/jpeg/dct.c and tools/autotiler_v3/.../FastMathFunctions/MathFuncsFix.c, 0 regressions, no crash/timeout. Strict mode: 477 -> 478 (dct.c; MathFuncsFix.c still needs float16 in strict's shim). dct.c object: 11 p.mulsN + 16 sh (trunch stores, like GCC); MathFuncsFix.c: mulhu; no undefined __builtin symbols. Confirms the spec: dct.c is unblocked by batch C alone.",
+    "gap9_sweep": "logs/20-F037.sweep.log: scratch copy of benchmarks/gap9-sweep, GAP9_EXTRA_COMPILERS base=int-20 snapshot (e7f97bbd0f05), mine=build/20-F037: 60 objects, disassembly identical, objects identical after removing .comment (version string).",
+    "hwloop_fuzz": "not run: no change to general codegen or hardware loops (new patterns only match the new intrinsics; the lowering hunk only handles i8/i16 results of trunch/truncb, which no existing intrinsic has).",
+    "lit": "logs/20-F037.lit.log (scripts/wlit.sh at 7ddac1d3b507 + F037): llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, clang/test/CodeGen/RISCV, clang/test/Sema, Driver/riscv-arch.c, riscv-cpus.c, Preprocessor/riscv-nofdiv.c, Misc/target-invalid-cpu-note + all data/fork-tests.txt entries: 5903 tests, 1 failure = known rvv/vsetvli-insert-zve64f.mir (B41).",
+    "policy_check": "0 FAIL, 0 WARN over 7ddac1d3b507..work/20/F037",
+    "rebases": "rebased 4 times (4851ef8 -> 2f24d00 -> de8abd2 -> 107b802 -> 271b0c1 -> e7f97bb); each conflict was the shared tail of BuiltinsRISCVXpulp.td (F019 shuffle, F038, F036, F041 blocks): kept both, sibling blocks unchanged, F037 block appended after them with its own let/closing brace.",
+    "review_fixes": "Review rev 1 (tasks/20/F037.review.json): (1) branch reordered so the intrinsics commit comes first (intrinsics, insn-tablegen, codegen-core, clang-builtins); every prefix builds clang+llc with 0 errors (logs/20-F037-prefix.log, logs/20-F037-prefix-<sha>.log). (2) Note corrected: the CORE-V sext/zext-of-trunc CGBuiltin route was not used because the task asked for no clang CodeGen edits (CGBuiltin.cpp is fork-touched, clang-builtins cluster), not because of an Upstream-File-Edit. Code unchanged (git diff of the F037 changes identical, 5 files +82); rebased by cherry-pick onto 7ddac1d3b507 (F043), no conflicts. Previous head e7f97bbd-based 5e145c904feb in logs/20-F037.prev-head.",
+    "asm_recheck_at_7ddac1d3b507": "spec test files recompiled at the new head: assembly identical to the verified output (logs/20-F037-repro/cmp/).",
+    "note_on_older_checks": "GVSoC, SDK survey and GAP9 sweep numbers were measured at e7f97bbd0f05 + the same F037 code; not rerun after the reorder/rebase (code unchanged)."
+  },
+  "proposed_test": [
+    "clang/test/CodeGen/RISCV/riscv-xpulpv2-gap9-alias-builtins.c (update_cc_test_checks, -target-feature +xpulpv +m): each of the 17 builtins -> call to its llvm.riscv.pulp.* intrinsic; trunch -> call i16 + sext at int use; truncb -> call i8 + zext.",
+    "clang/test/Sema/riscv-xpulpv2-gap9-alias-builtins.c: mulfsN/mulfuN/macfsN/macfuN N=32 and N=-1 out of range, non-constant N/R error, mulfsRN/macfuRN wrong R error, N=0 with R=1 accepted; _Generic result types short/char/int; 'needs target feature xpulpv' / 'xpulpv,m'.",
+    "llvm/test/CodeGen/RISCV/xpulp-gap9-alias-builtins.ll (update_llc_test_checks, -mattr=+m,+xpulpv): mulfs->p.muls, mulfu->p.mulu, macfs/macfu->p.macs/p.macu rd=acc, mulfsN/RN, mulfuN/RN, macfsN/RN, macfuN/RN at N=0,1,31; mul64hs->mulh, mul64hu->mulhu, mul64hus(x,y)->mulhsu y,x; trunch sext->p.exths, stored->sh; truncb zext->p.extbz, stored->sb; constant operand folded for trunch/truncb."
+  ],
+  "other_errors_seen": [
+    "GAP9 GCC defect (for benchmarks/gcc-bugs, B98): __builtin_pulp_macfsRN(a,b,c,0,1) ICE 'unrecognizable insn ... UNSPEC_MACSRN', extract_insn recog.c:2311 (logs/20-F037-repro/sem/n0_macfsRN.c); mulfsRN accepts any R and N=0 while GCC's mulsRN rejects them.",
+    "GVSoC semantics note: signed *RN and macuRN rounding add is 64-bit (no 32-bit wrap), muluRN 32-bit (int.h lib_MUL_ZL_ZL_NR_R uses 1<<, the others 1ULL<<). Worth a check against real GAP9 hardware/RTL if exact overflow behaviour of p.*RN matters."
+  ]
+}

@@ -8,7 +8,8 @@ typedef signed short v2s __attribute__((vector_size(4)));
 typedef unsigned short v2u __attribute__((vector_size(4)));
 typedef signed char v4s __attribute__((vector_size(4)));
 typedef unsigned char v4u __attribute__((vector_size(4)));
-#ifdef __clang__
+#if defined(__clang__) && !defined(float16)
+/* Only for clang builds without -march=rv32imc_xgap9; with xgap9 clang predefines float16/float16alt (20/F039). */
 typedef _Float16 float16; typedef _Float16 float16alt;      /* float16alt is WRONG (bf16): compile probing only */
 #endif
 typedef float16 v2h __attribute__((vector_size(4))); typedef float16alt v2ah __attribute__((vector_size(4)));

@@ -1,0 +1,32 @@
+{
+  "task": "20/F042",
+  "review_round": 2,
+  "branch": "work/20/F042",
+  "commits_reviewed": ["acf40cebd275", "f2d080c081fd", "fe11d8d5057d"],
+  "base": "4b76df2c70d0",
+  "verdict": "APPROVE",
+  "landing_condition": "work/20/F042 sits directly on 4b76df2c70d0, which is the current wt/int-20 HEAD (4b76df2c70d04c8a3c49564ceebd8320baff80b9). It applies as a fast-forward with no conflicts.",
+  "reasons": [],
+  "round1_issues_resolved": {
+    "nan_constant_fold": "Fixed. range-diff 107b802911c5..a7938fc0952b vs 4b76df2c70d0..fe11d8d5057d shows every max/min path in lowerPULPFP16Intrinsic now builds RISCVISD::FMAX/FMIN: scalar f16, v2h per lane, and the bf16-via-f32 path for scalar and packed. No ISD::FMAXIMUMNUM/FMINIMUMNUM/FMAXNUM/FMINNUM remains in the added code; the only generic nodes left are FSQRT, FP_EXTEND and FP_ROUND. The rest of the lowering is unchanged apart from the v2ohftov2hf constant fold. GVSoC (logs/20-F042-rev2/gv): reviewer t3.c (constant-NaN shapes) and the exhaustive t.c (8834 lines) now match GAP9 GCC -O0 on every line at O0/O1/O2/O3/Os/Oz, noinline and inlined (24 builds, all diff=0). The round-1 mismatches are gone (t3 amax/amin/hmax/amax2 with a NaN literal, t.c X_amm/X_hmm at O2/O3 inlined).",
+    "v2ohftov2hf_constant_fold": "Correct. When the i32 operand is a ConstantSDNode, each lane is converted with APFloat BFloat -> IEEEhalf, rmNearestTiesToEven; a NaN lane gives 0x7e00. That equals fcvt.h.s of the exactly widened f32, which the exhaustive runtime test shows the hardware does. New test tc.c: 600 compile-time-constant bf16 lanes (every exponent class incl. subnormal, overflow-to-inf boundary, RNE tie mantissas, NaNs of both signs with payloads) plus the same constants through v2hftov2ohf. At -O2 the v2ohftov2hf calls are folded (no fcvt in the object for them); the results equal GAP9 GCC -O0 on GVSoC at every level (GCC -O2 ICEs on constant conversions). Constants that appear only after combining (select of equal constants, (x&0)|K, a const-array load, x*0+K; logs/20-F042-rev2/gv/late.c) all fold to 0x7e007e00 at O1/O2/Oz, so the payload-keeping generic fold is not reached.",
+    "rebase": "Done onto 4b76df2c70d0 (includes F036, F041, F043, F045, F037). Additions only, each in its own block."
+  },
+  "warnings_checked": [
+    "policy_check.py --repo wt/20-F042 --range 4b76df2c70d0..work/20/F042 --stack-base llvmorg-20.1.8 --notes-root notes: 3 commits, 0 FAIL, 1 WARN (commented-code, IntrinsicsRISCVXpulp.td '// packed pairs (v2h, v2ah) as their 32 bits (i32, lane 0 in bits 15:0);'). Same false positive as round 1: prose in a comment block that ends in a semicolon. Acceptable. Subjects are the exact cluster fixup subjects; the trailers (Change-Note: 20/F042.md, Task, Co-Authored-By) sit in one final paragraph."
+  ],
+  "checks_passed": {
+    "build": "Fresh build dir build/20-F042-rev2, built commit by commit (acf40cebd275, f2d080c081fd, fe11d8d5057d): 0 errors each (logs/20-F042-rev2/build-*.log).",
+    "gvsoc": "t.c, t3.c and tc.c at O0/O1/O2/O3/Os/Oz x noinline/inlined against GAP9 GCC -O0 on GVSoC: 36/36 identical. Every object has an empty llvm-nm -u and links against GAP9 libgcc alone.",
+    "sdk_survey": "Private M2a work-dir copies, -march=rv32imc_xgap9 -mPE=8, base = int-20 clang at 4b76df2c70d0, mine = this branch head. pe8 586 -> 610 of 617 (+24, 0 regressions); xgap9 534 -> 542 (+8, 0 regressions). The worker's 610 is confirmed. CNN_Copy.c and CNN_Pooling_BasicKernels_{fp16,f16a}.c now compile (the round-1 'v2i16 = bitcast f32' crash is fixed by F045), and so do CNN_MatMul_Conv_{fp16,f16,f16a}.c. The 7 still failing are non-fp16 files (downmixer, get_param, passthrough, ring, sdio, udma_timestamp, virtualeeprom). logs/20-F042-rev2/survey/.",
+    "gap9_sweep": "Private copy of the sweep, base 4b76df2c70d0 vs head: 60/60 objects have identical llvm-objdump -d (logs/20-F042-rev2/survey/sweep.log).",
+    "lit": "wlit.sh on build/20-F042-rev2 over LIT_PATHS + clang/test/Sema + clang/test/CodeGen/builtins-riscv.c + fork-tests.txt: 5903 tests, 5776 passed, 126 unsupported, 1 failed = CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (B41, data/known-failures.txt line 1). logs/20-F042-rev2/lit.log.",
+    "unchanged_from_round1": "Gates and diagnostics (103 probes identical to GCC), the i16 custom-legalization analysis (no effect outside xpulpf16alt; llc output byte-identical on 561 rv32 tests in 4 configs) and the upstream citations all still hold: the relevant code is unchanged. gcc-summary.txt now agrees with clang-summary.txt (generic_types gcc_rc=0). The note documents the round-1 finding, the RISCVISD::FMAX/FMIN choice with the upstream reference RISCVISelLowering.cpp:6223, and the v2ohftov2hf constant fold.",
+    "libcall_trap": "adv.c: the builtin lowering never emits a libcall at any level, and s11 no longer crashes at -Oz (F045). __truncsfbf2 remains only in s9/s11/s22 (O2/Os/Oz) and s16 (O0), where the C code keeps a __bf16 value in a phi or select across blocks. That is pre-existing (plain C with no builtins does the same on base) and belongs to T3, as the note says."
+  },
+  "non_blocking_observations": [
+    "Backlog (T3): the SDK's scalar reduction 'm = f16altmax(m, p[i]); return m;' still references __truncsfbf2 at -O2 through LLVM 20's bf16 phi promotion, so it will not link against GAP9 libgcc until T3 lands.",
+    "The bf16 rounding step (integer RNE) ignores frm; this only matters if a program changes the rounding mode.",
+    "Minor gate inconsistency with F041: f16altabs is gated 'xpulpv,xpulpf16alt' while F042's f16alt* use 'xpulpf16alt'. No difference under xgap9."
+  ]
+}

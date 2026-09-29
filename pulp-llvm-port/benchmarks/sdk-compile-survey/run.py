@@ -38,13 +38,16 @@ Phases (idempotent; results cached under --work):
              the gcc-ok files (what the SDK build itself accepts).
   sdkflags   our clang as the SDK build drives it through the wrapper
              (../sdk-clang/bin/riscv32-unknown-elf-clang): -march=rv32imc_xgap9
-             (predefines __gap9__ etc., no macro shim), the SDK's -W flags incl.
+             (predefines __gap9__ etc., no macro shim) and the SDK's -mPE=8
+             (F018 CoreCount folding), the SDK's -W flags incl.
              -Werror (renamed/reordered as GCC resolves them), plus the
              wrapper's GCC-7 flags (GCC7_CODEGEN = -ffp-contract=fast;
              GCC7_DEFAULT_ERRORS without -Werror; CLANG_ONLY).  `strict` is unchanged: pure clang defaults.
   sdknowerror  sdkflags without -Werror (CONFIG_DISABLE_WERROR builds).
   parity     strict vs sdknowerror (both against gcc) and sdkflags (against
              gccsdk) -> sdkflags_parity.json.  Not part of `results`.
+  pe8, xgap9 strict with -march=rv32imc_xgap9 (no shim), with / without -mPE=8;
+  *lenient   and pe8abs* probes: see checkpoint-M2a-2026-09-29/report.txt.
   dbsnapshot explicit only: refresh the tracked compile_db.json.gz snapshot.
   builtins   every __builtin_pulp_* the SDK uses, __has_builtin in our clang,
              call sites incl. #define wrappers (gap_*, Max/Min helpers).
@@ -355,7 +358,20 @@ MODES = {
     'fp16probe': (True, True, True),    # what remains once float16 types + constant CoreCount exist
     'sdkflags': None,                   # SDK warning flags incl. -Werror + GCC-7 compat, -march=rv32imc_xgap9
     'sdknowerror': None,                # the same without -Werror (CONFIG_DISABLE_WERROR builds)
+    # M2a checkpoint (checkpoint-M2a-2026-09-29): -march=rv32imc_xgap9 (no shim), with and without -mPE=8
+    'pe8': (False, False, False),
+    'pe8lenient': (False, True, False),
+    'xgap9': (False, False, False),
+    'xgap9lenient': (False, True, False),
+    # probe only: pe8 + f16abs2/f16altabs2 as element-wise abs (silenced implicit decls in FastFloatApprox16.h)
+    'pe8abs': (False, False, False),
+    'pe8abslenient': (False, True, False),
 }
+ABS_SHIM = ['-D__builtin_pulp_f16abs2(a)=__builtin_elementwise_abs(a)',
+            '-D__builtin_pulp_f16altabs2(a)=__builtin_elementwise_abs(a)']
+XGAP9_MODES = ('pe8', 'pe8lenient', 'xgap9', 'xgap9lenient', 'pe8abs', 'pe8abslenient')
+LENIENT_OF = {'lenient': 'strict', 'pe8lenient': 'pe8', 'xgap9lenient': 'xgap9', 'pe8abs': 'pe8',
+              'pe8abslenient': 'pe8abs'}
 
 
 # ---- sdkflags mode: the SDK's own build flags, as the clang wrapper
@@ -408,6 +424,12 @@ def llvm_flags(args, mode):
     defs, len_, fp16 = MODES[mode]
     arch = list(LLVM_ARCH)
     extra = (COMPAT_DEFS if defs else []) + (LENIENT if len_ else [])
+    if mode in XGAP9_MODES:
+        arch[1] = '-march=rv32imc_xgap9'
+        if mode.startswith('pe8'):
+            arch.append('-mPE=8')
+        if mode.startswith('pe8abs'):
+            extra = extra + ABS_SHIM
     if fp16:
         arch[1] = '-march=rv32imc_zfinx_zhinx_xpulpv2'
         extra += FP16_SHIM
@@ -415,7 +437,7 @@ def llvm_flags(args, mode):
 
 
 def sdk_llvm_flags(args, werror=True):
-    keep, ws, it = [], [], iter(args)
+    keep, ws, pe, it = [], [], [], iter(args)
     for x in it:
         if x in ('-include', '-imacros', '-isystem', '-x'):
             keep += [x, next(it)]
@@ -428,8 +450,10 @@ def sdk_llvm_flags(args, werror=True):
         elif x.startswith('-W') and not x.startswith(('-Wl,', '-Wa,', '-Wp,')):
             if werror or not (x == '-Werror' or x.startswith('-Werror=')):
                 ws.append(x)
-        # -march/-mPE/-mFC/-mint64/-mno-memcpy/-O/-g dropped (-O2 as for GCC)
-    return (SDK_ARCH + LLVM_COMMON + ['-Wno-unused-command-line-argument']
+        elif x.startswith('-mPE='):
+            pe = [x]            # F018: clang folds CoreCount() to N, as GCC does
+        # -march/-mFC/-mint64/-mno-memcpy/-O/-g dropped (-O2 as for GCC)
+    return (SDK_ARCH + pe + LLVM_COMMON + ['-Wno-unused-command-line-argument']
             + WRAP.GCC7_CODEGEN + WRAP.gcc7_compat(ws) + WRAP.sdk_warning_flags(ws)
             + keep)  # the wrapper's order
 
@@ -472,10 +496,12 @@ def phase_compile(a, which):
     if which not in ('gcc',):
         g = json.load(open(os.path.join(w, 'compile_gcc.json')))
         todo = [e for e in todo if g.get(e['file'], {}).get('rc') == 0]
-    if which in ('nodefs', 'fp16probe', 'lenient'):
-        s = json.load(open(os.path.join(w, 'compile_strict.json')))
+    if which in ('nodefs', 'fp16probe') + tuple(LENIENT_OF):
+        s = json.load(open(os.path.join(w, 'compile_%s.json' % LENIENT_OF.get(which, 'strict'))))
         want_ok = which == 'nodefs'
         todo = [e for e in todo if (s.get(e['file'], {}).get('rc') == 0) == want_ok]
+        if which in ('pe8abs', 'pe8abslenient'):
+            todo = [e for e in todo if e['file'] in s]
     if a.only:
         todo = [e for e in todo if re.search(a.only, e['file'])]
     todo = [e for e in todo if e['file'] not in res or a.only]
@@ -824,6 +850,7 @@ RX_WERROR = re.compile(r'\[-Werror,(-W[\w-]+)\]')
 def phase_parity(a):
     """strict vs the SDK-flags modes, like for like:
          strict      clang defaults, no -Werror          vs gcc    (no -Werror)
+         pe8         strict with -march=rv32imc_xgap9 -mPE=8, no shim  vs gcc
          sdknowerror SDK -W flags, no -Werror, compat     vs gcc
          sdkflags    SDK -W flags incl. -Werror, compat   vs gccsdk (GCC with the SDK's -Werror)
     A file counts as ok only if clang exits 0 AND the log has no survey
@@ -832,7 +859,7 @@ def phase_parity(a):
     w = a.work
     inv = ensure_inventory(a)
     comp = {}
-    for m in ('gcc', 'gccsdk', 'strict', 'sdkflags', 'sdknowerror'):
+    for m in ('gcc', 'gccsdk', 'strict', 'pe8', 'sdkflags', 'sdknowerror'):
         p = '%s/compile_%s.json' % (w, m)
         comp[m] = json.load(open(p)) if os.path.exists(p) else {}
 
@@ -841,7 +868,16 @@ def phase_parity(a):
         if r is None:
             return None
         cats, _ = classify_llvm(r['rc'], read_log(w, m, f) or '')
-        return r['rc'] == 0 and not cats
+        if r['rc'] != 0 or cats:
+            return False
+        # an unknown builtin behind `#pragma GCC diagnostic ignored
+        # "-Wimplicit-function-declaration"` compiles silently: check the object
+        o = logpath(w, m, f)[:-4] + '.o'
+        if os.path.exists(o):
+            u = sh([GCC_TC + '/bin/riscv32-unknown-elf-nm', '-u', o]).stdout.split()
+            if any(x.startswith('__builtin_') for x in u):
+                return False
+        return True
     rows, A = {}, collections.defaultdict(collections.Counter)
     werror_only = collections.defaultdict(list)
     for e in inv:
@@ -849,13 +885,13 @@ def phase_parity(a):
         if e['scope'] != 'in' or comp['gcc'].get(f, {}).get('rc') != 0:
             continue
         r = {'area': e['area'], 'gccsdk': comp['gccsdk'].get(f, {}).get('rc') == 0}
-        for m in ('strict', 'sdkflags', 'sdknowerror'):
+        for m in ('strict', 'pe8', 'sdkflags', 'sdknowerror'):
             r[m] = ok(m, f)
         rows[f] = r
         t = A[e['area']]
         t['gcc'] += 1
         t['gccsdk'] += r['gccsdk']
-        for m in ('strict', 'sdkflags', 'sdknowerror'):
+        for m in ('strict', 'pe8', 'sdkflags', 'sdknowerror'):
             t[m] += bool(r[m])
         t['sdkflags_vs_gccsdk'] += bool(r['sdkflags']) and r['gccsdk']
         if r['sdkflags'] is False and r['gccsdk']:
@@ -867,14 +903,16 @@ def phase_parity(a):
     tot = collections.Counter()
     for t in A.values():
         tot.update(t)
-    hdr = '%-20s %5s %6s %6s %6s %6s %6s' % ('area', 'gcc', 'strict', 'nowerr', 'gccW', 'sdkfl', 'sdk/W')
+    hdr = '%-20s %5s %6s %6s %6s %6s %6s %6s' % ('area', 'gcc', 'strict', 'pe8', 'nowerr', 'gccW',
+                                                  'sdkfl', 'sdk/W')
     print(hdr)
     for k, t in sorted(A.items()) + [('TOTAL', tot)]:
-        print('%-20s %5d %6d %6d %6d %6d %6d' % (k, t['gcc'], t['strict'], t['sdknowerror'],
-              t['gccsdk'], t['sdkflags'], t['sdkflags_vs_gccsdk']))
+        print('%-20s %5d %6d %6d %6d %6d %6d %6d' % (k, t['gcc'], t['strict'], t['pe8'],
+              t['sdknowerror'], t['gccsdk'], t['sdkflags'], t['sdkflags_vs_gccsdk']))
     pc = lambda n, d: round(100.0 * n / (d or 1), 1)
     summ = {
         'strict': {'ok': tot['strict'], 'of': tot['gcc'], 'parity': pc(tot['strict'], tot['gcc'])},
+        'pe8': {'ok': tot['pe8'], 'of': tot['gcc'], 'parity': pc(tot['pe8'], tot['gcc'])},
         'sdknowerror': {'ok': tot['sdknowerror'], 'of': tot['gcc'],
                         'parity': pc(tot['sdknowerror'], tot['gcc'])},
         'sdkflags': {'ok': tot['sdkflags_vs_gccsdk'], 'of': tot['gccsdk'],
@@ -884,7 +922,7 @@ def phase_parity(a):
         'clang': json.load(open(os.path.join(w, 'snap', 'snap.json')))['version']
         if os.path.exists(os.path.join(w, 'snap', 'snap.json')) else CLANG,
     }
-    for k in ('strict', 'sdknowerror', 'sdkflags'):
+    for k in ('strict', 'pe8', 'sdknowerror', 'sdkflags'):
         print('%-12s %4d / %d = %.1f%%' % (k, summ[k]['ok'], summ[k]['of'], summ[k]['parity']))
     for k, v in sorted(werror_only.items(), key=lambda kv: -len(kv[1])):
         print('sdkflags fails only on -Werror %s: %d files' % (k, len(v)))

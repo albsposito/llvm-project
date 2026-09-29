@@ -1,0 +1,32 @@
+{
+ "status": "done",
+ "branch": "work/20/F045",
+ "integration_head": "7ddac1d3b507",
+ "commits": [
+  "29692dabea40"
+ ],
+ "commit_clusters": {
+  "29692dabea40": "insn-tablegen (RISCVInstrInfoXpulp.td): f32 <-> v2i16/v4i8 bitconvert patterns for F and Zfinx"
+ },
+ "note": "notes/20/F045.md",
+ "signature_gone": true,
+ "unmapped_files": [],
+ "upstream_file_edits": [],
+ "cluster_deviation": "Task names owner_cluster codegen-core, but the root cause is missing ISel patterns next to the fork's existing i32<->v2i16/v4i8 bitconvert patterns in RISCVInstrInfoXpulp.td, which belongs to insn-tablegen (scripts/fork_anatomy.py owner). No codegen-core file changed; no legalization change needed (the bitcast is Legal, only patterns were missing). Hunk is far from the LOOPsetup definitions (F028).",
+ "summary": "B140: 'Cannot select: v2i16 = bitcast f32' is a pre-existing fork gap (ref-18 and port-19 crash too): the fork has i32<->v2i16/v4i8 bitconvert patterns (fork commit 93e0fc427e93) but none for f32. Added, in a foreach over (v2i16,GPRAV2),(v4i8,GPRAV4): F: fmv.x.w / fmv.w.x (+ register class copy); Zfinx: INSERT_SUBREG/EXTRACT_SUBREG sub_32 (no instruction), mirroring upstream RISCVInstrInfoF.td:715-716 and :721-722 at llvmorg-20.1.8. v2f16/v2bf16 are legalized to v2i16 and covered. Note: EXTRACT_SUBREG of a COPY_TO_REGCLASS is silently dropped by TableGen (impossible type) - the final pattern extracts sub_32 directly from GPRAV2/GPRAV4.",
+ "verification": {
+  "repro": "logs/20-F045.repro.log (crash at xgap9, zfinx_xpulpv2, imfc_xpulpv2 on int-20)",
+  "matrix": "logs/20-F045-repro/matrix: {v2i16,v4i8,v2f16,v2bf16} x {to,from,from_add} x {xgap9,+zfinx+xpulpv,+f+xpulpv} x {O0,O2,O3} with -verify-machineinstrs: 36/36 crash before, 36/36 ok after",
+  "gvsoc": "logs/20-F045-repro/gvsoc/bc.c: clang O0/O2/O3 for rv32imc_xgap9 (+f16/bf16 part, 18 results) and rv32imc_zfinx_xpulpv2 (10 results) match host gcc -O0 bit-exactly; GAP9 GCC -O2 matches host on the 10 integer-vector results (GCC 7 has no _Float16/__bf16 vectors). F config verified in assembly only (GAP9 has no F registers).",
+  "sdk_with_F042": "F042's three commits cherry-picked temporarily (then dropped): CNN_Copy.c, CNN_Pooling_BasicKernels_fp16.c, CNN_Pooling_BasicKernels_f16a.c compile to objects with -verify-machineinstrs; same IR with the fix reverted crashes with 'Cannot select: v2i16 = bitcast' in all three. Remaining for linking: __truncsfbf2 (not in GAP9 libgcc; F042 T3 limitation) in all three; pooling files also use soft-double helpers present in libgcc.",
+  "gap9_sweep": "60 kernel objects O2/O3 identical disassembly (base=build/int-20 clang vs mine), logs/20-F045-repro/sweep",
+  "fuzzer": "seeds 45001-45040: 0 MISMATCH, 0 crashes (logs/20-F045-repro/fuzz)",
+  "lit": "LIT_PATHS + lld/test/ELF at 29692dabea40: 6707 tests, 1 fail = known B41 CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (logs/20-F045-lit2.log)",
+  "policy_check": "fail 0, warn 0 (range 7ddac1d3b507..work/20/F045)"
+ },
+ "proposed_test": "llvm/test/CodeGen/RISCV/pulp/bitcast-f32-packed.ll: RUN llc -mtriple=riscv32 -mattr=+m,+zfinx,+xpulpv -verify-machineinstrs and -mattr=+m,+f,+xpulpv; functions bitcasting float <-> <2 x i16>, <4 x i8>, <2 x half>, <2 x bfloat> (inputs from llvm.maxnum.f32 / outputs into fadd), CHECK: F -> fmv.x.w/fmv.w.x, Zfinx -> no move between fmax.s and ret (logs/20-F045-repro/matrix/*.ll are ready-made inputs).",
+ "other_errors_seen": [
+  "__truncsfbf2 referenced by CNN_Copy.c / CNN_Pooling_BasicKernels_fp16.c / _f16a.c with F042 applied (float16alt kept as f32 and rounded via libcall absent from GAP9 libgcc) - already reported by F042 (T3 limitation), link-time blocker.",
+  "float -> __bf16 conversion ((__bf16)x) likewise emits __truncsfbf2 on xgap9 (seen while writing the GVSoC test)."
+ ]
+}

@@ -1,0 +1,41 @@
+{
+ "status": "done",
+ "branch": "work/20/F036",
+ "integration_head": "107b802911c5",
+ "commits": [
+  "bb14733aeea2",
+  "f75c3636f8a7",
+  "14dbd726a6ed"
+ ],
+ "commit_clusters": {
+  "bb14733aeea2": "clang-builtins (BuiltinsRISCVXpulp.td)",
+  "f75c3636f8a7": "intrinsics (IntrinsicsRISCVXpulp.td)",
+  "14dbd726a6ed": "codegen-core (RISCVISelLowering.cpp)"
+ },
+ "note": "notes/20/F036.md",
+ "signature_gone": true,
+ "unmapped_files": [],
+ "upstream_file_edits": [],
+ "summary": "Seven GAP9 f32 builtins (f32max/min/abs/sqrt, rintsf2/rdownsf2/rupsf2) with GAP9 GCC prototypes, feature xpulpv,(f|zfinx). ClangBuiltin intrinsics lowered in LowerINTRINSIC_WO_CHAIN to FMAXIMUMNUM/FMINIMUMNUM/FABS/FSQRT and RISCVISD::FCVT_X with RMM/RDN/RUP (saturating fcvt.w.s). No CGBuiltin/Sema edits. Own blocks appended at the end of each file; rebased onto de8abd20c921 (one textual conflict with F019's __builtin_shuffle block, kept both). Rebased 2026-09-29 onto 107b802911c5 (F044+F038): textual conflicts with F038 blocks in BuiltinsRISCVXpulp.td and IntrinsicsRISCVXpulp.td resolved keeping both; F036 code unchanged.",
+ "verification": {
+  "repro": "logs/20-F036.repro.log: int-20 clang 'use of unknown builtin' for all 7 (spec gcc/<name>.c)",
+  "instructions": "spec GCC test files, -march=rv32imc_zfinx_xpulpv2 and rv32imc_xgap9: identical instruction sequences to GAP9 GCC modulo registers; folded constants materialized with lui instead of a constant-pool load (logs/20-F036-repro/mine-*.s)",
+  "diagnostics": "spec probes (logs/20-F036-repro/diag): same accept/reject as GCC; int->fcvt.s.w, double->__truncdfsf2, float*/v2s rejected, f32sqrt static init rejected; without F/Zfinx or xpulpv: 'needs target feature xpulpv,(f|zfinx)'",
+  "gvsoc": "logs/20-F036-repro/gvsoc: 30007 results (3052 inputs per unary builtin incl. NaN/inf/denormal/halves/+-2^31, 2704 special pairs + 3000 random pairs for max/min, clamp/loop/int-arg/constant uses). clang O0/O2/O3/Os identical to each other and to the GAP9 GCC build on 30002/30007; the 5 differences are GCC constant-folding f32max/min with C MAX_EXPR semantics (f32max(NaN,1)=NaN, f32max(-0,+0)=-0), contradicting its own fmax.s; clang matches host RISC-V-spec reference there. vs host reference: 197 differences, identical for GCC and clang, all from a GVSoC defect (RMM fcvt.w.s returns 0x80000001 instead of INT_MIN for x <= -2^31 and -inf; isa_lib/int.h:1956)",
+  "sdk_survey": "M2a strict mode pe8 (-march=rv32imc_xgap9 -mPE=8), private copy of the M2a work dir (gcc/db/inventory reused, compile_pe8 redone with this clang): 520 -> 528 / 617 (84.3% -> 85.6%), 8 newly OK, 0 regressions, 0 crashes/timeouts, no undefined __builtin refs; no failing file reports an unknown f32 builtin any more (the other files of the checkpoint's +16 also need f16abs2/f16altabs2). logs/20-F036-repro/survey-newly-ok.json, logs/20-F036-survey.log",
+  "gap9_sweep": "54 kernel objects O2/O3: disassembly identical base (int-20 at de8abd20c921) vs branch",
+  "lit": "logs/20-F036-lit.log: 5840 tests (llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, clang/test/CodeGen/RISCV, clang/test/Sema, Driver/riscv-arch.c, riscv-nofdiv.c, target-invalid-cpu-note, remaining fork tests): 5 failures; 4 were missing tools in the worker build (c-index-test, llvm-dwarfdump) and pass after building them (logs/20-F036-lit2.log); the remaining one is known B41 CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir",
+  "policy_check": "107b802911c5..work/20/F036: 0 FAIL, 0 WARN",
+  "rebase_107b802911c5": "Rebuilt; spec GCC tests under -march=rv32imc_xgap9 give byte-identical assembly to the pre-rebase build for all 7 builtins; F038 sibling __builtin_pulp_cplxmuls2 still selects pv.cplxmul.h.r/.i; lit logs/20-F036-lit3.log: 5840 tests, 1 failure = known B41 vsetvli-insert-zve64f.mir; policy_check 107b802911c5..work/20/F036: 3 commits, 0 FAIL, 0 WARN. GVSoC/survey/sweep not rerun (own code unchanged)."
+ },
+ "proposed_test": [
+  "clang/test/CodeGen/RISCV/riscv-xpulp-f32-builtins.c: -march=rv32imc_zfinx_xpulpv2 -emit-llvm, each builtin -> call to llvm.riscv.pulp.<name> with float/i32 types; int argument -> sitofp",
+  "clang/test/Sema/riscv-xpulp-f32-builtins.c: float*/v2s arguments rejected; rv32imc_xpulpv2 (no F/Zfinx) -> 'needs target feature xpulpv,(f|zfinx)'",
+  "llvm/test/CodeGen/RISCV/xpulp-f32-builtins.ll: llc -mattr=+zfinx,+xpulpv and +f,+xpulpv: fmax.s/fmin.s/fabs.s/fsqrt.s/fcvt.w.s rmm|rdn|rup; constant folding of f32max(-0.0,+0.0)=+0.0 and f32max(NaN,1.0)=1.0"
+ ],
+ "other_errors_seen": [
+  "GVSoC model defect: fcvt.w.s with rm=rmm returns 0x80000001 instead of 0x80000000 for inputs <= -2^31 and -inf (gvsoc2/core/models/cpu/iss/include/isa_lib/int.h:1956 lib_flexfloat_cvt_w_ff_round negates a saturated INT_MAX); affects GCC and clang equally",
+  "GAP9 GCC defect (for benchmarks/gcc-bugs): constant folding of __builtin_pulp_f32max/f32min uses C MAX/MIN semantics (f32max(NaN,1.0f) -> NaN, f32max(-0.0f,0.0f) -> -0.0, f32min(-0.0f,0.0f) -> +0.0), different from the fmax.s/fmin.s it emits for the same call at run time",
+  "benchmarks/gap9-sweep/run.py cannot run from a scratch copy without ../19-vs-18 and report.py next to it (objects are built; only the report step fails)"
+ ]
+}

@@ -1,0 +1,21 @@
+ninja: Entering directory `/work/build'
+[1/20] Generating VCSRevision.h
+[2/20] Generating VCSVersion.inc
+[3/20] Building CXX object tools/clang/lib/Basic/CMakeFiles/obj.clangBasic.dir/Targets/RISCV.cpp.o
+[4/20] Building CXX object tools/clang/lib/Basic/CMakeFiles/obj.clangBasic.dir/Version.cpp.o
+[5/20] Building CXX object lib/Object/CMakeFiles/LLVMObject.dir/IRSymtab.cpp.o
+[6/20] Linking CXX static library lib/libLLVMObject.a
+[7/20] Generating VCSVersion.inc
+[8/20] Linking CXX executable bin/llvm-objdump
+[9/20] Building CXX object tools/lld/Common/CMakeFiles/lldCommon.dir/Version.cpp.o
+[10/20] Linking CXX static library lib/liblldCommon.a
+[11/20] Linking CXX static library lib/libclangBasic.a
+[12/20] Building CXX object lib/CodeGen/AsmPrinter/CMakeFiles/LLVMAsmPrinter.dir/AsmPrinter.cpp.o
+[13/20] Linking CXX static library lib/libLLVMAsmPrinter.a
+[14/20] Linking CXX executable bin/opt
+[15/20] Linking CXX executable bin/llc
+[16/20] Building CXX object lib/LTO/CMakeFiles/LLVMLTO.dir/LTO.cpp.o
+[17/20] Linking CXX static library lib/libLLVMLTO.a
+[18/20] Linking CXX executable bin/lld
+[19/20] Linking CXX executable bin/clang-20
+[20/20] Creating executable symlink bin/clang

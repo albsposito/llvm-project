@@ -1,0 +1,46 @@
+{
+  "status": "done",
+  "branch": "work/20/F018",
+  "integration_head": "2c98caa32c1b",
+  "commits": [
+    "152e01799af45a4726eafdfaa984c2dd609a80fa",
+    "415893d79d561cb26e8847d02b458ea733b952c8",
+    "273227629b0c0abfdf49e5b38b6c540c3044a77f",
+    "c6606e97e735f1a0f0f04f4222a04a491b247568"
+  ],
+  "commit_clusters": {
+    "152e01799af4": "intrinsics: llvm.riscv.pulp.CoreCount_m1",
+    "415893d79d56": "insn-tablegen: run-time CoreCount pattern fixed to lw 18(0x1A103000) (was lw 0 & 0x12, B107); CoreCount_m1 = same load - 1",
+    "273227629b0c": "clang-builtins: TargetOptions::PULPClusterCores field (TargetOptions.h), CoreCount + new CoreCount_m1 Constexpr (BuiltinsRISCVXpulp.td), one ExprConstant case [Upstream-File-Edit: ExprConstant.cpp, TargetOptions.h]",
+    "c6606e97e735": "clang-driver: -mPE=<N> option (Options.td marshalling into TargetOpts, Clang.cpp AddRISCVTargetArgs forwarding) [Upstream-File-Edit: Clang.cpp]"
+  },
+  "note": "notes/20/F018.md",
+  "signature_gone": true,
+  "unmapped_files": [],
+  "reproduce": "logs/20-F018.repro.log (pre-fix: 'initializer element is not a compile-time constant', 'unknown argument: -mPE=8'); logs/20-F018/contexts.txt, options.txt, siblings.txt (post-fix vs GAP9 GCC)",
+  "gcc_semantics": "-mPE=N (N>0): __builtin_pulp_CoreCount() is an integer constant expression N in every C constant context, also at -O0; -mPE=0 / absent: run-time p.lw 18(0x1A103000). CoreCount_m1: N-1 for N>=2, else run-time read - 1. Values: decimal or 0x hex, non-negative; others are errors. -mFC=N folds HasFc (N!=0) and IsFc (0 when N==0) - not implemented here. No predefined macro depends on -mPE/-mFC.",
+  "verification": {
+    "contexts": "80 cases (10 C constant contexts x {-O2 -mPE=8, -O0 -mPE=8, none, -mPE=1} x {CoreCount, CoreCount_m1}): 74 identical accept/reject to GCC incl. all 40 CoreCount; 6 differ = CoreCount_m1 with -mPE=1 where GCC does not fold and clang folds to 0 (deliberate, documented)",
+    "gvsoc": "helloworld on gap.gap9.evk: GCC and clang -mPE=8 both print all 9 cluster lines; clang without -mPE (new lw 18 read) and int-20 (old lw 0&0x12) print none; GCC with -mPE=0 (same lw 18 read) crashes GVSoC. The run-time address does not give the core count on the GAP9 model for either compiler; -mPE=8 (which the SDK passes) is what fixes B107's symptom",
+    "sdk_survey": "CNN subset (68 GCC-ok files, devicetree headers supplied for both compilers because the tracked compile DB -I points at a deleted scratch dir): 'not a compile-time constant' files 58 -> 0 vs int-20; 0 new error kinds; none of the 68 compiles yet (float16 types, vector type mismatches, __builtin_shuffle mask shape, a few unknown builtins). Pre-rebase full run: 68 -> 0; fp16probe with -mPE=8 instead of the CoreCount macro shim identical (324/84)",
+    "gap9_sweep": "54 LLVM kernel objects O2/O3: disassembly identical int-20 vs F018",
+    "lit": "logs/20-F018.lit.log: 6195 tests (CodeGen/MC RISCV, clang CodeGen/RISCV, Driver/riscv*, Sema, Preprocessor, target-invalid-cpu-note, fork tests): 2 failures = known B41 vsetvli-insert-zve64f.mir + llvm-windres.rc (tool not built)",
+    "policy_check": "2c98caa32c1b..work/20/F018: 0 FAIL, 0 WARN",
+    "lit_r1": "logs/20-F018.lit2.log at c6606e97e735: llvm/test/CodeGen/RISCV + clang/test/CodeGen/RISCV + clang/test/Driver/riscv*: 4250 tests, 1 failure = known B41 vsetvli-insert-zve64f.mir"
+  },
+  "other_errors_seen": [
+    "GCC -mFC=N not supported by clang: GCC folds __builtin_pulp_HasFc() to (N!=0) and __builtin_pulp_IsFc() to 0 when N==0 (without -mFC too); fork HasFc is always 0 (wrong with -mFC=1), IsFc always reads mhartid. SDK passes -mFC=1; wrappers must drop it",
+    "__builtin_pulp_IsFc run-time: GCC p.extract (signed) gives 0/-1, fork gives 0/1",
+    "__builtin_pulp_CoreId: GCC masks mhartid with 0x1f (p.bclr 26,5), fork with 0xf (differs only for core ids >= 16)",
+    "The run-time CoreCount address 0x1A103012 (GCC's choice, now also clang's) is not a core-count register on GAP9 (uDMA area in the public memory map); GAP9 code must use -mPE",
+    "benchmarks/sdk-compile-survey/compile_db.json.gz contains -I paths into a deleted scratch dir (\u2026/scratchpad/F021-survey/bld/.../devicetree/include): a fresh survey run gets 433 GCC 'dt.h: No such file' failures (GCC ok 312 instead of 617)",
+    "Driver tests clang/test/Driver/as-options.s and print-supported-extensions-riscv.c fail on int-20 as well (not in the task suite)"
+  ],
+  "proposed_test": [
+    "clang/test/Driver/riscv-mpe.c: -mPE=8/010/0x10 forwarded as -mPE=8/10/16 to cc1 (-###); -mPE=-1/abc/''/2147483648 -> 'unsupported argument'; x86 target -> unsupported option",
+    "clang/test/CodeGen/RISCV/riscv-xpulpv2-corecount-mpe.c: -mPE=8 -O0 emits 'ret i32 8' / 'ret i32 7' for CoreCount / CoreCount_m1; without -mPE the llvm.riscv.pulp.CoreCount(_m1) calls stay",
+    "clang/test/Sema/riscv-xpulpv2-corecount-const.c: with -mPE=8 the 7 constant contexts (static init, file-scope array, _Static_assert, case, enum, bit-field, static local) are accepted; without -mPE each gives its not-a-constant diagnostic; without xpulpv 'needs target feature xpulpv'",
+    "llvm/test/CodeGen/RISCV/xpulp-corecount.ll: llc -mattr=+xpulpv: CoreCount -> lui a0, 106755; lw a0, 18(a0); CoreCount_m1 -> same + addi a0, a0, -1"
+  ],
+  "revision": "r1 after REJECT (tasks/20/F018.review.json): TargetOptions.h hunk and its Upstream-File-Edit reason moved from the clang-driver fixup into the clang-builtins fixup; commits reordered to cluster order (intrinsics, insn-tablegen, clang-builtins, clang-driver); rebased onto 2c98caa32c1b; tree identical to the reviewed content. Each of the 4 commits built on its own (clang, llc): logs/20-F018/percommit-<sha>.log, all rc=0. Note fixed: -mPE on non-RISC-V is an error; origin of GCC's run-time address (pulp-riscv-gcc riscv-builtins.c:280-297, GAP8-era constant; GAP9 uDMA lin channel 0 + 0x12, not a register; real count APB SoC INFO 0x1A104000[31:16] / ARCHI_CLUSTER_NB_PE=8; GCC path dead because SDK passes -mPE=8; matching GCC kept deliberately)."
+}

@@ -32,6 +32,8 @@ Environment:
   GAP_CLANG_COMPAT   1 = force-include gap9_clang_compat.h
   GAP_CLANG_MARCH    -march value (default rv32imc_zfinx_xpulpv2 + macro shim;
                      rv32imc_xgap9 with a clang that has F017)
+  GAP_CLANG_MPE      1 = pass -mPE=N to clang (F018; default 1 when
+                     GAP_CLANG_MARCH names xgap9), 0 = compat-header fallback
   GAP_CLANG_GCC7COMPAT 0 = do not add the GCC-7 diagnostic/codegen flags (default on)
   GAP_CLANG_LENIENT  1 = exploratory, NOT GCC-equivalent: also demotes
                      warnings GCC 7 does emit (incompatible-pointer-types,
@@ -212,6 +214,7 @@ UNKNOWN_BUILTIN = "use of unknown builtin '__builtin_"
 # GCC-only options: dropped (with the given number of following args).
 DROP = {'-mint64': 0, '-fno-tree-loop-distribute-patterns': 0, '-flto': 0,
         '-mno-memcpy': 0, '-gstrict-dwarf': 0}
+# (-mPE= is re-added natively with GAP_CLANG_MPE=1; -mFC= has no clang equivalent.)
 DROP_PREFIX = ('-march=', '-mPE=', '-mFC=', '-mabi=', '-mcpu=', '-mtune=')
 
 
@@ -282,6 +285,12 @@ def main(argv):
     if os.environ.get('GAP_CLANG_FP16PROBE') == '1':
         target = [t.replace('_xpulpv2', '_zhinx_xpulpv2').replace('_xgap9', '_zhinx_xgap9')
                   for t in target]
+    # -mPE=N: F018 clang folds __builtin_pulp_CoreCount() to N itself, as GCC
+    # does.  Passed natively with GAP_CLANG_MPE=1 (default when GAP_CLANG_MARCH
+    # names xgap9); otherwise the compat header's -D__GAP9_CLANG_PE__ fallback.
+    native_pe = os.environ.get('GAP_CLANG_MPE', '1' if march and 'xgap9' in march else '0') == '1'
+    if native_pe and pe and compile_only:
+        target = target + ['-mPE=' + pe]
     cmd = [CLANG] + target + defs + QUIET + ['-isystem', NEWLIB_INC]
     check_builtins = False
     if compile_only and not is_asm:
@@ -294,7 +303,7 @@ def main(argv):
             check_builtins = GCC7_DEFAULT_ERRORS[0] in extra
     if compile_only:
         if os.environ.get('GAP_CLANG_COMPAT') == '1' and not is_asm:
-            if pe:
+            if pe and not native_pe:
                 cmd += ['-D__GAP9_CLANG_PE__=' + pe]
             if os.environ.get('GAP_CLANG_FP16PROBE') == '1':
                 cmd += ['-D__GAP9_CLANG_FP16PROBE__']
@@ -315,21 +324,42 @@ def main(argv):
             cmd += ['-fuse-ld=lld', '-Wl,--no-check-sections']
         cmd += ['-L' + LIBGCC_DIR] + out
     log(cmd)
-    if not check_builtins:
+    obj = out[out.index('-o') + 1] if '-o' in out and out.index('-o') + 1 < len(out) else None
+    if not ('-c' in args and not is_asm):
         return subprocess.call(cmd)
     r = subprocess.run(cmd, stderr=subprocess.PIPE, errors='replace', text=True)
     sys.stderr.write(r.stderr)
-    if r.returncode == 0 and UNKNOWN_BUILTIN in r.stderr:
-        sys.stderr.write('riscv32-unknown-elf-clang: error: a __builtin_ unknown to clang was '
-                         'called (see "use of unknown builtin" above); GAP9 GCC knows every '
-                         'builtin the SDK uses, so this is a clang gap, not GCC-7 leniency\n')
-        if '-o' in out and out.index('-o') + 1 < len(out):
+    if r.returncode != 0:
+        return r.returncode
+    why = None
+    if check_builtins and UNKNOWN_BUILTIN in r.stderr:
+        why = 'a __builtin_ unknown to clang was called (see "use of unknown builtin" above)'
+    elif obj and os.path.exists(obj):
+        # The SDK silences -Wimplicit-function-declaration with a pragma in some
+        # headers (FastFloatApprox16.h), so an unknown builtin can compile with
+        # no message at all; its trace is an undefined __builtin_* symbol.
+        und = undefined_builtins(obj)
+        if und:
+            why = 'the object references undefined builtin symbol(s) %s' % ', '.join(und[:5])
+    if why:
+        sys.stderr.write('riscv32-unknown-elf-clang: error: %s; GAP9 GCC knows every builtin '
+                         'the SDK uses, so this is a missing clang builtin\n' % why)
+        if obj:
             try:
-                os.remove(out[out.index('-o') + 1])
+                os.remove(obj)
             except OSError:
                 pass
         return 1
-    return r.returncode
+    return 0
+
+
+def undefined_builtins(obj):
+    nm = os.path.join(ROOT, 'bin', 'llvm-nm')
+    if not os.path.exists(nm):
+        nm = os.path.join(GCC_TC, 'bin', 'riscv32-unknown-elf-nm')
+    r = subprocess.run([nm, '-u', obj], capture_output=True, text=True, errors='replace')
+    return [l.split()[-1] for l in r.stdout.splitlines()
+            if l.split() and l.split()[-1].startswith('__builtin_')]
 
 
 if __name__ == '__main__':

@@ -1,0 +1,212 @@
+GAP9 SDK compile survey: M3 checkpoint (steps/20/sdk100-queue.md), 2026-09-29
+================================================================================
+
+Compiler: a fresh build of the integration head wt/int-20 at d7c901b049e9, built for this
+checkpoint in build/int-20-M3 (scripts/build.sh, targets clang lld llvm-nm, Release +
+assertions, 0 build failures). bin/{clang-20,clang,clang++,lld,ld.lld} + lib/clang were
+copied into the private work dir before the run:
+  clang version 20.1.8 (https://github.com/albsposito/llvm-project.git d7c901b049e9118d0fe2746b7997ca1db3bccebf)
+  (see clang-version.txt)
+It contains everything M2a had (F016 F017 F018 F019 F020 F028 F029 F031 F035 F039 F040)
+plus F044, F038, F036, F041, F043, F045, F037 and F042.
+
+SDK: /home/ubuntu/gap_sdk_release 5.21.14, unmodified. GCC: GAP9 GCC 7.1.1 with the SDK's
+-march=rv32imcxgap9 -mPE=8 -mFC=1 -mint64.
+
+Method: the same as ../checkpoint-M2a-2026-09-29. A private copy of run.py (the HEAD
+bc82384aaee0 version plus run-m3.patch, which is byte-for-byte M2a's run-m2a.patch) ran in a
+private work dir. The tracked run.py and compile_db.json.gz were not touched: the copy's
+SNAP_DB points at a file that does not exist.
+Reused from M2a (same SDK, same GCC, same run.py, and none of them depends on clang):
+configure, db, inventory and gcc. M2a's compile_db.json.gz, inventory.json, compile_gcc.json,
+out/gcc and bld/ (the generated devicetree/Kconfig headers) were copied into the new work dir.
+That gives 618 db sources; an inventory of 618 cmake + 175 inferred + 95 excluded; and GCC
+617 ok / 176 fail. New in M3, for the denominator question: the run.py modes gccsdk (GCC
+with the SDK's own flags including -Werror), sdkflags and sdknowerror. Analysis: M2a's
+analyze.py, with its baselines changed to M1 + M2a and GCC -Werror status added per file,
+then combine.py unchanged.
+
+  P = --target=riscv32-unknown-elf -march=rv32imc_xgap9 -mPE=8 -mabi=ilp32 -mno-relax,
+      no macro shim                                          (modes pe8, pe8lenient)
+  X = the same without -mPE=8                                (modes xgap9, xgap9lenient)
+  Q = PROBE ONLY, on P's failures: P + f16abs2/f16altabs2 as __builtin_elementwise_abs
+                                                             (modes pe8abs, pe8abslenient)
+  All modes use -O2 -c + the SDK's per-file -D/-I/-f flags + the GAP newlib headers.
+
+HEADLINE
+--------
+  P (-mPE=8): 610/617 = 98.9%   vs M2a 520 (84.3%): +90    vs M1 476: +134
+  X (no -mPE): 542/617 = 87.8%  vs M2a 515 (83.5%): +27
+  Q probe:     610/617 = 98.9%  (the f16abs2 shim no longer changes anything: f16abs2 exists)
+
+  With the SDK's -Werror (denominator 609, the files GAP9 GCC compiles with the SDK flags
+  including -Werror): P compiles 609/609 = 100%, X 541/609 = 88.8%.
+
+- No regressions: 0 files that compiled at M2a (or at M1) fail now, in P or X.
+- 0 crashes, 0 timeouts in any of the 10 runs (pe8, xgap9, pe8lenient, xgap9lenient,
+  pe8abs, pe8abslenient, gccsdk, sdkflags, sdknowerror; gcc reused).
+- P vs X: 68 files differ, all of them because __builtin_pulp_CoreCount() is used in a
+  static initializer (58 CNN, 9 DSP, 1 other kernel). -mPE=8 (F018) is needed there, as GCC
+  always has -mPE=8.
+- __has_builtin: under -march=rv32imc_xgap9, 18 of the 212 __builtin_pulp_* names the SDK
+  uses are still missing (M2a: 67): add4div2 add4div4 sub4div2 sub4div4 cplxmjrot2 cplxmuls
+  cplxmulsdiv2 cplxmulsdiv4 v2hftov2hi v2hftov2hi_u v2hitov2hf v2hitov2hf_u v2hitov2ohf
+  v2hitov2ohf_u v2ohftov2hi v2ohftov2hi_u vitmax2 vitsel2. Under rv32imc_zfinx_xpulpv2
+  (the builtins phase default arch) 44 are missing: the new builtins are gated on xgap9.
+  Two of the 18 are reached silently by the survey files; see LINK READINESS.
+
+TOTALS PER AREA (P = -mPE=8, X = no -mPE)
+-----------------------------------------
+| area | GCC ok | GCC -Werror ok | M1 | M2a P | P ok | P parity | P vs M2a | M2a X | X ok | X parity | X vs M2a |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| rtos/freertos | 67 | 67 | 67 | 67 | 67 | 100% | +0 | 67 | 67 | 100% | +0 |
+| rtos/pmsis-implem | 57 | 55 | 55 | 55 | 55 | 96% | +0 | 55 | 55 | 96% | +0 |
+| rtos/pmsis-bsp | 69 | 68 | 68 | 68 | 68 | 99% | +0 | 68 | 68 | 99% | +0 |
+| rtos/other (tools, sfu) | 6 | 6 | 3 | 6 | 6 | 100% | +0 | 6 | 6 | 100% | +0 |
+| libs/mbedtls | 97 | 97 | 97 | 97 | 97 | 100% | +0 | 97 | 97 | 100% | +0 |
+| libs/other | 23 | 23 | 20 | 22 | 23 | 100% | +1 | 22 | 23 | 100% | +1 |
+| at/DSP_Libraries | 38 | 38 | 0 | 22 | 38 | 100% | +16 | 18 | 29 | 76% | +11 |
+| at/CNN_Libraries* | 68 | 67 | 0 | 1 | 68 | 100% | +67 | 0 | 10 | 15% | +10 |
+| at/other-kernels | 3 | 3 | 0 | 1 | 3 | 100% | +2 | 1 | 2 | 67% | +1 |
+| audio-framework | 50 | 46 | 39 | 46 | 46 | 92% | +0 | 46 | 46 | 92% | +0 |
+| examples/basic | 100 | 100 | 98 | 100 | 100 | 100% | +0 | 100 | 100 | 100% | +0 |
+| examples/dsp | 2 | 2 | 0 | 2 | 2 | 100% | +0 | 2 | 2 | 100% | +0 |
+| examples/audio | 5 | 5 | 5 | 5 | 5 | 100% | +0 | 5 | 5 | 100% | +0 |
+| examples/isp etc. | 11 | 11 | 6 | 8 | 11 | 100% | +3 | 8 | 11 | 100% | +3 |
+| nn_menu | 10 | 10 | 7 | 9 | 10 | 100% | +1 | 9 | 10 | 100% | +1 |
+| utils (ssbl, gap_cli) | 11 | 11 | 11 | 11 | 11 | 100% | +0 | 11 | 11 | 100% | +0 |
+| **total** | **617** | **609** | **476** | **520** | **610** | **98.9%** | **+90** | **515** | **542** | **87.8%** | **+27** |
+
+THE DENOMINATOR QUESTION
+------------------------
+There are two honest denominators:
+  617 = files GAP9 GCC compiles with the survey's GCC mode (SDK -D/-I/-f flags, -Werror
+        removed). Our P count against it: 610/617 = 98.9%.
+  609 = files GAP9 GCC compiles with the SDK's own flags, -Werror included (run.py mode
+        gccsdk). Our P count against it: 609/609 = 100%.
+GCC fails 8 of the 617 with the SDK's -Werror: the 7 files below, plus
+tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/RNN_BasicKernels_NE16.c
+(GCC: -Werror=sign-compare; P compiles it). So every file clang still fails is one that the
+SDK's own build rejects with GCC as well. Those files build only when the SDK is configured
+with CONFIG_DISABLE_WERROR.
+
+Secondary (like for like with the SDK warning flags, run.py sdkflags / sdknowerror modes):
+clang with the SDK's -W flags and -Werror compiles 534/609, and without -Werror 549/617.
+These two modes use run.py's SDK_ARCH, which at bc82384aaee0 has no -mPE=8, so the 68
+CoreCount files fail there for that reason alone. The remaining 7 sdkflags-only failures are
+clang -Werror diagnostics that GCC 7 does not issue: -Wsometimes-uninitialized (pi_lfs.c,
+read_fs.c), -Wuninitialized (ota.c, updater.c, CNN_BasicKernels_NE16.c), -Wformat
+(malloc_internal.c) and -Wunsequenced (CNN_Copy.c). They matter for a drop-in -Werror build
+through the wrapper, not for the P number.
+
+REMAINING FAILURES IN P: 7 files (all of them also fail GAP9 GCC with the SDK -Werror)
+--------------------------------------------------------------------------------------
+Root-cause bucket for all 7: clang-only implicit-declaration error. C99 and later removed
+implicit function declarations. Clang 20 makes -Wimplicit-function-declaration an error by
+default; GCC 7 only warns. All 7 are SDK source bugs (a missing #include, or a trace macro
+that is not defined in this configuration). All 7 compile with
+-Wno-error=implicit-function-declaration (pe8lenient: 7/7 ok, 0 crashes). What is left after
+that is only -Wint-conversion warnings from the implicit int return values. None of the 7
+involves a builtin, fp16, vectors or the back end.
+
+| file | first error (P) | GCC, survey mode (no -Werror) | GCC, SDK flags (-Werror) |
+|---|---|---|---|
+| rtos/pmsis/bsp/eeprom/virtualeeprom/virtualeeprom.c | call to undeclared function 'bsp_virtual_eeprom_conf_init' | ok (warning) | FAIL: -Werror=implicit-function-declaration |
+| rtos/pmsis/implem/chips/gap9/udma_sdio/driver/sdio.c | call to undeclared function 'SDIO_TRACE' | ok (warning) | FAIL: same |
+| rtos/pmsis/implem/chips/gap9/udma_timestamp/driver/udma_timestamp.c | call to undeclared function 'TIMESTAMP_TRACE_ERR' | ok (warning) | FAIL: same |
+| tools/audio-framework/lib/bindings/ring/src/ring.c | call to undeclared function 'pi_malloc' (via gap9_fc_framework/src/core.h:160) | ok (warning) | FAIL: same |
+| tools/audio-framework/lib/common/src/get_param/get_param.c | call to undeclared library function 'strtol' | ok (warning) | FAIL: same |
+| tools/audio-framework/lib/components/downmixer/src/downmixer.c | call to undeclared function 'pi_malloc' (core.h:160) | ok (warning) | FAIL: same |
+| tools/audio-framework/lib/components/passthrough/src/passthrough.c | call to undeclared function 'pi_malloc' (core.h:160) | ok (warning) | FAIL: same |
+
+These are the same 7 files as at M1 and M2a (queue item 5). The sdk-clang wrapper's
+GCC-7 compatibility flags already handle them for wrapper builds. The only lever left in the
+survey is -Wno-error=implicit-function-declaration: +7 gives 617/617.
+
+Everything M2a listed as a blocker is gone in P: f16abs2/f16altabs2 (77), other fp16
+builtins (24), fp32 builtins (22), non-constant mulsN/clip/clipu arguments (11), the
+inline-asm SIMD "r" operand (CNN_Copy.c, CNN_Pooling_SQ8.c; both compile now), and
+mul64hu, trunch, mulfsN and the FftLibraryFix.c cplx/div builtins.
+
+FILES THAT NEWLY COMPILE vs M2a (P: 90; full list in results.json summary.P.newly_compiling_vs_M2a)
+------------------------------------------------------------------------------------------
+  at/CNN_Libraries 67, at/DSP_Libraries 16, at/other-kernels 2 (ISP_Libraries/ResizeBasicKernels.c,
+  Transformers_Libraries/FlashAttention.c), examples/isp etc. 3 (examples/gap9/libs/fastmath/main.c,
+  fastmath/utils.c, sort/main.c), libs/other 1 (libs/gap_lib/jpeg/dct.c), nn_menu 1
+  (yolox_people_detection/.../detection/decoding.c).
+  X: +27 (the same files minus the 68 CoreCount files, which also need -mPE=8, minus the 5
+  that already compiled at M2a with -mPE=8).
+
+CRASHES AND HANGS
+-----------------
+None: 0 crashes and 0 timeouts in P, X and Q (strict and lenient) and in sdkflags and
+sdknowerror. Every CNN/fp16 kernel now reaches the back end (68/68 CNN files compile), and
+the old Xpulpv2 fp16-pair ISel hang was not hit.
+
+LINK READINESS (compile-only survey; not linked)
+-------------------------------------------------
+Method: llvm-nm -u on the 610 P objects, compared with llvm-nm --defined-only of GAP9 GCC's
+lib/gcc/riscv32-unknown-elf/7.1.1/rv32imcxgap9/ilp32/libgcc.a (3056 symbols). Undefined
+__* names that libgcc does not define were filtered down to compiler-runtime and builtin
+names. SDK-internal __pi_*/__os_*/__cli_* symbols and linker-script symbols were ignored,
+because the SDK's own sources and link script provide them.
+35 of the 610 objects reference a symbol that neither GAP9 libgcc nor the SDK provides:
+  32  __truncsfbf2 (float -> float16alt/bfloat16 conversion). GAP9 libgcc has only
+      __truncdfohf2 / __extendohfdf2 (double <-> float16alt) and __truncdfhf2 /
+      __extendhfdf2. There is no sf -> bf16 helper, because GCC does this conversion
+      inline. Files: all 9 CNN_Libraries_fp16/*_fp16.c, all 9 CNN_Libraries_fp16x/*_f16a.c,
+      CNN_Libraries/CNN_Copy.c, the DSP *f16a.c files (CmplxFunctionsf16a, PiecewiseMathf16a,
+      FirBasicKernelsf16a, MatMulDSPf16a, DctLibraryf16a, DftLibraryf16a, FftLibraryf16a,
+      MfccLibraryf16a, PreProcessingf16a), MatAddDSP.c, MatMulDSP.c, MatVectDSP.c and
+      ISP_Libraries/ResizeBasicKernels.c. (M2a: 5 objects.) The objects will not link
+      against the GAP9 toolchain until clang lowers f32 -> bf16 inline for xgap9, or a
+      runtime provides __truncsfbf2.
+   5  an undefined __builtin_pulp_* symbol, so the object compiles but emits a call to a
+      builtin that does not exist. This is a silent false "ok":
+        __builtin_pulp_v2hftov2hi   CNN_Libraries_fp16/CNN_Bias_Linear_Activation_fp16.c,
+                                    CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16.c, _f16a.c
+        __builtin_pulp_v2hitov2hf_u DSP_Libraries/FastMathFunctions/PiecewiseMathf16.c, f16a.c
+      Both names are in the 18 still-missing builtins. The call sites are the Cvt_v2h_v2s /
+      Cvt_v2u_v2h macros in DSP_Libraries/FloatDefines.h, which reach the files through
+      FastFloatApprox16.h. That header has `#pragma GCC diagnostic ignored
+      "-Wimplicit-function-declaration"`, so clang is silent. The int result is then cast
+      to a 4-byte vector, which is legal, so no later error appears either. The survey
+      counts these 5 as ok (rc 0, no diagnostic). They compiled for the first time in M3
+      (all 5 failed at M2a). Without these 5 false oks: 605/617.
+   1  examples/gap9/libs/openmp/main.c references __kmpc_fork_call /
+      __kmpc_for_static_init_4u / __kmpc_for_static_fini (the LLVM OpenMP runtime ABI).
+      The SDK provides GCC's GOMP_* runtime, not __kmpc_*. This is not new: the M2a object
+      has the same references.
+(32 + 2 + 1 = 35 distinct objects: 3 of the 5 builtin objects also use __truncsfbf2; the 2
+that do not are PiecewiseMathf16.c and CNN_Bias_Linear_Activation_f16.c.)
+Link-clean against the GAP9 GCC toolchain's runtime: 610 - 35 = 575/617 objects (93.2%).
+
+GREEDY ORDER (P base 610; parity over 617)
+------------------------------------------
+  +7  -Wno-error=implicit-function-declaration (SDK source bugs; GCC -Werror fails them too) -> 617 100%
+
+FILES IN THIS DIRECTORY
+-----------------------
+  report.txt       this report
+  results.json     meta (incl. link_readiness, missing builtins) + per-file results for P, X, Q
+                   (first error, group, needs, needs_combined, M1/M2a status, gcc/gccsdk and
+                   clang sdkflags/sdknowerror status) + summary + P_greedy
+  analysis.txt     full analysis dump (per config; P failures with GCC status; GCC -Werror
+                   failures)
+  combine.txt      P needs_combined counts, single blockers, greedy order
+  analyze.py       M2a's analyze.py with baselines M1 + M2a and GCC -Werror status added
+  combine.py       unchanged from M2a
+  run-m3.patch     the private run.py changes (identical to run-m2a.patch)
+  clang-version.txt clang --version of the snapshot
+
+Reproduce: copy run.py (HEAD bc82384aaee0) to <tool>, apply run-m3.patch, and put the
+snapshot of build/int-20-M3 in <work>/snap/{bin,lib/clang}. Copy compile_db.json.gz,
+inventory.json, compile_gcc.json, out/gcc and bld/ from the M2a work dir, or run the phases
+configure,db,inventory,gcc to redo them. Then:
+  python3 run.py --work <work> --jobs 16 --phases pe8,xgap9,pe8lenient,xgap9lenient,builtins
+  python3 run.py --work <work> --jobs 16 --phases pe8abs,pe8abslenient
+  python3 run.py --work <work> --jobs 16 --phases gccsdk,sdkflags,sdknowerror
+  python3 analyze.py <work> <out> ../checkpoint-M1-2026-09-28/results.json \
+      ../checkpoint-M2a-2026-09-29/results.json
+  python3 combine.py <work> <out>
+(analyze.py writes <out>/results.part.json; results.json = that + meta.)

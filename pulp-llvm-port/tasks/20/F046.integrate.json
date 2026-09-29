@@ -1,0 +1,15 @@
+{
+  "branch": "work/20/F046",
+  "int_head_before": "d7c901b049e9118d0fe2746b7997ca1db3bccebf",
+  "build_rc": 0,
+  "errors_fixed": [],
+  "errors_new": [],
+  "build_log": "tasks/20/work_20_F046.build.log",
+  "lit_rc": 0,
+  "lit_diff": "tasks/20/work_20_F046.lit_diff.json",
+  "verdict": "LANDED",
+  "int_head_after": "26e7268c3127ca9bc091afe463af37b621353e71",
+  "commits": [
+    "a4229b80e2beb79fc24d6fc482aa73798f808350"
+  ]
+}

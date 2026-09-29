@@ -1,0 +1,46 @@
+{
+ "status": "done",
+ "branch": "work/20/F040",
+ "integration_head": "75b4639bf455b3b7cf909c9759d018dcebaf9647",
+ "commits": [
+  "2787a1dad57ab21132b2b5fb182db284faa76627",
+  "7400ad44fbe0d94c834f4a8d32550580882a92f9"
+ ],
+ "commit_clusters": {
+  "2787a1dad57a": "insn-tablegen (new RISCVInstrInfoXpulpfloat.td + include in RISCVInstrInfo.td)",
+  "7400ad44fbe0": "mc (RISCVDisassembler.cpp: try DecoderTableXpulpfloat32 when xpulpf16alt||xpulpfvec)"
+ },
+ "note": "notes/20/F040.md",
+ "signature_gone": true,
+ "summary": "110 GAP9 fp16 MC instructions (28 scalar .ah incl. fcvt.s.ah/ah.s/h.ah/ah.h; 82 packed .h/.ah incl. .r forms) + 8 parse-only aliases, GPR operands (FPR16INX/FPR32INX/GPR), separate decoder namespace Xpulpfloat, _INX record names; no ISel patterns.",
+ "verification": {
+  "log": "logs/20-F040-verify/verify.log",
+  "repro": "logs/20-F040.repro.log",
+  "exhaustive_vs_gnu_as": "431 lines, .text byte-identical (1724 bytes); disassembly identical to GNU objdump for all 431 (encoding, mnemonic, operands)",
+  "gcc_vector.s": ".text byte-identical",
+  "gcc_scalar.s": "identical except 'mv a5,zero' (GNU as 2.x keeps addi, llvm-mc emits c.li) - standard RVC, unrelated",
+  "feature_gating": "all rejected with only +zhinx,+xpulpv and with Snitch features; partial sets reject exactly the missing groups",
+  "isel_reachability": "0 references in RISCVGenDAGISel/GlobalISel/CompressInstEmitter .inc",
+  "codegen_identity": "numeq.c (_Float16, __bf16) -march=rv32imc_xgap9 identical to int-20; GAP9 sweep 54/54 identical",
+  "lit": "MC/RISCV+CodeGen/RISCV 2581/2582 (only known B41 rvv/vsetvli-insert-zve64f.mir); clang LIT_PATHS 2149/2149; Snitch xsmallfloat MC tests pass unchanged",
+  "policy_check": "0 FAIL 0 WARN",
+  "regex_check": "RISCVInstrInfoXpulpfloat.td maps to insn-tablegen (fork_anatomy.py owner)"
+ },
+ "decisions_for_conductor": [
+  "vfdiv/vfdiv.r/vfsqrt (.h and .ah, 10 instrs) are defined with GVSoC encodings because the task lists them, but GAP9 GNU as rejects them; drop those defs if GNU as is authoritative (design Q9).",
+  "Not defined: fmv.x.ah/fmv.ah.x, vfmv.*, vfcpkb.* (GNU as rejects; GVSoC gates vfcpkb on D), Xf8/.b, Xfaux (vfdotp*, vfavg, fmulex.s.ah, fmacex.s.ah - GNU as accepts the last two but task excludes Xfaux), RV64 fcvt.l*.ah.",
+  "Vector .h ops gated on Xpulpfvec+Zhinx, .ah ops on Xpulpfvec+Xpulpf16alt (design 6.3 / GVSoC f16vec,f16altvec tags); scalar fcvt.h.ah/ah.h and vfcvt.h.ah/ah.h also need Zhinx.",
+  "Aliases fneg/fabs/fgt/fge.ah and vfneg/vfabs.h/.ah are parse-only so llvm-objdump prints like GNU objdump.",
+  "Sched<[]> like Snitch defs; T3/T5 should add real sched classes. No Uses=[FRM] on vfcvt.x.h (GVSoC rounds with frm) - T5 should decide."
+ ],
+ "unmapped_files": [],
+ "other_errors_seen": [
+  "GVSoC model bug (not LLVM): gvsoc2 isa_smallfloats.py swaps vfsgnj.ah (listed funct3 101) and vfsgnj.r.ah (001); GNU as encodes vfsgnj.ah with 001. GVSoC runs vfsgnj.ah as vfsgnj.r.ah - affects future v2ah copysign GVSoC checks (T5/T6).",
+  "Known failure B41: llvm/test/CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (pre-existing)."
+ ],
+ "proposed_test": [
+  "llvm/test/MC/RISCV/xpulp/xpulpfloat-valid.s: logs/20-F040-verify/exhaustive.s with CHECK-ASM-AND-OBJ encodings (from GNU as), RUN with -mattr=+xgap and with +zhinx,+xpulpf16alt,+xpulpfvec, llvm-objdump round trip",
+  "llvm/test/MC/RISCV/xpulp/xpulpfloat-invalid.s: rm operand on .ah ops, fmv.x.ah, vfcpkb.h.s, fmulex.s.ah; feature-gating (.ah without xpulpf16alt, vf*.h without xpulpfvec or zhinx) with expected diagnostics",
+  "Disassembler test: GAP9 bytes decode as <unknown> without the features and as Snitch FPR forms only with Snitch features"
+ ]
+}

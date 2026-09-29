@@ -14,8 +14,11 @@
 # chosen GCC.
 #
 # The wrapper reads GAP_CLANG_ROOT, GAP_CLANG_LINKER, GAP_CLANG_AS,
-# GAP_CLANG_COMPAT, GAP_CLANG_MARCH, GAP_CLANG_GCC7COMPAT, GAP_CLANG_LENIENT
-# from the environment at build time (see bin/riscv32-unknown-elf-clang).
+# GAP_CLANG_COMPAT, GAP_CLANG_MARCH, GAP_CLANG_MPE, GAP_CLANG_GCC7COMPAT,
+# GAP_CLANG_LENIENT from the environment at build time (see
+# bin/riscv32-unknown-elf-clang).  With a current integration compiler use
+# GAP_CLANG_MARCH=rv32imc_xgap9: no macro shim, native -mPE=N (F018), and no
+# compat header needed (F016).
 #
 # Diagnostics (-Werror): the SDK compiles with -Wall -Wextra -Werror unless
 # CONFIG_DISABLE_WERROR=y.  The wrapper, not this file, adds the flags that
@@ -35,7 +38,8 @@
 #     header-guard, deprecated-non-prototype, implicit-const-int-float-conversion,
 #     constant-conversion, pointer-bool-conversion, tautological-pointer-compare,
 #     empty-body (clang warnings GCC 7 does not emit for the SDK's code);
-#   * a call to a __builtin_* clang does not know always fails the compile;
+#   * a call to a __builtin_* clang does not know always fails the compile
+#     (stderr check, plus nm -u on the object for pragma-silenced cases);
 #   * -ffp-contract=fast (GCC's default; owner decision D6/Q5).  Not added:
 #     -fno-math-errno (GAP9 GCC keeps -fmath-errno, and so does clang).
 # With them, clang-only warnings no longer need CONFIG_DISABLE_WERROR=y

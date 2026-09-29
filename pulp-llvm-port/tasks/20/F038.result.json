@@ -1,0 +1,43 @@
+{
+ "status": "done",
+ "branch": "work/20/F038",
+ "integration_head": "de8abd20c921776adcc8edae3ea351ae1412b440",
+ "commits": [
+  "247f2c43e77cf1c9a3e73f001217a9151c5f8731",
+  "186ef4668ce98c5598df18f2c9eab02c905fb030",
+  "28c8fc0b8c34867c9cd6a48660cff297a6c71dc3",
+  "c0de24dbb78fca3d375e9258dba123ed9038b076"
+ ],
+ "commit_clusters": {
+  "247f2c43e77c": "insn-tablegen (llvm/lib/Target/RISCV/RISCVInstrInfoXpulp.td: 19 instruction defs, RV32Xgap9 decoder namespace, 10 builtin patterns; own block at end of file, away from LOOPsetup)",
+  "186ef4668ce9": "mc (llvm/lib/Target/RISCV/Disassembler/RISCVDisassembler.cpp: RV32Xgap9 table tried when FeatureVendorXgap9)",
+  "28c8fc0b8c34": "intrinsics (llvm/include/llvm/IR/IntrinsicsRISCVXpulp.td: 10 ClangBuiltin intrinsics)",
+  "c0de24dbb78f": "clang-builtins (clang/include/clang/Basic/BuiltinsRISCVXpulp.td: 10 builtins, feature \"xgap\")"
+ },
+ "note": "notes/20/F038.md",
+ "signature_gone": true,
+ "unmapped_files": [],
+ "upstream_file_edits": [],
+ "rebase": "Rebased from 4851ef81477b onto de8abd20c921; two textual conflicts resolved keeping both sides: RISCVDisassembler.cpp (F040's Xpulpfloat table + my RV32Xgap9 table, both before RV32Xpulp) and BuiltinsRISCVXpulp.td (F019's __builtin_shuffle block + my block).",
+ "summary": "Adds the 19 GAP9 complex/divide-by-N packed-SIMD instructions (pv.add.h.div2/4/8, pv.sub.h.div2/4/8, pv.subrotmj.h[.div2/4/8], pv.cplxconj.h, pv.cplxmul.h.r/i[.div2/4/8]; the task's '16' undercounts the families it lists) gated on xgap9 (HasVendorXgap9) with their own decoder table, and the 10 builtins add2div2, add2div4, sub2div2, sub2div4, sub2rotmj, cplx_conj, cplxmuls2, cplxmuls2div2/4/8 with GAP9 GCC prototypes (feature xgap). cplxmuls2* select GCC's .r then .i pair on a tied rd (Pulp_ALU_rr_wb, like upstream CVSIMDRRWb). No clang CodeGen/Sema edits.",
+ "verification": {
+  "repro": "logs/20-F038.repro.log (llvm-mc: unrecognized mnemonic; clang: unknown builtin)",
+  "build": "clang llc llvm-mc llvm-objdump + llvm-test-depends clang-test-depends lld at the rebased head (logs/20-F038.build.log, logs/20-F038-deps.log); cluster_errors: 0 clusters",
+  "mc": "21 lines covering all 19 instructions: llvm-mc -mattr=+xgap bytes identical to GAP9 GNU as -march=rv32imcxgap9 (logs/20-F038-verify/mc.bin == gas.bin); llvm-objdump disassembly reassembles to the same bytes; without xgap9 all rejected ('instruction requires ... Xgap9') and disassembled as <unknown>",
+  "codegen_vs_gcc": "spec gcc/<builtin>.c for all 10: same instructions as GAP9 GCC -O2 modulo registers (cplxmuls2: pv.cplxmul.h.r a2,a0,a1; pv.cplxmul.h.i a2,a0,a1; mv a0,a2). Diag probes: int arg error, v4s/unsigned accepted, as GCC; without xgap9: \"needs target feature xgap\". -verify-machineinstrs clean at O0/O2/O3.",
+  "gvsoc": "ri5ky_testbench models the GAP9 subset. logs/20-F038-verify/sem.c: 38416 edge pairs (14 edge values per 16-bit lane incl. 0x7fff,-0x8000,+-1) + 20000 random, per-builtin hash: clang O0/O1/O2/O3/Os == host C reference from the spec == GAP9 GCC -O2 on GVSoC, for all 10 builtins.",
+  "sdk_survey": "private work dir, baseline = M2a checkpoint run (int-20 de8abd20c921): -march=rv32imc_xgap9 515->516/617, with -mPE=8 520->521/617; newly OK: tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c; 0 regressions; no other file changes diagnostics. strict (xpulpv2) unaffected by design (builtins need xgap9). Its object contains all families GCC's has.",
+  "gap9_sweep": "scratch copy, base=int-20 de8abd20 snapshot vs mine: 54/54 disassemblies identical (header path line excluded)",
+  "lit": "llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, llvm/test/MC/Disassembler/RISCV, clang/test/CodeGen/RISCV, clang/test/Sema, clang/test/Driver/riscv-arch.c, clang/test/Preprocessor/riscv-nofdiv.c, clang/test/Misc/target-invalid-cpu-note: 5844 tests, only failure rvv/vsetvli-insert-zve64f.mir (in data/known-failures.txt). logs/20-F038.lit.log, logs/20-F038.lit-clang.log",
+  "policy_check": "tasks/20/work_20_F038.policy.json: 0 FAIL, 0 WARN"
+ },
+ "other_errors_seen": [
+  "missed optimization (not wrong code): GAP9 GCC folds add2div4(-a, b) in FftLibraryFix.c into pv.sub.h.div4; clang keeps pv.sub.h + pv.add.h.div4 (identical result in 16-bit wrap arithmetic) because the builtins are opaque intrinsics",
+  "optional GCC-only builtins add2div8/sub2div8 (gcc/extras_unused_by_sdk.c) not added: not in this task's list, SDK never calls them; trivially addable with PV_ADD_H_DIV8/PV_SUB_H_DIV8"
+ ],
+ "proposed_test": [
+  "llvm/test/MC/RISCV/xgap9-cplx-valid.s: llvm-mc -mattr=+xgap -show-encoding for all 19 instructions with the GAS encodings (CHECK-ENC) + llvm-objdump round trip; RUN without +xgap expecting 'instruction requires the following: 'Xgap9''",
+  "clang/test/CodeGen/RISCV/xgap9-cplx-builtins.c: -march=rv32imc_xgap9 each builtin -> call <2 x i16> @llvm.riscv.pulp.<name>; a -verify RUN with rv32imc_xpulpv2 expecting 'needs target feature xgap'",
+  "llvm/test/CodeGen/RISCV/xgap9-cplx-intrinsics.ll: llc -mattr=+xgap each intrinsic -> single instruction, cplxmuls2* -> pv.cplxmul.h.r[.divN] then pv.cplxmul.h.i[.divN] on the same rd distinct from the sources"
+ ]
+}

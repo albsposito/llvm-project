@@ -1,0 +1,69 @@
+--- run.py.orig
++++ run.py
+@@ -225,7 +225,7 @@
+ # placeholder @WORK@ and substituted at load time.  Runs use the database the
+ # db phase writes into --work; `dbsnapshot` refreshes the tracked copy on
+ # explicit request only.
+-SNAP_DB = os.path.join(HERE, 'compile_db.json.gz')
++SNAP_DB = os.path.join(HERE, 'compile_db.snapshot-unused.json.gz')  # M2a: never the tracked copy
+ WORK_TOKEN = '@WORK@'
+ RX_BLD = re.compile(r'(/[^\s"]*?)/bld/')
+ 
+@@ -355,7 +355,20 @@
+     'fp16probe': (True, True, True),    # what remains once float16 types + constant CoreCount exist
+     'sdkflags': None,                   # SDK warning flags incl. -Werror + GCC-7 compat, -march=rv32imc_xgap9
+     'sdknowerror': None,                # the same without -Werror (CONFIG_DISABLE_WERROR builds)
++    # M2a checkpoint: -march=rv32imc_xgap9 (no shim), with and without -mPE=8
++    'pe8': (False, False, False),
++    'pe8lenient': (False, True, False),
++    'xgap9': (False, False, False),
++    'xgap9lenient': (False, True, False),
++    # probe only: pe8 + f16abs2/f16altabs2 as element-wise abs (silenced implicit decls in FastFloatApprox16.h)
++    'pe8abs': (False, False, False),
++    'pe8abslenient': (False, True, False),
+ }
++ABS_SHIM = ['-D__builtin_pulp_f16abs2(a)=__builtin_elementwise_abs(a)',
++            '-D__builtin_pulp_f16altabs2(a)=__builtin_elementwise_abs(a)']
++XGAP9_MODES = ('pe8', 'pe8lenient', 'xgap9', 'xgap9lenient', 'pe8abs', 'pe8abslenient')
++LENIENT_OF = {'lenient': 'strict', 'pe8lenient': 'pe8', 'xgap9lenient': 'xgap9', 'pe8abs': 'pe8',
++              'pe8abslenient': 'pe8abs'}
+ 
+ 
+ # ---- sdkflags mode: the SDK's own build flags, as the clang wrapper
+@@ -366,7 +379,7 @@
+ # the wrapper, the single source of truth) makes clang's diagnostics behave as
+ # GAP9 GCC 7.1.1's do.
+ SDK_ARCH = ['--target=riscv32-unknown-elf', '-march=rv32imc_xgap9', '-mabi=ilp32', '-mno-relax']
+-SDK_WRAPPER = os.path.join(HERE, '..', 'sdk-clang', 'bin', 'riscv32-unknown-elf-clang')
++SDK_WRAPPER = '/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/sdk-clang/bin/riscv32-unknown-elf-clang'
+ 
+ 
+ def _wrapper_mod():
+@@ -408,6 +421,12 @@
+     defs, len_, fp16 = MODES[mode]
+     arch = list(LLVM_ARCH)
+     extra = (COMPAT_DEFS if defs else []) + (LENIENT if len_ else [])
++    if mode in XGAP9_MODES:
++        arch[1] = '-march=rv32imc_xgap9'
++        if mode.startswith('pe8'):
++            arch.append('-mPE=8')
++        if mode.startswith('pe8abs'):
++            extra = extra + ABS_SHIM
+     if fp16:
+         arch[1] = '-march=rv32imc_zfinx_zhinx_xpulpv2'
+         extra += FP16_SHIM
+@@ -472,10 +491,12 @@
+     if which not in ('gcc',):
+         g = json.load(open(os.path.join(w, 'compile_gcc.json')))
+         todo = [e for e in todo if g.get(e['file'], {}).get('rc') == 0]
+-    if which in ('nodefs', 'fp16probe', 'lenient'):
+-        s = json.load(open(os.path.join(w, 'compile_strict.json')))
++    if which in ('nodefs', 'fp16probe') + tuple(LENIENT_OF):
++        s = json.load(open(os.path.join(w, 'compile_%s.json' % LENIENT_OF.get(which, 'strict'))))
+         want_ok = which == 'nodefs'
+         todo = [e for e in todo if (s.get(e['file'], {}).get('rc') == 0) == want_ok]
++        if which in ('pe8abs', 'pe8abslenient'):
++            todo = [e for e in todo if e['file'] in s]
+     if a.only:
+         todo = [e for e in todo if re.search(a.only, e['file'])]
+     todo = [e for e in todo if e['file'] not in res or a.only]

@@ -411,3 +411,9 @@ shuffles/build/extract/setcc (T5b) keeps each under one root cause.
 | `tests/vcmp.c`, `out/vcmp.txt` | vector compare lanes are 0/1 on GVSoC |
 | `tests/clang_probe.{c,s}`, `tests/clang_abi.{c,s}`, `tests/clang_frontend.{c,ll}` | current port-20 clang behaviour for `_Float16`/`__bf16` and vectors |
 | `tests/xf16_equals_zhinx.s` | GAP9 Xf16 = Zhinx encodings (llvm-mc vs GNU as, byte-identical) |
+
+
+> **Review notes for T3/T5 (2026-09-29, from the 20/F040 review):** `vfcpka.h.s` overwrites the whole 32-bit rd in GVSoC (`VF_CPK`: rs1 -> lane 0, rs2 -> lane 1), so it does NOT keep the high half of rd — drop the rd tie in T5 and correct any text saying otherwise. Packed rounding ops use the dynamic rounding mode, so all rounding `vf*` instructions need `Uses = [FRM]`. The GPR half-precision register class accepts only f16: T3 must add bf16 before `.ah` patterns. GVSoC swaps vfsgnj.ah / vfsgnj.r.ah (backlog B127).
+
+
+> **Correction (2026-09-29, board-pack probe t3):** on both GVSoC models the packed fp16 compares write a bitmask (lane i true sets bit i; e.g. only lane 1 true gives 0x00000002), not 0/1 per lane as Q2 states. The earlier test only had lane 0 true. The silicon answer comes from benchmarks/board-pack t3.

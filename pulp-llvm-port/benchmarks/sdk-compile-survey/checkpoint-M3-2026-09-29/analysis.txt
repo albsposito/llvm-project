@@ -1,0 +1,580 @@
+GCC-compilable files: 617 (M1: 617; not in M1 set: 0)
+P (-march=rv32imc_xgap9 -mPE=8): 610/617 = 98.9%
+X (-march=rv32imc_xgap9, no -mPE): 542/617 = 87.8%
+Q probe (P + f16abs2/f16altabs2 as elementwise abs): 610/617 = 98.9%
+M1 (config B): 476; M2a P: 520, M2a X: 515
+Denominator with the SDK -Werror flags (GCC gccsdk ok): 609; P ok among them: 609 = 100.0%; X: 541 = 88.8%
+clang sdkflags mode (SDK -W flags incl. -Werror, run.py SDK_ARCH = xgap9 without -mPE): 534/609; sdknowerror: 549/617
+
+| area | GCC ok | GCC -Werror ok | M1 | M2a P | P ok | P parity | P vs M2a | M2a X | X ok | X parity | X vs M2a |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| rtos/freertos | 67 | 67 | 67 | 67 | 67 | 100% | +0 | 67 | 67 | 100% | +0 |
+| rtos/pmsis-implem | 57 | 55 | 55 | 55 | 55 | 96% | +0 | 55 | 55 | 96% | +0 |
+| rtos/pmsis-bsp | 69 | 68 | 68 | 68 | 68 | 99% | +0 | 68 | 68 | 99% | +0 |
+| rtos/other (tools, sfu) | 6 | 6 | 3 | 6 | 6 | 100% | +0 | 6 | 6 | 100% | +0 |
+| libs/mbedtls | 97 | 97 | 97 | 97 | 97 | 100% | +0 | 97 | 97 | 100% | +0 |
+| libs/other | 23 | 23 | 20 | 22 | 23 | 100% | +1 | 22 | 23 | 100% | +1 |
+| at/DSP_Libraries | 38 | 38 | 0 | 22 | 38 | 100% | +16 | 18 | 29 | 76% | +11 |
+| at/CNN_Libraries* | 68 | 67 | 0 | 1 | 68 | 100% | +67 | 0 | 10 | 15% | +10 |
+| at/other-kernels | 3 | 3 | 0 | 1 | 3 | 100% | +2 | 1 | 2 | 67% | +1 |
+| audio-framework | 50 | 46 | 39 | 46 | 46 | 92% | +0 | 46 | 46 | 92% | +0 |
+| examples/basic | 100 | 100 | 98 | 100 | 100 | 100% | +0 | 100 | 100 | 100% | +0 |
+| examples/dsp | 2 | 2 | 0 | 2 | 2 | 100% | +0 | 2 | 2 | 100% | +0 |
+| examples/audio | 5 | 5 | 5 | 5 | 5 | 100% | +0 | 5 | 5 | 100% | +0 |
+| examples/isp etc. | 11 | 11 | 6 | 8 | 11 | 100% | +3 | 8 | 11 | 100% | +3 |
+| nn_menu | 10 | 10 | 7 | 9 | 10 | 100% | +1 | 9 | 10 | 100% | +1 |
+| utils (ssbl, gap_cli) | 11 | 11 | 11 | 11 | 11 | 100% | +0 | 11 | 11 | 100% | +0 |
+| **total** | **617** | **609** | **476** | **520** | **610** | **98.9%** | **+90** | **515** | **542** | **87.8%** | **+27** |
+
+== config P: 7 failures
+-- survey primary bucket
+     7  clang-stricter default error
+-- first-error group (per file)
+     7  clang-only implicit-declaration error   [audio-framework 4, rtos/pmsis-implem 2, rtos/pmsis-bsp 1]
+-- first error per file (normalized)
+     6  call to undeclared function 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-declaration]   [e.g. virtualeeprom.c]
+     1  call to undeclared library function 'X' with type 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-d   [e.g. get_param.c]
+-- all needs per file (strict + lenient errors)
+     7  clang-only implicit-declaration error
+     3  clang-stricter default error (other)
+-- files whose ONLY need is X
+     4  clang-only implicit-declaration error
+-- builtins missing (files, strict + lenient)
+  
+-- non-constant builtin argument errors (which builtins)
+-- clang-only implicit declarations (files)
+  rtos/pmsis/bsp/eeprom/virtualeeprom/virtualeeprom.c
+  rtos/pmsis/implem/chips/gap9/udma_sdio/driver/sdio.c
+  rtos/pmsis/implem/chips/gap9/udma_timestamp/driver/udma_timestamp.c
+  tools/audio-framework/lib/bindings/ring/src/ring.c
+  tools/audio-framework/lib/common/src/get_param/get_param.c
+  tools/audio-framework/lib/components/downmixer/src/downmixer.c
+  tools/audio-framework/lib/components/passthrough/src/passthrough.c
+-- "other" needs (files)
+-- crashes/hangs: 0
+-- regressions vs M1: 0; vs M2a: 0
+-- newly compiling vs M2a: 90
+  examples/gap9/libs/fastmath/main.c
+  examples/gap9/libs/fastmath/utils.c
+  examples/gap9/libs/sort/main.c
+  libs/gap_lib/jpeg/dct.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/detection/decoding.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_BiasReLULinear_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DP_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DW_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DW_DP_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_MatAlgebra.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Pooling_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_SoftMax.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/SSD_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/CNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/RNN_BasicKernelsFScale_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/RNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/CNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/RNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Activation_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Bias_Linear_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQ16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQX.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_USQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQ16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQX.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_USQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_SQ16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_USQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_MatAlgebra_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_MatMul_Conv_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Pooling_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_SoftMax_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/RNN_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Bias_Linear_Activation_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Conv_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Conv_DW_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_DW_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_DW_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatMul_Conv_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatMul_Conv_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_SoftMax_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_SoftMax_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/RNN_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/RNN_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatAlgebra_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatMul_Conv_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Pooling_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_SoftMax_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/RNN_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/SSD_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Bias_Linear_Activation_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_MatAlgebra_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Pooling_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_SoftMax_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/RNN_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/Transformer_fp32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/MathFuncsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatAddDSP.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSP.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSPf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSPf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatVectDSP.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c
+  tools/autotiler_v3/BasicKernels/ISP_Libraries/ResizeBasicKernels.c
+  tools/autotiler_v3/BasicKernels/Transformers_Libraries/FlashAttention.c
+
+== config X: 75 failures
+-- survey primary bucket
+    68  gcc-only language feature
+     7  clang-stricter default error
+-- first-error group (per file)
+    68  CoreCount() not constant in static initializer   [at/CNN_Libraries 58, at/DSP_Libraries 9, at/other-kernels 1]
+     7  clang-only implicit-declaration error   [audio-framework 4, rtos/pmsis-implem 2, rtos/pmsis-bsp 1]
+-- first error per file (normalized)
+    68  initializer element is not a compile-time constant   [e.g. CNN_BiasReLULinear_BasicKernels.c]
+     6  call to undeclared function 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-declaration]   [e.g. virtualeeprom.c]
+     1  call to undeclared library function 'X' with type 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-d   [e.g. get_param.c]
+-- all needs per file (strict + lenient errors)
+    68  CoreCount() not constant in static initializer
+     7  clang-only implicit-declaration error
+     3  clang-stricter default error (other)
+-- files whose ONLY need is X
+    68  CoreCount() not constant in static initializer
+     4  clang-only implicit-declaration error
+-- builtins missing (files, strict + lenient)
+  
+-- non-constant builtin argument errors (which builtins)
+-- clang-only implicit declarations (files)
+  rtos/pmsis/bsp/eeprom/virtualeeprom/virtualeeprom.c
+  rtos/pmsis/implem/chips/gap9/udma_sdio/driver/sdio.c
+  rtos/pmsis/implem/chips/gap9/udma_timestamp/driver/udma_timestamp.c
+  tools/audio-framework/lib/bindings/ring/src/ring.c
+  tools/audio-framework/lib/common/src/get_param/get_param.c
+  tools/audio-framework/lib/components/downmixer/src/downmixer.c
+  tools/audio-framework/lib/components/passthrough/src/passthrough.c
+-- "other" needs (files)
+-- crashes/hangs: 0
+-- regressions vs M1: 0; vs M2a: 0
+-- newly compiling vs M2a: 27
+  examples/gap9/libs/fastmath/main.c
+  examples/gap9/libs/fastmath/utils.c
+  examples/gap9/libs/sort/main.c
+  libs/gap_lib/jpeg/dct.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/detection/decoding.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/SSD_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/CNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/RNN_BasicKernelsFScale_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/RNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/CNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/RNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/SSD_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/MathFuncsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c
+  tools/autotiler_v3/BasicKernels/ISP_Libraries/ResizeBasicKernels.c
+
+== config Q: 7 failures
+-- survey primary bucket
+     7  clang-stricter default error
+-- first-error group (per file)
+     7  clang-only implicit-declaration error   [audio-framework 4, rtos/pmsis-implem 2, rtos/pmsis-bsp 1]
+-- first error per file (normalized)
+     6  call to undeclared function 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-declaration]   [e.g. virtualeeprom.c]
+     1  call to undeclared library function 'X' with type 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-d   [e.g. get_param.c]
+-- all needs per file (strict + lenient errors)
+     7  clang-only implicit-declaration error
+     3  clang-stricter default error (other)
+-- files whose ONLY need is X
+     4  clang-only implicit-declaration error
+-- builtins missing (files, strict + lenient)
+  
+-- non-constant builtin argument errors (which builtins)
+-- clang-only implicit declarations (files)
+  rtos/pmsis/bsp/eeprom/virtualeeprom/virtualeeprom.c
+  rtos/pmsis/implem/chips/gap9/udma_sdio/driver/sdio.c
+  rtos/pmsis/implem/chips/gap9/udma_timestamp/driver/udma_timestamp.c
+  tools/audio-framework/lib/bindings/ring/src/ring.c
+  tools/audio-framework/lib/common/src/get_param/get_param.c
+  tools/audio-framework/lib/components/downmixer/src/downmixer.c
+  tools/audio-framework/lib/components/passthrough/src/passthrough.c
+-- "other" needs (files)
+-- crashes/hangs: 0
+-- regressions vs M1: 0; vs M2a: 0
+-- newly compiling vs M2a: 51
+  examples/gap9/libs/fastmath/main.c
+  examples/gap9/libs/fastmath/utils.c
+  libs/gap_lib/jpeg/dct.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/detection/decoding.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/CNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/RNN_BasicKernelsFScale_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/CNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Activation_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Pooling_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_SoftMax_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Bias_Linear_Activation_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Conv_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Conv_DW_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_DW_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_DW_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatMul_Conv_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatMul_Conv_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_SoftMax_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_SoftMax_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatAlgebra_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatMul_Conv_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Pooling_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_SoftMax_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/SSD_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Bias_Linear_Activation_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_MatAlgebra_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Pooling_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_SoftMax_fp32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/MathFuncsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c
+  tools/autotiler_v3/BasicKernels/Transformers_Libraries/FlashAttention.c
+
+== P vs X differences
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_BiasReLULinear_BasicKernels.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_BasicKernels.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DP_BasicKernels.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DW_BasicKernels.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DW_DP_BasicKernels.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_MatAlgebra.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Pooling_BasicKernels.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_SoftMax.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_AT_Misc.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Activation_SQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Bias_Linear_SQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQ16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQX.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_USQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQ16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQX.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_USQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_SQ16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_SQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_USQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_SQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_MatAlgebra_SQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_MatMul_Conv_SQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Pooling_SQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_SoftMax_SQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/RNN_SQ8.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Bias_Linear_Activation_fp16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Conv_BasicKernels_fp16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Conv_DW_BasicKernels_fp16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16a.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_BasicKernels_f16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_BasicKernels_f16a.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_DW_BasicKernels_f16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_DW_BasicKernels_f16a.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16a.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatMul_Conv_f16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatMul_Conv_f16a.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16a.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_SoftMax_f16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_SoftMax_f16a.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/RNN_f16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/RNN_f16a.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatAlgebra_fp16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatMul_Conv_fp16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Pooling_BasicKernels_fp16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_SoftMax_fp16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/RNN_fp16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Bias_Linear_Activation_fp32.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_MatAlgebra_fp32.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Pooling_fp32.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_SoftMax_fp32.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/RNN_fp32.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/Transformer_fp32.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsFix.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16a.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf32.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatAddDSP.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSP.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSPf16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSPf16a.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatVectDSP.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/Transformers_Libraries/FlashAttention.c  P=ok X=fail
+  (68 files differ)
+
+== files that newly compile vs M1, config P (134)
+  examples/gap9/basic/getting_started/cluster_kernels.c
+  examples/gap9/basic/getting_started/main.c
+  examples/gap9/dsp/benchmarks/FFTL1/FFTRunTest.c
+  examples/gap9/dsp/benchmarks/Fir/Test.c
+  examples/gap9/isp/white_balance/wb.c
+  examples/gap9/libs/fastmath/main.c
+  examples/gap9/libs/fastmath/utils.c
+  examples/gap9/libs/openmp/main.c
+  examples/gap9/libs/sort/main.c
+  libs/gap_lib/g722_encoder_decoder/src/g722_encode.c
+  libs/gap_lib/img_io/ImgIO.c
+  libs/gap_lib/jpeg/dct.c
+  nn_menu/object_detection/blaze_face/post_process.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/detection/decoding.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/detection/postprocessing.c
+  rtos/sfu/SFU_RT.c
+  rtos/sfu/sfu_coeff_packer.c
+  rtos/sfu/sfu_pmsis_runtime.c
+  tools/audio-framework/lib/components/fft/gap9_cluster_fft/src/gap9_cluster_fft.c
+  tools/audio-framework/lib/components/fft/gap9_fc_fft/src/gap9_fc_fft.c
+  tools/audio-framework/lib/components/file_source/gap9_fc_file_source/src/gap9_fc_file_source.c
+  tools/audio-framework/lib/components/lms/gap9_cluster_lms/src/gap9_cluster_lms.c
+  tools/audio-framework/lib/components/pcm_source/gap9_fc_pcm_source/src/gap9_fc_pcm_source.c
+  tools/audio-framework/lib/components/tdm_source/gap9_fc_tdm_source/src/gap9_fc_tdm_source.c
+  tools/audio-framework/lib/framework/gap9_fc_framework/src/audio_framework.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_BiasReLULinear_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DP_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DW_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DW_DP_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_MatAlgebra.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Pooling_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_SoftMax.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/SSD_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/CNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/RNN_BasicKernelsFScale_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/RNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/CNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/RNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_AT_Misc.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Activation_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Bias_Linear_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQ16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQX.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_USQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQ16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQX.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_USQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_SQ16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_USQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_MatAlgebra_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_MatMul_Conv_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Pooling_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_SoftMax_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/RNN_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Bias_Linear_Activation_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Conv_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Conv_DW_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Bias_Linear_Activation_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_DW_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Conv_DW_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatAlgebra_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatMul_Conv_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_MatMul_Conv_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_Pooling_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_SoftMax_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/CNN_SoftMax_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/RNN_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/RNN_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatAlgebra_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_MatMul_Conv_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Pooling_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_SoftMax_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/RNN_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/SSD_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Bias_Linear_Activation_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_MatAlgebra_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_Pooling_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/CNN_SoftMax_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/RNN_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/Transformer_fp32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/MathFuncsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatAddDSP.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSP.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSPf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSPf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatVectDSP.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/RFFTTwiddlesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/SwapTablesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/TwiddlesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf32.c
+  tools/autotiler_v3/BasicKernels/ISP_Libraries/ISP_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/ISP_Libraries/ResizeBasicKernels.c
+  tools/autotiler_v3/BasicKernels/Transformers_Libraries/FlashAttention.c
+
+== files that newly compile vs M1, config X (66)
+  examples/gap9/basic/getting_started/cluster_kernels.c
+  examples/gap9/basic/getting_started/main.c
+  examples/gap9/dsp/benchmarks/FFTL1/FFTRunTest.c
+  examples/gap9/dsp/benchmarks/Fir/Test.c
+  examples/gap9/isp/white_balance/wb.c
+  examples/gap9/libs/fastmath/main.c
+  examples/gap9/libs/fastmath/utils.c
+  examples/gap9/libs/openmp/main.c
+  examples/gap9/libs/sort/main.c
+  libs/gap_lib/g722_encoder_decoder/src/g722_encode.c
+  libs/gap_lib/img_io/ImgIO.c
+  libs/gap_lib/jpeg/dct.c
+  nn_menu/object_detection/blaze_face/post_process.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/detection/decoding.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/detection/postprocessing.c
+  rtos/sfu/SFU_RT.c
+  rtos/sfu/sfu_coeff_packer.c
+  rtos/sfu/sfu_pmsis_runtime.c
+  tools/audio-framework/lib/components/fft/gap9_cluster_fft/src/gap9_cluster_fft.c
+  tools/audio-framework/lib/components/fft/gap9_fc_fft/src/gap9_fc_fft.c
+  tools/audio-framework/lib/components/file_source/gap9_fc_file_source/src/gap9_fc_file_source.c
+  tools/audio-framework/lib/components/lms/gap9_cluster_lms/src/gap9_cluster_lms.c
+  tools/audio-framework/lib/components/pcm_source/gap9_fc_pcm_source/src/gap9_fc_pcm_source.c
+  tools/audio-framework/lib/components/tdm_source/gap9_fc_tdm_source/src/gap9_fc_tdm_source.c
+  tools/audio-framework/lib/framework/gap9_fc_framework/src/audio_framework.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/SSD_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/CNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/RNN_BasicKernelsFScale_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/RNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/CNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/RNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/SSD_BasicKernels_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/SSD_BasicKernels_fp16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/MathFuncsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/PiecewiseMathf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DftLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/RFFTTwiddlesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/SwapTablesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/TwiddlesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf32.c
+  tools/autotiler_v3/BasicKernels/ISP_Libraries/ISP_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/ISP_Libraries/ResizeBasicKernels.c
+
+== P failures: GCC status (gcc = survey GCC mode, no -Werror; gccsdk = GCC with the SDK -Werror flags)
+  rtos/pmsis/bsp/eeprom/virtualeeprom/virtualeeprom.c  gcc=ok gccsdk=FAIL clang_sdkflags=False clang_sdknowerror=True  | call to undeclared function 'bsp_virtual_eeprom_conf_init'; ISO C99 and later do not support implicit function declarati
+  rtos/pmsis/implem/chips/gap9/udma_sdio/driver/sdio.c  gcc=ok gccsdk=FAIL clang_sdkflags=False clang_sdknowerror=True  | call to undeclared function 'SDIO_TRACE'; ISO C99 and later do not support implicit function declarations [-Wimplicit-fu
+  rtos/pmsis/implem/chips/gap9/udma_timestamp/driver/udma_timestamp.c  gcc=ok gccsdk=FAIL clang_sdkflags=False clang_sdknowerror=True  | call to undeclared function 'TIMESTAMP_TRACE_ERR'; ISO C99 and later do not support implicit function declarations [-Wim
+  tools/audio-framework/lib/bindings/ring/src/ring.c  gcc=ok gccsdk=FAIL clang_sdkflags=False clang_sdknowerror=True  | call to undeclared function 'pi_malloc'; ISO C99 and later do not support implicit function declarations [-Wimplicit-fun
+  tools/audio-framework/lib/common/src/get_param/get_param.c  gcc=ok gccsdk=FAIL clang_sdkflags=False clang_sdknowerror=True  | call to undeclared library function 'strtol' with type 'long (const char *, char **, int)'; ISO C99 and later do not sup
+  tools/audio-framework/lib/components/downmixer/src/downmixer.c  gcc=ok gccsdk=FAIL clang_sdkflags=False clang_sdknowerror=True  | call to undeclared function 'pi_malloc'; ISO C99 and later do not support implicit function declarations [-Wimplicit-fun
+  tools/audio-framework/lib/components/passthrough/src/passthrough.c  gcc=ok gccsdk=FAIL clang_sdkflags=False clang_sdknowerror=True  | call to undeclared function 'pi_malloc'; ISO C99 and later do not support implicit function declarations [-Wimplicit-fun
+-- GCC-ok files that GCC fails with the SDK -Werror flags (8)
+  rtos/pmsis/bsp/eeprom/virtualeeprom/virtualeeprom.c  P=fail
+  rtos/pmsis/implem/chips/gap9/udma_sdio/driver/sdio.c  P=fail
+  rtos/pmsis/implem/chips/gap9/udma_timestamp/driver/udma_timestamp.c  P=fail
+  tools/audio-framework/lib/bindings/ring/src/ring.c  P=fail
+  tools/audio-framework/lib/common/src/get_param/get_param.c  P=fail
+  tools/audio-framework/lib/components/downmixer/src/downmixer.c  P=fail
+  tools/audio-framework/lib/components/passthrough/src/passthrough.c  P=fail
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/RNN_BasicKernels_NE16.c  P=ok

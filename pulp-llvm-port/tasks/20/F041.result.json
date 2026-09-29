@@ -1,0 +1,49 @@
+{
+  "status": "done",
+  "branch": "work/20/F041",
+  "integration_head": "271b0c142ccb98815e4d2406f764c9d953cd8d87",
+  "commits": [
+    "4bf9320df54b3bd0a367587769e5d247caf0af22",
+    "6f106aaddab74a5ffe00081ba4406a50a3452123"
+  ],
+  "commit_clusters": {
+    "4bf9320df54b": "clang-builtins (BuiltinsRISCVXpulp.td, CGBuiltin.cpp): the four builtins",
+    "6f106aaddab7": "clang-builtins (CGBuiltin.cpp): review fix, f16altabs2 lowered as two opaque p.bclr"
+  },
+  "note": "notes/20/F041.md",
+  "signature_gone": true,
+  "unmapped_files": [],
+  "upstream_file_edits": [],
+  "summary": "Adds __builtin_pulp_f16abs (float16), f16altabs (float16alt), f16abs2 (v2h), f16altabs2 (v2ah) with GAP9 GCC's prototypes (own block at the end of BuiltinsRISCVXpulp.td). Lowered in EmitRISCVBuiltinExpr (CGBuiltin.cpp, own switch after the __builtin_shuffle dispatch): f16abs -> llvm.fabs.f16 (fabs.h, as GCC); f16abs2 -> bitcast to i32, AND 0x7fff7fff; f16altabs2 -> two llvm.riscv.pulp.bclr (bits 15 and 31, p.bclr x2); f16altabs -> llvm.riscv.pulp.bclr(zext, 0xffff7fff) = p.bclr bit 15. No new intrinsic, no back-end change. Deviation from the F016 pattern (intrinsic + ISel pattern) is deliberate: the results are illegal types (bf16, v2f16, v2bf16) on RV32, and the bf16 forms must not go through llvm.fabs because LLVM 20 soft-promotes a bf16 fabs via float + __truncsfbf2 (quiets sNaNs, symbol missing from GAP9 libgcc; fixed upstream by 11571a005a38, LLVM 22). A plain i16 AND is folded by InstCombine into llvm.fabs.bf16, and an AND on an extracted lane of the pair is narrowed and folded the same way (review), hence the opaque bclr intrinsic for both bf16 forms.",
+  "verification": {
+    "repro": "logs/20-F041.repro.log (unknown builtin for all four at de8abd20c921)",
+    "build": "clang, llc, lld, llvm-nm, llvm-test-depends, clang-test-depends built at 6f106aaddab7 (on 271b0c142ccb): logs/20-F041-build9.log, no errors",
+    "semantics": "GAP9 GCC emits fabs.h / fabs.ah / vfabs.h / vfabs.ah; on GVSoC the GCC-built test equals a host C reference doing x & 0x7fff7fff (sign bits cleared, NaN payloads incl. sNaN kept).",
+    "asm_vs_gcc": "logs/20-F041-repro/gcc-t.O2.s vs mine-t.O2.s: f16abs identical (fabs.h a0,a0). f16abs2: GCC 1 vfabs.h, clang lui+addi+and (constant hoisted in loops -> one and per pair). f16altabs2: GCC 1 vfabs.ah, clang p.bclr 0,15 + p.bclr 0,31. f16altabs standalone: GCC fabs.ah, clang p.exthz+p.bclr+p.bset (zext, clear bit 15, bf16 return NaN-boxing); in a loop one p.bclr. Native GAP9 vfsgnjx/fsgnjx.ah selection is T3/T5.",
+    "diagnostics_vs_gcc": "logs/20-F041-repro/d.c: GCC and clang reject the same 3 lines (int to f16abs2, v2h to f16abs, extra argument) and accept the same same-size vector conversions; _Generic result types match. Feature gating per builtin and -march: logs/20-F041-repro/gating.txt (xgap9 enables all four; otherwise 'needs target feature ...').",
+    "gvsoc": "(1) logs/20-F041-repro/gvsoc (kern.c, drv.c, host.c): 64 pairs incl. +-0, +-inf, qNaN/sNaN of both formats, subnormals, random; register and memory forms; float16 sum of f16abs values. At the final head clang -O0/-O1/-O2/-O3/-Os/-Oz and host print RES1 0xcf58f5db RES2 0x00e89e7f RES3 0x00004728 (logs/20-F041.gvsoc-rev2.log); GAP9 GCC -O0/-O2/-Os the same (logs/20-F041.gvsoc.log). (2) Review shapes, logs/20-F041-repro/lane (kern.c = reviewer k3.c n0..n9 + scalar f16altabs loop + f16abs2 lane extract; 16 bf16 inputs incl. sNaN 0x7f81/0xff81, qNaN, inf, subnormals): clang -O0..-Oz, GAP9 GCC -O0/-O2/-Os and host all RESB 0xe9c275e1 RESH 0xdb2abd48 SNAN 0x00007f81; the reviewer's lk2.c + k3.c links with GAP9 libgcc at -O1/-O2/-Os/-Oz and keeps the sNaN (0xff81 -> 0x7f81, like GCC) (logs/20-F041.gvsoc-lane.log). (3) llvm-nm -u: no __truncsfbf2/__extendbfsf2 (or any __trunc*/__extend*) and no llvm.fabs.bf16 in IR for lane/kern.c, gvsoc/kern.c, reviewer k3.c, k3h.c, kern.c at -O0/-O1/-O2/-O3/-Os/-Oz: 30/30 clean (logs/20-F041-repro/lane/nm.out).",
+    "sdk_survey": "Private run.py copy (M2a version) + private --work in the session scratchpad (bld/sdk symlinked to the M2a work dir, compile_db copied; tracked compile_db.json.gz untouched), snapshot of the final build, mode pe8 (-march=rv32imc_xgap9 -mPE=8): 559/617 = 90.6% (M2a 520/617): 39 files newly compile, exactly the 39 the M2a Q probe predicted; 0 regressions; 0 crashes/timeouts in strict and lenient. No remaining failure mentions f16abs*/f16altabs*. Remaining 58 first errors: 11 non-constant mulsN/clip args, 34 other missing builtins (f32*, f16max/min/sqrt families, trunch, mul64hu, sub2rotmj, ...), 7 clang-only implicit declarations, 6 others of the same families; no new failure bucket (the inline-asm SIMD 'r' error is gone in lenient with F044 now in the base). logs/20-F041.survey.log, logs/20-F041-repro/survey-newly-ok.json, survey-pe8.json, survey-pe8lenient.json",
+    "gap9_sweep": "Scratch copy, base = int-20 snapshot at b7b5bc729710, mine = final build, sweep flags (rv32imc_zfinx_xpulpv2) O2/O3: 54 common objects identical disassembly; 3 '-file' kernels x 2 levels newly compile (base fails on the missing builtins in FastFloatApprox16.h). logs/20-F041.sweep.txt",
+    "lit": "scripts/wlit.sh at 6f106aaddab7 (on 271b0c142ccb) over llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, clang/test/CodeGen/RISCV, clang/test/Sema, clang/test/Driver/riscv-arch.c, Preprocessor/riscv-nofdiv.c, Misc/target-invalid-cpu-note and every data/fork-tests.txt entry: 5902 tests, 5775 passed, 126 unsupported, 1 failed = rvv/vsetvli-insert-zve64f.mir (known B41, data/known-failures.txt). logs/20-F041-lit5.log",
+    "policy_check": "0 FAIL, 0 WARN over 271b0c142ccb..work/20/F041 (2 commits)",
+    "hwloop_fuzz": "not run: the change only adds builtins in clang and cannot affect code without them (sweep disassembly identical)",
+    "recheck_after_rebase": "At 6f106aaddab7: reviewer k3.c, lane/kern.c and t.c at -O1/-O2/-Os/-Oz: 0 __truncsfbf2/__extendbfsf2 undefined refs (llvm-nm -u), 0 llvm.fabs.bf16 in IR; t.c -O2 asm unchanged (and / p.bclr x2 / fabs.h / p.exthz+p.bclr+p.bset). logs/20-F041-repro/lane/recheck-271b0c142ccb.txt. GVSoC, survey and sweep results are from the pre-rebase head a7215e0b3c0b (same F041 code; the rebase only adds other tasks' builtins)."
+  },
+  "proposed_test": [
+    "clang/test/CodeGen/RISCV/riscv-xgap9-f16abs-builtins.c (update_cc_test_checks, -march=rv32imc_xgap9, -O0 and -O2 IR): f16abs -> call half @llvm.fabs.f16; f16abs2 -> bitcast to i32, and i32 %x, 2147450879, bitcast back; f16altabs2 -> two calls i32 @llvm.riscv.pulp.bclr(i32, i32 -32769) and (i32, i32 2147483647); f16altabs -> zext i16 + call @llvm.riscv.pulp.bclr(i32, i32 -32769) + trunc. At -O1/-O2/-Os/-Oz, the review's k3.c shapes (lane 0/1 extract of f16altabs2 on {*p,*p}, {x,0}, {0,x}, loops over bf16 arrays, extract from a loaded v2ah) must contain no llvm.fabs.bf16 (CHECK-NOT).",
+    "clang/test/Sema/riscv-xgap9-f16abs-builtins.c: accepted with -march=rv32imc_xgap9; 'needs target feature' with rv32imc_xpulpv2 / without xpulpfvec / without xpulpf16alt; errors for int to f16abs2, v2h to f16abs, wrong argument count; _Generic result types float16/float16alt/v2h/v2ah.",
+    "llvm/test/CodeGen/RISCV/xpulp-bf16-abs.ll (update_llc_test_checks, +xpulpv,+xpulpf16alt,+xpulpfvec): the IR above selects p.bclr (x2 for the pair) with no __truncsfbf2 call, for register operands and for load -> lane extract -> store bf16 operands."
+  ],
+  "other_errors_seen": [
+    "Pre-existing, general: in plain C, abs or negation of a float16alt (bf16) value, and even 'bits & 0x7fff' on one (InstCombine folds it into llvm.fabs.bf16), compiles to a __truncsfbf2 call (LLVM 20 SoftPromoteHalfRes_UnaryOp for FABS/FNEG). __truncsfbf2 is not in GAP9 libgcc (link error) and quiets signalling NaNs. Example: void neg(float16alt *p,int n){for(...) p[i]=-p[i];} with -march=rv32imc_xgap9 at int-20. Upstream fix 11571a005a38 'Fix legalizing FNEG and FABS with TypeSoftPromoteHalf (#156343)' (llvmorg-22.1.0); a backport would change upstream CHECK lines (llvm/test/CodeGen/RISCV/half-arith.ll changed in that commit), so it needs an owner decision / test-regen; or T3 makes bf16 a GPR register type. Suggest a BACKLOG row.",
+    "f16altabs (scalar) costs p.exthz+p.bclr(+p.bset for a returned value) where GCC uses one fabs.ah, and the pair forms lui+addi+and vs one vfabs.h/.ah; to switch to llvm.fabs and native instructions with T3/T5.",
+    "Sibling task F042 (other fp16 builtins) will hit the same bf16 legalization issue if it lowers f16alt* to generic bf16 IR (fmax/fmin/sqrt on bf16 go through float + __truncsfbf2 as well).",
+    "Sweep harness: benchmarks/gap9-sweep/run.py resolves toolchains and ../19-vs-18 relative to its own location, so a scratch copy must keep the <root>/benchmarks/gap9-sweep layout with toolchains and benchmarks/19-vs-18 reachable (used symlinks)."
+  ],
+  "review_round": {
+    "review": "tasks/20/F041.review.json (REJECT: f16altabs2 AND refolded into llvm.fabs.bf16 after a lane extract -> __truncsfbf2)",
+    "fix": "f16altabs2 now = llvm.riscv.pulp.bclr(llvm.riscv.pulp.bclr(x, 0xffff7fff), 0x7fffffff) -> p.bclr a0,a0,0,15; p.bclr a0,a0,0,31. f16abs2 keeps the i32 AND (its refold is llvm.fabs.f16 -> fabs.h, legal). Scalar f16altabs unchanged. Note corrected (notes/20/F041.md lowering items for f16abs2 and f16altabs2, evidence paragraph).",
+    "rebased_onto": "271b0c142ccb (after F044 b7b5bc729710, F038 107b802911c5, F036). BuiltinsRISCVXpulp.td conflicts (each task appends its own block at the end) resolved by keeping every block whole with its own braces, F041's last (after F038 and F036). CGBuiltin.cpp merged cleanly.",
+    "round2": "APPROVED (tasks/20/F041.review.json); only rebased since."
+  }
+}

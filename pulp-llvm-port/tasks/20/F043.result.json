@@ -1,0 +1,40 @@
+{
+ "status": "done",
+ "branch": "work/20/F043",
+ "integration_head": "b7b5bc729710cbaf479656c3a7f198a19a2b7c75",
+ "commits": [
+  "af257db14671",
+  "20b886f86d12",
+  "ffbfacbd9a74"
+ ],
+ "commit_roles": {
+  "af257db14671": "intrinsics: IntrinsicsRISCVXpulp.td, own block after clipu_r: 18 llvm.riscv.pulp.<op>.deferred intrinsics (mul/mac {s,u,hhs,hhu}{N,RN}, clip, clipu), same operands as the ImmArg ones, no ImmArg, no ClangBuiltin.",
+  "20b886f86d12": "codegen-core: RISCVISelLowering.cpp lowerPulpDeferredImmIntrinsic (called first in LowerINTRINSIC_WO_CHAIN): constant + GCC range rule -> rebuild the ImmArg intrinsic node (existing patterns select it); else DiagnosticInfoUnsupported error + UNDEF.",
+  "ffbfacbd9a74": "clang-builtins: BuiltinsRISCVXpulp.td drops _Constant on the 18 prototypes (in-place edits, no reorder); SemaRISCV.cpp getPulpDeferredImmArgStart + early return when an immediate is not an ICE (existing checks unchanged otherwise); CGBuiltin.cpp EmitPULPDeferredImmBuiltin before the generic ClangBuiltin path: all-ICE -> ImmArg intrinsic with constants (same IR as before), else .deferred intrinsic."
+ },
+ "note": "notes/20/F043.md",
+ "signature_gone": true,
+ "key_finding": "The task premise is wrong: GAP9 GCC never accepts a true run-time normalisation/clip argument and has no register form for them (function parameter or global -> 'invalid argument to built-in function on arg N', at every -O level; any non-literal at -O0). It accepts values that become constant after its optimisation (local variable, const/static variable, parameter of an inlined always_inline function) and then applies the same range rules as for literals. That is exactly the SDK pattern (int Prec=10; gap_mulsN(...,Prec) in fp16 CNN kernels; OUT_CLIP(acc, OutUnsigned, OutDatasize) inside an always_inline NE16 kernel). So the fix defers the check to instruction selection (after LLVM optimisation) instead of adding a run-time lowering.",
+ "design_choice": "New .deferred intrinsics used only when an immediate is not an ICE, rather than dropping ImmArg from the existing intrinsics: ImmArg is what prevents SimplifyCFG/GVNSink from merging calls with different constant immediates into a phi (Local.cpp canReplaceOperandWithVariable), so dropping it could newly break literal calls. With this design every call that compiled before takes the identical path (verified: same IR/asm/diagnostics). Mechanism reference: upstream 846e562dcc6a '[Clang] add support for error+warning fn attrs' (GCC-compatible post-optimisation diagnostics via a backend DiagnosticInfo); DiagnosticInfoUnsupported as in upstream RISCVISelLowering.cpp:20596 @llvmorg-20.1.8. Scope: mul/mac {s,u,hhs,hhu}{N,RN} + clip/clipu (task scope); addN/subN/bextract/binsert etc. still require literals (GCC also folds those, e.g. addN/bextract with a local variable compile in GCC) - not needed by the SDK survey, left as a possible follow-up.",
+ "gcc_rules_mirrored": "post-optimisation constant required; Norm <= 31 (unsigned); RN: 1 <= Norm <= 31 and Round == 2^(Norm-1) (GCC rejects Norm = 0 for RN); clip: Min = -2^(N-1), Max = 2^(N-1)-1, clipu: Min = 0, 1 <= N <= 30 (same as F011's Sema rule).",
+ "verification": {
+  "repro": "logs/20-F043.repro.log: int-20 rejects local-variable/inline/run-time immediates with 'must be a constant integer'",
+  "gcc_sweep": "logs/20-F043/sweep/{summary.txt,mine.tsv,int20.tsv,sweep.py}: 18 builtins x {literal, local, always_inline param, run-time param, global} x valid/invalid values x -O0/-O1/-O2/-Os = 5920 calls. Non-mulhh/machh: accept/reject equals GCC on 3504/3520; the 16 others are literal *RN(x,y,0,1) (pre-existing ICE Sema mismatch, identical in int-20). mulhh*/machh*: GCC rejects all (GCC HI-mode bug); clang treats them exactly like their s/u twins. Both-accept 460 calls: same instruction+immediate as GCC except N=0 (GCC p.muls vs our p.mulsN ...,0, same result; pre-existing on the literal path). Literal calls vs int-20: 592/592 identical accept/asm/message. Local/inline calls: asm identical to the literal call. int-20 rejected all 72 local/inline calls GCC accepts at -O2; now accepted. 0 crashes.",
+  "gvsoc": "logs/20-F043/sim/{results.txt,results.rebased.txt,gen.py,run.sh,k.c,ref.c,m.c}: 570 kernels (every builtin x every valid immediate via the deferred path and the literal path, + 6 SDK-shaped kernels), 32x32 edge values x 6 accumulators + 300 random each, vs host-C model of GVSoC isa_lib/int.h compiled for plain rv32imc: O2/O3/Os checks=3673080 mismatches=0 each (before and after rebase). O2: 564/564 deferred/literal pairs have identical code.",
+  "branch_merge_probe": "c ? g(x,y,3) : g(x,y,4), if/else, OUT_CLIP with run-time selector at O1/O2/O3/Os: two separate p.mulsN/p.clip(u), same as GCC; no merge into a non-constant.",
+  "sdk_survey": "logs/20-F043/survey.txt (private run.py copy with run-m2a.patch, private work dir, modes pe8/pe8lenient/pe8abs/pe8abslenient): P 520/617 unchanged, 0 regressions, 0 remaining non-constant-argument errors. Q probe (P + f16abs2 shim): all 11 checkpoint files now compile (pe8abs strict +8: both NE16 + 6 fp16 Conv files; pe8abslenient +3: CNN_MatMul_Conv_{fp16,f16,f16a}.c, which also need other fp16 builtins). In P they remain blocked by __builtin_pulp_f16abs2/f16altabs2 (F041), so the +11 materialises once F041 lands (the three MatMul files also need F042's f16max/min). No new failure bucket.",
+  "gap9_sweep": "logs/20-F043/gap9sweep.txt: 54 rows int20 and mine, 226/226 outputs identical (.dis without header)",
+  "hwloop_fuzz": "not run: the change cannot affect hardware loops or general codegen - calls that compiled before produce identical IR (sweep literal rows, GAP9 sweep identical); new code runs only for .deferred intrinsics.",
+  "lit": "scripts/wlit.sh LIT_PATHS + clang/test/Sema + riscv-nofdiv.c + riscv-arch.c: 5839 tests, 5712 pass, 126 unsupported, 1 fail = CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (known B41). logs/20-F043.lit.log. After rebase onto b7b5bc729710: clang/test/CodeGen/RISCV 2130 tests pass.",
+  "policy_check": "0 FAIL 0 WARN (tasks/20/work_20_F043.policy.json, range b7b5bc729710..work/20/F043)"
+ },
+ "other_errors_seen": [
+  "Pre-existing: literal __builtin_pulp_{mul,mac}{s,u,hhs,hhu}RN(..., 0, 1) is accepted by our Sema (round = 1<<0) and emits p.*RN ...,0, but GAP9 GCC rejects Norm = 0 for every RN builtin ('expects Norm and Round cst, Norm<=31, Round==2^(Norm-1)'). Left unchanged (task: keep the constant checks); the new deferred path follows GCC and rejects Norm = 0.",
+  "GAP9 GCC bug: every __builtin_pulp_mulhh{s,u}[R]N / machh{s,u}[R]N call fails with 'invalid argument to built-in function on arg 1, builtin arg mode: SI, actual arg mode: HI', even with literals. Not our issue; noted for the GCC-bug list.",
+  "GAP9 GCC also folds post-optimisation constants for other immediate builtins (addN with a local variable -> p.addN, bextract -> p.extract); ours still require literals there. No SDK file in the survey needs it.",
+  "Diagnostics from the back end point at the function (no line) without -g, unlike Sema errors."
+ ],
+ "unmapped_files": [],
+ "upstream_file_edit": null,
+ "proposed_test": "clang/test/CodeGen/RISCV/riscv-xpulp-deferred-imm.c: RUN clang -cc1 -triple riscv32 -target-feature +xpulpv -emit-llvm: 'int f(int x,int y){int n=10; return __builtin_pulp_mulsN(x,y,n);}' CHECK call @llvm.riscv.pulp.mulsN.deferred, and literal form CHECK @llvm.riscv.pulp.mulsN(i32 %x, i32 %y, i32 3). llvm/test/CodeGen/RISCV/xpulp-deferred-imm.ll: llc -mattr=+xpulpv on .deferred calls with constants CHECK p.mulsn/p.mulsrn/p.macsn/p.clip/p.clipu with the literal immediates; plus a 'not llc' RUN with a non-constant operand, out-of-range Norm, RN with bad rounding and clip bounds -4/127, CHECK the four error messages. clang/test/Sema: -O0-independent Sema test that non-ICE immediates are accepted and ICE out-of-range still errors."
+}

@@ -1,0 +1,328 @@
+GCC-compilable files: 617 (M1: 617; not in M1 set: 0)
+P (-march=rv32imc_xgap9 -mPE=8): 520/617 = 84.3%
+X (-march=rv32imc_xgap9, no -mPE): 515/617 = 83.5%
+Q probe (P + f16abs2/f16altabs2 as elementwise abs): 559/617 = 90.6%
+M1 (config B): 476; F039 (reconstructed): 515
+
+| area | GCC ok | M1 | F039 | P ok | P parity | P vs M1 | X ok | X parity | X vs M1 |
+|---|---|---|---|---|---|---|---|---|---|
+| rtos/freertos | 67 | 67 | 67 | 67 | 100% | +0 | 67 | 100% | +0 |
+| rtos/pmsis-implem | 57 | 55 | 55 | 55 | 96% | +0 | 55 | 96% | +0 |
+| rtos/pmsis-bsp | 69 | 68 | 68 | 68 | 99% | +0 | 68 | 99% | +0 |
+| rtos/other (tools, sfu) | 6 | 3 | 6 | 6 | 100% | +3 | 6 | 100% | +3 |
+| libs/mbedtls | 97 | 97 | 97 | 97 | 100% | +0 | 97 | 100% | +0 |
+| libs/other | 23 | 20 | 22 | 22 | 96% | +2 | 22 | 96% | +2 |
+| at/DSP_Libraries | 38 | 0 | 18 | 22 | 58% | +22 | 18 | 47% | +18 |
+| at/CNN_Libraries* | 68 | 0 | 0 | 1 | 1% | +1 | 0 | 0% | +0 |
+| at/other-kernels | 3 | 0 | 1 | 1 | 33% | +1 | 1 | 33% | +1 |
+| audio-framework | 50 | 39 | 46 | 46 | 92% | +7 | 46 | 92% | +7 |
+| examples/basic | 100 | 98 | 100 | 100 | 100% | +2 | 100 | 100% | +2 |
+| examples/dsp | 2 | 0 | 2 | 2 | 100% | +2 | 2 | 100% | +2 |
+| examples/audio | 5 | 5 | 5 | 5 | 100% | +0 | 5 | 100% | +0 |
+| examples/isp etc. | 11 | 6 | 8 | 8 | 73% | +2 | 8 | 73% | +2 |
+| nn_menu | 10 | 7 | 9 | 9 | 90% | +2 | 9 | 90% | +2 |
+| utils (ssbl, gap_cli) | 11 | 11 | 11 | 11 | 100% | +0 | 11 | 100% | +0 |
+| **total** | **617** | **476** | **515** | **520** | **84.3%** | **+44** | **515** | **83.5%** | **+39** |
+
+== config P: 97 failures
+-- survey primary bucket
+    43  missing builtin
+    39  unsupported type
+     8  builtin argument check
+     7  clang-stricter default error
+-- first-error group (per file)
+    77  cascade: int from an implicitly declared builtin used as a vector   [at/CNN_Libraries 67, at/DSP_Libraries 7, at/other-kernels 2, examples/other 1]
+     8  fp32 builtin (f32*, rintsf2)   [at/DSP_Libraries 5, examples/other 2, nn_menu 1]
+     7  clang-only implicit-declaration error   [audio-framework 4, rtos/pmsis-implem 2, rtos/pmsis-bsp 1]
+     3  other builtin   [at/DSP_Libraries 2, libs/other 1]
+     2  fp16 builtin (f16*/f16alt*)   [at/DSP_Libraries 2]
+-- first error per file (normalized)
+    77  passing 'X' to parameter of incompatible type 'X' (vector of N 'X' values)   [e.g. main.c]
+    13  use of unknown builtin '__builtin_pulp_X' [-Wimplicit-function-declaration]   [e.g. main.c]
+     6  call to undeclared function 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-declaration]   [e.g. virtualeeprom.c]
+     1  call to undeclared library function 'X' with type 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-d   [e.g. get_param.c]
+-- all needs per file (strict + lenient errors)
+    78  cascade: int from an implicitly declared builtin used as a vector
+    24  fp16 builtin (f16*/f16alt*)
+    22  fp32 builtin (f32*, rintsf2)
+    11  non-constant builtin argument (Sema)
+     7  clang-only implicit-declaration error
+     3  other builtin
+     3  clang-stricter default error (other)
+-- files whose ONLY need is X
+    39  cascade: int from an implicitly declared builtin used as a vector
+     8  fp32 builtin (f32*, rintsf2)
+     4  clang-only implicit-declaration error
+     2  other builtin
+     2  fp16 builtin (f16*/f16alt*)
+-- builtins missing (files, strict + lenient)
+  f32max 15, f16altmax 14, f32min 9, f16altmin 9, f16max 9, f16altmax2 8, f32abs 7, f16max2 6, f16min 6, f32sqrt 5, f16altmin2 3, f16min2 3, rintsf2 2, mulfsN 1, trunch 1, v2hftov2ohf 1, v2ohftov2hf 1, f16sqrt 1, f16altsqrt 1, mul64hu 1, add2div2 1, add2div4 1, cplx_conj 1, cplxmuls2 1, cplxmuls2div2 1, cplxmuls2div4 1, sub2div2 1, sub2rotmj 1
+-- non-constant builtin argument errors (which builtins)
+    26  argument to '__builtin_pulp_X' must be a constant integer
+-- clang-only implicit declarations (files)
+  rtos/pmsis/bsp/eeprom/virtualeeprom/virtualeeprom.c
+  rtos/pmsis/implem/chips/gap9/udma_sdio/driver/sdio.c
+  rtos/pmsis/implem/chips/gap9/udma_timestamp/driver/udma_timestamp.c
+  tools/audio-framework/lib/bindings/ring/src/ring.c
+  tools/audio-framework/lib/common/src/get_param/get_param.c
+  tools/audio-framework/lib/components/downmixer/src/downmixer.c
+  tools/audio-framework/lib/components/passthrough/src/passthrough.c
+-- "other" needs (files)
+  libs/gap_lib/jpeg/dct.c: other builtin
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/MathFuncsFix.c: other builtin
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c: other builtin
+-- crashes/hangs: 0
+-- regressions vs M1: 0; vs F039: 0
+-- newly compiling vs F039: 5
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_AT_Misc.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf32.c
+
+== config X: 102 failures
+-- survey primary bucket
+    45  gcc-only language feature
+    43  missing builtin
+     7  clang-stricter default error
+     5  unsupported type
+     2  builtin argument check
+-- first-error group (per file)
+    77  cascade: int from an implicitly declared builtin used as a vector   [at/CNN_Libraries 67, at/DSP_Libraries 7, at/other-kernels 2, examples/other 1]
+     8  fp32 builtin (f32*, rintsf2)   [at/DSP_Libraries 5, examples/other 2, nn_menu 1]
+     7  clang-only implicit-declaration error   [audio-framework 4, rtos/pmsis-implem 2, rtos/pmsis-bsp 1]
+     5  CoreCount() not constant in static initializer   [at/DSP_Libraries 4, at/CNN_Libraries 1]
+     3  other builtin   [at/DSP_Libraries 2, libs/other 1]
+     2  fp16 builtin (f16*/f16alt*)   [at/DSP_Libraries 2]
+-- first error per file (normalized)
+    77  passing 'X' to parameter of incompatible type 'X' (vector of N 'X' values)   [e.g. main.c]
+    13  use of unknown builtin '__builtin_pulp_X' [-Wimplicit-function-declaration]   [e.g. main.c]
+     6  call to undeclared function 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-declaration]   [e.g. virtualeeprom.c]
+     5  initializer element is not a compile-time constant   [e.g. CNN_AT_Misc.c]
+     1  call to undeclared library function 'X' with type 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-d   [e.g. get_param.c]
+-- all needs per file (strict + lenient errors)
+    78  cascade: int from an implicitly declared builtin used as a vector
+    68  CoreCount() not constant in static initializer
+    24  fp16 builtin (f16*/f16alt*)
+    22  fp32 builtin (f32*, rintsf2)
+    11  non-constant builtin argument (Sema)
+     7  clang-only implicit-declaration error
+     3  other builtin
+     3  clang-stricter default error (other)
+-- files whose ONLY need is X
+     8  fp32 builtin (f32*, rintsf2)
+     5  cascade: int from an implicitly declared builtin used as a vector
+     5  CoreCount() not constant in static initializer
+     4  clang-only implicit-declaration error
+     2  other builtin
+     2  fp16 builtin (f16*/f16alt*)
+-- builtins missing (files, strict + lenient)
+  f32max 15, f16altmax 14, f32min 9, f16altmin 9, f16max 9, f16altmax2 8, f32abs 7, f16max2 6, f16min 6, f32sqrt 5, f16altmin2 3, f16min2 3, rintsf2 2, mulfsN 1, trunch 1, v2hftov2ohf 1, v2ohftov2hf 1, f16sqrt 1, f16altsqrt 1, mul64hu 1, add2div2 1, add2div4 1, cplx_conj 1, cplxmuls2 1, cplxmuls2div2 1, cplxmuls2div4 1, sub2div2 1, sub2rotmj 1
+-- non-constant builtin argument errors (which builtins)
+    26  argument to '__builtin_pulp_X' must be a constant integer
+-- clang-only implicit declarations (files)
+  rtos/pmsis/bsp/eeprom/virtualeeprom/virtualeeprom.c
+  rtos/pmsis/implem/chips/gap9/udma_sdio/driver/sdio.c
+  rtos/pmsis/implem/chips/gap9/udma_timestamp/driver/udma_timestamp.c
+  tools/audio-framework/lib/bindings/ring/src/ring.c
+  tools/audio-framework/lib/common/src/get_param/get_param.c
+  tools/audio-framework/lib/components/downmixer/src/downmixer.c
+  tools/audio-framework/lib/components/passthrough/src/passthrough.c
+-- "other" needs (files)
+  libs/gap_lib/jpeg/dct.c: other builtin
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/MathFuncsFix.c: other builtin
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c: other builtin
+-- crashes/hangs: 0
+-- regressions vs M1: 0; vs F039: 0
+-- newly compiling vs F039: 0
+
+== config Q: 58 failures
+-- survey primary bucket
+    43  missing builtin
+     8  builtin argument check
+     7  clang-stricter default error
+-- first-error group (per file)
+    21  fp16 builtin (f16*/f16alt*)   [at/CNN_Libraries 17, at/DSP_Libraries 4]
+    16  fp32 builtin (f32*, rintsf2)   [at/CNN_Libraries 7, at/DSP_Libraries 5, examples/other 2, nn_menu 1, at/other-kernels 1]
+    11  non-constant builtin argument (Sema)   [at/CNN_Libraries 11]
+     7  clang-only implicit-declaration error   [audio-framework 4, rtos/pmsis-implem 2, rtos/pmsis-bsp 1]
+     3  other builtin   [at/DSP_Libraries 2, libs/other 1]
+-- first error per file (normalized)
+    40  use of unknown builtin '__builtin_pulp_X' [-Wimplicit-function-declaration]   [e.g. main.c]
+    11  argument to '__builtin_pulp_X' must be a constant integer   [e.g. CNN_BasicKernels_NE16.c]
+     6  call to undeclared function 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-declaration]   [e.g. virtualeeprom.c]
+     1  call to undeclared library function 'X' with type 'X'; ISO CN and later do not support implicit function declarations [-Wimplicit-function-d   [e.g. get_param.c]
+-- all needs per file (strict + lenient errors)
+    24  fp16 builtin (f16*/f16alt*)
+    22  fp32 builtin (f32*, rintsf2)
+    11  non-constant builtin argument (Sema)
+    10  cascade: int from an implicitly declared builtin used as a vector
+     7  clang-only implicit-declaration error
+     3  other builtin
+     3  clang-stricter default error (other)
+     1  other: couldn'X'r'
+-- files whose ONLY need is X
+    16  fp32 builtin (f32*, rintsf2)
+    10  fp16 builtin (f16*/f16alt*)
+     8  non-constant builtin argument (Sema)
+     4  clang-only implicit-declaration error
+     2  other builtin
+-- builtins missing (files, strict + lenient)
+  f32max 15, f16altmax 14, f32min 9, f16altmin 9, f16max 9, f16altmax2 8, f32abs 7, f16max2 6, f16min 6, f32sqrt 5, f16altmin2 3, f16min2 3, rintsf2 2, mulfsN 1, trunch 1, v2hftov2ohf 1, v2ohftov2hf 1, f16sqrt 1, f16altsqrt 1, mul64hu 1, add2div2 1, add2div4 1, cplx_conj 1, cplxmuls2 1, cplxmuls2div2 1, cplxmuls2div4 1, sub2div2 1, sub2rotmj 1
+-- non-constant builtin argument errors (which builtins)
+    26  argument to '__builtin_pulp_X' must be a constant integer
+-- clang-only implicit declarations (files)
+  rtos/pmsis/bsp/eeprom/virtualeeprom/virtualeeprom.c
+  rtos/pmsis/implem/chips/gap9/udma_sdio/driver/sdio.c
+  rtos/pmsis/implem/chips/gap9/udma_timestamp/driver/udma_timestamp.c
+  tools/audio-framework/lib/bindings/ring/src/ring.c
+  tools/audio-framework/lib/common/src/get_param/get_param.c
+  tools/audio-framework/lib/components/downmixer/src/downmixer.c
+  tools/audio-framework/lib/components/passthrough/src/passthrough.c
+-- "other" needs (files)
+  libs/gap_lib/jpeg/dct.c: other builtin
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Copy.c: other: couldn'X'r'
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FastMathFunctions/MathFuncsFix.c: other builtin
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryFix.c: other builtin
+-- crashes/hangs: 0
+-- regressions vs M1: 0; vs F039: 0
+-- newly compiling vs F039: 44
+  examples/gap9/libs/sort/main.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_BiasReLULinear_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DP_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DW_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Conv_DW_DP_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_MatAlgebra.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_Pooling_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/CNN_SoftMax.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries/SSD_BasicKernels.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16/RNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_HWPE/ne16_el1/RNN_BasicKernels_NE16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_AT_Misc.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Bias_Linear_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQ16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_SQX.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_HWC_USQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQ16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_SQX.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_Red_USQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_SQ16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_DW_USQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_Conv_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_MatAlgebra_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_MatMul_Conv_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/RNN_SQ8.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/RNN_f16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/CNN_Libraries_fp16x/RNN_f16a.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp16/RNN_fp16.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/RNN_fp32.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_fp32/Transformer_fp32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatAddDSP.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSP.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSPf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatMulDSPf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/MatrixFunctions/MatVectDSP.c
+  tools/autotiler_v3/BasicKernels/ISP_Libraries/ResizeBasicKernels.c
+
+== P vs X differences
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_AT_Misc.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsFix.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16a.c  P=ok X=fail
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf32.c  P=ok X=fail
+  (5 files differ)
+
+== files that newly compile vs M1, config P (44)
+  examples/gap9/basic/getting_started/cluster_kernels.c
+  examples/gap9/basic/getting_started/main.c
+  examples/gap9/dsp/benchmarks/FFTL1/FFTRunTest.c
+  examples/gap9/dsp/benchmarks/Fir/Test.c
+  examples/gap9/isp/white_balance/wb.c
+  examples/gap9/libs/openmp/main.c
+  libs/gap_lib/g722_encoder_decoder/src/g722_encode.c
+  libs/gap_lib/img_io/ImgIO.c
+  nn_menu/object_detection/blaze_face/post_process.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/detection/postprocessing.c
+  rtos/sfu/SFU_RT.c
+  rtos/sfu/sfu_coeff_packer.c
+  rtos/sfu/sfu_pmsis_runtime.c
+  tools/audio-framework/lib/components/fft/gap9_cluster_fft/src/gap9_cluster_fft.c
+  tools/audio-framework/lib/components/fft/gap9_fc_fft/src/gap9_fc_fft.c
+  tools/audio-framework/lib/components/file_source/gap9_fc_file_source/src/gap9_fc_file_source.c
+  tools/audio-framework/lib/components/lms/gap9_cluster_lms/src/gap9_cluster_lms.c
+  tools/audio-framework/lib/components/pcm_source/gap9_fc_pcm_source/src/gap9_fc_pcm_source.c
+  tools/audio-framework/lib/components/tdm_source/gap9_fc_tdm_source/src/gap9_fc_tdm_source.c
+  tools/audio-framework/lib/framework/gap9_fc_framework/src/audio_framework.c
+  tools/autotiler_v3/BasicKernels/CNN_Libraries_SQ8/CNN_AT_Misc.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/FilteringFunctions/FirBasicKernelsf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/RFFTTwiddlesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/SwapTablesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/TwiddlesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf32.c
+  tools/autotiler_v3/BasicKernels/ISP_Libraries/ISP_BasicKernels.c
+
+== files that newly compile vs M1, config X (39)
+  examples/gap9/basic/getting_started/cluster_kernels.c
+  examples/gap9/basic/getting_started/main.c
+  examples/gap9/dsp/benchmarks/FFTL1/FFTRunTest.c
+  examples/gap9/dsp/benchmarks/Fir/Test.c
+  examples/gap9/isp/white_balance/wb.c
+  examples/gap9/libs/openmp/main.c
+  libs/gap_lib/g722_encoder_decoder/src/g722_encode.c
+  libs/gap_lib/img_io/ImgIO.c
+  nn_menu/object_detection/blaze_face/post_process.c
+  nn_menu/object_detection/yolox_people_detection/gap_functions/detection/postprocessing.c
+  rtos/sfu/SFU_RT.c
+  rtos/sfu/sfu_coeff_packer.c
+  rtos/sfu/sfu_pmsis_runtime.c
+  tools/audio-framework/lib/components/fft/gap9_cluster_fft/src/gap9_cluster_fft.c
+  tools/audio-framework/lib/components/fft/gap9_fc_fft/src/gap9_fc_fft.c
+  tools/audio-framework/lib/components/file_source/gap9_fc_file_source/src/gap9_fc_file_source.c
+  tools/audio-framework/lib/components/lms/gap9_cluster_lms/src/gap9_cluster_lms.c
+  tools/audio-framework/lib/components/pcm_source/gap9_fc_pcm_source/src/gap9_fc_pcm_source.c
+  tools/audio-framework/lib/components/tdm_source/gap9_fc_tdm_source/src/gap9_fc_tdm_source.c
+  tools/audio-framework/lib/framework/gap9_fc_framework/src/audio_framework.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/ComplexMathFunctions/CmplxFunctionsFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/DctLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/FftLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/RFFTTwiddlesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/SwapTablesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/LUT_Tables/TwiddlesDef.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/TransformFunctions/MfccLibraryf32.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingFix.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf16.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf16a.c
+  tools/autotiler_v3/BasicKernels/DSP_Libraries/WindowFunctions/PreProcessingf32.c
+  tools/autotiler_v3/BasicKernels/ISP_Libraries/ISP_BasicKernels.c

@@ -17,7 +17,7 @@ The owner of this port judges it by its output (tests, downstream programs, inst
 
 5. One task fixes one root cause (one error signature or one test group). You MUST NOT fix unrelated errors you notice; list them in your result file instead, because mixed changes cannot be reviewed or reverted independently.
 6. Every commit subject is `fixup! <exact subject of the cluster commit that owns the file>` (find it with `git log --format=%s <step-base>..HEAD`). This is what lets the stack collapse back to one commit per cluster at the end of the step.
-7. Every commit carries `Change-Note: <step>/<task-id>.md` and that file exists under `notes/` with the four sections of `templates/change-note.md`. The note is written for a reader who does not know LLVM.
+7. Every commit carries `Change-Note: <step>/<task-id>.md` and that file exists under `notes/` with the four sections of `templates/change-note.md`. The note is written for a reader who does not know LLVM. Put ALL trailers (Change-Note, Test-Regen, Upstream-File-Edit, Task, Co-Authored-By) together in ONE final paragraph with no blank line between them: `git interpret-trailers`, which policy_check uses, only reads the last paragraph, so a trailer above a blank line is reported missing.
 8. You MUST cite the upstream commit (hash and subject) that caused the break, found with `git log -S`, `git log -G` or `git log --follow` in the main clone. "Probably renamed" without a hash is not an explanation.
 
 ## No cheating the oracle

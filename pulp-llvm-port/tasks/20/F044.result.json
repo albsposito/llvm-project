@@ -1,0 +1,24 @@
+{
+  "status": "done",
+  "branch": "work/20/F044",
+  "integration_head": "de8abd20c921",
+  "commits": ["5877dc894f5f"],
+  "note": "notes/20/F044.md",
+  "signature_gone": true,
+  "fix": "RISCVTargetLowering::getRegForInlineAsmConstraint, case 'r': a fixed-length 32-bit vector with Xpulpv2 on RV32 maps to GPRNoX0 (generic SelectionDAGBuilder code bitcasts it to i32); everything else keeps upstream 0a35211b3488's rejection. One file, codegen-core, already fork-touched.",
+  "cause": "pre-existing fork gap; rejection from upstream 0a35211b3488 '[RISCV] Don't allow vector types to be used with inline asm 'r' constraint' (LLVM 15); same code in pulp/integer_SIMD_fix and still a TODO at llvmorg-22.1.7",
+  "verification": {
+    "reproducer": "inline-asm-simd-r-operand.c: 4 errors before (int-20), compiles now with rv32imc_xgap9 -O2; asm identical to GAP9 GCC (vfcvt.h.x a0,a0 / vfcvt.x.h a0,a0 / vfcvt.ah.x a0,a0 / mv a0,a0)",
+    "extra_shapes": "v4s->v4u, +r, matching '0', v2h from memory, v2h/v2ah results used afterwards: compile at O0/O2, same register use as GCC (logs/20-F044-evidence/t2.c)",
+    "gvsoc": "SDK vfcvt_* macro text + pv.add.b on v4s, 16 pairs: clang rv32imc_xgap9 O0/O2/O3/Os == GAP9 GCC O2 == host gcc -O0 reference, 80 values, hash 0x07965336 (logs/20-F044-evidence/)",
+    "sdk_files": "mode P strict: both still fail only on missing fp builtins (F036/F041/F042), same error list before/after -> 0 newly compiling files yet. Q probe + lenient: CNN_Copy.c 6 'couldn't allocate output register' errors -> compiles; CNN_Pooling_SQ8.c (with f16max/min(2) elementwise shim as in the M2a manual probe) 8 errors -> compiles. No new failure bucket. Script: logs/20-F044-evidence/probe.py (reads the M2a work dir, writes nothing tracked).",
+    "gap9_sweep": "scratch copy, base=int-20 clang vs mine: 54/54 objects byte-identical (O2+O3)",
+    "hwloop_fuzz": "not run: change only affects inline asm with a 32-bit vector 'r' operand; sweep byte-identical",
+    "lit": "llvm/test/CodeGen/RISCV, llvm/test/MC/RISCV, clang/test/CodeGen/RISCV, clang/test/Sema, clang/test/Driver/riscv-arch.c, clang/test/Preprocessor/riscv-nofdiv.c, clang/test/Misc/target-invalid-cpu-note: 5837 tests, 5710 pass, 126 unsupported, 1 fail = CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir (known failure B41, fails in steps/20/lit-land baseline too)",
+    "policy_check": "0 fail, 0 warn"
+  },
+  "other_errors_seen": [],
+  "unmapped_files": [],
+  "upstream_file_edit": false,
+  "proposed_test": "llvm/test/CodeGen/RISCV/xpulp-inline-asm-vector-r.ll (new): llc -mtriple=riscv32 -mattr=+xpulpv (and +xgap9): asm '=r,r' with <2 x i16>, <4 x i8>, <2 x half>, <2 x bfloat> operands and results; CHECK the asm uses a0 in and out with no spill, plus a '+r' <2 x i16> case. RUN without +xpulpv: CHECK error couldn't allocate input reg for constraint 'r' (keeps upstream's rejection off-PULP). Also a clang/test/CodeGen/RISCV test of the SDK macro form vfcvt_h_x with -march=rv32imc_xgap9 -S."
+}

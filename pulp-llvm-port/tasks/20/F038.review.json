@@ -1,0 +1,31 @@
+{
+  "task": "20/F038",
+  "branch": "work/20/F038",
+  "reviewed_head": "c0de24dbb78fca3d375e9258dba123ed9038b076",
+  "base": "de8abd20c921776adcc8edae3ea351ae1412b440",
+  "verdict": "APPROVE",
+  "reasons": [],
+  "warnings_checked": [
+    "scripts/policy_check.py --range de8abd20c921..work/20/F038 --stack-base llvmorg-20.1.8 (run by the reviewer): 4 commits, 0 FAIL, 0 WARN. No WARN to examine (logs/20-F038-review/policy.json)."
+  ],
+  "checks": {
+    "build": "Worktree clean at c0de24dbb78f; scripts/build.sh on build/20-F038 for clang llc llvm-mc llvm-objdump FileCheck llvm-tblgen: 'no work to do' (the build matches the committed head).",
+    "diff": "Read with git show for all 4 commits. 99 added lines and nothing removed: RISCVInstrInfoXpulp.td +67 (a block at the end of the file, away from LOOPsetup), RISCVDisassembler.cpp +2, IntrinsicsRISCVXpulp.td +13, BuiltinsRISCVXpulp.td +17. No fork logic removed, no early returns or stubs, no tests touched. Each fixup targets the cluster that owns the file.",
+    "encodings": "Reviewer's own test, logs/20-F038-review/mine.s: 135 lines covering all 19 mnemonics with random rd/rs1/rs2 over x0..x31, plus x31,x0,x17. GAP9 GNU as -march=rv32imcxgap9 and llvm-mc -mattr=+xgap give the same 540 bytes. llvm-objdump output reassembles to the same bytes. Every def's funct7/funct3/opcode, and rs2=00000 for pv.cplxconj.h, matches gvsoc2 gap9_isa.py:75-98. GNU objdump shows older alias names (pv.cplxmul.s*) for some of the same bytes, which is cosmetic.",
+    "semantics_gvsoc": "logs/20-F038-review/rv.c. The host reference is copied from gvsoc2 isa_lib/int.h (lib_CPLXMUL_H_R/I with the old-rd merge, lib_CPLX_CONJ_16, lib_VEC_ADD_16_ROTMJ[_DIVn], VEC_OP_DIV2/4/8 with the int16 wrap before the shift); it is not the worker's spec-text reference. (a) Raw inline-asm tests of all 19 instructions, including the div8 and subrotmj.divN forms that no builtin uses, with rd preset to a random value so the .r/.i read-modify-write is checked: 20 edge half-words (0, +-1..3, 0x7fff, 0x8000, 0x7ffe, 0x8001, +-0x4000, 0x3fff, 0xbfff, 7, -7, 0x5a82, 0xa57e, 0x1234) give 20^3*7 = 56000 (a,b) pairs, plus 5000 random pairs. (b) Inlined builtins in loops: chained products, cplxmuls2(a,a), cplxmuls2div4(b,conj(b)), an FFT-butterfly block with 8 products live at once, 40 reps x 64 elements, random and edge inputs. On GVSoC ri5ky_testbench, clang -O0/-O1/-O2/-O3/-Os and GAP9 GCC -O2 -mnohwloop all equal the host reference on every hash (27 of 27). Sensitivity check: mutating the reference's .r half-merge changes 12 hashes. In the -O3 kern code, all 18 .r/.i pairs use the same rd, which differs from both sources.",
+    "gating": "Assembler: all 135 lines rejected with 'requires Xgap9' when +xpulpv lacks xgap. Disassembler: 135 of 135 are <unknown> without xgap. ISel: each of the 10 intrinsics gives 'Cannot select' under llc -mattr=+m,+xpulpv. Builtins: each of the 10 gives \"needs target feature xgap\" for rv32imc, rv32imc_xpulpv2 and rv32imc_zfinx_xpulpv2 (diagnosed in CodeGen, as for the fork's other feature-gated builtins, so -fsyntax-only does not report it). Prototype diagnostics (int argument, extra argument) match GAP9 GCC.",
+    "decoder_ambiguity": "logs/20-F038-review/opv.s: every OP-V funct7 x funct3 (1024) x 4 register patterns = 4096 words. With the full GAP9 set (zfinx,zhinx,xpulpf16alt,xpulpfvec,xpulpv), adding xgap decodes exactly 73 new words (18 R-type x 4 patterns + cplxconj with rs2=0) and changes 0 previously decoded words. So the Xgap9 table, placed before RV32Xpulp and after Xpulpfloat, shadows nothing and is shadowed by nothing. With every Snitch smallfloat feature plus xfrep/xssr/xdma, the OP-V space is fully undecoded and adding xgap changes 0 known words, so there is no overlap with the default (Snitch) table.",
+    "rebase": "git diff de8abd20c921 HEAD contains additions only (4 files, +99/-0). F040's Xpulpfloat TRY_TO_DECODE block and F019's __builtin_shuffle block are unchanged, and the new lines sit next to them.",
+    "fft_sdk": "FftLibraryFix.c with the survey's xgap9 and pe8 flags (compile_db args, run.py llvm_flags): int-20 gives 53 errors (unknown builtins), F038 gives 0. -verify-machineinstrs is clean at -O0/-O2/-O3. The object contains every family (pv.add.h.div2/4, pv.sub.h.div2, pv.subrotmj.h, pv.cplxconj.h, pv.cplxmul.h.r/i plain/div2/div4) and 0 <unknown>.",
+    "gap9_sweep": "Scratch copy, GAP9_EXTRA_COMPILERS base=build/int-20 (de8abd20c921), mine=build/20-F038: 54 of 54 disassemblies identical.",
+    "lit": "scripts/wlit.sh over llvm/test/MC/RISCV, llvm/test/MC/Disassembler/RISCV, llvm/test/CodeGen/RISCV, clang/test/CodeGen/RISCV and clang/test/Sema: 5826 tests, 5699 passed, 126 unsupported, 1 failed: CodeGen/RISCV/rvv/vsetvli-insert-zve64f.mir, which is in data/known-failures.txt (owner-approved).",
+    "upstream_reference": "No upstream regression; this adds a feature the fork never had, so there is no in-range commit to cite, and the note cites the fork commit f1b7aebff8c2 (verified) as the wave-4 rules allow. The reference pattern is 3c0604b224e3 '[RISCV] Add support for XCVsimd extension in CV32E40P' (verified, before llvmorg-19.1.7). At llvmorg-20.1.8, RISCVInstrInfoXCV.td:467-491 (CV_CPLXMUL_R/I[_DIVn], CV_CPLXCONJ, CV_SUBROTMJ*, CV_ADD/SUB_DIVn) and :311 (CVSIMDRRWb, Constraints $rd = $rd_wb) are as the note says. Pulp_ALU_rr_wb has the same tied constraint, and the per-feature TRY_TO_DECODE_FEATURE follows RISCVDisassembler.cpp:700. Gated on HasVendorXgap9 per owner decision D5.",
+    "note": "All four sections are present. 'What breaks' names observable symptoms: GVSoC hash mismatch, illegal instruction on PULPv2, 'cannot select'."
+  },
+  "non_blocking_observations": [
+    "No lit coverage yet; the worker's three proposed tests (MC round trip with GAS encodings plus a no-xgap negative, a clang builtin-to-intrinsic test with a missing-feature negative, and an llc .r/.i pair test) should be added by a test-regen/test-add task.",
+    "The missing-feature error for these builtins comes from CodeGen, not Sema, so -fsyntax-only accepts them without xgap9. This matches the fork's existing builtins, not a defect of this change.",
+    "Missed optimization already reported by the worker: GCC folds add2div4(-a,b) into pv.sub.h.div4."
+  ],
+  "reviewer_artifacts": "logs/20-F038-review/"
+}

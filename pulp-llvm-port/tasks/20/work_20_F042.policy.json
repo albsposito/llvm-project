@@ -1,0 +1,14 @@
+{
+  "range": "4b76df2c70d04c8a3c49564ceebd8320baff80b9..work/20/F042",
+  "commits": 3,
+  "fail": 0,
+  "warn": 1,
+  "findings": [
+    {
+      "commit": "f2d080c081fd",
+      "level": "WARN",
+      "rule": "commented-code",
+      "msg": "adds what looks like commented-out code in llvm/include/llvm/IR/IntrinsicsRISCVXpulp.td: // packed pairs (v2h, v2ah) as their 32 bits (i32, lane 0 in bits 15:0);"
+    }
+  ]
+}

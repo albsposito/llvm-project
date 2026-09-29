@@ -228,3 +228,31 @@ Reproduce:
 ```
 python3 run.py --work DIR --phases snapshot,gcc,gccsdk,strict,sdkflags,sdknowerror,parity
 ```
+
+### 2026-09-29 update: the current compiler, `-mPE=8`, fresh work dir
+
+- **Compiler:** a snapshot of `build/int-20` clang with `lib/clang`, `de8abd20c921`, the same compiler as the M2a checkpoint (it includes F016, F018 and F019).
+- **Harness changes:**
+  - `sdkflags` and `sdknowerror` now pass the SDK's `-mPE=8`, which clang now accepts (F018 folds `CoreCount()` as GCC does). `-mFC` is still dropped: clang has no equivalent.
+  - The M2a modes `pe8`, `xgap9`, their `*lenient` variants and `pe8abs*` are folded into `run.py`, so the checkpoint can be reproduced with the tracked script.
+  - `parity` also runs `nm -u` on every ok object and rejects a file whose object has an undefined `__builtin_*`. Some SDK headers, such as `FastFloatApprox16.h`, silence `-Wimplicit-function-declaration` with a pragma, so an unknown builtin can compile without any message.
+  - The wrapper applies the same check to every `-c` compile.
+- **Run from an empty `--work`** with `--phases snapshot,gcc,gccsdk,strict,pe8,sdkflags,sdknowerror,parity`: configure and db ran by themselves, and the whole run took 6.5 min at `-j12`.
+
+| mode | flags | compared with | ok | parity |
+|---|---|---|---|---|
+| strict | clang defaults + macro shim, xpulpv2 | GCC, no `-Werror` (617) | 477 | 77.3% |
+| pe8 | `-march=rv32imc_xgap9 -mPE=8`, no shim, clang defaults | GCC, no `-Werror` (617) | 520 | 84.3% |
+| sdknowerror | pe8 + SDK `-W` flags without `-Werror` + policy | GCC, no `-Werror` (617) | 527 | 85.4% |
+| sdkflags | pe8 + SDK `-W` flags with `-Werror` + policy | GCC with the SDK's `-Werror` (609) | 515 | 84.6% |
+
+- **sdknowerror is pe8 plus exactly the 7 implicit-declaration files** from the M2a report: `pi_malloc` ×3, `strtol`, `bsp_virtual_eeprom_conf_init`, `SDIO_TRACE`, `TIMESTAMP_TRACE_ERR`. Nothing else changes.
+  - This mode is like for like with the survey's GCC reference, which also compiles without `-Werror`.
+  - With the SDK's own `-Werror`, GCC 7 rejects the same 7 files, so there they are SDK bugs, not clang gaps.
+- **sdkflags is pe8 minus 5 files, on GCC's 609:**
+  - uninitialized uses in `read_fs.c:184`, `pi_lfs.c:147/156`, `ota.c:271` and `updater.c:56`, which GCC 7 misses;
+  - `malloc_internal.c` (`%lX` on a `uint32_t`, because `int32_t` is `int` in clang).
+
+  All 5 are deliberate.
+- **App check:** `examples/gap9/basic/helloworld` builds and links with the SDK's `-Werror`, **without the compat header** and with native `-mPE=8`. The wrapper setting is `GAP_CLANG_MARCH=rv32imc_xgap9`, variant `clang-gnuas-gnuld`. Without the policy it stops at `fll.c`.
+
