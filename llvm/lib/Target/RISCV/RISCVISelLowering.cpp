@@ -9929,6 +9929,31 @@ SDValue RISCVTargetLowering::LowerINTRINSIC_WO_CHAIN(SDValue Op,
         IntNo == Intrinsic::riscv_clmulh ? RISCVISD::CLMULH : RISCVISD::CLMULR;
     return DAG.getNode(Opc, DL, XLenVT, Op.getOperand(1), Op.getOperand(2));
   }
+  // GAP9 f32 scalar builtins (__builtin_pulp_f32max, ...): each one is a
+  // single F/Zfinx instruction, so lower to the node that selects it.
+  // fmax.s/fmin.s are exactly IEEE 754-2019 maximumNumber/minimumNumber.
+  case Intrinsic::riscv_pulp_f32max:
+    return DAG.getNode(ISD::FMAXIMUMNUM, DL, Op.getValueType(),
+                       Op.getOperand(1), Op.getOperand(2));
+  case Intrinsic::riscv_pulp_f32min:
+    return DAG.getNode(ISD::FMINIMUMNUM, DL, Op.getValueType(),
+                       Op.getOperand(1), Op.getOperand(2));
+  case Intrinsic::riscv_pulp_f32abs:
+    return DAG.getNode(ISD::FABS, DL, Op.getValueType(), Op.getOperand(1));
+  case Intrinsic::riscv_pulp_f32sqrt:
+    return DAG.getNode(ISD::FSQRT, DL, Op.getValueType(), Op.getOperand(1));
+  // fcvt.w.s with a fixed rounding mode; saturates like the instruction
+  // (NaN gives INT_MAX), which fp_to_sint of round/floor/ceil does not.
+  case Intrinsic::riscv_pulp_rintsf2:
+  case Intrinsic::riscv_pulp_rdownsf2:
+  case Intrinsic::riscv_pulp_rupsf2: {
+    RISCVFPRndMode::RoundingMode RM =
+        IntNo == Intrinsic::riscv_pulp_rintsf2    ? RISCVFPRndMode::RMM
+        : IntNo == Intrinsic::riscv_pulp_rdownsf2 ? RISCVFPRndMode::RDN
+                                                  : RISCVFPRndMode::RUP;
+    return DAG.getNode(RISCVISD::FCVT_X, DL, XLenVT, Op.getOperand(1),
+                       DAG.getTargetConstant(RM, DL, XLenVT));
+  }
   case Intrinsic::experimental_get_vector_length:
     return lowerGetVectorLength(Op.getNode(), DAG, Subtarget);
   case Intrinsic::experimental_cttz_elts:
