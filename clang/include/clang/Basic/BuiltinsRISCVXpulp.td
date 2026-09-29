@@ -284,3 +284,17 @@ def pulp_rintsf2 : PULPBuiltin<"int(float)", "xpulpv,(f|zfinx)">;
 def pulp_rdownsf2 : PULPBuiltin<"int(float)", "xpulpv,(f|zfinx)">;
 def pulp_rupsf2 : PULPBuiltin<"int(float)", "xpulpv,(f|zfinx)">;
 } // Attributes = [NoThrow, Const]
+
+//===----------------------------------------------------------------------===//
+// GAP9 half-precision absolute value (task 20/F041). Prototypes are GAP9
+// GCC's: float16 is _Float16 (IEEE half), float16alt is __bf16 (bfloat16),
+// v2h / v2ah are GCC vectors of two of them in one 32-bit register. Each one
+// clears the sign bit of every lane and nothing else (GCC: fabs.h, fabs.ah,
+// vfabs.h, vfabs.ah). Lowered in CGBuiltin.cpp (EmitRISCVBuiltinExpr).
+//===----------------------------------------------------------------------===//
+let Attributes = [NoThrow, Const] in {
+def pulp_f16abs : PULPBuiltin<"_Float16(_Float16)", "xpulpv,(zhinx|zfh)">;
+def pulp_f16altabs : PULPBuiltin<"__bf16(__bf16)", "xpulpv,xpulpf16alt">;
+def pulp_f16abs2 : PULPBuiltin<"_Vector<2, _Float16>(_Vector<2, _Float16>)", "xpulpfvec,zhinx">;
+def pulp_f16altabs2 : PULPBuiltin<"_Vector<2, __bf16>(_Vector<2, __bf16>)", "xpulpfvec,xpulpf16alt">;
+} // Attributes = [NoThrow, Const]
