@@ -327,3 +327,32 @@ def pulp_mul64hus : PULPBuiltin<"int(int, int)", "xpulpv,m">;
 def pulp_trunch : PULPBuiltin<"short(int)", "xpulpv">;
 def pulp_truncb : PULPBuiltin<"char(int)", "xpulpv">;
 } // Attributes = [NoThrow, Const]
+
+//===----------------------------------------------------------------------===//
+// GAP9 half-precision builtins (task 20/F042, backlog B97 batches D/E1-E3).
+// Prototypes are GAP9 GCC's: float16 = _Float16 (IEEE binary16), float16alt =
+// __bf16 (bfloat16), v2h / v2ah = 2 x _Float16 / 2 x __bf16 in one 32-bit
+// register. GCC emits one GAP9 instruction for each:
+//  - f16max/f16min/f16altmax/f16altmin and the packed *2 forms: fmax/fmin.h,
+//    .ah, vfmax/vfmin.h, .ah: IEEE 754-2019 maximumNumber/minimumNumber per
+//    lane (a NaN operand yields the other operand, -0.0 < +0.0)
+//  - f16sqrt/f16altsqrt: fsqrt.h/fsqrt.ah (dynamic rounding mode)
+//  - v2hftov2ohf/v2ohftov2hf: vfcvt.ah.h/vfcvt.h.ah (per-lane conversion
+//    between the two formats, dynamic rounding mode)
+// Each maps to a ClangBuiltin intrinsic (IntrinsicsRISCVXpulp.td), lowered in
+// RISCVISelLowering.cpp to the same operation on f16 (Zhinx) or f32 (Zfinx).
+//===----------------------------------------------------------------------===//
+let Attributes = [NoThrow, Const] in {
+def pulp_f16max : PULPBuiltin<"_Float16(_Float16, _Float16)", "xpulpv,(zhinx|zfh)">;
+def pulp_f16min : PULPBuiltin<"_Float16(_Float16, _Float16)", "xpulpv,(zhinx|zfh)">;
+def pulp_f16sqrt : PULPBuiltin<"_Float16(_Float16)", "xpulpv,(zhinx|zfh)">;
+def pulp_f16altmax : PULPBuiltin<"__bf16(__bf16, __bf16)", "xpulpf16alt">;
+def pulp_f16altmin : PULPBuiltin<"__bf16(__bf16, __bf16)", "xpulpf16alt">;
+def pulp_f16altsqrt : PULPBuiltin<"__bf16(__bf16)", "xpulpf16alt">;
+def pulp_f16max2 : PULPBuiltin<"_Vector<2, _Float16>(_Vector<2, _Float16>, _Vector<2, _Float16>)", "xpulpfvec,zhinx">;
+def pulp_f16min2 : PULPBuiltin<"_Vector<2, _Float16>(_Vector<2, _Float16>, _Vector<2, _Float16>)", "xpulpfvec,zhinx">;
+def pulp_f16altmax2 : PULPBuiltin<"_Vector<2, __bf16>(_Vector<2, __bf16>, _Vector<2, __bf16>)", "xpulpfvec,xpulpf16alt">;
+def pulp_f16altmin2 : PULPBuiltin<"_Vector<2, __bf16>(_Vector<2, __bf16>, _Vector<2, __bf16>)", "xpulpfvec,xpulpf16alt">;
+def pulp_v2hftov2ohf : PULPBuiltin<"_Vector<2, __bf16>(_Vector<2, _Float16>)", "xpulpfvec,zhinx,xpulpf16alt">;
+def pulp_v2ohftov2hf : PULPBuiltin<"_Vector<2, _Float16>(_Vector<2, __bf16>)", "xpulpfvec,zhinx,xpulpf16alt">;
+} // Attributes = [NoThrow, Const]
