@@ -664,6 +664,9 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
     setOperationAction(ISD::CTPOP, XLenVT, Legal);
     setOperationAction(ISD::ROTR, XLenVT, Legal);
     setOperationAction(ISD::INTRINSIC_W_CHAIN, MVT::i1, Custom);
+    // __builtin_pulp_trunch/truncb (20/F037) return short/char: their i16/i8
+    // intrinsic results are legalized in ReplaceNodeResults.
+    setOperationAction(ISD::INTRINSIC_WO_CHAIN, {MVT::i8, MVT::i16}, Custom);
 
 
     for (auto VT : {MVT::v2i16, MVT::v4i8}){
@@ -13725,6 +13728,12 @@ void RISCVTargetLowering::ReplaceNodeResults(SDNode *N,
           DAG.getNode(ISD::TRUNCATE, DL, N->getValueType(0), Res));
       return;
     }
+    case Intrinsic::riscv_pulp_trunch:
+    case Intrinsic::riscv_pulp_truncb:
+      // (short)x / (char)x: a plain truncate of the i32 operand (task 20/F037).
+      Results.push_back(
+          DAG.getNode(ISD::TRUNCATE, DL, N->getValueType(0), N->getOperand(1)));
+      return;
     case Intrinsic::riscv_orc_b:
     case Intrinsic::riscv_brev8:
     case Intrinsic::riscv_sha256sig0:
