@@ -23,7 +23,7 @@
                   "^lld/"]},
     {"name": "clang-builtins", "subject": "[pulp] clang-builtins: RISC-V builtins and their Sema checks",
      "patterns": ["^clang/include/clang/Basic/BuiltinsRISCV[A-Za-z]*\\.(def|td)$", "^clang/include/clang/Basic/DiagnosticSemaKinds\\.td$",
-                  "^clang/lib/Sema/Sema(Checking|RISCV)\\.cpp$", "^clang/lib/CodeGen/CGBuiltin\\.cpp$"]},
+                  "^clang/lib/Sema/Sema(Checking|RISCV)\\.cpp$", "^clang/lib/CodeGen/CGBuiltin\\.cpp$", "^clang/lib/AST/ExprConstant\\.cpp$", "^clang/include/clang/Basic/TargetOptions\\.h$"]},
     {"name": "clang-frep-pragma", "subject": "[pulp] clang-frep-pragma: #pragma frep parsing, attribute, codegen",
      "patterns": ["^clang/include/clang/Basic/(Attr|AttrDocs)\\.td$", "^clang/include/clang/Basic/TokenKinds\\.def$",
                   "^clang/include/clang/Parse/", "^clang/lib/Parse/", "^clang/lib/Sema/SemaStmtAttr\\.cpp$",
