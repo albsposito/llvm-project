@@ -214,6 +214,30 @@ let TargetPrefix = "riscv" in {
                              [IntrNoMem, ImmArg<ArgIndex<1>>, ImmArg<ArgIndex<2>>]>;
   defm clipu_r : PulpBinary32;
 
+  // Task 20/F043: GAP9 GCC accepts an immediate of the mul/mac N/RN and
+  // clip/clipu builtins that becomes constant only after optimisation (a
+  // local variable, a parameter of an inlined function). Clang emits these
+  // variants, with the same operands but no ImmArg, when such an argument is
+  // not an integer constant expression. Instruction selection
+  // (RISCVISelLowering) turns them into the intrinsics above once the operand
+  // is a valid constant, and reports an error otherwise, as GCC does. They
+  // have no ClangBuiltin: clang/lib/CodeGen/CGBuiltin.cpp picks them.
+  multiclass PulpDeferredImm<list<LLVMType> param_types> {
+    def int_riscv_pulp_ #NAME #_deferred
+        : Intrinsic<[llvm_i32_ty], param_types, [IntrNoMem]>;
+  }
+  foreach op = ["s", "u", "hhs", "hhu"] in {
+    defm mul #op #N : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty]>;
+    defm mul #op #RN : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty,
+                                        llvm_i32_ty]>;
+    defm mac #op #N : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty,
+                                       llvm_i32_ty]>;
+    defm mac #op #RN : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty,
+                                        llvm_i32_ty, llvm_i32_ty]>;
+  }
+  defm clip : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty]>;
+  defm clipu : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty]>;
+
   // PULP Memory Intrinsics
 
   multiclass PulpReadMemIntrinsic
