@@ -311,4 +311,17 @@ let TargetPrefix = "riscv" in {
       Intrinsic<[llvm_i32_ty],
                 [llvm_i32_ty, llvm_i32_ty, llvm_i32_ty, llvm_i32_ty],
                 [IntrNoMem]>;
+
+  // GAP9 complex / divide-by-N builtins (task 20/F038). Selected only with
+  // the GAP9 extension (xgap9), see RISCVInstrInfoXpulp.td.
+  defm add2div2 : PulpBinaryV2;
+  defm add2div4 : PulpBinaryV2;
+  defm sub2div2 : PulpBinaryV2;
+  defm sub2div4 : PulpBinaryV2;
+  defm sub2rotmj : PulpBinaryV2;
+  defm cplx_conj : PulpUnaryV2;
+  defm cplxmuls2 : PulpBinaryV2;
+  defm cplxmuls2div2 : PulpBinaryV2;
+  defm cplxmuls2div4 : PulpBinaryV2;
+  defm cplxmuls2div8 : PulpBinaryV2;
 }
