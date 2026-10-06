@@ -1,0 +1,103 @@
+# Test 8 (B151): disassembly of prebuilt/board/t8_vfmre_sign_b151.elf (GAP9 GCC 7.1.1, main.c at -O2),
+# riscv32-unknown-elf-objdump -d. It shows (1) what GAP9 GCC emits for the packed C expressions and
+# (2) the probes: the fixed word (t8_w_*) and the assembled mnemonic (t8_m_*) are the same instruction,
+# and it is the instruction GCC emits for a*b - c, with other registers:
+#   GCC, c_msub_h (a*b - c):  92b52633  vfmre.h a2,a0,a1    probe: 92c5a533  vfmre.h a0,a1,a2
+#   both & 0xfe00707f (funct7, funct3, opcode) = 0x92002033
+
+1c0115f4 <c_msub_h>:
+1c0115f4:	92b52633          	vfmre.h	a2,a0,a1
+1c0115f8:	8532                	mv	a0,a2
+1c0115fa:	8082                	ret
+
+1c0115fc <c_nmsub_h>:
+1c0115fc:	9ca52533          	vfsgnjn.h	a0,a0,a0
+1c011600:	90b52633          	vfmac.h	a2,a0,a1
+1c011604:	8532                	mv	a0,a2
+1c011606:	8082                	ret
+
+1c011c2a <c_madd_h>:
+1c011c2a:	90b52633          	vfmac.h	a2,a0,a1
+1c011c2e:	8532                	mv	a0,a2
+1c011c30:	8082                	ret
+
+1c011608 <c_msub_a>:
+1c011608:	92b51633          	vfmre.ah	a2,a0,a1
+1c01160c:	8532                	mv	a0,a2
+1c01160e:	8082                	ret
+
+1c011610 <c_nmsub_a>:
+1c011610:	9ca51533          	vfsgnjn.ah	a0,a0,a0
+1c011614:	90b51633          	vfmac.ah	a2,a0,a1
+1c011618:	8532                	mv	a0,a2
+1c01161a:	8082                	ret
+
+1c011c68 <c_madd_a>:
+1c011c68:	90b51633          	vfmac.ah	a2,a0,a1
+1c011c6c:	8532                	mv	a0,a2
+1c011c6e:	8082                	ret
+
+1c011574 <t8_w_vfmre_h>:
+1c011574:	92c5a533          	vfmre.h	a0,a1,a2
+1c011578:	00008067          	ret
+
+1c01157c <t8_m_vfmre_h>:
+1c01157c:	92c5a533          	vfmre.h	a0,a1,a2
+1c011580:	00008067          	ret
+
+1c011584 <t8_w_vfmac_h>:
+1c011584:	90c5a533          	vfmac.h	a0,a1,a2
+1c011588:	00008067          	ret
+
+1c01158c <t8_m_vfmac_h>:
+1c01158c:	90c5a533          	vfmac.h	a0,a1,a2
+1c011590:	00008067          	ret
+
+1c011594 <t8_w_vfmre_ah>:
+1c011594:	92c59533          	vfmre.ah	a0,a1,a2
+1c011598:	00008067          	ret
+
+1c01159c <t8_m_vfmre_ah>:
+1c01159c:	92c59533          	vfmre.ah	a0,a1,a2
+1c0115a0:	00008067          	ret
+
+1c0115a4 <t8_w_vfmac_ah>:
+1c0115a4:	90c59533          	vfmac.ah	a0,a1,a2
+1c0115a8:	00008067          	ret
+
+1c0115ac <t8_m_vfmac_ah>:
+1c0115ac:	90c59533          	vfmac.ah	a0,a1,a2
+1c0115b0:	00008067          	ret
+
+1c0115b4 <t8_w_vfmre_r_h>:
+1c0115b4:	92c5e533          	vfmre.r.h	a0,a1,a2
+1c0115b8:	00008067          	ret
+
+1c0115bc <t8_m_vfmre_r_h>:
+1c0115bc:	92c5e533          	vfmre.r.h	a0,a1,a2
+1c0115c0:	00008067          	ret
+
+1c0115c4 <t8_w_vfmac_r_h>:
+1c0115c4:	90c5e533          	vfmac.r.h	a0,a1,a2
+1c0115c8:	00008067          	ret
+
+1c0115cc <t8_m_vfmac_r_h>:
+1c0115cc:	90c5e533          	vfmac.r.h	a0,a1,a2
+1c0115d0:	00008067          	ret
+
+1c0115d4 <t8_w_vfmre_r_ah>:
+1c0115d4:	92c5d533          	vfmre.r.ah	a0,a1,a2
+1c0115d8:	00008067          	ret
+
+1c0115dc <t8_m_vfmre_r_ah>:
+1c0115dc:	92c5d533          	vfmre.r.ah	a0,a1,a2
+1c0115e0:	00008067          	ret
+
+1c0115e4 <t8_w_vfmac_r_ah>:
+1c0115e4:	90c5d533          	vfmac.r.ah	a0,a1,a2
+1c0115e8:	00008067          	ret
+
+1c0115ec <t8_m_vfmac_r_ah>:
+1c0115ec:	90c5d533          	vfmac.r.ah	a0,a1,a2
+1c0115f0:	00008067          	ret
+

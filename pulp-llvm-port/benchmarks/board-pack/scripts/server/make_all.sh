@@ -19,8 +19,9 @@ put() {  # put <elf> <name>: copy to prebuilt/board/<name>.elf and run it on GVS
   bash "$RUN" "$PB/board/$2.elf" 900 > "$SR/$2.log" 2>&1
   ok "$2: sim exit $? ($(grep -c '^CHECK.*PASS' "$SR/$2.log") PASS, $(grep -c '^CHECK.*FAIL' "$SR/$2.log") FAIL)"
 }
-# tests 1-5 (GAP9 GCC only)
-for t in t1_b101_gcc_hwloop t2_hwloop_align_b68 t3_fp16_vcmp_lanes_b99 t4_shuffle_sci_h_b114 t5_shuffle2_order_b113; do
+# tests 1-5 and 8 (GAP9 GCC only)
+for t in t1_b101_gcc_hwloop t2_hwloop_align_b68 t3_fp16_vcmp_lanes_b99 t4_shuffle_sci_h_b114 t5_shuffle2_order_b113 \
+         t8_vfmre_sign_b151; do
   "$PACK/scripts/build.sh" "$PACK/$t" board "$OUT/$t" > "$OUT/$t.build.log" 2>&1 || { ok "$t BUILD FAILED"; continue; }
   put "$OUT/$t/$t" "$t"
 done

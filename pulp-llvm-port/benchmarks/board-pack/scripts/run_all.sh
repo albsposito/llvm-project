@@ -20,12 +20,13 @@ have_clang=0
 echo "[board-pack] mode=$MODE platform=$PLATFORM clang=$([ $have_clang = 1 ] && echo "$GAP_CLANG_ROOT" || echo 'none (prebuilt clang ELFs are used)')"
 
 if [ "$MODE" = source ] || [ "$MODE" = both ]; then
-  # Tests 1-5: GAP9 GCC only. Test 2 last: if misaligned hardware loops hang the core, the other
+  # Tests 1-5 and 8: GAP9 GCC only. Test 2 last: if misaligned hardware loops hang the core, the other
   # results are already saved.
   pack_test t1_b101_gcc_hwloop     "$PACK/t1_b101_gcc_hwloop"
   pack_test t3_fp16_vcmp_lanes_b99 "$PACK/t3_fp16_vcmp_lanes_b99"
   pack_test t4_shuffle_sci_h_b114  "$PACK/t4_shuffle_sci_h_b114"
   pack_test t5_shuffle2_order_b113 "$PACK/t5_shuffle2_order_b113"
+  pack_test t8_vfmre_sign_b151    "$PACK/t8_vfmre_sign_b151"
   pack_test t2_hwloop_align_b68    "$PACK/t2_hwloop_align_b68"
   # Test 6: GCC libraries built here; clang libraries prebuilt (or rebuilt with GAP_CLANG_ROOT).
   pack_test t6_kernels.gcc-O2 "$PACK/t6_kernels_clang_vs_gcc" -DPACK_KERNELS=gcc-O2
@@ -48,7 +49,7 @@ if [ "$MODE" = source ] || [ "$MODE" = both ]; then
   done
 fi
 if [ "$MODE" = prebuilt ] || [ "$MODE" = both ]; then
-  for e in "$PB"/t1_*.elf "$PB"/t3_*.elf "$PB"/t4_*.elf "$PB"/t5_*.elf "$PB"/t6_*.elf "$PB"/t7_*.elf "$PB"/t2_*.elf; do
+  for e in "$PB"/t1_*.elf "$PB"/t3_*.elf "$PB"/t4_*.elf "$PB"/t5_*.elf "$PB"/t8_*.elf "$PB"/t6_*.elf "$PB"/t7_*.elf "$PB"/t2_*.elf; do
     pack_prebuilt "prebuilt.$(basename "$e" .elf)" "$e"
   done
 fi

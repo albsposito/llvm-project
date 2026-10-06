@@ -13,6 +13,9 @@ GAP9 GCC 7.1.1 and our clang `20.1.8 (albsposito/llvm-project 75b4639bf455)`, wh
 integration build `build/int-20` of that day. Every program was run on GVSoC2 `gap.gap9.evk`,
 and those outputs are in `sim-results/`.
 
+Test 8 (`t8_vfmre_sign_b151`) was added on 2026-10-06 with the same SDK and GAP9 GCC. Its
+prebuilt ELF and simulator log were made separately and the other 18 ELFs were not rebuilt.
+
 ## Quick start (what to run first)
 
 ```bash
@@ -35,7 +38,7 @@ scripts/run.sh t1_b101_gcc_hwloop
 #    the all-clang programs of test 7 run from the prebuilt ELFs instead of being rebuilt.
 tar -xJf toolchain/pulp-clang-20-75b4639bf455-linux-x86_64.tar.xz -C toolchain/
 
-# 5. everything (18 programs, 36 with "both"; a few minutes on the board)
+# 5. everything (19 programs, 38 with "both"; a few minutes on the board)
 scripts/run_all.sh              # builds from source with your SDK where possible (recommended)
 #   scripts/run_all.sh both     # ... and also runs every prebuilt ELF (useful if your SDK differs)
 
@@ -76,8 +79,13 @@ have no clang, and even there the all-GCC half is rebuilt.
 
 In every test, **`CHECK ... PASS` means "same value as on the simulator"**. A `FAIL` on the board
 is therefore the interesting outcome: silicon differs from GVSoC. The `VERDICT` lines say what
-the values mean. Only test 6 differs: its CHECKs compare checksums with the GAP9 GCC reference,
-so a FAIL there is a wrong result.
+the values mean. Two tests differ:
+- test 6: its CHECKs compare checksums with the GAP9 GCC reference, so a FAIL there is a wrong
+  result;
+- test 8: a CHECK passes when the probe ran and its result matched exactly one of the candidate
+  formulas. Its CHECKs pass whichever side is right, and the `VERDICT B151:` line carries the
+  finding. A difference from the simulator still shows up in the "difference to the simulator"
+  section of the results file.
 
 | test | question (backlog) | built by | simulator result (GVSoC2 gap.gap9.evk) |
 |---|---|---|---|
@@ -87,6 +95,7 @@ so a FAIL there is a wrong result.
 | t4_shuffle_sci_h_b114 | Which immediate bit selects lane 1 in `pv.shuffle.sci.h`: bit 1 (LLVM) or bit 4 (GCC)? (B114) | GAP9 GCC inline asm | bit 0 / bit 1, so LLVM is right; GCC's `__builtin_shuffle(v,{1,1})` gives {v1,v0} |
 | t5_shuffle2_order_b113 | In `pv.shuffle2.b/.h`, does a set selector bit pick `rs1` (manual, GCC) or `rD` (GVSoC)? (B113) | GAP9 GCC inline asm | `rD`: GVSoC swaps the sources; GCC's own two-vector shuffles come out wrong there |
 | t6_kernels_clang_vs_gcc | Our clang vs GAP9 GCC on 12 real kernels (FIR int16/f32, 3 MatMul, MatVect f32, complex mag, FFT, dot products, clip, copy loop): same checksums? cycles? | clang or GCC (kernels), GCC (app) | all 4 builds x 2 cores correct; clang/GCC cycle geomean FC 1.104 (-O2), 1.119 (-O3); cluster 1.007 / 1.033 |
+| t8_vfmre_sign_b151 | Does `vfmre.h` / `vfmre.ah` compute `rd - a*b` (GVSoC) or `a*b - rd` (what GAP9 GCC assumes when it emits it for packed `a*b - c`)? (B151) | GAP9 GCC (fixed instruction words + GCC C) | `rd - a*b` on FC and cluster, so GCC's packed `a*b - c` comes out negated; `vfmac` = `rd + a*b` |
 | t7_sdk_apps_clang | SDK helloworld and perf built **entirely with our clang** through the SDK CMake flow; cluster core count (B107) | clang (whole app + SDK runtime C code) or GCC | gcc and clang-ccfix: 8 cluster cores run; plain clang: **0 cores** (B107) |
 
 ### Test 1: GAP9 GCC hardware-loop bug (B101)
@@ -253,6 +262,65 @@ The simulator agrees with all of this:
 - gcc and clang-ccfix: 8 cores and the full helloworld output;
 - clang: `__builtin_pulp_CoreCount()=0 ... cores_that_ran=0`.
 
+### Test 8: sign of `vfmre.h` (B151)
+
+For the packed float16 expression `a*b - c`, GAP9 GCC emits `vfmre.h c, a, b`. GVSoC executes
+`vfmre.h rd, rs1, rs2` as `rd = rd - rs1*rs2`, the opposite sign. GCC's float16 and float16alt
+FFT is therefore wrong on the simulator, and only silicon can say which side has the bug.
+
+Part 1 runs the instruction itself, with no compiler code generation involved:
+- Each probe is a fixed 32-bit word with fixed registers (`vfmre.h a0, a1, a2` = `0x92c5a533`).
+  Next to it the same mnemonic is assembled by the toolchain, and the program checks at run
+  time that the two words are equal (`RESULT t8 encoding ...`).
+- The program also scans GCC's code for the C expression and prints the instruction found there
+  (`RESULT t8 compiled_code float16 a*b-c: vfmre.h=0x92b52633`). It is the probe's instruction
+  with other registers. `sim-results/t8_b151_disasm.txt` shows the same from the disassembly.
+- The inputs are small integers, exact in both formats and different per lane: rd={10,1},
+  a={2,3}, b={4,5}, then rd={4,-20}, a={-3,7}, b={5,2}. Each `RESULT ... out=` line prints the
+  raw result next to the candidate values, so the log is evidence on its own.
+- The result is matched against `rd - a*b`, `a*b - rd`, `rd + a*b` and `-(rd + a*b)`, each
+  with b per lane or with one lane of rs2 used for both lanes. The candidates are computed with
+  integer arithmetic.
+- Probed: `vfmre.h` and `vfmre.ah`, with `vfmac.h` and `vfmac.ah` as controls (expected
+  `rd + a*b`). The `.r` forms (`vfmre.r.h`, `vfmac.r.h`, `.r.ah`) are extra controls and run
+  last, after the verdict is printed.
+
+Part 2 compiles packed `a*b - c`, `c - a*b` and `a*b + c` with the compiler that builds the
+test, and compares each with the same expression done lane by lane in scalar arithmetic
+(`MATCH` / `MISMATCH`).
+
+How to run it and read it:
+
+```bash
+scripts/run.sh t8_vfmre_sign_b151        # about 1 minute; output in results/t8_vfmre_sign_b151.log
+grep '^VERDICT B151' results/t8_vfmre_sign_b151.log
+```
+
+The last `VERDICT B151:` line is the answer. It needs both cores to agree, `vfmre.ah` to agree
+with `vfmre.h`, and both `vfmac` controls to give `rd + a*b`:
+- `VERDICT B151: vfmre.h and vfmre.ah compute rd - a*b on this target (same as GVSoC) => ...
+  GAP9 GCC emits the wrong instruction for a*b - c`: silicon agrees with GVSoC. It is a GAP9 GCC
+  bug, and GCC's float16 FFT is wrong on the chip too. The compiled-code line then shows
+  `float16 a*b-c MISMATCH`.
+- `VERDICT B151: vfmre.h and vfmre.ah compute a*b - rd on this target (not what GVSoC does) =>
+  ... GVSoC models vfmre with the wrong sign and GAP9 GCC's code is right`: a simulator bug. The
+  compiled-code line then shows `float16 a*b-c MATCH`.
+- `VERDICT B151: inconclusive (...)`: the line lists what each probe computed on each core.
+
+Simulator: `rd - a*b` for `vfmre.h` (0xcb004000 for set 0, where `a*b - rd` would be
+0x4b00c000) and for `vfmre.ah`, on both cores. `vfmac` gives `rd + a*b`. The `.r` forms do the
+same with lane 0 of rs2 in both lanes. GCC's compiled `a*b - c` is a MISMATCH, and `c - a*b` and
+`a*b + c` MATCH. All 17 CHECKs pass.
+
+The cluster part runs first, as in test 3. If the output stops after an `INFO starting ...`
+line, that core does not implement the instructions named there, and the VERDICT lines printed
+before it still hold.
+
+The test can also be built with our clang (`t7_sdk_apps_clang/build_clang_app.sh
+$PWD/t8_vfmre_sign_b151 board <build dir> clang`). It is not needed for the answer. Clang does
+not emit `vfmre` for `a*b - c`, so its three float16 expressions MATCH, and the float16alt half
+of part 2 is left out there (clang needs a soft-float helper that the GAP9 libgcc lacks).
+
 ## Layout
 
 ```
@@ -269,6 +337,7 @@ t6_kernels_clang_vs_gcc/  test 6: main.c (app), kernels/ (src, drivers, gen = SD
                           rt.h, build_kernels.sh)
 t7_sdk_apps_clang/        test 7: build_clang_app.sh, sdk-clang/ (wrapper, cmake cache file,
                           compat header), t7_corecount/
+t8_vfmre_sign_b151/       test 8
 scripts/run_all.sh        run everything, then collect_results.sh
 scripts/run.sh            build one test from source and run it:  scripts/run.sh <test dir>
 scripts/run_prebuilt.sh   run one prebuilt ELF:  scripts/run_prebuilt.sh prebuilt/board/<x>.elf
@@ -277,12 +346,13 @@ scripts/collect_results.sh  results/*.log -> results/board-results-<date>.txt (s
 scripts/build.sh          configure + build one test (board or gvsoc)
 scripts/compare_t6.py     clang/GCC cycle table from test-6 logs
 scripts/server/           how prebuilt/ and sim-results/ were made on the build server
-prebuilt/board/*.elf      18 ELFs (board config): t1..t5, t6_kernels.{gcc,clang}-O{2,3},
+prebuilt/board/*.elf      19 ELFs (board config): t1..t5, t8, t6_kernels.{gcc,clang}-O{2,3},
                           t7_{helloworld,perf,corecount}.{gcc,clang,clang-ccfix}
 prebuilt/kernels/         the test-6 kernel libraries (+ disassembly, build log)
 prebuilt/MANIFEST.txt     sha256 of every prebuilt file, SDK/compiler versions
 sim-results/              GVSoC output of every prebuilt ELF (the "simulator result"),
-                          t6_compare.txt, t1_b101_disasm.txt, t2_cases_disasm.txt
+                          t6_compare.txt, t1_b101_disasm.txt, t2_cases_disasm.txt,
+                          t8_b151_disasm.txt
 toolchain/                our clang snapshot (tarball; not in git)
 ```
 
@@ -319,6 +389,12 @@ information: the board (EVK version) and the SDK version, if they differ from th
   This also exercised the prebuilt-ELF runner, the SDK `run` target and `collect_results.sh`.
 - The clang tarball was unpacked and used to rebuild `t7_corecount` (clang-ccfix), which ran
   correctly.
+- Test 8 (2026-10-06): built for the board with `scripts/build.sh` and run on GVSoC2
+  `gap.gap9.evk` (`sim-results/t8_vfmre_sign_b151.log`). `scripts/run.sh`,
+  `scripts/run_prebuilt.sh` and `collect_results.sh` were run on it with `PACK_PLATFORM=gvsoc`,
+  and both outputs matched `sim-results/`. The two other verdicts (`a*b - rd` and
+  `inconclusive`) were checked with a scratch copy in which the `vfmre` probes were replaced by
+  `vfmul` + `vfsub`. It was also built with our clang 20.1.8 (26e7268c3127) and run on GVSoC.
 - Not verifiable here: JTAG loading, real memory timing and anything silicon-specific. That is
   the purpose of this pack.
 

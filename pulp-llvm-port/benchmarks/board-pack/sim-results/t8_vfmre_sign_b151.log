@@ -1,0 +1,107 @@
+
+=== BOARD-PACK t8_vfmre_sign_b151 (pack 2026-09-29) ===
+INFO compiler of this file: 7.1.1 20170509
+INFO platform: board
+INFO CHECK PASS = the probe ran and matched exactly one candidate. It does not say who is right: read the VERDICT lines
+INFO probes are `<op> a0, a1, a2` (rd = a0, rs1 = a1 = a, rs2 = a2 = b); lanes {lane 0, lane 1}, lane 0 = low half
+INFO set=0 rd={10,1} a={2,3} b={4,5}
+INFO set=1 rd={4,-20} a={-3,7} b={5,2}
+RESULT t8 encoding vfmre.h a0,a1,a2: probe word=0x92c5a533 assembler=0x92c5a533 same
+RESULT t8 encoding vfmac.h a0,a1,a2: probe word=0x90c5a533 assembler=0x90c5a533 same
+RESULT t8 encoding vfmre.ah a0,a1,a2: probe word=0x92c59533 assembler=0x92c59533 same
+RESULT t8 encoding vfmac.ah a0,a1,a2: probe word=0x90c59533 assembler=0x90c59533 same
+RESULT t8 encoding vfmre.r.h a0,a1,a2: probe word=0x92c5e533 assembler=0x92c5e533 same
+RESULT t8 encoding vfmac.r.h a0,a1,a2: probe word=0x90c5e533 assembler=0x90c5e533 same
+RESULT t8 encoding vfmre.r.ah a0,a1,a2: probe word=0x92c5d533 assembler=0x92c5d533 same
+RESULT t8 encoding vfmac.r.ah a0,a1,a2: probe word=0x90c5d533 assembler=0x90c5d533 same
+CHECK t8.probe_words_are_the_assembler_encodings PASS got=0x00000001 want=0x00000001
+RESULT t8 compiled_code float16 a*b-c: vfmre.h=0x92b52633 vfmac.h=0x00000000 (0 = not used; same opcode bits as the probes under mask 0xfe00707f)
+RESULT t8 compiled_code float16 c-a*b: vfmre.h=0x00000000 vfmac.h=0x90b52633 (0 = not used; same opcode bits as the probes under mask 0xfe00707f)
+RESULT t8 compiled_code float16alt a*b-c: vfmre.ah=0x92b51633 vfmac.ah=0x00000000 (0 = not used; same opcode bits as the probes under mask 0xfe00707f)
+RESULT t8 compiled_code float16alt c-a*b: vfmre.ah=0x00000000 vfmac.ah=0x90b51633 (0 = not used; same opcode bits as the probes under mask 0xfe00707f)
+INFO cluster task runs on cluster 0 core 8 (the cluster controller)
+RESULT t8 core=cl op=vfmre.h set=0 rd=0x3c004900 a=0x42004000 b=0x45004400 out=0xcb004000 out_mnemonic=0xcb004000 candidates: rd-a*b=0xcb004000 a*b-rd=0x4b00c000 rd+a*b=0x4c004c80
+RESULT t8 core=cl op=vfmre.h set=1 rd=0xcd004400 a=0x4700c200 b=0x40004500 out=0xd0404cc0 out_mnemonic=0xd0404cc0 candidates: rd-a*b=0xd0404cc0 a*b-rd=0x5040ccc0 rd+a*b=0xc600c980
+RESULT t8 core=cl op=vfmre.h computes: rd - a*b
+CHECK t8.cl.vfmre.h_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=cl op=vfmac.h set=0 rd=0x3c004900 a=0x42004000 b=0x45004400 out=0x4c004c80 out_mnemonic=0x4c004c80 candidates: rd-a*b=0xcb004000 a*b-rd=0x4b00c000 rd+a*b=0x4c004c80
+RESULT t8 core=cl op=vfmac.h set=1 rd=0xcd004400 a=0x4700c200 b=0x40004500 out=0xc600c980 out_mnemonic=0xc600c980 candidates: rd-a*b=0xd0404cc0 a*b-rd=0x5040ccc0 rd+a*b=0xc600c980
+RESULT t8 core=cl op=vfmac.h computes: rd + a*b
+CHECK t8.cl.vfmac.h_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=cl op=vfmre.ah set=0 rd=0x3f804120 a=0x40404000 b=0x40a04080 out=0xc1604000 out_mnemonic=0xc1604000 candidates: rd-a*b=0xc1604000 a*b-rd=0x4160c000 rd+a*b=0x41804190
+RESULT t8 core=cl op=vfmre.ah set=1 rd=0xc1a04080 a=0x40e0c040 b=0x400040a0 out=0xc2084198 out_mnemonic=0xc2084198 candidates: rd-a*b=0xc2084198 a*b-rd=0x4208c198 rd+a*b=0xc0c0c130
+RESULT t8 core=cl op=vfmre.ah computes: rd - a*b
+CHECK t8.cl.vfmre.ah_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=cl op=vfmac.ah set=0 rd=0x3f804120 a=0x40404000 b=0x40a04080 out=0x41804190 out_mnemonic=0x41804190 candidates: rd-a*b=0xc1604000 a*b-rd=0x4160c000 rd+a*b=0x41804190
+RESULT t8 core=cl op=vfmac.ah set=1 rd=0xc1a04080 a=0x40e0c040 b=0x400040a0 out=0xc0c0c130 out_mnemonic=0xc0c0c130 candidates: rd-a*b=0xc2084198 a*b-rd=0x4208c198 rd+a*b=0xc0c0c130
+RESULT t8 core=cl op=vfmac.ah computes: rd + a*b
+CHECK t8.cl.vfmac.ah_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=cl compiled float16 a*b-c packed=0xcb004000 scalar_lanes=0x4b00c000 exact=0x4b00c000 MISMATCH
+RESULT t8 core=cl compiled float16 c-a*b packed=0xcb004000 scalar_lanes=0xcb004000 exact=0xcb004000 MATCH
+RESULT t8 core=cl compiled float16 a*b+c packed=0x4c004c80 scalar_lanes=0x4c004c80 exact=0x4c004c80 MATCH
+RESULT t8 core=cl compiled float16alt a*b-c packed=0xc1604000 scalar_lanes=0x4160c000 exact=0x4160c000 MISMATCH
+RESULT t8 core=cl compiled float16alt c-a*b packed=0xc1604000 scalar_lanes=0xc1604000 exact=0xc1604000 MATCH
+RESULT t8 core=cl compiled float16alt a*b+c packed=0x41804190 scalar_lanes=0x41804190 exact=0x41804190 MATCH
+VERDICT B151 probes on cl: vfmre.h computes rd - a*b; vfmre.ah rd - a*b; control vfmac.h rd + a*b; vfmac.ah rd + a*b
+VERDICT B151 compiled code on cl: float16 a*b-c MISMATCH, c-a*b MATCH, a*b+c MATCH; float16alt a*b-c MISMATCH, c-a*b MATCH, a*b+c MATCH (packed against scalar lanes)
+INFO starting the FC part; if the output stops here, the FC does not implement the packed fp16 multiply-accumulate (the cluster VERDICT lines above are the answer)
+RESULT t8 core=fc op=vfmre.h set=0 rd=0x3c004900 a=0x42004000 b=0x45004400 out=0xcb004000 out_mnemonic=0xcb004000 candidates: rd-a*b=0xcb004000 a*b-rd=0x4b00c000 rd+a*b=0x4c004c80
+RESULT t8 core=fc op=vfmre.h set=1 rd=0xcd004400 a=0x4700c200 b=0x40004500 out=0xd0404cc0 out_mnemonic=0xd0404cc0 candidates: rd-a*b=0xd0404cc0 a*b-rd=0x5040ccc0 rd+a*b=0xc600c980
+RESULT t8 core=fc op=vfmre.h computes: rd - a*b
+CHECK t8.fc.vfmre.h_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=fc op=vfmac.h set=0 rd=0x3c004900 a=0x42004000 b=0x45004400 out=0x4c004c80 out_mnemonic=0x4c004c80 candidates: rd-a*b=0xcb004000 a*b-rd=0x4b00c000 rd+a*b=0x4c004c80
+RESULT t8 core=fc op=vfmac.h set=1 rd=0xcd004400 a=0x4700c200 b=0x40004500 out=0xc600c980 out_mnemonic=0xc600c980 candidates: rd-a*b=0xd0404cc0 a*b-rd=0x5040ccc0 rd+a*b=0xc600c980
+RESULT t8 core=fc op=vfmac.h computes: rd + a*b
+CHECK t8.fc.vfmac.h_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=fc op=vfmre.ah set=0 rd=0x3f804120 a=0x40404000 b=0x40a04080 out=0xc1604000 out_mnemonic=0xc1604000 candidates: rd-a*b=0xc1604000 a*b-rd=0x4160c000 rd+a*b=0x41804190
+RESULT t8 core=fc op=vfmre.ah set=1 rd=0xc1a04080 a=0x40e0c040 b=0x400040a0 out=0xc2084198 out_mnemonic=0xc2084198 candidates: rd-a*b=0xc2084198 a*b-rd=0x4208c198 rd+a*b=0xc0c0c130
+RESULT t8 core=fc op=vfmre.ah computes: rd - a*b
+CHECK t8.fc.vfmre.ah_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=fc op=vfmac.ah set=0 rd=0x3f804120 a=0x40404000 b=0x40a04080 out=0x41804190 out_mnemonic=0x41804190 candidates: rd-a*b=0xc1604000 a*b-rd=0x4160c000 rd+a*b=0x41804190
+RESULT t8 core=fc op=vfmac.ah set=1 rd=0xc1a04080 a=0x40e0c040 b=0x400040a0 out=0xc0c0c130 out_mnemonic=0xc0c0c130 candidates: rd-a*b=0xc2084198 a*b-rd=0x4208c198 rd+a*b=0xc0c0c130
+RESULT t8 core=fc op=vfmac.ah computes: rd + a*b
+CHECK t8.fc.vfmac.ah_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=fc compiled float16 a*b-c packed=0xcb004000 scalar_lanes=0x4b00c000 exact=0x4b00c000 MISMATCH
+RESULT t8 core=fc compiled float16 c-a*b packed=0xcb004000 scalar_lanes=0xcb004000 exact=0xcb004000 MATCH
+RESULT t8 core=fc compiled float16 a*b+c packed=0x4c004c80 scalar_lanes=0x4c004c80 exact=0x4c004c80 MATCH
+RESULT t8 core=fc compiled float16alt a*b-c packed=0xc1604000 scalar_lanes=0x4160c000 exact=0x4160c000 MISMATCH
+RESULT t8 core=fc compiled float16alt c-a*b packed=0xc1604000 scalar_lanes=0xc1604000 exact=0xc1604000 MATCH
+RESULT t8 core=fc compiled float16alt a*b+c packed=0x41804190 scalar_lanes=0x41804190 exact=0x41804190 MATCH
+VERDICT B151 probes on fc: vfmre.h computes rd - a*b; vfmre.ah rd - a*b; control vfmac.h rd + a*b; vfmac.ah rd + a*b
+VERDICT B151 compiled code on fc: float16 a*b-c MISMATCH, c-a*b MATCH, a*b+c MATCH; float16alt a*b-c MISMATCH, c-a*b MATCH, a*b+c MATCH (packed against scalar lanes)
+VERDICT B151: vfmre.h and vfmre.ah compute rd - a*b on this target (same as GVSoC) => if this is the board, GAP9 GCC emits the wrong instruction for a*b - c
+INFO starting the .r controls (vfmre.r.h, vfmac.r.h, .r.ah) on the FC, then on the cluster; if the output stops here, that core does not implement them (the VERDICT above stands)
+RESULT t8 core=fc op=vfmre.r.h set=0 rd=0x3c004900 a=0x42004000 b=0x45004400 out=0xc9804000 out_mnemonic=0xc9804000 candidates(b = rs2 lane 0): rd-a*b=0xc9804000 a*b-rd=0x4980c000 rd+a*b=0x4a804c80
+RESULT t8 core=fc op=vfmre.r.h set=1 rd=0xcd004400 a=0x4700c200 b=0x40004500 out=0xd2e04cc0 out_mnemonic=0xd2e04cc0 candidates(b = rs2 lane 0): rd-a*b=0xd2e04cc0 a*b-rd=0x52e0ccc0 rd+a*b=0x4b80c980
+RESULT t8 core=fc op=vfmre.r.h computes: rd - a*b with b = rs2 lane 0 in both lanes
+CHECK t8.fc.vfmre.r.h_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=fc op=vfmac.r.h set=0 rd=0x3c004900 a=0x42004000 b=0x45004400 out=0x4a804c80 out_mnemonic=0x4a804c80 candidates(b = rs2 lane 0): rd-a*b=0xc9804000 a*b-rd=0x4980c000 rd+a*b=0x4a804c80
+RESULT t8 core=fc op=vfmac.r.h set=1 rd=0xcd004400 a=0x4700c200 b=0x40004500 out=0x4b80c980 out_mnemonic=0x4b80c980 candidates(b = rs2 lane 0): rd-a*b=0xd2e04cc0 a*b-rd=0x52e0ccc0 rd+a*b=0x4b80c980
+RESULT t8 core=fc op=vfmac.r.h computes: rd + a*b with b = rs2 lane 0 in both lanes
+CHECK t8.fc.vfmac.r.h_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=fc op=vfmre.r.ah set=0 rd=0x3f804120 a=0x40404000 b=0x40a04080 out=0xc1304000 out_mnemonic=0xc1304000 candidates(b = rs2 lane 0): rd-a*b=0xc1304000 a*b-rd=0x4130c000 rd+a*b=0x41504190
+RESULT t8 core=fc op=vfmre.r.ah set=1 rd=0xc1a04080 a=0x40e0c040 b=0x400040a0 out=0xc25c4198 out_mnemonic=0xc25c4198 candidates(b = rs2 lane 0): rd-a*b=0xc25c4198 a*b-rd=0x425cc198 rd+a*b=0x4170c130
+RESULT t8 core=fc op=vfmre.r.ah computes: rd - a*b with b = rs2 lane 0 in both lanes
+CHECK t8.fc.vfmre.r.ah_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=fc op=vfmac.r.ah set=0 rd=0x3f804120 a=0x40404000 b=0x40a04080 out=0x41504190 out_mnemonic=0x41504190 candidates(b = rs2 lane 0): rd-a*b=0xc1304000 a*b-rd=0x4130c000 rd+a*b=0x41504190
+RESULT t8 core=fc op=vfmac.r.ah set=1 rd=0xc1a04080 a=0x40e0c040 b=0x400040a0 out=0x4170c130 out_mnemonic=0x4170c130 candidates(b = rs2 lane 0): rd-a*b=0xc25c4198 a*b-rd=0x425cc198 rd+a*b=0x4170c130
+RESULT t8 core=fc op=vfmac.r.ah computes: rd + a*b with b = rs2 lane 0 in both lanes
+CHECK t8.fc.vfmac.r.ah_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=cl op=vfmre.r.h set=0 rd=0x3c004900 a=0x42004000 b=0x45004400 out=0xc9804000 out_mnemonic=0xc9804000 candidates(b = rs2 lane 0): rd-a*b=0xc9804000 a*b-rd=0x4980c000 rd+a*b=0x4a804c80
+RESULT t8 core=cl op=vfmre.r.h set=1 rd=0xcd004400 a=0x4700c200 b=0x40004500 out=0xd2e04cc0 out_mnemonic=0xd2e04cc0 candidates(b = rs2 lane 0): rd-a*b=0xd2e04cc0 a*b-rd=0x52e0ccc0 rd+a*b=0x4b80c980
+RESULT t8 core=cl op=vfmre.r.h computes: rd - a*b with b = rs2 lane 0 in both lanes
+CHECK t8.cl.vfmre.r.h_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=cl op=vfmac.r.h set=0 rd=0x3c004900 a=0x42004000 b=0x45004400 out=0x4a804c80 out_mnemonic=0x4a804c80 candidates(b = rs2 lane 0): rd-a*b=0xc9804000 a*b-rd=0x4980c000 rd+a*b=0x4a804c80
+RESULT t8 core=cl op=vfmac.r.h set=1 rd=0xcd004400 a=0x4700c200 b=0x40004500 out=0x4b80c980 out_mnemonic=0x4b80c980 candidates(b = rs2 lane 0): rd-a*b=0xd2e04cc0 a*b-rd=0x52e0ccc0 rd+a*b=0x4b80c980
+RESULT t8 core=cl op=vfmac.r.h computes: rd + a*b with b = rs2 lane 0 in both lanes
+CHECK t8.cl.vfmac.r.h_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=cl op=vfmre.r.ah set=0 rd=0x3f804120 a=0x40404000 b=0x40a04080 out=0xc1304000 out_mnemonic=0xc1304000 candidates(b = rs2 lane 0): rd-a*b=0xc1304000 a*b-rd=0x4130c000 rd+a*b=0x41504190
+RESULT t8 core=cl op=vfmre.r.ah set=1 rd=0xc1a04080 a=0x40e0c040 b=0x400040a0 out=0xc25c4198 out_mnemonic=0xc25c4198 candidates(b = rs2 lane 0): rd-a*b=0xc25c4198 a*b-rd=0x425cc198 rd+a*b=0x4170c130
+RESULT t8 core=cl op=vfmre.r.ah computes: rd - a*b with b = rs2 lane 0 in both lanes
+CHECK t8.cl.vfmre.r.ah_classified PASS got=0x00000001 want=0x00000001
+RESULT t8 core=cl op=vfmac.r.ah set=0 rd=0x3f804120 a=0x40404000 b=0x40a04080 out=0x41504190 out_mnemonic=0x41504190 candidates(b = rs2 lane 0): rd-a*b=0xc1304000 a*b-rd=0x4130c000 rd+a*b=0x41504190
+RESULT t8 core=cl op=vfmac.r.ah set=1 rd=0xc1a04080 a=0x40e0c040 b=0x400040a0 out=0x4170c130 out_mnemonic=0x4170c130 candidates(b = rs2 lane 0): rd-a*b=0xc25c4198 a*b-rd=0x425cc198 rd+a*b=0x4170c130
+RESULT t8 core=cl op=vfmac.r.ah computes: rd + a*b with b = rs2 lane 0 in both lanes
+CHECK t8.cl.vfmac.r.ah_classified PASS got=0x00000001 want=0x00000001
+=== END t8_vfmre_sign_b151 pass=17 fail=0
+[run_app] exit code: 0
