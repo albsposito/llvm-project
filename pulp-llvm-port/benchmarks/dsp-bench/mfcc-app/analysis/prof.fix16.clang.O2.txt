@@ -1,0 +1,270 @@
+function                          instrs     cycles
+rt_hash                          8452434   11832600
+load_frame                        837216    1132512
+Radix4FFT_DIF_Par_Fix16           713952     732096
+PreEmphasis                       537515     683874
+RFFT_DIF_Par_Fix16                467520     518880
+MelFilterBank_Fix32_app           433248     539040
+WindowingReal2Real_Fix16          198720     248064
+ulogn_17_15                       134400     142080
+DctTypeII_Fix16                   125760     128256
+CmplxMagSquared_Fix16              75360     100032
+LogDb_Fix_app                      65472      77376
+rt_hex                             57408      68640
+put_frame                          50016      64608
+main                               26611      33218
+st_hash                            20832      23712
+rt_puts                            12672      18144
+memcpy                             12480      18720
+.Lpcrel_hi3                         8034      10042
+rt_u64                              6870       9044
+_start                                 2          2
+.Lpcrel_hi1                            2          2
+.Lpcrel_hi2                            2          2
+
+hottest PCs in PreEmphasis (count, cycles, pc, insn):
+      96      192  000f8a  p.min	t2, a2, t0
+      96      192  000fa4  lp.setup	x0, a2, 0xa
+   49152    49152  000fa8  p.lh	a2, 0x2(a5!)
+   49152    49152  000fac  p.abs	a2, a2
+   49152   146707  000fb0  bgeu	a4, a2, 0xfb8 <PreEmphasis+0x52>
+     749      749  000fb6  mv	a4, a2
+   49152    98208  000fb8  nop
+      96      192  000fba  j	0xfbc <PreEmphasis+0x56>
+      96      288  000fc4  j	0xfc8 <PreEmphasis+0x62>
+      96      192  000fce  p.exths	a2, a1
+      96      130  000fd6  blez	a2, 0x1010 <PreEmphasis+0xaa>
+      79      158  000fda  beqz	t2, 0x1046 <PreEmphasis+0xe0>
+      79      158  000ff0  lp.setup	x0, a4, 0xe
+   40448    40448  000ff8  p.exths	a5, a5
+   40448    40448  000ffc  sll	a4, a4, a2
+   40448    40448  001000  p.mulsrn	a5, t3, a5, 0xf
+   40448    80896  001004  sub	a5, a4, a5
+   40448    80817  00100c  mv	a5, a4
+      79      158  00100e  j	0x1046 <PreEmphasis+0xe0>
+    8704     8704  001034  p.mulsrn	a5, t3, a5, 0xf
+    8704     8704  001038  sra	a4, a4, a2
+    8704    17408  00103c  sub	a5, a4, a5
+    8704    17391  001044  mv	a5, a4
+      96      192  001048  add	t0, t0, t1
+      96      192  00104a  lh	a1, -0x2(t0)
+      96      192  001052  ret
+
+hottest PCs in get_max (count, cycles, pc, insn):
+
+hottest PCs in WindowingReal2Real_Fix16 (count, cycles, pc, insn):
+      96       96  001346  lw	t2, 0x10(a0)
+      96       96  00134a  lw	a6, 0x4(a0)
+      96        0  00134e  lw	a7, 0xc(a0)
+      96       96  001352  li	a1, 0x1
+      96       96  001354  p.fl1	t1, a1
+      96       96  001358  srl	a1, t2, t1
+      96       96  00135c  p.min	a1, a1, t2
+      96      192  001360  beqz	a1, 0x1388 <WindowingReal2Real_Fix16+0x42>
+      96       96  001362  lw	a5, 0x8(a0)
+      96        0  001364  lw	a0, 0x0(a0)
+      96       96  001366  slli	a1, a1, 0x1
+      96       96  001368  add	a1, a1, a5
+      96       96  00136a  sub	a3, a1, a5
+      96       96  00136e  srli	t0, a3, 0x1
+      96       96  001372  mv	a3, a6
+      96      192  001374  lp.setup	x0, t0, 0x8
+   49152    49152  001378  p.lh	a4, 0x2(a0!)
+   49152    49152  00137c  p.lh	a2, 0x2(a5!)
+   49152    98304  001380  p.mulsrn	a2, a4, a2, 0xf
+   49152    49056  001384  p.sh	a2, 0x2(a3!)
+      96       96  001388  sub	a0, a7, t2
+      96       96  00138c  srl	a0, a0, t1
+      96       96  001390  add	a0, a0, t2
+      96       96  001392  p.min	a0, a0, a7
+      96      288  001396  bgeu	t2, a0, 0x13b2 <WindowingReal2Real_Fix16+0x6c>
+      96      192  0013b2  ret
+
+hottest PCs in Radix4FFT_DIF_Par_Fix16 (count, cycles, pc, insn):
+    7680    23040  001b5a  add	a4, a4, t5
+    7680    15360  001b5c  lw	s11, 0x0(a5)
+    7680    15360  001b60  lw	ra, 0x0(s0)
+   12288    12288  001b70  add	a3, a1, s8
+   12288    12288  001b74  add	s1, a1, s7
+   12288    24576  001b78  add	a2, a1, s10
+   12288    12288  001b7c  lw	a5, 0x0(a1)
+   12288    12288  001b7e  lw	a6, 0x0(a3)
+   12288    12288  001b82  lw	a7, 0x0(s1)
+   12288    12288  001b8a  pv.add.h	a0, a7, a5
+   12288    12288  001b8e  pv.add.h	t1, t0, a6
+   12288    12288  001b92  pv.sub.h	a5, a5, a7
+   12288    12288  001b96  pv.subrotmj.h	a4, a6, t0
+   12288    12288  001b9a  pv.add.h	a6, t1, a0
+   12288    12288  001b9e  pv.add.h	s0, a4, a5
+   12288    12288  001ba2  pv.sub.h	a7, a0, t1
+   12288    12288  001ba6  pv.sub.h	t0, a5, a4
+   12288    12288  001baa  pv.sra.h	a6, a6, s6
+   12288    12288  001bae  pv.cplxmul.h.r.div4	a5, s0, s11
+   12288    12288  001bb2  pv.cplxmul.h.r.div4	a0, a7, ra
+   12288    12288  001bb6  pv.cplxmul.h.r.div4	a4, t0, t2
+   12288    12288  001bba  pv.cplxmul.h.i.div4	a5, s0, s11
+   12288    12288  001bbe  pv.cplxmul.h.i.div4	a0, a7, ra
+   12288    24576  001bc2  pv.cplxmul.h.i.div4	a4, t0, t2
+   12288    12288  001bc6  p.sw	a6, s9(a1!)
+   12288    12288  001bca  sw	a5, 0x0(a3)
+
+hottest PCs in SwapSamples_Par (count, cycles, pc, insn):
+
+hottest PCs in RFFT_DIF_Par_Fix16 (count, cycles, pc, insn):
+      96      192  00383e  addi	sp, sp, -0x30
+      96      192  003860  srli	s4, a1, 0x1
+      96      288  00386c  beq	s4, a0, 0x387e <RFFT_DIF_Par_Fix16+0x40>
+      96      288  003884  jalr	0x202(ra) <_end+0xfffe1d12>
+      96      288  00388c  bgtz	a0, 0x38a4 <RFFT_DIF_Par_Fix16+0x66>
+      96      192  0038a8  lp.setup	x0, a0, 0xd
+   24576    24576  0038ac  p.lh	a3, 0x2(s1!)
+   24576    50688  0038b0  bge	a1, a3, 0x38c0 <RFFT_DIF_Par_Fix16+0x82>
+   11520    11520  0038b4  slli	a3, a3, 0x2
+   11520    23040  0038b6  add	a3, a3, s0
+   11520    11520  0038b8  lw	a4, 0x0(a3)
+   11520    11520  0038ba  lw	a5, 0x0(a2)
+   11520    11520  0038bc  sw	a4, 0x0(a2)
+   24576    24576  0038c0  addi	a1, a1, 0x1
+   24576    49056  0038c2  addi	a2, a2, 0x4
+      96      192  0038ce  li	a3, 0x1
+      96      192  0038f4  pv.pack.h	a5, zero, a5
+   24480    24480  003928  p.lw	a5, 0x4(a0!)
+   24480    48960  00392c  lw	s1, 0x0(s0)
+   24480    24480  003936  pv.cplxconj.h	s1, s1
+   24480    24480  00393a  pv.add.h.div4	a4, a4, s1
+   24480    24480  00393e  pv.add.h.div4	a5, a5, s1
+   24480    24480  003942  pv.cplxmul.h.r	s1, a3, a4
+   24480    24480  003946  pv.cplxmul.h.i	s1, a3, a4
+   24480    48960  00394a  pv.add.h	a3, s1, a5
+   24480    48960  003952  addi	s0, s0, -0x4
+
+hottest PCs in CmplxMagSquared_Fix16 (count, cycles, pc, insn):
+      96        0  003d04  lw	a1, 0x8(a0)
+      96       96  003d06  li	a2, 0x1
+      96       96  003d08  p.fl1	a2, a2
+      96       96  003d0c  srl	a2, a1, a2
+      96       96  003d10  p.min	a2, a2, a1
+      96      192  003d14  beqz	a2, 0x3d34 <CmplxMagSquared_Fix16+0x30>
+      96       96  003d16  lw	a1, 0x0(a0)
+      96        0  003d18  lw	a0, 0x4(a0)
+      96       96  003d1a  slli	a2, a2, 0x2
+      96       96  003d1c  add	a2, a2, a1
+      96       96  003d1e  sub	a3, a2, a1
+      96       96  003d22  srli	a3, a3, 0x2
+      96      192  003d24  lp.setup	x0, a3, 0x6
+   24672    24672  003d28  p.lw	a3, 0x4(a1!)
+   24672    49344  003d2c  pv.dotsp.h	a3, a3, a3
+   24672    24576  003d30  p.sw	a3, 0x4(a0!)
+      96      192  003d34  ret
+
+hottest PCs in MelFilterBank_Fix32_app (count, cycles, pc, insn):
+    3840     3840  000b7c  slli	a0, t5, 0x1
+    3840     3840  000b80  slli	a1, t5, 0x3
+    3840     3840  000b84  sub	a1, a1, a0
+    3840     7680  000b86  add	a2, t0, a1
+    3840     3840  000b8a  lhu	a0, 0x2(a2)
+    3840     3840  000b8e  beqz	a0, 0xbfe <MelFilterBank_Fix32_app+0xaa>
+    3840     7680  000b90  li	a1, 0x0
+    3840     3840  000b92  lhu	a3, 0x0(a2)
+    3840     3840  000b9a  slli	a5, a0, 0x2
+    3840     3840  000b9e  slli	a3, a3, 0x2
+    3840     3840  000ba0  add	a2, t2, a3
+    3840     3840  000ba4  add	a3, a3, a5
+    3840     3840  000ba6  add	a5, t2, a3
+    3840     3840  000baa  sub	a3, a5, a2
+    3840     7680  000bb4  lp.setup	x0, a4, 0x4
+   47040    47040  000bb8  p.lw	a4, 0x4(a3!)
+   47040    90240  000bbc  p.maxu	a1, a4, a1
+    3840     7680  000bc8  j	0xbcc <MelFilterBank_Fix32_app+0x78>
+    3840     7680  000be8  lp.setup	x0, a3, 0x8
+   47040    47040  000bec  p.lh	a3, 0x2(a4!)
+   47040    47040  000bf0  p.lw	a0, 0x4(a2!)
+   47040    47040  000bf4  srl	a0, a0, t4
+   47040    90240  000bf8  p.mac	a1, a0, a3
+    3840     7680  000bfc  j	0xc02 <MelFilterBank_Fix32_app+0xae>
+    3840     7680  000c06  add	a2, a2, a7
+    3840     7680  000c0e  addi	t5, t5, 0x1
+
+hottest PCs in LogDb_Fix_app (count, cycles, pc, insn):
+      96      192  000c18  addi	sp, sp, -0x30
+      96       96  000c1a  sw	ra, 0x2c(sp)
+      96       96  000c1c  sw	s0, 0x28(sp)
+      96       96  000c1e  sw	s1, 0x24(sp)
+      96       96  000c20  sw	s2, 0x20(sp)
+      96       96  000c22  sw	s3, 0x1c(sp)
+      96       96  000c24  sw	s4, 0x18(sp)
+      96       96  000c26  sw	s5, 0x14(sp)
+      96       96  000c28  sw	s6, 0x10(sp)
+      96       96  000c2a  sw	s7, 0xc(sp)
+      96      288  000c66  j	0xc72 <LogDb_Fix_app+0x5a>
+    3840     3840  000c6c  addi	s0, s0, 0x1
+    3840     7872  000c6e  beq	s1, s3, 0xc9c <LogDb_Fix_app+0x84>
+    3840     3840  000c76  mv	a1, s4
+    3840     3840  000c78  beqz	a0, 0xc68 <LogDb_Fix_app+0x50>
+    3840     3840  000c7a  auipc	ra, 0x3
+    3840    11520  000c7e  jalr	0x6da(ra) <ulogn_17_15>
+    3840     3840  000c82  lb	a1, 0x0(s0)
+    3840     3840  000c86  add	a1, a1, s2
+    3840     3840  000c88  p.mac	a0, a1, s5
+    3840     3840  000c8c  p.max	a0, a0, s6
+    3840     3840  000c90  srai	a0, a0, 0x8
+    3840     3840  000c92  mul	a0, a0, s7
+    3840     3840  000c96  p.addun	a1, a0, s8, 0xe
+    3840    11520  000c9a  j	0xc68 <LogDb_Fix_app+0x50>
+      96      192  000cb4  ret
+
+hottest PCs in ulogn_17_15 (count, cycles, pc, insn):
+    3840     3840  004354  beqz	a0, 0x43be <ulogn_17_15+0x6a>
+    3840     3840  004356  p.clb	a1, a0
+    3840     3840  00435a  lui	a2, 0xffff8
+    3840     3840  00435c  lui	a3, 0xffffc
+    3840     3840  00435e  li	a4, 0xf
+    3840     3840  004360  sll	a0, a0, a1
+    3840     3840  004364  sub	a4, a4, a1
+    3840     3840  004366  lui	a1, 0x8
+    3840     3840  004368  addi	a3, a3, 0x149
+    3840     3840  00436c  addi	a1, a1, -0x1d
+    3840     3840  00436e  srli	a0, a0, 0xf
+    3840     3840  004370  add	a0, a0, a2
+    3840     3840  004372  mul	a2, a0, a0
+    3840     3840  004376  srli	a2, a2, 0xf
+    3840     3840  004378  mul	a3, a2, a3
+    3840     3840  00437c  p.mac	a3, a0, a1
+    3840     3840  004380  lui	a1, 0x2
+    3840     3840  004382  addi	a1, a1, 0x491
+    3840     3840  004386  mul	a2, a2, a0
+    3840     3840  00438a  srai	a2, a2, 0xf
+    3840     3840  00438c  p.mac	a3, a2, a1
+    3840     3840  004390  lui	a1, 0xfffff
+    3840     3840  004392  addi	a1, a1, -0x108
+    3840     3840  004396  mul	a2, a2, a0
+    3840     3840  00439a  srai	a2, a2, 0xf
+    3840    11520  0043bc  ret
+
+hottest PCs in DctTypeII_Fix16 (count, cycles, pc, insn):
+      96      192  003f16  addi	sp, sp, -0x20
+      96      192  003f28  li	s4, 0x0
+    1248     1248  003f78  li	s0, 0x0
+    1248     1248  003f7a  bltu	t2, a6, 0x3fa8 <DctTypeII_Fix16+0xa8>
+    1248     1248  003f7e  sub	a5, s7, t4
+    1248     1248  003f82  srli	s3, a5, 0x3
+    1248     1248  003f86  mv	s1, s5
+    1248     1248  003f88  mv	a5, t4
+    1248     1248  003f8a  nop
+    1248     2496  003f8c  lp.setup	x0, s3, 0xd
+   12480    12480  003f90  lw	a2, -0x4(s1)
+   12480    12480  003f94  lw	a1, -0x4(a5)
+   12480    12480  003f98  lw	a4, 0x0(a5)
+   12480    12480  003f9c  pv.sdotsp.h	s0, a1, a2
+   12480    12480  003fa0  addi	a5, a5, 0x8
+   12480    12480  003fa2  pv.sdotsp.h	s0, a4, a0
+   12480    23712  003fa6  addi	s1, s1, 0x8
+    1248     3744  003fa8  beq	t3, t1, 0x3fc8 <DctTypeII_Fix16+0xc8>
+    1248     1248  003fc8  p.addrnr	s0, zero, t6
+    1248     1248  003fcc  slli	a0, s4, 0x1
+    1248     1248  003fd0  addi	s4, s4, 0x1
+    1248     1248  003fd2  add	s5, s5, s2
+    1248     1248  003fd4  p.clip	a1, s0, 0x10
+    1248     2496  003fd8  add	a0, a0, a7
+    1248     1344  003fde  add	s6, s6, s2
+      96      192  003ff2  ret

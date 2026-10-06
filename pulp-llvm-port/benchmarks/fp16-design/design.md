@@ -417,3 +417,8 @@ shuffles/build/extract/setcc (T5b) keeps each under one root cause.
 
 
 > **Correction (2026-09-29, board-pack probe t3):** on both GVSoC models the packed fp16 compares write a bitmask (lane i true sets bit i; e.g. only lane 1 true gives 0x00000002), not 0/1 per lane as Q2 states. The earlier test only had lane 0 true. The silicon answer comes from benchmarks/board-pack t3.
+
+
+## Board finding 2026-10-06: vfmre sign (B151)
+
+On GAP9 silicon `vfmre.h` and `vfmre.ah` compute `a*b - rd` (rs1*rs2 minus the accumulator), on both the cluster and the FC core; `vfmac.h`/`.ah` compute `rd + a*b`. GVSoC computes `rd - a*b` for vfmre, which is wrong (board-pack test `t8_vfmre_sign_b151`). T5 patterns must select vfmre for `a*b - c` (as GAP9 GCC does), and GVSoC runs of code using vfmre must not be used as the oracle until the simulator is patched.

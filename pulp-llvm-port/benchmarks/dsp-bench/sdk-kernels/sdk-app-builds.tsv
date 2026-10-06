@@ -1,0 +1,25 @@
+app	variant	build_rc	note
+DftSimple	clang-compat-nowerror-gnuas-gnuld	0	
+DftSimple	clang-compat-nowerror-sdkp	0	
+DftSimple	clang-gnuas-gnuld	0	
+DftSimple	gcc	0	
+FFTL1	clang-compat-nowerror-gnuas-gnuld	0	
+FFTL1	clang-compat-nowerror-sdkp	0	
+FFTL1	clang-gnuas-gnuld	0	
+FFTL1	gcc	0	
+Fir	clang-compat-nowerror-gnuas-gnuld	0	
+Fir	clang-compat-nowerror-sdkp	0	
+Fir	clang-gnuas-gnuld	0	
+Fir	gcc	0	
+IRFFTL1	clang-compat-nowerror-gnuas-gnuld	0	
+IRFFTL1	clang-compat-nowerror-sdkp	0	
+IRFFTL1	clang-gnuas-gnuld	0	
+IRFFTL1	gcc	0	
+MatMul	clang-compat-nowerror-gnuas-gnuld	2	all files compile; link: cannot find -lm (wrapper does not pass the GAP9 newlib multilib dir); links when -L.../riscv32-unknown-elf/lib/rv32imcxgap9/ilp32 is added
+MatMul	clang-compat-nowerror-sdkp	2	all files compile; link: cannot find -lm (wrapper does not pass the GAP9 newlib multilib dir); links when -L.../riscv32-unknown-elf/lib/rv32imcxgap9/ilp32 is added
+MatMul	clang-gnuas-gnuld	2	all files compile; link: cannot find -lm (wrapper does not pass the GAP9 newlib multilib dir); links when -L.../riscv32-unknown-elf/lib/rv32imcxgap9/ilp32 is added
+MatMul	gcc	0	
+RFFTL1	clang-compat-nowerror-gnuas-gnuld	0	
+RFFTL1	clang-compat-nowerror-sdkp	0	
+RFFTL1	clang-gnuas-gnuld	0	
+RFFTL1	gcc	0	

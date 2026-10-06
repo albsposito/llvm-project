@@ -1,0 +1,264 @@
+function                          instrs     cycles
+rt_hash                          1099687    1465352
+Radix4FFT_DIF_Par_f16             971040     987456
+RFFT_DIF_Par_f16                  373344     373920
+MelFilterBank_f16                 219552     274080
+PreEmphasis_f16                   198528     247776
+WindowingReal2Real_f16            198048     247392
+load_frame                        197472     246815
+DctTypeII_f16                     195648     198144
+SwapSamples_Par_f16               194304     245088
+CmplxMagSquared_f16               148992     148992
+put_frame                          97230     108104
+Db_f16_f32                         60960      64896
+main                               26585      30188
+st_hash                            14784      16224
+__udivdi3                          13818      35814
+__umoddi3                          12126      34404
+memcpy                              9984      13728
+_start                              7407       9256
+
+hottest PCs in PreEmphasis_f16 (count, cycles, pc, insn):
+      96       96  0008e8  lw	a6, 0xc(a0)
+      96       96  0008ec  lw	a5, 0x8(a0)
+      96       96  0008ee  lw	a7, 0x10(a0)
+      96       96  0008f2  lw	t1, 0x0(a0)
+      96        0  0008f6  lw	a2, 0x4(a0)
+      96       96  0008f8  fcvt.h.s	a6, a6
+      96       96  0008fc  fcvt.h.s	a5, a5
+      96       96  000900  beqz	a7, 0x922 <PreEmphasis_f16+0x3a>
+      96       96  000904  slli	a4, a7, 0x1
+      96       96  000908  addi	a4, a4, -0x2
+      96       96  00090a  srli	a4, a4, 0x1
+      96       96  00090c  mv	a1, t1
+      96       96  00090e  addi	a4, a4, 0x1
+      96      192  000910  lp.setup	x1, a4, 0x8
+   49152    49152  000914  p.lhu	a3, 0x2(a1!)
+   49152    98304  000918  fnmsub.h	a5, a6, a5, a3
+   49152        0  00091c  p.sh	a5, 0x2(a2!)
+   49152    98208  000920  mv	a5, a3
+      96       96  000922  slli	a7, a7, 0x1
+      96      192  000924  addi	a7, a7, -0x2
+      96       96  000926  p.lhu	a7, a7(t1)
+      96      192  00092a  fcvt.s.h	a7, a7
+      96        0  00092e  sw	a7, 0x8(a0)
+      96      192  000932  ret
+
+hottest PCs in WindowingReal2Real_f16 (count, cycles, pc, insn):
+      96       96  000934  lw	t1, 0x10(a0)
+      96       96  000938  lw	a3, 0x0(a0)
+      96       96  00093a  lw	a2, 0x4(a0)
+      96       96  00093c  lw	a1, 0x8(a0)
+      96        0  00093e  lw	a5, 0xc(a0)
+      96       96  000940  beqz	t1, 0x966 <WindowingReal2Real_f16+0x32>
+      96       96  000944  slli	a4, t1, 0x1
+      96       96  000948  addi	a4, a4, -0x2
+      96       96  00094a  srli	a4, a4, 0x1
+      96       96  00094c  mv	a0, a3
+      96       96  00094e  mv	a6, a2
+      96       96  000950  addi	a4, a4, 0x1
+      96      192  000952  lp.setup	x1, a4, 0x8
+   49152    49152  000956  p.lhu	a3, 0x2(a0!)
+   49152    49152  00095a  p.lhu	a7, 0x2(a1!)
+   49152    98304  00095e  fmul.h	a3, a3, a7
+   49152    49056  000962  p.sh	a3, 0x2(a6!)
+      96      288  000966  bgeu	t1, a5, 0x986 <WindowingReal2Real_f16+0x52>
+      96      192  000986  ret
+
+hottest PCs in Radix4FFT_DIF_Par_f16 (count, cycles, pc, insn):
+    7680    15360  000a6a  lp.setup	x1, t3, 0x43
+   12288    12288  000a6e  lw	a6, 0x0(t1)
+   12288    12288  000a72  lw	a0, 0x0(t5)
+   12288    12288  000a76  lw	t6, 0x0(t4)
+   12288    12288  000a7e  vfsub.h	a1, a6, a0
+   12288    12288  000a82  pv.shuffle.sci.h	a1, a1, 0x1
+   12288    12288  000a86  vfsub.h	a5, t6, a3
+   12288    12288  000a8a  vfsgnjn.h	a2, a1, a1
+   12288    12288  000a8e  mv	a4, a5
+   12288    12288  000a90  vfadd.h	a0, a6, a0
+   12288    12288  000a94  vfmac.h	a5, a1, s10
+   12288    12288  000a98  vfadd.h	a3, t6, a3
+   12288    12288  000a9c  vfsub.h	a1, a3, a0
+   12288    12288  000aa0  vfmul.h	a6, s0, a5
+   12288    12288  000aa4  vfmul.h	a5, a5, s3
+   12288    12288  000aa8  vfmac.h	a4, a2, s10
+   12288    12288  000aac  vfadd.h	a3, a3, a0
+   12288    12288  000ab0  vfmul.h	a2, t2, a1
+   12288    12288  000ab4  <unknown>
+   12288    12288  000ab8  vfmul.h	a1, a1, s2
+   12288    24576  000abc  pv.pack.h	a5, a5, a6
+   12288    12288  000ac4  vfmac.h	a5, a0, s5
+   12288    12288  000ac8  vfmul.h	a3, t0, a4
+   12288    24576  000ad4  pv.pack.h	a2, a1, a2
+   12288    24576  000ae4  pv.pack.h	a4, a4, a3
+   12288    24576  000aec  vfmac.h	a4, a5, s5
+    7680    15360  000afa  add	s6, s6, a4
+    7680    15360  000afe  add	s8, s8, a5
+    7680    15360  000b02  addi	a4, a4, -0x1
+    7680    30336  000b08  bnez	a4, 0xa3c <Radix4FFT_DIF_Par_f16+0xb4>
+
+hottest PCs in SwapSamples_Par_f16 (count, cycles, pc, insn):
+      96       96  000f46  lw	a4, 0x8(a0)
+      96       96  000f48  lw	a6, 0x0(a0)
+      96        0  000f4c  lw	a0, 0x4(a0)
+      96       96  000f4e  blez	a4, 0xf78 <SwapSamples_Par_f16+0x32>
+      96       96  000f52  mv	a2, a6
+      96       96  000f54  li	a3, 0x0
+      96      192  000f56  lp.setup	x1, a4, 0x10
+   24576    24576  000f5a  p.lh	a1, 0x2(a0!)
+   24576    24576  000f5e  slli	a5, a1, 0x2
+   24576    24576  000f62  add	a5, a5, a6
+   24576    62208  000f64  bge	a3, a1, 0xf74 <SwapSamples_Par_f16+0x2e>
+   11520    11520  000f68  lw	a7, 0x0(a5)
+   11520    11520  000f6c  lw	a1, 0x0(a2)
+   11520    11520  000f6e  sw	a7, 0x0(a2)
+   11520        0  000f72  sw	a1, 0x0(a5)
+   24576    24576  000f74  addi	a3, a3, 0x1
+   24576    49056  000f76  addi	a2, a2, 0x4
+      96      288  000f78  ret
+
+hottest PCs in RFFT_DIF_Par_f16 (count, cycles, pc, insn):
+      96      192  000f7a  addi	sp, sp, -0x40
+      96       96  000f7c  sw	s0, 0x38(sp)
+      96      192  000f86  srli	s0, s0, 0x1
+      96      192  000f98  li	a5, 0x100
+      96      288  000fa8  beq	s0, a5, 0xfba <RFFT_DIF_Par_f16+0x40>
+      96      288  000fbc  jal	0x988 <Radix4FFT_DIF_Par_f16>
+      96      192  000fbe  addi	a0, sp, 0x4
+      96      288  000fc6  jal	0xf46 <SwapSamples_Par_f16>
+      96      192  000fd4  add	a4, s2, a1
+      96      192  000fdc  fadd.h	a2, a5, a3
+      96      192  000fe8  addi	s0, s0, -0x1
+      96      192  000ff8  lui	a5, 0xa
+      96      192  001000  lui	a5, 0xa
+      96      192  001014  addi	a4, a4, -0x4
+      96      192  00102c  lp.setup	x1, a4, 0x1d
+   24480    24480  001030  p.lw	a5, 0x4(t3!)
+   24480    24480  001034  p.lw	a6, -0x4(a1!)
+   24480    24480  00103c  mv	a2, a5
+   24480    24480  00103e  vfmre.h	a5, a6, t4
+   24480    24480  001042  pv.shuffle.sci.h	a3, a5, 0x1
+   24480    24480  001046  vfmul.h	a3, a3, a7
+   24480    24480  00104a  vfmul.h	a5, a7, a5
+   24480    24480  00104e  <unknown>
+   24480    24480  001052  pv.pack.h	a5, a3, a5
+   24480    24480  001056  vfmac.h	a5, a7, t6
+   24480    24480  00105a  vfmac.h	a2, a6, t4
+   24480    24480  00105e  vfadd.h	a5, a5, a2
+   24480    48960  001062  vfmul.h	a5, a5, t5
+   24480    24480  001066  p.sw	a5, 0x4(a0!)
+      96      192  001078  ret
+
+hottest PCs in CmplxMagSquared_f16 (count, cycles, pc, insn):
+      96       96  001080  lw	a5, 0x8(a0)
+      96       96  001082  lw	a2, 0x0(a0)
+      96        0  001084  lw	a1, 0x4(a0)
+      96       96  001086  beqz	a5, 0x10ac <CmplxMagSquared_f16+0x2c>
+      96       96  001088  slli	a3, a5, 0x1
+      96       96  00108c  addi	a3, a3, -0x2
+      96       96  00108e  srli	a3, a3, 0x1
+      96       96  001090  addi	a3, a3, 0x1
+      96      192  001092  lp.setup	x1, a3, 0xb
+   24672    24672  001096  lhu	a5, 0x0(a2)
+   24672        0  00109a  lhu	a4, 0x2(a2)
+   24672    24672  00109e  addi	a2, a2, 0x4
+   24672    24672  0010a0  fmul.h	a4, a4, a4
+   24672    49344  0010a4  fmadd.h	a5, a5, a5, a4
+   24672    24576  0010a8  p.sh	a5, 0x2(a1!)
+      96      192  0010ac  ret
+
+hottest PCs in MelFilterBank_f16 (count, cycles, pc, insn):
+      96       96  0011a0  lh	a5, 0x10(a0)
+      96       96  0011a4  lw	t1, 0x0(a0)
+      96       96  0011a8  lw	t4, 0x4(a0)
+      96       96  0011ac  lw	t3, 0x8(a0)
+      96       96  0011b4  beqz	a5, 0x1218 <MelFilterBank_f16+0x78>
+      96       96  0011b6  slli	a7, a5, 0x1
+      96       96  0011ba  add	a7, a7, a5
+      96      192  0011d4  addi	a7, a7, 0x1
+    3840     3840  0011d6  lhu	a5, 0x2(a6)
+    3840     3840  0011da  lhu	a4, 0x4(a6)
+    3840     3840  0011e2  beqz	a5, 0x121a <MelFilterBank_f16+0x7a>
+    3840     3840  0011e4  add	a5, a5, a4
+    3840     3840  0011e6  slli	a5, a5, 0x1
+    3840     3840  0011e8  slli	a4, a4, 0x1
+    3840     3840  0011ea  sub	a5, a5, a4
+    3840     3840  0011ec  addi	a5, a5, -0x2
+    3840     3840  0011ee  li	a2, 0x0
+    3840     3840  0011f2  slli	a3, a3, 0x1
+    3840     3840  0011f4  srli	a5, a5, 0x1
+    3840     3840  0011f6  add	a3, a3, t1
+    3840     3840  0011f8  add	a4, a4, t3
+    3840     3840  0011fa  addi	a5, a5, 0x1
+    3840     7680  0011fc  lp.setup	x1, a5, 0x6
+   47040    47040  001200  p.lhu	a0, 0x2(a4!)
+   47040    47040  001204  p.lhu	a1, 0x2(a3!)
+   47040    94080  001208  fmadd.h	a2, a0, a1, a2
+    3840     3840  001210  addi	a6, a6, 0x6
+    3840     3840  001212  addi	a7, a7, -0x1
+    3840    15072  001214  bnez	a7, 0x11d6 <MelFilterBank_f16+0x36>
+      96      192  001218  ret
+
+hottest PCs in Db_f16_f32 (count, cycles, pc, insn):
+      96       96  00122c  lhu	a5, 0x8(a0)
+      96      192  001230  beqz	a5, 0x12de <Db_f16_f32+0xb2>
+      96       96  001236  li	a4, 0x0
+      96      192  00123a  addi	sp, sp, -0x10
+      96      192  00123e  feq.s	a1, a6, a4
+      96       96  001242  lw	a3, 0x0(a0)
+      96      192  001246  beqz	a1, 0x12e0 <Db_f16_f32+0xb4>
+      96       96  00124c  lui	t5, 0xa
+      96       96  001250  lui	t4, 0xa
+      96       96  001254  feq.s	a4, a7, a4
+      96       96  001258  lui	t3, 0xa
+      96      192  00126c  lui	a4, 0xa
+      96      192  001280  lui	a6, 0x800
+      96      192  001298  lp.setup	x1, a0, 0x1e
+    3840     3840  00129c  p.lhu	a4, 0x2(a3!)
+    3840     3840  0012a0  fcvt.s.h	a4, a4
+    3840     3840  0012a4  fmax.s	a4, a4, a7
+    3840     3840  0012a8  and	a5, a6, a4
+    3840     3840  0012ac  or	a5, a5, t1
+    3840     3840  0012b0  fadd.s	a1, t6, a5
+    3840     3840  0012b4  fcvt.s.wu	a4, a4
+    3840     3840  0012b8  fmadd.s	a4, a4, s0, t2
+    3840     3840  0012bc  fdiv.s	a1, t5, a1
+    3840     3840  0012c0  fnmsub.s	a5, a5, t0, a4
+    3840     3840  0012c4  fsub.s	a5, a5, a1
+    3840     3840  0012c8  fmul.s	a5, a5, t4
+    3840     3840  0012cc  fmul.s	a5, a5, t3
+    3840     7680  0012d0  fcvt.h.s	a5, a5
+    3840     3840  0012d4  p.sh	a5, 0x2(a2!)
+      96      192  0012dc  ret
+
+hottest PCs in DctTypeII_f16 (count, cycles, pc, insn):
+      96      192  0010c6  slli	t4, a5, 0x1
+      96      192  0010d6  addi	t4, t4, -0x2
+      96      192  0010ea  srli	t4, t4, 0x1
+    1248     1248  001102  beqz	s2, 0x1198 <DctTypeII_f16+0xea>
+    1248     1248  001106  sub	a1, s3, t5
+    1248     1248  00110a  addi	a1, a1, -0x8
+    1248     1248  00110c  li	a2, 0x0
+    1248     1248  001110  srli	a1, a1, 0x3
+    1248     1248  001112  addi	t1, t5, 0x4
+    1248     1248  001116  addi	a7, t3, 0x4
+    1248     1248  00111a  mv	a6, t3
+    1248     1248  00111c  mv	a0, t5
+    1248     1248  00111e  addi	a1, a1, 0x1
+    1248     2496  001120  lp.setup	x1, a1, 0x1c
+   12480    12480  001124  p.lw	a5, 0x8(a6!)
+   12480    12480  001128  p.lw	s6, 0x8(a7!)
+   12480    12480  00112c  p.lw	a3, 0x8(a0!)
+   12480    12480  001134  vfmul.h	a3, a3, a5
+   12480    12480  001138  vfmul.h	a4, a4, s6
+   12480    12480  00113c  pv.extract.h	a5, a3, 0x0
+   12480    12480  001140  pv.extract.h	s6, a4, 0x0
+   12480    12480  001144  pv.extract.h	a3, a3, 0x1
+   12480    12480  001148  pv.extract.h	a4, a4, 0x1
+   12480    12480  00114c  fadd.h	a5, a5, a3
+   12480    12480  001150  fadd.h	a5, a5, s6
+   12480    12480  001154  fadd.h	a5, a5, a4
+   12480    23712  001158  fadd.h	a2, a2, a5
+    1248     4992  00115c  bgeu	s1, t2, 0x1180 <DctTypeII_f16+0xd2>
+    1248     1344  001184  add	t3, t3, s0
+      96      192  001196  ret

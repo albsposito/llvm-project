@@ -1,0 +1,207 @@
+## Analysis (hand-written)
+
+Written after reading the tables above, the library disassembly (`build/<compiler>/<opt>/lib/*.dis`) and per-PC
+profiles (`./profile.sh <elf> <function>`, a GVSoC instruction trace). "Per iteration" numbers are executed
+instructions of the hottest loop, read off the per-PC profile.
+
+### The short version
+
+- **Integer and f32 kernels: clang is level with GCC or ahead.** Without the f16 kernels the geomean is 0.965 (-O2)
+  and 0.969 (-O3). fix16 is 5% behind (the FFT family), f32 is 9% ahead.
+- **f16 kernels: clang is 21% (-O2) to 24% (-O3) behind**, and 2.7x on MatMul. One cause: clang does the SDK's
+  two-lane f16 vector code one lane at a time, where GCC uses the packed f16 instructions.
+- **f16alt kernels: clang's code does not link** (B133). Nothing can be said about their speed.
+- **-Os: clang is 1.46x faster** (ratio 0.69), because GCC -Os gives up hardware loops and clang does not.
+- **At each app's own opt level** (Fir, MatMul, DftSimple build with -O3; FFTL1, RFFTL1, IRFFTL1 with -O2) the
+  geomean over the 45 comparable app kernel functions is 1.019.
+- **No wrong result and no compiler crash from clang** in any of the 215 x 3 builds. One family of wrong results
+  from GCC (next section).
+
+### GCC f16 RFFT / IRFFT: wrong result on the simulator (BACKLOG B151)
+
+All 44 GCC f16 and f16alt RFFT/IRFFT configurations (RFFT_DIF_Seq/Par, IRFFT_DIF_Seq/Par, every size, every opt
+level) give an output that has nothing to do with the host reference (error about as large as the signal). clang's f16
+output for the same kernels is within 2.5e-3 of the host. The complex FFTs underneath are right with both compilers; the
+error is in the real-FFT pre/post-processing loop.
+
+Cause, isolated with `repro/gcc_vfmre_sign.c` (three one-line functions, run on the same simulator):
+
+| C expression on `v2h` | GCC emits | GVSoC result for a={3,5} b={1,-1} c={0.5,0.25} | expected |
+|---|---|---|---|
+| `a*b + c` | `vfmac.h c, a, b` | 3.5, -4.75 | 3.5, -4.75 |
+| `c - a*b` | `vfsgnjn.h` + `vfmac.h` | -2.5, 5.25 | -2.5, 5.25 |
+| `a*b - c` | `vfmre.h c, a, b` | **-2.5, 5.25** | 2.5, -5.25 |
+
+GCC uses `vfmre.h` for "multiply, then subtract the accumulator" (`a*b - c`). GVSoC executes `vfmre.h` as
+"accumulator minus product" (`c - a*b`). The RFFT loop computes `t1 = xB*{1,-1} - xA`, so GCC's code gets `-t1`.
+One of the two is wrong about the instruction. It cannot be settled here: it needs one run on silicon.
+
+Consequences:
+
+- This is the kind of simulator/GCC trap the task warned about (B113, B127, B136), but on a different instruction. It
+  did not corrupt the oracle, because every row is judged against the host reference, not against GCC.
+- clang is not affected either way: it emits no `vfmre` (it does not use packed f16 instructions at all).
+- If silicon behaves like GVSoC, GAP9 GCC miscompiles `a*b - c` on f16/f16alt vectors, and the SDK's f16 RFFT is wrong
+  on the board with GCC. If silicon behaves like GCC expects, it is a simulator bug of the B127 kind.
+- The 22 affected f16 configurations are left out of the speed geomeans. Their cycle ratios are in the table
+  "Configurations where the GCC build gives a wrong result" for information (clang 1.3x to 1.5x GCC's cycles).
+- **BACKLOG: B151.** The MFCC application benchmark (`benchmarks/dsp-bench/mfcc-app`) found the same disagreement
+  on the same day and filed it. This benchmark adds: a minimal reproducer
+  (`benchmarks/dsp-bench/sdk-kernels/repro/gcc_vfmre_sign.c`), and the list of SDK kernels it breaks with GCC: the
+  f16 and f16alt RFFT and IRFFT, sequential and parallel, every size. It is a board-pack probe candidate, like B99
+  and B114.
+
+### Float results: tolerance, and why they are not bit-exact
+
+- **Integer (fix16): bit-exact everywhere**, clang = GCC = host, all 50 configurations at all three opt levels.
+- **f32:** clang and GCC both differ from the host by at most 2.6e-7 of the output peak (tolerance used: 1e-4).
+  The host (x86, -O0) never fuses a multiply and an add; both target compilers do (`fmadd.s`), which changes the last
+  bit. clang is bit-identical to GCC in 37 of 57 f32 configurations at -O2; the others differ in which operations are
+  fused. (Fir f32 is bit-exact with the host: the SDK's f32 FIR keeps its accumulator in an `int`.)
+- **f16:** clang within 2.5e-3 of the host, GCC within 1.2e-3 (tolerance used: 2e-2; for scale, the DftSimple app's own
+  pass limit is 1e-2 of the peak). Same reason, larger because a half has 11 significant bits. GCC's f16 FFT is
+  bit-exact with the host; clang's is not, because `-ffp-contract=fast` lets it fuse the scalar butterfly.
+- **`-ffp-contract`.** The table "Experiment: clang with its own default" shows the trade: with clang's default
+  (`on`), 50 of 54 f16 configurations become bit-exact with the host, at a cost of 7% more cycles (3% for f32).
+  The numbers in this report use `fast`, as the SDK wrapper does. BACKLOG: **B152** (whether the xgap9 target
+  should default to `fast` is an open owner decision).
+- **f16alt:** GCC within 5e-3 of the host. clang only in the compiler-rt experiment (within 1e-2).
+- **The GVSoC bugs named in the task touch no result here.** Checked by searching the disassembly of every library
+  object: no `pv.shuffle2` (B113), no `vfsgnj.ah` (B127), and every float-to-int conversion uses round-to-zero, not
+  rmm (B136). GCC's f16/f16alt FFT objects contain 17 instructions each that our llvm-objdump does not decode
+  (encoding `d2....57`, next to `pv.pack.h`); GCC's complex f16 FFT results match the host, so the simulator runs
+  them as GCC intends.
+
+### Worst gaps for clang, with root cause
+
+**1. MatMul f16: 2.72x (-O2), 2.90x (-O3).** `KerParMatMulDSP_f16`, 64x64x64 (a library variant, not selectable in
+the app).
+- Inner loop per iteration: GCC 14 instructions (6 post-increment `p.lw` of two-lane f16 words + 8 packed
+  `vfmac.h`), 14 cycles. clang 43 instructions (12 `lh`, 16 scalar `fmadd.h`, 8 register moves, 6 `addi` pointer
+  bumps, 1 stack reload), 43 cycles.
+- Cause: clang has no packed f16 code generation. The SDK source is written on `v2h` vectors; clang splits every
+  vector operation into two scalar ones. Sixteen scalar accumulators then no longer fit in registers.
+- BACKLOG: **B115** (`<2 x half>` is not a PULP packed type; fp16 task T5), B28 (fp16 vector instructions).
+
+**2. FFT f16: 1.42x to 1.70x.** `Radix2FFT_DIF_*_f16`, `Radix4FFT_DIF_*_f16` (and the f16 RFFT/IRFFT, 1.3x to 1.5x, for
+information only).
+- Radix-2 butterfly: GCC 11 instructions (`vfsub.h`, `vfadd.h`, 2 `vfmul.h`, `vfmac.h`, 2 pack, 2 `lw`, 2
+  post-modify `p.sw`), clang 18 (4 `lh`, 4 `sh`, 8 scalar f16 operations, 2 address adds).
+- Same cause as 1: **B115**.
+
+**3. FIR f16: 1.35x to 1.40x.** `KerFirSeqf16`, `KerFirParf16` (`KerFirSeqBaselinef16`: 1.17x).
+- GCC: 12 `lw` + 8 `vfmac.h` per unrolled step. clang: 17 `lh` + 16 `fmadd.h`. Same cause: **B115**.
+- `SwapSamples_*_f16` (1.08x) is the same thing in miniature: clang copies a complex f16 sample as two 16-bit halves
+  (4 `lh` + 4 `sh`), GCC as one 32-bit word (2 `lw` + 2 `sw`).
+
+**4. fix16 FFT family: 1.09x to 1.19x.** `Radix2FFT_DIF_*_Fix16`, `Radix4FFT_DIF_*_Fix16`, `RFFT_DIF_*_Fix16`,
+`IRFFT_DIF_*_Fix16`. Three separate causes:
+- *One pointer plus offsets where GCC keeps one pointer per stream.* Radix-2 butterfly: GCC 8 instructions, clang 9.
+  The extra one is an `add` that recomputes the second address every iteration, and its store is a plain `sw` where
+  GCC stores through two post-modify `p.sw`. Radix-4: GCC 22, clang 26 (3 address `add`s for the other three
+  streams, and the separate shift of the next point). BACKLOG: **B20** (load-and-advance declined when the pointer has other users),
+  **B94** (far fewer post-increment loads/stores than GCC), **B153** (several loads/stores at different offsets
+  from one pointer).
+- *Radix-4 only: a separate vector shift.* clang emits `pv.add.h` + `pv.sra.h` where GCC emits one
+  `pv.add.h.div4`. clang does form `pv.add.h.div2`. BACKLOG: **B97** (GAP9 `.divN` forms, batch B).
+- *The RFFT/IRFFT pre/post-processing loop is not a hardware loop.* clang ends it with `bne ptr, end` (4 cycles per
+  iteration for the branch alone) and reads the descending stream with `lw` + `addi -4`. GCC uses `lp.setup` and three
+  post-modify loads, one of them descending. This is the pointer-against-end-pointer loop shape that
+  `gap9-sweep/runtime/notes.md` describes for `k12_copy_loop`. BACKLOG: **B153** covers the missing post-decrement
+  load; no row found for the missed hardware loop itself (closest: B94, B95). It deserves one.
+
+**5. `KerFirSeqf32` / `KerFirParf32` at -O3: 1.04x** (0.92x at -O2). GCC -O3 improves its own code by 12%
+(32358 -> 28510 cycles); clang's -O3 code is its -O2 code. Small; not analysed further.
+
+### Clang wins, with root cause
+
+**1. Everything at -Os (geomean 0.69, down to 0.37 on MatMul).** GCC -Os stops using hardware loops: the 12
+library objects contain 301 `lp.setup` at -O2 and 5 at -Os, so every loop pays a taken branch. clang keeps them
+(341 at -O2, 279 at -Os), and its -Os code is within 1% of its -O2 code in cycles for most kernels.
+The SDK's default optimisation level is -Os; the six benchmark apps override it with -O2 or -O3.
+
+**2. `SwapSamples_*_f32`: 0.71.** The bit-reverse swap skips about half of its iterations. GCC computes both swap
+addresses before the test and keeps two running pointers: 9 instructions on a skipped iteration. clang computes the
+addresses only when it swaps and uses one pointer: 5 instructions. (fix16: 0.90, same reason, smaller.)
+
+**3. DftSimple, all four kernels, f32 and f16: 0.81 to 0.89.** clang inlines the radix-2/3/4 butterflies
+(`DFT2`, `DFT3`, `DFT4` and the stage-0 variants) into the stage loop and keeps only `DFT5` as a call (8 calls in the
+whole f16 object). GCC calls every butterfly (56 calls). Fewer instructions (0.82 to 0.92 of GCC's) and fewer cycles.
+For f16 this gain is larger than the loss from the missing packed instructions (GCC's f16 DFT object has 124 of them).
+
+**4. `KerFirSeq` fix16: 0.915; `KerFirSeqBaselinef32`: 0.85.** Same instruction count as GCC (1.006, 1.008); the gain
+is stalls. clang issues the loads of an unrolled step first and the `pv.sdotsp.h` / `fmadd.s` after them; GCC puts
+each load directly in front of the instruction that uses it and pays the load-use stall. Already seen in the sweep
+(k01).
+
+**5. f32 FFT family: 0.95 to 0.98.** A few percent, same mechanism as 4. MatMul f32 and fix16 are level (1.01).
+
+### Code size
+
+Kernel function plus the library functions it calls: over the app configurations clang is 5% larger than GCC at -O2
+(geomean 1.054), 7.5% at -O3, 18% at -Os. Per data type at -O2: fix16 1.05, f32 0.96, f16 1.16 (scalarised vector
+code), f16alt 2.6 (every bfloat16 operation is widened to f32 and narrowed again by a library call). The geomean over
+all 69 functions (1.33 at -O2) is dominated by the 18 f16alt functions.
+
+### f16alt with compiler-rt (the labelled experiment)
+
+With compiler-rt's `__truncsfbf2` linked in, all 54 f16alt configurations run and are correct against the host.
+They need 8.2x GCC's cycles in the geomean at -O2: 14x to 97x for the arithmetic kernels; the swap kernels, which do
+no arithmetic, are at 1.08x. The reason is in B133: LLVM 20 widens each bfloat16 operation to f32 and calls a
+soft-float routine to narrow the result. Linking compiler-rt makes f16alt link and compute correctly, at an unusable
+speed.
+
+### Stretch: the six apps through the SDK's own CMake with our clang
+
+Built with `benchmarks/sdk-clang/build_app.sh` in a private SDK mirror (scratch), wrapper with
+`GAP_CLANG_MARCH=rv32imc_xgap9`, compiler = `toolchains/port-20-bench`. Build and link only; nothing was run.
+Raw results: `sdk-app-builds.tsv`; the script: `sdk_app_builds.sh`.
+
+| app | GCC | setup A (clang + GNU as + GNU ld) | setup B (all LLVM, patched mirror, ld.lld) | strict (wrapper only, SDK `-Werror`, GNU as/ld) |
+|---|---|---|---|---|
+| Fir | builds, links | builds, links | builds, links | builds, links |
+| DftSimple | builds, links | builds, links | builds, links | builds, links |
+| FFTL1 | builds, links | builds, links | builds, links | builds, links |
+| RFFTL1 | builds, links | builds, links | builds, links | builds, links |
+| IRFFTL1 | builds, links | builds, links | builds, links | builds, links |
+| MatMul | builds, links | every file compiles; **link fails: `cannot find -lm`** | every file compiles; **link fails: `unable to find library -lm`** | same link failure |
+
+- MatMul is the only one of the six that links newlib's libm (`CONFIG_ENABLE_LIBMATH`). The wrapper passes GCC's
+  libgcc directory to the linker but not the GAP9 newlib multilib directory
+  (`riscv32-unknown-elf/lib/rv32imcxgap9/ilp32`), which GCC adds by itself. With that one `-L` added to the unchanged
+  link command, MatMul links in setups A and B. It is a wrapper gap (the B111 family), not a compiler problem.
+- The f16alt library objects reference `__truncsfbf2` in these builds too. The apps still link because they never call
+  an f16alt kernel and the SDK links with `--gc-sections`. An app that calls one would hit B133.
+- On 2026-09-28 none of these apps compiled with clang (`benchmarks/sdk-clang/report.txt`).
+
+### Caveats
+
+- **Simulator, not silicon.** GVSoC2 `ri5ky_testbench` is instruction-accurate with a timing model. No L1/L2
+  memory latency, no TCDM contention, no instruction cache, no DMA.
+- **Single core.** The "Par" kernels run with `gap_ncore() == 1` through the shim. Their 8-core scaling is not
+  measured. `-mPE=8` is still passed to both compilers.
+- **Kernels, not apps.** The six apps do not run on the available GVSoC2 gap9.evk model (cluster timer). Each kernel
+  is called from a small driver with the app's data and sizes. MatMul: the 128x256x128 case calls
+  `KerParMatMulDSP_f32` once on the whole matrices; the app's autotiler tiling and DMA are not reproduced.
+  `MatMulSimpleSeq` is the app's own reference loop, copied verbatim into the driver and called with run-time sizes
+  (the app passes constants).
+- **RFFTL1** builds `FFTMultiFrameTest.c` with NFRAMES=1; its ParSeq path only runs with more than one frame and is
+  not measured.
+- **Timing window** includes the call, the return and about 2 instructions of counter reads (under 1% for the
+  smallest kernel, 580 cycles).
+- **What did not link:** every f16alt kernel with clang (B133). `SwapSamples_*_f16a` contains no bfloat16
+  arithmetic and would link by itself; it is not run because the driver times it together with its FFT.
+- **fix32:** no benchmark app exercises a fix32 kernel (the library has `Radix*FFT_DIF_Par_Fix32`,
+  `SwapSamples_Par_Fix32`, `RFFT_DIF_Par_Fix32_Scal`). Not measured.
+- **Library-variant rows** (f16alt, MatMul fix16/f16) use the app's data converted to that type; the apps cannot
+  select them. MatMul fix16 uses Q12 inputs and Norm=12, chosen here. f16alt inputs are converted from f32 with
+  integer code in the driver, so that the driver itself never needs a bfloat16 helper.
+- **Flags:** `-mint64` (in the SDK's flag set) is not passed to GCC, as specified for this task. `-D__GAP9__` is
+  passed to both compilers, because the shim replaces the SDK header chain that normally selects the GAP9 builtin
+  spellings. clang gets `-ffp-contract=fast`, as the SDK wrapper gives it.
+- **memcpy/memset** are the sweep's byte loops, built by the compiler under test (the SDK's own are the same
+  loops). In these libraries they are called only from `KerFirInit*` and `*_InstallTwiddlesAndSwapLUT`, which run
+  outside the timed window.
+- **Float tolerance** is relative to the output peak, so small-magnitude bins can differ by more in relative terms.
+- **One simulator run per build.** GVSoC is deterministic; three full runs of this benchmark gave identical cycle
+  counts.
