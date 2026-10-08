@@ -18,6 +18,7 @@
 #include "MCTargetDesc/RISCVTargetStreamer.h"
 #include "RISCV.h"
 #include "RISCVConstantPoolValue.h"
+#include "RISCVInstrInfo.h"
 #include "RISCVMachineFunctionInfo.h"
 #include "RISCVRegisterInfo.h"
 #include "TargetInfo/RISCVTargetInfo.h"
@@ -28,6 +29,7 @@
 #include "llvm/CodeGen/MachineConstantPool.h"
 #include "llvm/CodeGen/MachineInstr.h"
 #include "llvm/CodeGen/MachineModuleInfo.h"
+#include "llvm/IR/DiagnosticInfo.h"
 #include "llvm/IR/Module.h"
 #include "llvm/MC/MCAsmInfo.h"
 #include "llvm/MC/MCContext.h"
@@ -475,6 +477,25 @@ bool RISCVAsmPrinter::runOnMachineFunction(MachineFunction &MF) {
       static_cast<RISCVTargetStreamer &>(*OutStreamer->getTargetStreamer());
 
   bool EmittedOptionArch = emitDirectiveOptionArch();
+
+  // An frep repeats exactly the next N FP instructions. If a pass after the
+  // frep pass (register allocation, typically) changed the number of FP
+  // instructions in its body, the program would silently compute wrong
+  // results: report it instead.
+  if (STI->hasExtXfrep() &&
+      MF.getInfo<RISCVMachineFunctionInfo>()->getMaxFrepBody())
+    for (const MachineBasicBlock &MBB : MF)
+      for (const MachineInstr &MI : MBB)
+        if (MI.getOpcode() == RISCV::FREP_O ||
+            MI.getOpcode() == RISCV::FREP_I) {
+          std::string Why;
+          if (!RISCVInstrInfo::isFrepBodyIntact(MI, Why))
+            MF.getFunction().getContext().diagnose(DiagnosticInfoUnsupported(
+                MF.getFunction(),
+                "frep loop body was changed after the frep was created (" +
+                    Why + "); the loop cannot be repeated by frep",
+                MI.getDebugLoc()));
+        }
 
   SetupMachineFunction(MF);
   emitFunctionBody();

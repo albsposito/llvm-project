@@ -19,7 +19,10 @@
 #include "../RISCVRegisterInfo.h"
 #include "../RISCVSubtarget.h"
 #include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitVector.h"
 #include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/SmallSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/ADT/StringRef.h"
@@ -158,6 +161,12 @@ private:
   /// Return true if PHI elimination / register allocation may have to turn
   /// the loop-carried PHI into a copy inside the loop body.
   bool phiMayNeedCopy(MachineLoop *L, const MachineInstr &Phi) const;
+
+  /// Return true if register allocation may have to put spill code or
+  /// copies inside the frep body: more FP (or integer) values are live at
+  /// some point of the body than there are allocatable registers.
+  bool mayNeedSpillInBody(MachineLoop *L,
+                          ArrayRef<MachineInstr *> OldInsts) const;
 
   /// Scan the loop body and search for a branch instruction that
   /// leads to the induction variable and trip count
@@ -329,8 +338,15 @@ bool SNITCHFrepLoops::runOnMachineFunction(MachineFunction &MF) {
   TII = HST.getInstrInfo();
   TRI = HST.getRegisterInfo();
 
+  // At -O0 the fast register allocator spills and reloads values around
+  // every block boundary, which puts fld/fsd inside any frep body (see
+  // mayNeedSpillInBody): the repeat window would end early. clang -O0 marks
+  // functions optnone, so skipFunction above already stops there; this covers
+  // llc -O0 the same way. The loops stay ordinary loops.
+  bool FastRegAlloc = MF.getTarget().getOptLevel() == CodeGenOptLevel::None;
+
   for (auto &L : *MLI)
-    if (L->isOutermost()) {
+    if (!FastRegAlloc && L->isOutermost()) {
       FL = new FrepLoop(L);
       Changed |= convertToHardwareLoop(L);
       delete FL;
@@ -405,6 +421,13 @@ bool SNITCHFrepLoops::convertToHardwareLoop(MachineLoop *L) {
     return changed;
   }
   LLVM_DEBUG(dbgs() << "No invalid instructions found\n");
+
+  // Register allocation runs after this pass. Any spill, reload or copy it
+  // puts in the body would be repeated by the sequencer without being
+  // counted in N, so N would end the repeat early. Leave the loop alone if
+  // the body needs more registers than there are.
+  if (mayNeedSpillInBody(L, OldInsts))
+    return changed;
 
   // don't proceed if we don't have a control block
   MachineBasicBlock *ControlBlock = L->findLoopControlBlock();
@@ -944,6 +967,252 @@ bool SNITCHFrepLoops::phiMayNeedCopy(MachineLoop *L,
       if (!MDT->properlyDominates(UB, DB))
         return true;
     }
+  }
+  return false;
+}
+
+/// Return true if the register allocator may have to add instructions to the
+/// frep body.
+///
+/// Register allocation runs after this pass. When more values of one
+/// register bank are live at some point of the body than the bank has
+/// allocatable registers, it spills, reloads, rematerializes or splits a value
+/// there, and those instructions land inside the body. An FP reload (fld),
+/// spill (fsd) or copy (fmv.d = fsgnj.d) is repeated by the sequencer but not
+/// counted in N, so the repeat window ends early (backlog B116). N cannot
+/// simply be recounted afterwards: the allocator places such code for the loop
+/// it sees, not for the sequencer's repetition. So the loop is declined.
+///
+/// The body is taken in execution order (the chain of blocks from the header
+/// to the latch; anything else is declined). Live at the end of the body are:
+///  - the values the loop-carried PHIs take on the back edge (they share a
+///    register with the PHI, see phiMayNeedCopy);
+///  - every value defined in the loop or live into it that is used after the
+///    loop, including values live through the loop without a use in it;
+///  - every value from outside the loop that the loop uses. This pass leaves
+///    the header among the latch's successors, so the allocator still sees
+///    the back edge and keeps such a value (an invariant such as a scale
+///    factor) live across the whole body, not just up to its last use.
+/// A backward scan over the body then gives the number of live values right
+/// before and right after each instruction, per bank; the largest must not
+/// exceed the allocatable registers. The loop control the frep replaces
+/// (PHIs, OldInsts, the exit branch) is not counted. Allocatable registers are
+/// the ones not reserved now: the SSR expansion pass runs before this one and
+/// has already reserved ft0-ft2 when SSR is enabled.
+///
+/// The count only predicts what the allocator will do; RISCVInstrInfo::
+/// isFrepBodyIntact checks the result before the function is emitted.
+bool SNITCHFrepLoops::mayNeedSpillInBody(
+    MachineLoop *L, ArrayRef<MachineInstr *> OldInsts) const {
+  MachineBasicBlock *Header = L->getHeader();
+  MachineBasicBlock *Latch = L->getLoopLatch();
+  const MachineFunction &MF = *Header->getParent();
+  if (!Latch)
+    return true;
+
+  // The body blocks in execution order: a chain from the header to the latch.
+  SmallVector<MachineBasicBlock *, 4> Chain;
+  for (MachineBasicBlock *B = Header;;) {
+    Chain.push_back(B);
+    if (B == Latch)
+      break;
+    MachineBasicBlock *Next = nullptr;
+    for (MachineBasicBlock *S : B->successors()) {
+      if (!L->contains(S))
+        continue;
+      if (Next || S == Header) {
+        LLVM_DEBUG(dbgs() << "Cannot convert to frep: loop is not a chain\n");
+        return true;
+      }
+      Next = S;
+    }
+    if (!Next || Chain.size() >= L->getNumBlocks()) {
+      LLVM_DEBUG(dbgs() << "Cannot convert to frep: loop is not a chain\n");
+      return true;
+    }
+    B = Next;
+  }
+  if (Chain.size() != L->getNumBlocks()) {
+    LLVM_DEBUG(dbgs() << "Cannot convert to frep: loop is not a chain\n");
+    return true;
+  }
+
+  enum Bank { FP, Int, NumBanks };
+  // Register bank of a register, or NumBanks for neither.
+  auto BankOf = [this](Register R) -> unsigned {
+    if (R.isPhysical()) {
+      if (RISCV::FPR64RegClass.contains(R) ||
+          RISCV::FPR32RegClass.contains(R) || RISCV::FPR16RegClass.contains(R))
+        return FP;
+      if (RISCV::GPRRegClass.contains(R))
+        return Int;
+      return NumBanks;
+    }
+    const TargetRegisterClass *RC = MRI->getRegClass(R);
+    if (RISCV::FPR64RegClass.hasSubClassEq(RC) ||
+        RISCV::FPR32RegClass.hasSubClassEq(RC) ||
+        RISCV::FPR16RegClass.hasSubClassEq(RC))
+      return FP;
+    if (RISCV::GPRRegClass.hasSubClassEq(RC))
+      return Int;
+    return NumBanks;
+  };
+
+  // Allocatable registers per bank. getReservedRegs is recomputed here
+  // because the SSR expansion pass reserves the SSR registers after the
+  // reserved set was frozen at instruction selection.
+  BitVector Reserved = TRI->getReservedRegs(MF);
+  unsigned Avail[NumBanks] = {0, 0};
+  for (MCPhysReg R : RISCV::FPR64RegClass)
+    if (!Reserved.test(R))
+      ++Avail[FP];
+  for (MCPhysReg R : RISCV::GPRRegClass)
+    if (!Reserved.test(R))
+      ++Avail[Int];
+
+  // Blocks that can run after the loop.
+  SmallPtrSet<const MachineBasicBlock *, 16> After;
+  SmallVector<const MachineBasicBlock *, 16> Work;
+  SmallVector<MachineBasicBlock *, 2> Exits;
+  L->getExitBlocks(Exits);
+  for (MachineBasicBlock *E : Exits)
+    if (After.insert(E).second)
+      Work.push_back(E);
+  while (!Work.empty()) {
+    const MachineBasicBlock *B = Work.pop_back_val();
+    for (const MachineBasicBlock *S : B->successors())
+      if (After.insert(S).second)
+        Work.push_back(S);
+  }
+  // True if R has a use that can run after the loop.
+  auto UsedAfterLoop = [&](Register R) {
+    for (const MachineOperand &MO : MRI->use_nodbg_operands(R)) {
+      const MachineInstr &UseMI = *MO.getParent();
+      if (UseMI.isPHI()) {
+        // A PHI use happens at the end of the incoming block.
+        const MachineBasicBlock *In =
+            UseMI.getOperand(MO.getOperandNo() + 1).getMBB();
+        if (!L->contains(In) && After.count(In))
+          return true;
+        continue;
+      }
+      if (!L->contains(UseMI.getParent()) && After.count(UseMI.getParent()))
+        return true;
+    }
+    return false;
+  };
+
+  auto IsLoopControl = [&](const MachineInstr &MI) {
+    return MI.isPHI() || MI.isDebugInstr() || &MI == FL->condTerm ||
+           MI.isUnconditionalBranch() || is_contained(OldInsts, &MI);
+  };
+  // PHIs of the header are the loop-carried values themselves; their
+  // incoming values from outside are read in the preheader.
+  auto IsLoopControlUse = [&](const MachineInstr &MI) {
+    return MI.isDebugInstr() || &MI == FL->condTerm ||
+           is_contained(OldInsts, &MI) ||
+           (MI.isPHI() && MI.getParent() == Header);
+  };
+  // Registers live at the end of the body.
+  SmallSet<Register, 32> Live;
+  // Back-edge values of the header PHIs.
+  for (const MachineInstr &Phi : Header->phis())
+    for (unsigned i = 1, n = Phi.getNumOperands(); i < n; i += 2)
+      if (L->contains(Phi.getOperand(i + 1).getMBB()))
+        Live.insert(Phi.getOperand(i).getReg());
+  // Values defined in the loop, or live into it, and used after it; and
+  // values from outside the loop that the loop uses (live across the whole
+  // body because of the back edge; were the edge removed, this would only
+  // overestimate).
+  auto UsedInLoop = [&](Register R) {
+    for (const MachineInstr &UseMI : MRI->use_nodbg_instructions(R))
+      if (L->contains(UseMI.getParent()) && !IsLoopControlUse(UseMI))
+        return true;
+    return false;
+  };
+  for (unsigned I = 0, E = MRI->getNumVirtRegs(); I != E; ++I) {
+    Register R = Register::index2VirtReg(I);
+    if (MRI->reg_nodbg_empty(R) || BankOf(R) == NumBanks)
+      continue;
+    const MachineInstr *Def = MRI->getVRegDef(R);
+    if (!Def)
+      continue;
+    // A value defined outside the loop is live in it only if its definition
+    // reaches the header.
+    if (!L->contains(Def->getParent()) &&
+        !MDT->dominates(Def->getParent(), Header))
+      continue;
+    if (UsedAfterLoop(R) || (!L->contains(Def->getParent()) && UsedInLoop(R)))
+      Live.insert(R);
+  }
+  // Allocatable physical registers the body names directly stay taken for
+  // the whole body.
+  SmallSet<unsigned, 4> PhysUnits[NumBanks];
+
+  auto Count = [&](const SmallSet<Register, 32> &S, unsigned B) {
+    unsigned N = 0;
+    for (Register R : S)
+      if (BankOf(R) == B)
+        ++N;
+    return N;
+  };
+  unsigned MaxLive[NumBanks] = {Count(Live, FP), Count(Live, Int)};
+  // One backward step over MI: update Live and the maxima in Max.
+  auto Step = [&](MachineInstr &MI, unsigned *Max) {
+    // Right after MI: everything live after it, plus its definitions
+    // (a dead definition still needs a register). Right before MI:
+    // everything live after it that MI does not define, plus its uses.
+    // A definition may take the register of a use that ends at MI, so the
+    // two are counted separately. An early-clobber definition cannot, so
+    // it is counted before MI as well.
+    SmallSet<Register, 32> LiveAfter = Live;
+    SmallSet<Register, 32> EarlyClobber;
+    for (const MachineOperand &MO : MI.operands()) {
+      if (!MO.isReg() || !MO.getReg())
+        continue;
+      Register R = MO.getReg();
+      if (R.isPhysical()) {
+        unsigned Bk = BankOf(R);
+        // One register unit identifies f<n> whatever its width.
+        if (Bk != NumBanks && !Reserved.test(R))
+          PhysUnits[Bk].insert(*TRI->regunits(R).begin());
+        continue;
+      }
+      if (MO.isDef()) {
+        LiveAfter.insert(R);
+        if (MO.isEarlyClobber())
+          EarlyClobber.insert(R);
+      }
+    }
+    for (const MachineOperand &MO : MI.operands())
+      if (MO.isReg() && MO.getReg().isVirtual() && MO.isDef())
+        Live.erase(MO.getReg());
+    for (const MachineOperand &MO : MI.operands())
+      if (MO.isReg() && MO.getReg().isVirtual() && MO.readsReg())
+        Live.insert(MO.getReg());
+    SmallSet<Register, 32> LiveBefore = Live;
+    for (Register R : EarlyClobber)
+      LiveBefore.insert(R);
+    for (unsigned Bk = 0; Bk != NumBanks; ++Bk)
+      Max[Bk] = std::max(
+          {Max[Bk], Count(LiveAfter, Bk), Count(LiveBefore, Bk)});
+  };
+  for (MachineBasicBlock *B : reverse(Chain))
+    for (MachineInstr &MI : reverse(*B))
+      if (!IsLoopControl(MI))
+        Step(MI, MaxLive);
+
+  // Physical registers the body uses directly occupy a register throughout.
+  for (unsigned Bk = 0; Bk != NumBanks; ++Bk)
+    MaxLive[Bk] += PhysUnits[Bk].size();
+
+  LLVM_DEBUG(dbgs() << "frep body register pressure: FP " << MaxLive[FP]
+                    << " of " << Avail[FP] << ", integer " << MaxLive[Int]
+                    << " of " << Avail[Int] << "\n");
+  if (MaxLive[FP] > Avail[FP] || MaxLive[Int] > Avail[Int]) {
+    LLVM_DEBUG(dbgs() << "Cannot convert to frep: register allocation may "
+                         "spill or copy inside the body\n");
+    return true;
   }
   return false;
 }

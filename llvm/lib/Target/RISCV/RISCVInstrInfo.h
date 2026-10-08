@@ -316,6 +316,13 @@ public:
   // cases answer false. Used by isSchedulingBoundary and by the frep pass.
   static bool isFrepSequenced(const MachineInstr &MI);
 
+  // Final check of an frep created by the frep pass, run just before the
+  // function is emitted: return true if the instructions the sequencer will
+  // repeat are exactly the N the frep counts, i.e. no later pass (register
+  // allocation in particular) added an FP instruction to its body or removed
+  // one. Otherwise set Why and return false.
+  static bool isFrepBodyIntact(const MachineInstr &Frep, std::string &Why);
+
 protected:
   const RISCVSubtarget &STI;
 

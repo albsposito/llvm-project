@@ -3372,6 +3372,85 @@ static bool isInFrepBody(const MachineInstr &MI, unsigned MaxN) {
   }
 }
 
+// The frep pass ends every frep body with an FPU barrier at the start of the
+// loop exit block: "fmv.x.w tmp, f; blt tmp, tmp, done", where the FP operand
+// of the fmv.x.w is marked as a definition. No other fmv.x.w has that shape.
+static bool isFrepBarrier(const MachineInstr &MI) {
+  return MI.getOpcode() == RISCV::FMV_X_W && MI.getNumOperands() > 1 &&
+         MI.getOperand(1).isReg() && MI.getOperand(1).isDef();
+}
+
+// Walk the code after Frep in execution order up to the pass's FPU barrier.
+// Between the two, the pass left exactly N sequenced instructions (the loop
+// body) and no other FP instruction; integer instructions may be scheduled
+// into the gaps, the sequencer does not see them. Register allocation treats
+// the body as straight-line code and may add spills, reloads or copies to it;
+// machine copy propagation could delete a copy. The frep pass declines loops
+// where the allocator could need to (SNITCHFrepLoops::mayNeedSpillInBody),
+// so this check is the backstop that turns a short or long repeat window
+// into a compile error instead of a silent wrong result.
+bool RISCVInstrInfo::isFrepBodyIntact(const MachineInstr &Frep,
+                                      std::string &Why) {
+  uint64_t N = Frep.getOperand(1).getImm();
+  uint64_t Seen = 0;
+  const MachineBasicBlock *MBB = Frep.getParent();
+  MachineBasicBlock::const_iterator I = std::next(Frep.getIterator());
+  // The frep pass only converts loops of at most 1023 instructions.
+  for (unsigned Steps = 0; Steps < 4096; ++Steps) {
+    if (I == MBB->end()) {
+      // No branch ended the block (branches are handled below), so control
+      // falls through to the next block in the layout.
+      const MachineBasicBlock *Next = MBB->getNextNode();
+      if (!Next)
+        break;
+      MBB = Next;
+      I = MBB->begin();
+      continue;
+    }
+    const MachineInstr &MI = *I;
+    if (isFrepBarrier(MI)) {
+      if (Seen == N)
+        return true;
+      Why = "the body holds " + std::to_string(Seen) +
+            " repeated FP instructions, but the frep counts " +
+            std::to_string(N);
+      return false;
+    }
+    if (MI.isUnconditionalBranch() && MI.getOperand(0).isMBB()) {
+      // Continue at the branch target.
+      MBB = MI.getOperand(0).getMBB();
+      I = MBB->begin();
+      continue;
+    }
+    if (MI.isBranch() || MI.isCall() || MI.isReturn() || MI.isInlineAsm() ||
+        MI.getOpcode() == RISCV::FREP_O || MI.getOpcode() == RISCV::FREP_I) {
+      Why = "unexpected instruction in the body: " +
+            std::string(MI.getMF()->getSubtarget().getInstrInfo()->getName(
+                MI.getOpcode()));
+      return false;
+    }
+    if (isFrepSequenced(MI)) {
+      ++Seen;
+    } else if (!MI.isMetaInstruction()) {
+      // Any other instruction that touches an FP register may or may not be
+      // repeated; the frep pass never leaves one in the body.
+      for (const MachineOperand &MO : MI.operands())
+        if (MO.isReg() && MO.getReg().isPhysical() &&
+            (RISCV::FPR64RegClass.contains(MO.getReg()) ||
+             RISCV::FPR32RegClass.contains(MO.getReg()) ||
+             RISCV::FPR16RegClass.contains(MO.getReg()))) {
+          Why = "unexpected FP instruction in the body: " +
+                std::string(MI.getMF()->getSubtarget().getInstrInfo()->getName(
+                    MI.getOpcode()));
+          return false;
+        }
+    }
+    ++I;
+  }
+  Why = "the end of the body was not found";
+  return false;
+}
+
 bool RISCVInstrInfo::isSchedulingBoundary(const MachineInstr &MI,
                                           const MachineBasicBlock *MBB,
                                           const MachineFunction &MF) const {
