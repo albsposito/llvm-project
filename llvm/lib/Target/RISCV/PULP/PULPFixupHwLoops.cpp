@@ -882,7 +882,8 @@ bool PULPFixupHwLoops::fixupLoopInstrs(MachineFunction &MF) {
   // (llvm/lib/CodeGen/BranchRelaxation.cpp), recompute the layout after each
   // change and repeat until nothing changes. This terminates: a setup is
   // expanded at most once and a loop is padded at most once, since loops only
-  // ever grow.
+  // ever grow. Both can happen to the same loop in either order; when the
+  // padding came first, the long form's start label is the NOP block.
   while (fixupOneLoopLength(MF))
     ;
 
@@ -905,19 +906,25 @@ struct HwLoopExtent {
 } // namespace
 
 // Measures the loop set up by Setup, whose last instruction starts block End,
-// with the real size of every instruction (getInstSizeInBytes, which knows
-// which instructions will be compressed).
+// with getInstSizeInBytes for every instruction. That size is never smaller
+// than the emitted one: it is 2 for instructions that will certainly be
+// compressed, but 4 for branches and jumps (the assembler may still emit
+// them as 2-byte c.beqz/c.bnez/c.j/c.jr, which depends on the final
+// distance). So the result is an upper bound; loops with branches can be
+// overestimated by 2 bytes per branch, which only costs a long form (or a
+// software loop) that was not strictly needed.
 //
 // Alignment: runOnMachineFunction later moves every setup that is not the
 // first instruction of its block into a new 4-byte aligned block, so the
 // assembler may insert padding before it, and before any aligned block.
 // Addresses are multiples of the instruction granularity G (2 bytes with
 // compressed instructions, else 4). If the setup itself ends up 4-byte
-// aligned, the addresses after it are known modulo 4 and padding up to
-// 4-byte alignment is known exactly. Otherwise the setup's address modulo 4
-// depends on where the function is placed, and like upstream branch
-// relaxation (BasicBlockInfo::postOffset, llvm/lib/CodeGen/BranchRelaxation
-// .cpp) the worst case is assumed: A - G bytes before an A-aligned point.
+// aligned, padding up to the next 4-byte boundary is computed from the
+// measured sizes (still an upper bound, as the sizes are). Otherwise the
+// setup's address modulo 4 depends on where the function is placed, and like
+// upstream branch relaxation (BasicBlockInfo::postOffset,
+// llvm/lib/CodeGen/BranchRelaxation.cpp) the worst case is assumed: A - G
+// bytes before an A-aligned point.
 static HwLoopExtent measureHwLoop(const MachineInstr &Setup,
                                   const MachineBasicBlock *End) {
   const MachineBasicBlock *SetupMBB = Setup.getParent();
@@ -1026,9 +1033,17 @@ bool PULPFixupHwLoops::fixupOneLoopLength(MachineFunction &MF) {
         LoopStartMBB->setMachineBlockAddressTaken();
         LoopStartMBB->setLabelMustBeEmitted();
         // This line is needed to set the hasAddressTaken flag on the
-        // BasicBlock object.
-        BlockAddress::get(
-            const_cast<BasicBlock *>(LoopStartMBB->getBasicBlock()));
+        // BasicBlock object. The loop start can be a block without an IR
+        // block: the block of padding NOPs created below for a loop that was
+        // padded in an earlier round of fixupOneLoopLength and only now needs
+        // the long form (possible when -pulp-loop-range-immediate is below
+        // the padded length). Its label is emitted through the two
+        // machine-level flags above alone (a machine block address taken
+        // "by some form of target-specific branch lowering",
+        // MachineBasicBlock::setMachineBlockAddressTaken), and the NOPs stay
+        // inside the loop because lp.starti names that block.
+        if (const BasicBlock *BB = LoopStartMBB->getBasicBlock())
+          BlockAddress::get(const_cast<BasicBlock *>(BB));
         // Remove old instruction.
         MII->eraseFromParent();
         return true;
