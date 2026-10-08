@@ -1,0 +1,15 @@
+{
+  "task": "H003",
+  "status": "ready_for_review",
+  "branch": "work/20/H003",
+  "implementation_commit": "2458055619510c5abb8f41b21db9d3e265be36f1",
+  "prerequisites": [
+    "1fe389ea16b9",
+    "3f7396a03e8f"
+  ],
+  "patch": "tasks/20/H003.patch",
+  "mapping": "steps/20/baseline-renames.candidate.json",
+  "tests": "19 harness tests passed; git diff --check passed",
+  "review": "Independent review required before application",
+  "unrelated_errors": []
+}

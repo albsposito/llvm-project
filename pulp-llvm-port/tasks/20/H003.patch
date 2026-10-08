@@ -1,0 +1,178 @@
+From 2458055619510c5abb8f41b21db9d3e265be36f1 Mon Sep 17 00:00:00 2001
+From: Alberto Sposito <albsposito@gmail.com>
+Date: Fri, 25 Sep 2026 00:30:11 +0000
+Subject: [PATCH] Require every successor to pass for upstream baseline test
+ splits
+
+Change-Note: 20/H003.md
+---
+ pulp-llvm-port/notes/20/H003.md               | 21 ++++++++++
+ pulp-llvm-port/scripts/lit_diff.py            | 27 +++++++++---
+ .../steps/20/baseline-renames.candidate.json  | 24 +++++++++++
+ pulp-llvm-port/tests/test_harness.py          | 41 +++++++++++++++++++
+ 4 files changed, 107 insertions(+), 6 deletions(-)
+ create mode 100644 pulp-llvm-port/notes/20/H003.md
+ create mode 100644 pulp-llvm-port/steps/20/baseline-renames.candidate.json
+
+diff --git a/pulp-llvm-port/notes/20/H003.md b/pulp-llvm-port/notes/20/H003.md
+new file mode 100644
+index 000000000000..c2e5c0f9ce33
+--- /dev/null
++++ b/pulp-llvm-port/notes/20/H003.md
+@@ -0,0 +1,21 @@
++# 20/H003: Preserve coverage across upstream test splits
++
++## What upstream changed
++
++Upstream `39e3085a55880dbbc5aeddc3661342980d5e1467` ([clang][NFC] Split invalid-cpu-note tests (#104601)) replaced one Clang test with 16 target-specific tests. A one-to-one identity mapping could not require all successors.
++
++## Why this is equivalent
++
++The primary destination remains mandatory. Optional additional_destinations names all other successors. Every destination must be present and PASS before mapping the old identity. Candidate failures and fork inventory checks are unchanged. Duplicate destinations, self mappings, malformed paths/types, unknown fields and ambiguous chains fail closed. The candidate mapping lists all 16 paths directly from the upstream tree, with riscv.c primary. Resolver notes/20/conflict-tests.md records all 24 compiler invocations and 48 assertions preserved (AVR end anchor strengthened); the conductor runs the entire directory.
++
++Prerequisite snapshots: 1fe389ea16b9 contains current dirty lit_diff.py, test_harness.py, unit_report.py and step-19 mapping; 3f7396a03e8f contains current dirty integrate.py. Neither belongs in the implementation patch. The initial full harness run found the missing integrate.py prerequisite; after snapshotting it all 19 tests pass. New tests cover all non-PASS/missing secondaries, all-PASS, malformed/duplicate entries, unrelated failures and fork presence. No LLVM test or main clone file changed. Descriptive harness commit subjects are explicitly conductor-authorized.
++
++## What breaks if this is wrong
++
++A green comparison could hide target CPU diagnostic coverage. Synthetic tests reject passing-primary/failed-or-missing-secondary combinations; the real mapping requires all 16 successors. Completeness of evidence remains a review responsibility because a SHA alone cannot reveal an omitted successor to this JSON comparator.
++
++## Upstream reference
++
++- Commit: `39e3085a55880dbbc5aeddc3661342980d5e1467` [clang][NFC] Split invalid-cpu-note tests (#104601)
++- Reference code: `clang/test/Misc/target-invalid-cpu-note/riscv.c:1` and 15 siblings at that commit, inventoried with git ls-tree.
++- Release notes: not mentioned.
+diff --git a/pulp-llvm-port/scripts/lit_diff.py b/pulp-llvm-port/scripts/lit_diff.py
+index 05b15ea568f0..c2861979cc6d 100755
+--- a/pulp-llvm-port/scripts/lit_diff.py
++++ b/pulp-llvm-port/scripts/lit_diff.py
+@@ -40,7 +40,8 @@ def load_renames(path, base, candidate):
+     """Explicit upstream identity changes, only for absent baseline PASS tests.
+ 
+     JSON is a list of {source, destination, upstream_commit} objects using repo
+-    paths and full upstream SHA-1s. Evidence is reviewed separately; the hash is
++    paths and full upstream SHA-1s. Optional additional_destinations lists all other
++    successors of an upstream split; every successor must PASS. Evidence is reviewed separately; the hash is
+     retained in the report so a passing comparison remains auditable.
+     """
+     entries = json.loads(Path(path).read_text())
+@@ -56,16 +57,30 @@ def load_renames(path, base, candidate):
+             raise ValueError("rename requires source, destination and upstream_commit")
+         if not re.fullmatch(r"[0-9a-f]{40}", sha):
+             raise ValueError(f"rename {src}: upstream_commit must be a full SHA-1")
+-        if src in sources or dst in destinations or src == dst:
+-            raise ValueError(f"duplicate or self rename: {src} -> {dst}")
++        allowed = {"source", "destination", "upstream_commit", "additional_destinations"}
++        if set(entry) - allowed:
++            raise ValueError(f"rename {src}: unknown fields")
++        extra = entry.get("additional_destinations", [])
++        if not isinstance(extra, list) or not all(isinstance(d, str) and d for d in extra):
++            raise ValueError(f"rename {src}: additional_destinations must be a list of paths")
++        targets = [dst, *extra]
++        for path in [src, *targets]:
++            if (not any(path.startswith(prefix) for prefix in SUITE_PREFIX.values())
++                    or any(part in ("", ".", "..") for part in path.split("/"))
++                    or "\\" in path or any(c.isspace() for c in path)):
++                raise ValueError(f"rename path must be a canonical repo test path: {path}")
++        if (src in sources or src in targets or len(set(targets)) != len(targets)
++                or destinations.intersection(targets)):
++            raise ValueError(f"duplicate or self rename: {src} -> {targets}")
+         sources.add(src)
+-        destinations.add(dst)
++        destinations.update(targets)
+         if baseline.get(src) != "PASS":
+             raise ValueError(f"rename source is not a baseline PASS: {src}")
+         if src in candidate:
+             raise ValueError(f"rename source still exists in candidate: {src}")
+-        if candidate.get(dst) != "PASS":
+-            raise ValueError(f"rename destination must PASS: {dst} ({candidate.get(dst, 'MISSING')})")
++        for target in targets:
++            if candidate.get(target) != "PASS":
++                raise ValueError(f"rename destination must PASS: {target} ({candidate.get(target, 'MISSING')})")
+     if sources & destinations:
+         raise ValueError("chained baseline renames are ambiguous")
+     return entries
+diff --git a/pulp-llvm-port/steps/20/baseline-renames.candidate.json b/pulp-llvm-port/steps/20/baseline-renames.candidate.json
+new file mode 100644
+index 000000000000..f9c37d507b61
+--- /dev/null
++++ b/pulp-llvm-port/steps/20/baseline-renames.candidate.json
+@@ -0,0 +1,24 @@
++[
++  {
++    "source": "clang/test/Misc/target-invalid-cpu-note.c",
++    "destination": "clang/test/Misc/target-invalid-cpu-note/riscv.c",
++    "additional_destinations": [
++      "clang/test/Misc/target-invalid-cpu-note/aarch64.c",
++      "clang/test/Misc/target-invalid-cpu-note/amdgcn.c",
++      "clang/test/Misc/target-invalid-cpu-note/arm.c",
++      "clang/test/Misc/target-invalid-cpu-note/avr.c",
++      "clang/test/Misc/target-invalid-cpu-note/bpf.c",
++      "clang/test/Misc/target-invalid-cpu-note/hexagon.c",
++      "clang/test/Misc/target-invalid-cpu-note/lanai.c",
++      "clang/test/Misc/target-invalid-cpu-note/mips.c",
++      "clang/test/Misc/target-invalid-cpu-note/nvptx.c",
++      "clang/test/Misc/target-invalid-cpu-note/powerpc.c",
++      "clang/test/Misc/target-invalid-cpu-note/r600.c",
++      "clang/test/Misc/target-invalid-cpu-note/sparc.c",
++      "clang/test/Misc/target-invalid-cpu-note/systemz.c",
++      "clang/test/Misc/target-invalid-cpu-note/wasm.c",
++      "clang/test/Misc/target-invalid-cpu-note/x86.c"
++    ],
++    "upstream_commit": "39e3085a55880dbbc5aeddc3661342980d5e1467"
++  }
++]
+diff --git a/pulp-llvm-port/tests/test_harness.py b/pulp-llvm-port/tests/test_harness.py
+index 4ca805ec4ddb..effff5314ffc 100755
+--- a/pulp-llvm-port/tests/test_harness.py
++++ b/pulp-llvm-port/tests/test_harness.py
+@@ -356,6 +356,47 @@ class LitDiffTest(unittest.TestCase):
+         self.assertEqual(rc, 1)
+         self.assertTrue(any(t["problem"] == "fork test did not run" for g in report["groups"] for t in g["tests"]))
+ 
++    def test_split_requires_every_successor_and_preserves_other_checks(self):
++        src = "llvm/test/CodeGen/RISCV/old.ll"
++        dst = "llvm/test/CodeGen/RISCV/new.ll"
++        secondary = "llvm/test/CodeGen/RISCV/second.ll"
++        entry = {"source": src, "destination": dst, "additional_destinations": [secondary],
++                 "upstream_commit": "a" * 40}
++        base = {"LLVM :: CodeGen/RISCV/old.ll": "PASS"}
++        cand = {"LLVM :: CodeGen/RISCV/xpulp-hwloop.ll": "PASS",
++                "LLVM :: MC/RISCV/rv32xssr-valid.s": "PASS",
++                "LLVM :: CodeGen/RISCV/new.ll": "PASS",
++                "LLVM :: CodeGen/RISCV/second.ll": "PASS"}
++        rc, report = self.run_diff(cand, base, [entry])
++        self.assertEqual(rc, 0, report)
++        self.assertEqual(report["baseline_renames"], [entry])
++        for code in (None, "FAIL", "UNRESOLVED", "TIMEOUT", "XPASS", "XFAIL", "UNSUPPORTED"):
++            with self.subTest(secondary=code):
++                changed = dict(cand)
++                if code is None:
++                    del changed["LLVM :: CodeGen/RISCV/second.ll"]
++                else:
++                    changed["LLVM :: CodeGen/RISCV/second.ll"] = code
++                rc, report = self.run_diff(changed, base, [entry])
++                self.assertEqual(rc, 1)
++                self.assertTrue(report["mapping_errors"])
++                if code == "FAIL":
++                    self.assertTrue(any(t["problem"] == "FAIL" for g in report["groups"] for t in g["tests"]))
++        for extra in (None, secondary, [None], [""], [dst], [secondary, secondary], [src],
++                      ["/tmp/test"], ["llvm/test/../test/x.ll"]):
++            with self.subTest(extra=extra):
++                self.assertTrue(self.run_diff(cand, base, [{**entry, "additional_destinations": extra}])[1]["mapping_errors"])
++        self.assertTrue(self.run_diff(cand, base, [{**entry, "additional_destination": []}])[1]["mapping_errors"])
++        other = {"source": "llvm/test/CodeGen/RISCV/other.ll", "destination": secondary,
++                 "upstream_commit": "b" * 40}
++        self.assertTrue(self.run_diff(cand, {**base, "LLVM :: CodeGen/RISCV/other.ll": "PASS"},
++                                      [entry, other])[1]["mapping_errors"])
++        for name in ("LLVM :: CodeGen/RISCV/unrelated.ll", "LLVM :: CodeGen/RISCV/xpulp-hwloop.ll"):
++            self.assertEqual(self.run_diff({**cand, name: "FAIL"}, base, [entry])[0], 1)
++        missing = dict(cand)
++        del missing["LLVM :: CodeGen/RISCV/xpulp-hwloop.ll"]
++        self.assertEqual(self.run_diff(missing, base, [entry])[0], 1)
++
+ 
+ DIS_REF = """
+ 00000000 <gemm>:
+-- 
+2.43.0
+
