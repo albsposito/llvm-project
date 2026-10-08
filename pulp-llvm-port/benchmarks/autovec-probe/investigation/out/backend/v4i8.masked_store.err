@@ -1,0 +1,33 @@
+llc: /work/src/llvm/lib/CodeGen/SelectionDAG/SelectionDAG.cpp:9406: SDValue llvm::SelectionDAG::getTruncStore(SDValue, const SDLoc &, SDValue, SDValue, EVT, MachineMemOperand *): Assertion `SVT.getScalarType().bitsLT(VT.getScalarType()) && "Should only be a truncating store, not extending!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: /home/ubuntu/llvm-project/pulp-llvm-port/toolchains/port-20-bench/bin/llc -mtriple=riscv32-unknown-elf -mattr=+m,+c,+xgap,+xpulpv,+xpulpfvec,+xpulpf16alt,+zfinx,+zhinx,+zhinxmin,+zicsr,+zmmul,+unaligned-scalar-mem -target-abi=ilp32 -O2 -verify-machineinstrs /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/backend/v4i8.masked_store.ll -o /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/backend/v4i8.masked_store.s
+1.	Running pass 'Function Pass Manager' on module '/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/backend/v4i8.masked_store.ll'.
+2.	Running pass 'RISC-V DAG->DAG Pattern Instruction Selection' on function '@f'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x0000598b3140d218 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc       0x0000598b3140adee llvm::sys::RunSignalHandlers() + 238
+2  llc       0x0000598b3140d8c8
+3  libc.so.6 0x00007b47d9c45330
+4  libc.so.6 0x00007b47d9c9ec0c pthread_kill + 284
+5  libc.so.6 0x00007b47d9c4527e gsignal + 30
+6  libc.so.6 0x00007b47d9c288ff abort + 223
+7  libc.so.6 0x00007b47d9c2881b
+8  libc.so.6 0x00007b47d9c3b517
+9  llc       0x0000598b311c6f73 llvm::SelectionDAG::getTruncStore(llvm::SDValue, llvm::SDLoc const&, llvm::SDValue, llvm::SDValue, llvm::EVT, llvm::MachineMemOperand*) + 2227
+10 llc       0x0000598b311c662d llvm::SelectionDAG::getTruncStore(llvm::SDValue, llvm::SDLoc const&, llvm::SDValue, llvm::SDValue, llvm::MachinePointerInfo, llvm::EVT, llvm::Align, llvm::MachineMemOperand::Flags, llvm::AAMDNodes const&) + 381
+11 llc       0x0000598b310c8aa3
+12 llc       0x0000598b310c6513 llvm::SelectionDAG::Legalize() + 595
+13 llc       0x0000598b311f6943 llvm::SelectionDAGISel::CodeGenAndEmitDAG() + 4899
+14 llc       0x0000598b311f4786 llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 6454
+15 llc       0x0000598b311f1be1 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 593
+16 llc       0x0000598b311ef459 llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 169
+17 llc       0x0000598b303eb6e6 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 694
+18 llc       0x0000598b30965735 llvm::FPPassManager::runOnFunction(llvm::Function&) + 677
+19 llc       0x0000598b3096db62 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+20 llc       0x0000598b309661cc llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1932
+21 llc       0x0000598b2fce2e10 main + 9632
+22 libc.so.6 0x00007b47d9c2a1ca
+23 libc.so.6 0x00007b47d9c2a28b __libc_start_main + 139
+24 llc       0x0000598b2fcdcc65 _start + 37
+timeout: the monitored command dumped core

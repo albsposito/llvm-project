@@ -1,0 +1,45 @@
+add16	6	VF2=6 (3.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+add8	6	VF2=6 (3.0/lane);VF4=6 (1.5/lane);	LV: Selecting VF: 4	LV: Interleaving to reduce branch cost.
+sub16	6	VF2=6 (3.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+and16	6	VF2=6 (3.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+min16	6	VF2=6 (3.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+max8	6	VF2=6 (3.0/lane);VF4=6 (1.5/lane);	LV: Selecting VF: 4	LV: Interleaving to reduce branch cost.
+maxu8	6	VF2=6 (3.0/lane);VF4=6 (1.5/lane);	LV: Selecting VF: 4	LV: Interleaving to reduce branch cost.
+abs16	5	VF2=5 (2.5/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+shr16	5	VF2=5 (2.5/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+shl8	5	VF2=5 (2.5/lane);VF4=5 (1.2/lane);	LV: Selecting VF: 4	LV: Interleaving to reduce branch cost.
+shrv16	5	VF2=7 (3.5/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+addc16	5	VF2=5 (2.5/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+adds16	5	VF2=5 (2.5/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+scale16	5	VF2=8 (4.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+scaleq15	6	VF2=9 (4.5/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+mul16	6	VF2=10 (5.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+copy16	-	-	-	-
+set16	3	VF2=3 (1.5/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+avg8	8	VF2=10 (5.0/lane);VF4=17 (4.2/lane);	LV: Selecting VF: 4	LV: Interleaving to reduce branch cost.
+sat16	12	VF2=16 (8.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+clip16	6	VF2=6 (3.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+relu8	5	VF2=5 (2.5/lane);VF4=5 (1.2/lane);	LV: Selecting VF: 4	LV: Interleaving to reduce branch cost.
+sel16	8	VF2=10 (5.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+dot16	-	-	LV: Vectorization is possible but not beneficial	LV: Interleaving to reduce branch cost.
+dot8	-	-	LV: Vectorization is possible but not beneficial	LV: Interleaving to reduce branch cost.
+dotu8	-	-	LV: Vectorization is possible but not beneficial	LV: Interleaving to reduce branch cost.
+sum16	-	-	LV: Vectorization is possible but not beneficial	LV: Interleaving to reduce branch cost.
+sum8	-	-	LV: Vectorization is possible but not beneficial	LV: Interleaving to reduce branch cost.
+sum16n	4	VF2=4 (2.0/lane);	LV: Selecting VF: 2	LV: Interleaving because of reductions.
+max16r	-	-	LV: Vectorization is possible but not beneficial	LV: Interleaving to reduce branch cost.
+max16rn	4	VF2=4 (2.0/lane);	LV: Selecting VF: 2	LV: Interleaving because of reductions.
+sad8	-	-	LV: Vectorization is possible but not beneficial	LV: Interleaving to reduce branch cost.
+add16_k64	6	VF2=6 (3.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+add16_k63	6	VF2=6 (3.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+add8_k4	-	-	-	-
+add16_k2	-	-	-	-
+dot16_k64	-	-	LV: Vectorization is possible but not beneficial	LV: Interleaving to reduce branch cost.
+add16_glob	6	VF2=6 (3.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+add16_nr	6	VF2=6 (3.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+add8_nr	6	VF2=6 (3.0/lane);VF4=6 (1.5/lane);	LV: Selecting VF: 4	LV: Interleaving to reduce branch cost.
+inplace16	6	VF2=6 (3.0/lane);	LV: Selecting VF: 2	LV: Interleaving to reduce branch cost.
+slp_add16	-	-	-	-
+slp_add8	-	-	-	-
+slp_px	-	-	-	-
+add32	-	-	LV: Vectorization is possible but not beneficial	LV: Interleaving to reduce branch cost.

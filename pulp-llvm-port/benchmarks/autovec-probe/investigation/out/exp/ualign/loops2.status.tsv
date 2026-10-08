@@ -1,0 +1,45 @@
+add16	<2 x i16> 	ok
+add8	<4 x i8> 	ok
+sub16	<2 x i16> 	ok
+and16	<2 x i16> 	ok
+min16	<2 x i16> 	ok
+max8	<4 x i8> 	ok
+maxu8	<4 x i8> 	ok
+abs16	<2 x i16> 	ok
+shr16	<2 x i16> 	ok
+shl8	<4 x i8> 	ok
+shrv16	<2 x i16> <2 x i32> 	ok
+addc16	<2 x i16> 	ok
+adds16	<2 x i16> <2 x i32> 	ok
+scale16	<2 x i16> 	ok
+scaleq15	<2 x i16> <2 x i32> 	ok
+mul16	<2 x i16> 	ok
+copy16	-	ok
+set16	<2 x i16> <2 x i32> 	ok
+avg8	<4 x i16> <4 x i8> 	ok
+sat16	<2 x i16> 	ok
+clip16	<2 x i16> 	ok
+relu8	<4 x i8> 	ok
+sel16	<2 x i16> <2 x i1> 	ok
+dot16	-	ok
+dot8	-	ok
+dotu8	-	ok
+sum16	-	ok
+sum8	-	ok
+sum16n	<2 x i16> 	CRASH: LLVM ERROR: Cannot select: t19: i32 = vecreduce_add t2
+max16r	-	ok
+max16rn	<2 x i16> 	ok
+sad8	-	ok
+add16_k64	<2 x i16> 	ok
+add16_k63	<2 x i16> 	ok
+add8_k4	<4 x i8> 	ok
+add16_k2	<2 x i16> 	ok
+dot16_k64	-	ok
+add16_glob	<2 x i16> 	ok
+add16_nr	<2 x i16> 	ok
+add8_nr	<4 x i8> 	ok
+inplace16	<2 x i16> 	ok
+slp_add16	<2 x i16> 	ok
+slp_add8	<4 x i8> 	ok
+slp_px	<4 x i8> 	ok
+add32	-	ok

@@ -1,0 +1,46 @@
+function	loops2.O2: packed	insns	hwloops	post-inc	loops2.O3: packed	insns	hwloops	post-inc	loops2.O3: packed	insns	hwloops	post-inc
+add16	-	12	1	3	pv.add.hx1	47	1	3	-	9	0	3
+add8	-	8	1	3	pv.add.bx1	80	1	3	-	8	0	3
+sub16	-	12	1	3	pv.sub.hx1	47	1	3	-	9	0	3
+and16	-	12	1	3	pv.and.hx1	47	1	3	-	9	0	3
+min16	-	12	1	3	pv.min.hx1	51	1	3	-	9	0	3
+max8	-	8	1	3	pv.max.bx1	92	1	3	-	8	0	3
+maxu8	-	8	1	3	pv.maxu.bx1	92	1	3	-	8	0	3
+abs16	-	11	1	2	-	11	1	2	-	8	0	2
+shr16	-	11	1	2	pv.sra.sci.hx1	44	1	2	-	8	0	2
+shl8	-	7	1	2	pv.sll.sci.bx1	69	1	2	-	7	0	2
+shrv16	-	11	1	2	-	11	1	2	-	8	0	2
+addc16	-	11	1	2	pv.add.sci.hx1	42	1	2	-	8	0	2
+adds16	-	12	1	2	pv.add.hx1 pv.add.sc.hx1	44	1	2	-	8	0	2
+scale16	-	12	1	2	pv.add.hx1 pv.sll.sci.hx1	45	1	2	-	9	0	2
+scaleq15	-	12	1	2	-	12	1	2	-	9	0	2
+mul16	-	12	1	3	-	12	1	3	-	9	0	3
+copy16	-	10	1	2	-	4	0	0	-	4	0	0
+set16	-	10	1	1	pv.add.sc.hx1	47	1	2	-	6	0	1
+avg8	-	8	1	3	-	8	1	3	-	10	0	3
+sat16	-	17	1	3	-	17	1	3	-	10	0	3
+clip16	-	14	1	2	-	14	1	2	-	8	0	2
+relu8	-	7	1	2	pv.max.sci.bx1	75	1	2	-	7	0	2
+sel16	-	16	1	3	pv.and.hx1 pv.cmpgt.hx1 pv.sub.hx1	67	1	3	-	12	0	3
+dot16	-	15	1	2	-	15	1	2	-	14	1	2
+dot8	-	11	1	2	-	11	1	2	-	12	1	2
+dotu8	-	11	1	2	-	11	1	2	-	12	1	2
+sum16	-	14	1	1	-	14	1	1	-	13	1	1
+sum8	-	10	1	1	-	10	1	1	-	11	1	1
+sum16n	-	15	1	1	-	15	1	1	-	13	1	1
+max16r	-	14	1	1	-	14	1	1	-	13	1	1
+max16rn	-	14	1	1	pv.add.sci.hx1 pv.extract.hx1 pv.max.hx2 pv.shuffle2.hx1	49	1	1	-	15	1	1
+sad8	-	13	1	2	-	13	1	2	-	15	1	2
+add16_k64	-	7	1	3	pv.add.hx1	34	1	3	-	7	0	3
+add16_k63	-	7	1	3	pv.add.hx1	26	1	3	-	7	0	3
+add8_k4	-	7	1	3	pv.add.bx1	5	0	0	-	17	0	0
+add16_k2	-	9	0	0	pv.add.hx1	5	0	0	-	9	0	0
+dot16_k64	-	8	1	2	-	8	1	2	-	10	1	2
+add16_glob	-	13	1	3	pv.add.hx1	43	1	3	-	13	1	0
+add16_nr	-	12	1	3	pv.add.hx1	72	2	6	-	9	0	3
+add8_nr	-	8	1	3	pv.add.bx1	111	2	6	-	8	0	3
+inplace16	-	12	1	2	pv.add.hx1	67	2	5	-	9	0	2
+slp_add16	-	9	0	0	pv.add.hx1	5	0	0	-	9	0	0
+slp_add8	-	17	0	0	pv.add.bx1	5	0	0	-	17	0	0
+slp_px	-	17	0	0	pv.add.bx1	5	0	0	-	17	0	0
+add32	-	12	1	3	-	12	1	3	-	9	0	3

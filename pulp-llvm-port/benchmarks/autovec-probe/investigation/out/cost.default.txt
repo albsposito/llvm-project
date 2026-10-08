@@ -1,0 +1,35 @@
+Printing analysis 'Cost Model Analysis' for function 'f':
+1 for instruction:   %l2 = load <2 x i16>, ptr %p, align 2
+1 for instruction:   %l4 = load <4 x i8>, ptr %p, align 1
+1 for instruction:   %l2a = load <2 x i16>, ptr %p, align 4
+2 for instruction:   %lh = load <2 x half>, ptr %p, align 2
+2 for instruction:   %lw = load <4 x i16>, ptr %p, align 2
+1 for instruction:   store <2 x i16> %a, ptr %q, align 2
+1 for instruction:   store <4 x i8> %c, ptr %q, align 1
+1 for instruction:   %add2 = add <2 x i16> %a, %b
+1 for instruction:   %add4 = add <4 x i8> %c, %d
+2 for instruction:   %add44 = add <4 x i16> %w, %w
+5 for instruction:   %mul2 = mul <2 x i16> %a, %b
+7 for instruction:   %mul4 = mul <4 x i8> %c, %d
+1 for instruction:   %shl2 = shl <2 x i16> %a, splat (i16 3)
+1 for instruction:   %ashr2 = ashr <2 x i16> %a, %b
+1 for instruction:   %cmp2 = icmp slt <2 x i16> %a, %b
+3 for instruction:   %sel2 = select <2 x i1> %cmp2, <2 x i16> %a, <2 x i16> %b
+1 for instruction:   %min2 = call <2 x i16> @llvm.smin.v2i16(<2 x i16> %a, <2 x i16> %b)
+11 for instruction:   %sat2 = call <2 x i16> @llvm.sadd.sat.v2i16(<2 x i16> %a, <2 x i16> %b)
+1 for instruction:   %ins = insertelement <2 x i16> poison, i16 %s, i32 0
+1 for instruction:   %spl = shufflevector <2 x i16> %ins, <2 x i16> poison, <2 x i32> zeroinitializer
+1 for instruction:   %rev = shufflevector <4 x i8> %c, <4 x i8> poison, <4 x i32> <i32 3, i32 2, i32 1, i32 0>
+1 for instruction:   %ext = extractelement <2 x i16> %a, i32 1
+3 for instruction:   %sx = sext <2 x i16> %a to <2 x i32>
+7 for instruction:   %zx = zext <4 x i8> %c to <4 x i32>
+3 for instruction:   %sx48 = sext <4 x i8> %c to <4 x i16>
+2 for instruction:   %mulw = mul <2 x i32> %sx, %sx
+3 for instruction:   %red = call i32 @llvm.vector.reduce.add.v2i32(<2 x i32> %mulw)
+3 for instruction:   %red16 = call i16 @llvm.vector.reduce.add.v2i16(<2 x i16> %a)
+3 for instruction:   %redmx = call i16 @llvm.vector.reduce.smax.v2i16(<2 x i16> %a)
+0 for instruction:   %tr = trunc <2 x i32> %mulw to <2 x i16>
+4 for instruction:   %fmul = fmul <2 x half> %h, %k
+1 for instruction:   %sadd = add i16 %s, %s
+1 for instruction:   %sl = load i16, ptr %p, align 2
+0 for instruction:   ret void

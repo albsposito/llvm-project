@@ -1,0 +1,13 @@
+deint16	<2 x i16> <2 x i32> <4 x i16> 	CRASH: Assertion `hasVInstructions() && "Tried to get vector length without Zve or V extension support!"' failed.
+int16	<2 x i16> <4 x i16> <4 x i32> 	CRASH: Assertion `hasVInstructions() && "Expected V extension"' failed.
+rev16	<2 x i16> <2 x i32> 	ok
+rev8	<4 x i32> <4 x i8> 	ok
+cond16	<2 x i16> <2 x i1> 	ok
+widen8to16	<2 x i16> <2 x i8> 	ok
+narrow16to8	<2 x i16> <2 x i8> 	ok
+mulhi16	<2 x i16> <2 x i32> 	ok
+stride2	<2 x i16> <2 x i32> <4 x i16> 	CRASH: Assertion `hasVInstructions() && "Tried to get vector length without Zve or V extension support!"' failed.
+idx16	<2 x i16> <2 x i32> <2 x i8> 	ok
+find16	-	ok
+iota8	<4 x i8> 	ok
+cadd	<2 x i16> <4 x i16> 	ok

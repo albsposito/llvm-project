@@ -1,0 +1,4 @@
+define <2 x i16> @f(<2 x half> %a) {
+  %r = fptosi <2 x half> %a to <2 x i16>
+  ret <2 x i16> %r
+}

@@ -1,0 +1,34 @@
+LLVM ERROR: Cannot select: t19: i32 = vecreduce_add t2
+  t2: v2i16,ch = CopyFromReg t0, Register:v2i16 %4
+    t1: v2i16 = Register %4
+In function: sum16n
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: /home/ubuntu/llvm-project/pulp-llvm-port/toolchains/port-20-bench/bin/llc -O3 -verify-machineinstrs /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/base/loops2.opt.ll -o /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/base/loops2.s
+1.	Running pass 'Function Pass Manager' on module '/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/base/loops2.opt.ll'.
+2.	Running pass 'RISC-V DAG->DAG Pattern Instruction Selection' on function '@sum16n'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00005ac099e70218 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc       0x00005ac099e6ddee llvm::sys::RunSignalHandlers() + 238
+2  llc       0x00005ac099e708c8
+3  libc.so.6 0x0000786e6ca45330
+4  libc.so.6 0x0000786e6ca9ec0c pthread_kill + 284
+5  libc.so.6 0x0000786e6ca4527e gsignal + 30
+6  libc.so.6 0x0000786e6ca288ff abort + 223
+7  llc       0x00005ac099ddc66c llvm::report_fatal_error(llvm::Twine const&, bool) + 428
+8  llc       0x00005ac099c675b4 llvm::SelectionDAGISel::CannotYetSelect(llvm::SDNode*) + 548
+9  llc       0x00005ac099c6662a llvm::SelectionDAGISel::SelectCodeCommon(llvm::SDNode*, unsigned char const*, unsigned int) + 21082
+10 llc       0x00005ac09887cc1c
+11 llc       0x00005ac099c5ae9f llvm::SelectionDAGISel::DoInstructionSelection() + 1359
+12 llc       0x00005ac099c59e42 llvm::SelectionDAGISel::CodeGenAndEmitDAG() + 6178
+13 llc       0x00005ac099c57786 llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 6454
+14 llc       0x00005ac099c54be1 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 593
+15 llc       0x00005ac099c52459 llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 169
+16 llc       0x00005ac098e4e6e6 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 694
+17 llc       0x00005ac0993c8735 llvm::FPPassManager::runOnFunction(llvm::Function&) + 677
+18 llc       0x00005ac0993d0b62 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+19 llc       0x00005ac0993c91cc llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1932
+20 llc       0x00005ac098745e10 main + 9632
+21 libc.so.6 0x0000786e6ca2a1ca
+22 libc.so.6 0x0000786e6ca2a28b __libc_start_main + 139
+23 llc       0x00005ac09873fc65 _start + 37

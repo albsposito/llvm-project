@@ -1,0 +1,14 @@
+function	loops3.O2: packed	insns	hwloops	post-inc	loops3.O3: packed	insns	hwloops	post-inc	loops3.O3: packed	insns	hwloops	post-inc
+deint16	-	13	1	3	pv.add.hx1 pv.pack.hx1 pv.pack.h.hx1	30	1	3	-	11	0	1
+int16	-	13	1	4	pv.pack.hx1 pv.pack.h.hx1	31	1	4	-	13	1	2
+rev16	-	13	1	3	pv.add.hx1 pv.shuffle.sci.hx1	61	1	3	-	12	0	2
+rev8	-	9	1	2	pv.shuffleI0.sci.bx1	69	1	2	-	9	0	1
+cond16	-	13	1	1	-	13	1	1	-	12	1	1
+widen8to16	-	6	1	2	-	6	1	2	-	7	0	2
+narrow16to8	-	11	1	2	-	11	1	2	-	7	0	1
+mulhi16	-	13	1	3	-	13	1	3	-	10	0	3
+stride2	-	10	1	2	-	10	1	2	-	7	0	2
+idx16	-	8	1	2	-	8	1	2	-	10	0	2
+find16	-	14	0	1	-	14	0	1	-	12	0	1
+iota8	-	8	1	1	-	8	1	1	-	7	0	1
+cadd	-	19	1	6	pv.add.hx1	12	1	3	-	21	1	0

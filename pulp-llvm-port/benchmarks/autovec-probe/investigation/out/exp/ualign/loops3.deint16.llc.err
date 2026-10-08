@@ -1,0 +1,34 @@
+llc: /work/src/llvm/lib/Target/RISCV/RISCVSubtarget.cpp:176: unsigned int llvm::RISCVSubtarget::getMinRVVVectorSizeInBits() const: Assertion `hasVInstructions() && "Tried to get vector length without Zve or V extension support!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: /home/ubuntu/llvm-project/pulp-llvm-port/toolchains/port-20-bench/bin/llc -O3 -verify-machineinstrs /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/ualign/loops3.deint16.ll -o /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/ualign/loops3.deint16.s
+1.	Running pass 'Function Pass Manager' on module '/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/ualign/loops3.deint16.ll'.
+2.	Running pass 'RISC-V DAG->DAG Pattern Instruction Selection' on function '@deint16'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00005fd6fd020218 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc       0x00005fd6fd01ddee llvm::sys::RunSignalHandlers() + 238
+2  llc       0x00005fd6fd0208c8
+3  libc.so.6 0x00007f4a77245330
+4  libc.so.6 0x00007f4a7729ec0c pthread_kill + 284
+5  libc.so.6 0x00007f4a7724527e gsignal + 30
+6  libc.so.6 0x00007f4a772288ff abort + 223
+7  libc.so.6 0x00007f4a7722881b
+8  libc.so.6 0x00007f4a7723b517
+9  llc       0x00005fd6fb9f53aa
+10 llc       0x00005fd6fb958f0d
+11 llc       0x00005fd6fccca88c
+12 llc       0x00005fd6fcc5d7ce
+13 llc       0x00005fd6fcc1a36b
+14 llc       0x00005fd6fcc17ec9 llvm::SelectionDAG::Combine(llvm::CombineLevel, llvm::BatchAAResults*, llvm::CodeGenOptLevel) + 2137
+15 llc       0x00005fd6fce08b0e llvm::SelectionDAGISel::CodeGenAndEmitDAG() + 1262
+16 llc       0x00005fd6fce07786 llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 6454
+17 llc       0x00005fd6fce04be1 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 593
+18 llc       0x00005fd6fce02459 llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 169
+19 llc       0x00005fd6fbffe6e6 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 694
+20 llc       0x00005fd6fc578735 llvm::FPPassManager::runOnFunction(llvm::Function&) + 677
+21 llc       0x00005fd6fc580b62 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+22 llc       0x00005fd6fc5791cc llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1932
+23 llc       0x00005fd6fb8f5e10 main + 9632
+24 libc.so.6 0x00007f4a7722a1ca
+25 libc.so.6 0x00007f4a7722a28b __libc_start_main + 139
+26 llc       0x00005fd6fb8efc65 _start + 37

@@ -1,0 +1,5 @@
+loops3.c:5:49: note: loop vectorized
+loops3.c:6:62: note: loop vectorized
+loops3.c:7:62: note: loop vectorized
+loops3.c:8:43: note: loop vectorized
+loops3.c:18:82: note: loop vectorized

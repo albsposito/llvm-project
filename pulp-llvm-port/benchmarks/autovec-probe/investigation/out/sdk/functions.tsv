@@ -1,0 +1,28 @@
+CmplxFunctionsf16	CmplxMagSquared_f16	insns 21 -> 22	hwloops 1 -> 1	packed: - -> -
+CmplxFunctionsf16a	CmplxMagSquared_f16a	insns 43 -> 40	hwloops 0 -> 0	packed: pv.extract.hx1 -> -
+DctLibraryFix	DctTypeII_Fix16	insns 150 -> 161	hwloops 6 -> 6	packed: pv.sdotsp.hx4 -> pv.add.sc.hx1 pv.sdotsp.hx4
+DftLibraryf16	KerParDftMR_Real_f16	insns 117 -> 30	hwloops 1 -> 0	packed: - -> -
+DftLibraryf16	KerParIDftMR_Real_f16	insns 101 -> 28	hwloops 1 -> 0	packed: - -> -
+DftLibraryf16	KerSeqDftMR_Real_f16	insns 115 -> 30	hwloops 1 -> 0	packed: - -> -
+DftLibraryf16	KerSeqIDftMR_Real_f16	insns 101 -> 28	hwloops 1 -> 0	packed: - -> -
+DftLibraryf16a	_DIT_DFT_MR	insns 1085 -> 1048	hwloops 1 -> 1	packed: pv.extract.hx22 -> pv.extract.hx10
+DftLibraryf16a	_DFT_MR_Real_Split	insns 275 -> 255	hwloops 0 -> 0	packed: pv.extract.hx5 -> -
+DftLibraryf16a	_DIT_IDFT_MR	insns 1115 -> 1089	hwloops 1 -> 1	packed: pv.extract.hx23 -> pv.extract.hx12
+DftLibraryf16a	_DIT_DFT_MR_seq	insns 1076 -> 1044	hwloops 1 -> 1	packed: pv.extract.hx22 -> pv.extract.hx10
+DftLibraryf16a	_DFT_MR_Real_Split_seq	insns 270 -> 264	hwloops 0 -> 0	packed: pv.extract.hx5 -> pv.extract.hx2
+DftLibraryf16a	_DIT_IDFT_MR_seq	insns 1107 -> 1082	hwloops 1 -> 1	packed: pv.extract.hx23 -> pv.extract.hx12
+DftLibraryf16a	DFT5	insns 430 -> 423	hwloops 0 -> 0	packed: pv.extract.hx14 -> pv.extract.hx10
+DftLibraryf16a	IDFT5	insns 436 -> 431	hwloops 0 -> 0	packed: pv.extract.hx14 -> pv.extract.hx12
+FftLibraryf16a	Radix4FFT_DIF_Seq_f16a	insns 478 -> 473	hwloops 0 -> 0	packed: pv.extract.hx5 -> pv.extract.hx3
+FftLibraryf16a	Radix4FFT_DIF_Par_f16a	insns 1475 -> 1470	hwloops 0 -> 0	packed: pv.extract.hx15 -> pv.extract.hx13
+FftLibraryf16a	Radix2FFT_DIF_Seq_f16a	insns 235 -> 230	hwloops 0 -> 0	packed: pv.extract.hx3 -> pv.extract.hx1
+FftLibraryf16a	Radix2FFT_DIF_Par_f16a	insns 731 -> 726	hwloops 0 -> 0	packed: pv.extract.hx9 -> pv.extract.hx7
+FftLibraryf16a	RFFT_DIF_Seq_f16a	insns 347 -> 345	hwloops 2 -> 2	packed: pv.extract.hx2 -> pv.extract.hx1
+FftLibraryf16a	RFFT_DIF_Par_f16a	insns 183 -> 181	hwloops 1 -> 1	packed: pv.extract.hx1 -> -
+FirBasicKernelsFix	KerFirSeqBaseline	insns 40 -> 64	hwloops 2 -> 3	packed: - -> -
+FirBasicKernelsFix	KerFirSeq	insns 181 -> 205	hwloops 5 -> 6	packed: pv.sdotsp.hx12 -> pv.sdotsp.hx12
+FirBasicKernelsFix	KerFirPar	insns 219 -> 268	hwloops 5 -> 7	packed: pv.sdotsp.hx12 -> pv.sdotsp.hx12
+MatMulDSP	KerParMatMulDSP_Fix16	insns 606 -> 692	hwloops 9 -> 9	packed: pv.sdotsp.hx16 -> pv.pack.hx6 pv.sdotsp.hx16
+MatMulDSP	KerParMatMulDSPT_Fix16	insns 614 -> 646	hwloops 10 -> 12	packed: pv.sdotsp.hx15 -> pv.add.sc.hx2 pv.pack.hx8 pv.sdotsp.hx15
+PreProcessingFix	ZeroPad_Fix16	insns 27 -> 46	hwloops 0 -> 1	packed: - -> -
+PreProcessingFix	ZeroPadCenter_Fix16	insns 64 -> 87	hwloops 1 -> 2	packed: - -> -

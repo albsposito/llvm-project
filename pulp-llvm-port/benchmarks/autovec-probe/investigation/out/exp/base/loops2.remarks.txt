@@ -1,0 +1,88 @@
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: vectorized loop (vectorization width: 4, interleaved count: 1)
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 4, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 4, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 4, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 4, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 4, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: Stores SLP vectorized with cost -12 and with tree size 4
+remark: <unknown>:0:0: Stores SLP vectorized with cost -4 and with tree size 4
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: vectorized loop (vectorization width: 4, interleaved count: 1)
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: vectorized loop (vectorization width: 2, interleaved count: 1)
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported
+remark: <unknown>:0:0: Stores SLP vectorized with cost -4 and with tree size 4
+remark: <unknown>:0:0: Stores SLP vectorized with cost -12 and with tree size 4
+remark: <unknown>:0:0: Stores SLP vectorized with cost -12 and with tree size 4
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization factor less than 2 is not supported

@@ -1,0 +1,180 @@
+v2bf16.extract1	OK	-	1	p.bsetx1	-
+v2bf16.fabs	OK	pv.extract.hx1	18	addix2 callx2 lwx3 mvx1 p.bsetx2 sllix3 srlix2 swx3	__truncsfbf2 
+v2bf16.fadd	OK	pv.extract.hx1	23	addix2 callx2 fadd.sx2 lwx4 mvx2 p.bsetx2 sllix5 swx4	__truncsfbf2 
+v2bf16.fcmp_olt_select	OK	pv.extract.hx1	13	bnezx2 flt.sx2 mvx2 p.bsetx2 sllix5	-
+v2bf16.fdiv	OK	pv.extract.hx1	23	addix2 callx2 fdiv.sx2 lwx4 mvx2 p.bsetx2 sllix5 swx4	__truncsfbf2 
+v2bf16.fmul	OK	pv.extract.hx1	23	addix2 callx2 fmul.sx2 lwx4 mvx2 p.bsetx2 sllix5 swx4	__truncsfbf2 
+v2bf16.fmuladd	OK	pv.extract.hx1	35	addix2 callx4 fadd.sx2 fmul.sx2 lwx5 mvx4 p.bsetx2 sllix9 swx5	__truncsfbf2 
+v2bf16.fneg	OK	pv.extract.hx1	21	addix2 callx2 luix1 lwx4 mvx1 p.bsetx2 sllix3 swx4 xorx2	__truncsfbf2 
+v2bf16.fptosi_v2i16	OK	pv.pack.hx1	4	fcvt.w.sx2 sllix2	-
+v2bf16.fsub	OK	pv.extract.hx1	23	addix2 callx2 fsub.sx2 lwx4 mvx2 p.bsetx2 sllix5 swx4	__truncsfbf2 
+v2bf16.insert1	OK	-	2	p.bsetx2	-
+v2bf16.load	OK	pv.extract.hx2	3	lwx1 p.bsetx2	-
+v2bf16.load_fmul_store	OK	-	28	addix2 callx2 fmul.sx2 lhux4 lwx5 mvx2 shx2 sllix4 swx5	__truncsfbf2 
+v2bf16.maxnum	OK	pv.extract.hx1	23	addix2 callx2 fmax.sx2 lwx4 mvx2 p.bsetx2 sllix5 swx4	__truncsfbf2 
+v2bf16.minnum	OK	pv.extract.hx1	23	addix2 callx2 fmin.sx2 lwx4 mvx2 p.bsetx2 sllix5 swx4	__truncsfbf2 
+v2bf16.reduce_fadd_fast	OK	-	12	addix2 callx2 fadd.sx2 lwx1 p.bsetx1 sllix3 swx1	__truncsfbf2 
+v2bf16.sitofp_v2i16	OK	pv.extract.hx3	15	addix2 callx2 fcvt.s.wx2 lwx2 mvx2 p.bsetx2 sllix1 swx2	__truncsfbf2 
+v2bf16.splat	OK	-	2	mvx1 p.bsetx1	-
+v2bf16.sqrt	OK	pv.extract.hx1	18	addix2 callx2 fsqrt.sx2 lwx3 mvx1 p.bsetx2 sllix3 swx3	__truncsfbf2 
+v2bf16.store	OK	-	2	shx2	-
+v2f16.extract1	OK	-	1	mvx1	-
+v2f16.fabs	OK	-	2	fabs.hx2	-
+v2f16.fadd	OK	-	2	fadd.hx2	-
+v2f16.fcmp_olt_select	OK	-	7	beqzx2 bnezx1 flt.hx2 mvx2	-
+v2f16.fdiv	OK	-	2	fdiv.hx2	-
+v2f16.fmul	OK	-	2	fmul.hx2	-
+v2f16.fmuladd	OK	-	4	fadd.hx2 fmul.hx2	-
+v2f16.fneg	OK	-	2	fneg.hx2	-
+v2f16.fptosi_v2i16	OK	pv.pack.hx1	2	fcvt.w.hx2	-
+v2f16.fsub	OK	-	2	fsub.hx2	-
+v2f16.insert1	OK	-	1	mvx1	-
+v2f16.load	OK	-	3	lhx2 mvx1	-
+v2f16.load_fmul_store	OK	-	8	fmul.hx2 lhx4 shx2	-
+v2f16.maxnum	OK	-	2	fmax.hx2	-
+v2f16.minnum	OK	-	2	fmin.hx2	-
+v2f16.reduce_fadd_fast	OK	-	2	fadd.hx2	-
+v2f16.sitofp_v2i16	OK	pv.extract.hx2	2	fcvt.h.wx2	-
+v2f16.splat	OK	-	1	mvx1	-
+v2f16.sqrt	OK	-	2	fsqrt.hx2	-
+v2f16.store	OK	-	2	shx2	-
+v2i16.abs	OK	pv.abs.hx1	0	-	-
+v2i16.add	OK	pv.add.hx1	0	-	-
+v2i16.add_splat_scalar	OK	pv.add.hx1 pv.add.sc.hx1	0	-	-
+v2i16.and	OK	pv.and.hx1	0	-	-
+v2i16.ashr	OK	pv.sra.hx1	0	-	-
+v2i16.ashr_const	OK	pv.add.sci.hx1 pv.sra.hx1	0	-	-
+v2i16.build_vector	OK	pv.pack.hx1	0	-	-
+v2i16.const_nonsplat	OK	pv.pack.hx1	2	lix2	-
+v2i16.dot_s_loop_inloop	OK	pv.sdotsp.hx1	6	addix1 bnezx1 lix1 mvx1 p.lwx2	-
+v2i16.dot_s_loop_vecphi	OK	pv.extract.hx4	9	addx1 addix1 bnezx1 lix2 p.lwx2 p.macsx2	-
+v2i16.dot_s_reduce	OK	pv.dotsp.hx1	0	-	-
+v2i16.dot_s_reduce_acc	OK	pv.sdotsp.hx1	1	mvx1	-
+v2i16.dot_u_reduce	OK	pv.dotup.hx1	0	-	-
+v2i16.dot_u_reduce_acc	OK	pv.sdotup.hx1	1	mvx1	-
+v2i16.extract0	OK	pv.extract.hx1	0	-	-
+v2i16.extract_last_sext	OK	pv.extract.hx1	0	-	-
+v2i16.extract_var	OK	pv.shuffle.hx1	0	-	-
+v2i16.icmp_eq_sext	OK	pv.cmpeq.hx1	0	-	-
+v2i16.icmp_select	OK	pv.and.hx2 pv.cmpge.hx1 pv.cmplt.hx1 pv.or.hx1	0	-	-
+v2i16.icmp_select_minpat	OK	pv.min.hx1	0	-	-
+v2i16.icmp_slt_sext	OK	pv.cmplt.hx1	0	-	-
+v2i16.icmp_ugt_sext	OK	pv.cmpgtu.hx1	0	-	-
+v2i16.insert1	OK	pv.insert.hx1	0	-	-
+v2i16.insert_var	OK	-	3	lix1 p.insertx1 p.insertrx1	-
+v2i16.interleaved_load_factor2	CRASH	llc: /work/src/llvm/lib/Target/RISCV/RISCVSubtarget.cpp:176: unsigned int llvm::RISCVSubtarget::getMinRVVVectorSizeInBits() const: Assertion `hasVInst	-
+v2i16.load_add_store_loop	OK	pv.add.hx1	5	addix1 bnezx1 p.lwx2 p.swx1	-
+v2i16.load_align1	OK	-	1	lwx1	-
+v2i16.load_aligned4	OK	-	1	lwx1	-
+v2i16.load_natural	OK	-	1	lwx1	-
+v2i16.lshr	OK	pv.srl.hx1	0	-	-
+v2i16.masked_load	CRASH	llc: /work/src/llvm/lib/CodeGen/SelectionDAG/SelectionDAG.cpp:9410: SDValue llvm::SelectionDAG::getTruncStore(SDValue, const SDLoc &, SDValue, SDValue	-
+v2i16.masked_store	CRASH	llc: /work/src/llvm/lib/CodeGen/SelectionDAG/SelectionDAG.cpp:9410: SDValue llvm::SelectionDAG::getTruncStore(SDValue, const SDLoc &, SDValue, SDValue	-
+v2i16.mul	OK	pv.extract.hx4 pv.pack.hx1	2	mulx2	-
+v2i16.mul_const	OK	pv.extract.hx2 pv.pack.hx1	4	sllix2 subx2	-
+v2i16.or	OK	pv.or.hx1	0	-	-
+v2i16.reduce_add	CRASH	LLVM ERROR: Cannot select: t8: i32 = vecreduce_add t2	-
+v2i16.reduce_and	OK	pv.extract.hx2	1	andx1	-
+v2i16.reduce_mul	OK	pv.extract.hx2	1	mulx1	-
+v2i16.reduce_or	OK	pv.extract.hx2	1	orx1	-
+v2i16.reduce_smax	OK	pv.extract.hx2	1	p.maxx1	-
+v2i16.reduce_smin	OK	pv.extract.hx2	1	p.minx1	-
+v2i16.reduce_umax	OK	pv.extractu.hx2	1	p.maxux1	-
+v2i16.reduce_umin	OK	pv.extractu.hx2	1	p.minux1	-
+v2i16.reduce_xor	OK	pv.extract.hx2	1	xorx1	-
+v2i16.sadd_sat	OK	pv.extract.hx4 pv.pack.hx1	4	addx2 p.clipx2	-
+v2i16.sdiv	OK	pv.extract.hx4 pv.pack.hx1	2	divx2	-
+v2i16.select_scalar_cond	OK	-	4	andix1 bnezx1 mvx2	-
+v2i16.sext_to_i32	OK	pv.extract.hx2	1	mvx1	-
+v2i16.shl	OK	pv.sll.hx1	0	-	-
+v2i16.shuffle_deinterleave_odd	OK	pv.shuffle2.hx1	2	addix1 luix1	-
+v2i16.shuffle_interleave_lo	OK	pv.shuffle2.hx1	1	luix1	-
+v2i16.shuffle_reverse	OK	pv.shuffle.sci.hx1	0	-	-
+v2i16.smax	OK	pv.max.hx1	0	-	-
+v2i16.smin	OK	pv.min.hx1	0	-	-
+v2i16.splat	OK	pv.add.sc.hx1	0	-	-
+v2i16.splat_const	OK	pv.add.sci.hx1	0	-	-
+v2i16.ssub_sat	OK	pv.extract.hx4 pv.pack.hx1	4	p.clipx2 subx2	-
+v2i16.store_align1	OK	-	1	swx1	-
+v2i16.store_aligned4	OK	-	1	swx1	-
+v2i16.store_natural	OK	-	1	swx1	-
+v2i16.sub	OK	pv.sub.hx1	0	-	-
+v2i16.sum_sext_reduce	OK	pv.extract.hx2	1	addx1	-
+v2i16.trunc_from_i32	OK	pv.pack.hx1	0	-	-
+v2i16.uadd_sat	OK	pv.add.hx1 pv.add.sc.hx1 pv.minu.hx1 pv.xor.hx1	2	addix1 luix1	-
+v2i16.udiv	OK	pv.extractu.hx4 pv.pack.hx1	2	divux2	-
+v2i16.umax	OK	pv.maxu.hx1	0	-	-
+v2i16.umin	OK	pv.minu.hx1	0	-	-
+v2i16.usub_sat	OK	pv.maxu.hx1 pv.sub.hx1	0	-	-
+v2i16.xor	OK	pv.xor.hx1	0	-	-
+v2i16.zext_to_i32	OK	pv.extractu.hx2	1	mvx1	-
+v4i8.abs	OK	pv.abs.bx1	0	-	-
+v4i8.add	OK	pv.add.bx1	0	-	-
+v4i8.add_splat_scalar	OK	pv.add.bx1 pv.add.sc.bx1	0	-	-
+v4i8.and	OK	pv.and.bx1	0	-	-
+v4i8.ashr	OK	pv.sra.bx1	0	-	-
+v4i8.ashr_const	OK	pv.add.sci.bx1 pv.sra.bx1	0	-	-
+v4i8.build_vector	OK	pv.packhi.bx1 pv.packlo.bx1	1	mvx1	-
+v4i8.const_nonsplat	OK	pv.packhi.bx1 pv.packlo.bx1	4	lix4	-
+v4i8.dot_s_loop_inloop	OK	pv.extract.bx8	17	addx3 addix2 andix1 lix1 lp.setupx1 mulx2 mvx1 p.lwx2 p.macx2 srlix1 subx1	-
+v4i8.dot_s_loop_vecphi	OK	pv.extract.bx8	20	addx4 addix2 andix1 lix4 lp.setupx1 p.lwx2 p.macx4 srlix1 subx1	-
+v4i8.dot_s_reduce	OK	pv.extract.bx8	5	addx1 mulx2 p.macx2	-
+v4i8.dot_s_reduce_acc	OK	pv.extract.bx8	6	addx2 mulx2 p.macx2	-
+v4i8.dot_u_reduce	OK	pv.extractu.bx8	5	addx1 mulx2 p.macx2	-
+v4i8.dot_u_reduce_acc	OK	pv.extractu.bx8	6	addx2 mulx2 p.macx2	-
+v4i8.extract0	OK	pv.extract.bx1	0	-	-
+v4i8.extract_last_sext	OK	pv.extract.bx1	0	-	-
+v4i8.extract_var	OK	pv.shuffle.bx1	0	-	-
+v4i8.icmp_eq_sext	OK	pv.cmpeq.bx1	0	-	-
+v4i8.icmp_select	OK	pv.and.bx2 pv.cmpge.bx1 pv.cmplt.bx1 pv.or.bx1	0	-	-
+v4i8.icmp_select_minpat	OK	pv.min.bx1	0	-	-
+v4i8.icmp_slt_sext	OK	pv.cmplt.bx1	0	-	-
+v4i8.icmp_ugt_sext	OK	pv.cmpgtu.bx1	0	-	-
+v4i8.insert1	OK	pv.insert.bx1	0	-	-
+v4i8.insert_var	OK	-	3	lix1 p.insertx1 p.insertrx1	-
+v4i8.interleaved_load_factor2	CRASH	llc: /work/src/llvm/lib/Target/RISCV/RISCVSubtarget.cpp:176: unsigned int llvm::RISCVSubtarget::getMinRVVVectorSizeInBits() const: Assertion `hasVInst	-
+v4i8.load_add_store_loop	OK	pv.add.bx1	8	addx1 addix2 andix1 bnex1 p.lwx2 p.swx1	-
+v4i8.load_align1	OK	-	1	lwx1	-
+v4i8.load_aligned4	OK	-	1	lwx1	-
+v4i8.load_natural	OK	-	1	lwx1	-
+v4i8.lshr	OK	pv.srl.bx1	0	-	-
+v4i8.masked_load	CRASH	llc: /work/src/llvm/lib/CodeGen/SelectionDAG/SelectionDAG.cpp:9406: SDValue llvm::SelectionDAG::getTruncStore(SDValue, const SDLoc &, SDValue, SDValue	-
+v4i8.masked_store	CRASH	llc: /work/src/llvm/lib/CodeGen/SelectionDAG/SelectionDAG.cpp:9406: SDValue llvm::SelectionDAG::getTruncStore(SDValue, const SDLoc &, SDValue, SDValue	-
+v4i8.mul	OK	pv.extract.bx8 pv.packhi.bx1 pv.packlo.bx1	4	mulx4	-
+v4i8.mul_const	OK	pv.extract.bx4 pv.packhi.bx1 pv.packlo.bx1	8	sllix4 subx4	-
+v4i8.or	OK	pv.or.bx1	0	-	-
+v4i8.reduce_add	CRASH	LLVM ERROR: Cannot select: t8: i32 = vecreduce_add t2	-
+v4i8.reduce_and	OK	pv.extract.bx4	3	andx3	-
+v4i8.reduce_mul	OK	pv.extract.bx4	3	mulx3	-
+v4i8.reduce_or	OK	pv.extract.bx4	3	orx3	-
+v4i8.reduce_smax	OK	pv.extract.bx4	3	p.maxx3	-
+v4i8.reduce_smin	OK	pv.extract.bx4	3	p.minx3	-
+v4i8.reduce_umax	OK	pv.extractu.bx4	3	p.maxux3	-
+v4i8.reduce_umin	OK	pv.extractu.bx4	3	p.minux3	-
+v4i8.reduce_xor	OK	pv.extract.bx4	3	xorx3	-
+v4i8.sadd_sat	OK	pv.extract.bx8 pv.packhi.bx1 pv.packlo.bx1	8	addx4 p.clipx4	-
+v4i8.sdiv	OK	pv.extract.bx8 pv.packhi.bx1 pv.packlo.bx1	4	divx4	-
+v4i8.select_scalar_cond	OK	-	4	andix1 bnezx1 mvx2	-
+v4i8.sext_to_i32	OK	pv.extract.bx4	4	swx4	-
+v4i8.shl	OK	pv.sll.bx1	0	-	-
+v4i8.shuffle_deinterleave_odd	OK	pv.shuffle2.bx1	2	addix1 luix1	-
+v4i8.shuffle_interleave_lo	OK	pv.shuffle2.bx1	2	addix1 luix1	-
+v4i8.shuffle_reverse	OK	pv.shufflei0.sci.bx1	0	-	-
+v4i8.smax	OK	pv.max.bx1	0	-	-
+v4i8.smin	OK	pv.min.bx1	0	-	-
+v4i8.splat	OK	pv.add.sc.bx1	0	-	-
+v4i8.splat_const	OK	pv.add.sci.bx1	0	-	-
+v4i8.ssub_sat	OK	pv.extract.bx8 pv.packhi.bx1 pv.packlo.bx1	8	p.clipx4 subx4	-
+v4i8.store_align1	OK	-	1	swx1	-
+v4i8.store_aligned4	OK	-	1	swx1	-
+v4i8.store_natural	OK	-	1	swx1	-
+v4i8.sub	OK	pv.sub.bx1	0	-	-
+v4i8.sum_sext_reduce	OK	pv.extract.bx4	3	addx3	-
+v4i8.trunc_from_i32	OK	pv.packhi.bx1 pv.packlo.bx1	4	lwx4	-
+v4i8.uadd_sat	OK	pv.add.bx1 pv.add.sc.bx1 pv.minu.bx1 pv.xor.bx1	1	lix1	-
+v4i8.udiv	OK	pv.extractu.bx8 pv.packhi.bx1 pv.packlo.bx1	4	divux4	-
+v4i8.umax	OK	pv.maxu.bx1	0	-	-
+v4i8.umin	OK	pv.minu.bx1	0	-	-
+v4i8.usub_sat	OK	pv.maxu.bx1 pv.sub.bx1	0	-	-
+v4i8.xor	OK	pv.xor.bx1	0	-	-
+v4i8.zext_to_i32	OK	pv.extractu.bx4	4	swx4	-

@@ -1,0 +1,1121 @@
+loops2.c:9:62: note: Unknown misalignment, naturally aligned
+loops2.c:9:62: note: Unknown misalignment, naturally aligned
+loops2.c:9:62: note: Unknown misalignment, naturally aligned
+loops2.c:9:62: note: not ssa-name.
+loops2.c:9:62: note: use not simple.
+loops2.c:9:62: note: not ssa-name.
+loops2.c:9:62: note: use not simple.
+loops2.c:9:62: note: no optab.
+loops2.c:9:62: note: not ssa-name.
+loops2.c:9:62: note: use not simple.
+loops2.c:9:62: note: not ssa-name.
+loops2.c:9:62: note: use not simple.
+loops2.c:9:62: note: no optab.
+loops2.c:9:62: note: no optab.
+loops2.c:9:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:9:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:9:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:9:79: note: not consecutive access *_32 = _31;
+loops2.c:9:79: note: not consecutive access _44 = *_45;
+loops2.c:9:79: note: not consecutive access _35 = *_42;
+loops2.c:9:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:9:79: note: not vectorized: not enough data-refs in basic block.
+loops2.c:9:87: note: not vectorized: no vectype for stmt: vect__4.158_80 = MEM[(const s16 *)vectp_b.156_78];
+ scalar_type: const vector(2) short int
+loops2.c:9:87: note: not vectorized: no vectype for stmt: vect__7.162_86 = MEM[(const s16 *)vectp_c.160_84];
+ scalar_type: const vector(2) short int
+loops2.c:9:87: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.166_92] = vect__11.165_89;
+ scalar_type: vector(2) short int
+loops2.c:9:87: note: not vectorized: no grouped stores in basic block.
+loops2.c:9:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:9:62: note: not consecutive access *_9 = _10;
+loops2.c:9:62: note: not consecutive access _3 = *_2;
+loops2.c:9:62: note: not consecutive access _6 = *_5;
+loops2.c:9:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:9:79: note: not consecutive access *_61 = _62;
+loops2.c:9:79: note: not consecutive access _55 = *_54;
+loops2.c:9:79: note: not consecutive access _58 = *_57;
+loops2.c:9:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:9:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:10:62: note: Unknown misalignment, naturally aligned
+loops2.c:10:62: note: Unknown misalignment, naturally aligned
+loops2.c:10:62: note: Unknown misalignment, naturally aligned
+loops2.c:10:62: note: not ssa-name.
+loops2.c:10:62: note: use not simple.
+loops2.c:10:62: note: not ssa-name.
+loops2.c:10:62: note: use not simple.
+loops2.c:10:62: note: no optab.
+loops2.c:10:62: note: not ssa-name.
+loops2.c:10:62: note: use not simple.
+loops2.c:10:62: note: not ssa-name.
+loops2.c:10:62: note: use not simple.
+loops2.c:10:62: note: no optab.
+loops2.c:10:62: note: no optab.
+loops2.c:10:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:10:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:10:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:10:79: note: not consecutive access *_155 = _156;
+loops2.c:10:79: note: not consecutive access _149 = *_148;
+loops2.c:10:79: note: not consecutive access _152 = *_151;
+loops2.c:10:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:10:79: note: not consecutive access *_171 = _172;
+loops2.c:10:79: note: not consecutive access _165 = *_164;
+loops2.c:10:79: note: not consecutive access _168 = *_167;
+loops2.c:10:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:10:79: note: not consecutive access *_30 = _29;
+loops2.c:10:79: note: not consecutive access _41 = *_42;
+loops2.c:10:79: note: not consecutive access _33 = *_39;
+loops2.c:10:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:10:79: note: not vectorized: not enough data-refs in basic block.
+loops2.c:10:87: note: not vectorized: no vectype for stmt: vect__3.192_75 = MEM[(const s8 *)vectp_b.190_73];
+ scalar_type: const vector(4) signed char
+loops2.c:10:87: note: not vectorized: no vectype for stmt: vect__6.196_80 = MEM[(const s8 *)vectp_c.194_78];
+ scalar_type: const vector(4) signed char
+loops2.c:10:87: note: not vectorized: no vectype for stmt: MEM[(s8 *)vectp_a.200_85] = vect__10.199_83;
+ scalar_type: vector(4) signed char
+loops2.c:10:87: note: not vectorized: no grouped stores in basic block.
+loops2.c:10:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:10:62: note: not consecutive access *_8 = _9;
+loops2.c:10:62: note: not consecutive access _2 = *_1;
+loops2.c:10:62: note: not consecutive access _5 = *_4;
+loops2.c:10:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:10:62: note: not consecutive access *_98 = _99;
+loops2.c:10:62: note: not consecutive access _92 = *_91;
+loops2.c:10:62: note: not consecutive access _95 = *_94;
+loops2.c:10:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:10:62: note: not consecutive access *_112 = _113;
+loops2.c:10:62: note: not consecutive access _106 = *_105;
+loops2.c:10:62: note: not consecutive access _109 = *_108;
+loops2.c:10:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:10:62: note: not consecutive access *_126 = _127;
+loops2.c:10:62: note: not consecutive access _120 = *_119;
+loops2.c:10:62: note: not consecutive access _123 = *_122;
+loops2.c:10:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:10:62: note: not consecutive access *_140 = _141;
+loops2.c:10:62: note: not consecutive access _134 = *_133;
+loops2.c:10:62: note: not consecutive access _137 = *_136;
+loops2.c:10:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:10:79: note: not consecutive access *_57 = _58;
+loops2.c:10:79: note: not consecutive access _51 = *_50;
+loops2.c:10:79: note: not consecutive access _54 = *_53;
+loops2.c:10:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:10:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:11:62: note: Unknown misalignment, naturally aligned
+loops2.c:11:62: note: Unknown misalignment, naturally aligned
+loops2.c:11:62: note: Unknown misalignment, naturally aligned
+loops2.c:11:62: note: not ssa-name.
+loops2.c:11:62: note: use not simple.
+loops2.c:11:62: note: not ssa-name.
+loops2.c:11:62: note: use not simple.
+loops2.c:11:62: note: no optab.
+loops2.c:11:62: note: not ssa-name.
+loops2.c:11:62: note: use not simple.
+loops2.c:11:62: note: not ssa-name.
+loops2.c:11:62: note: use not simple.
+loops2.c:11:62: note: no optab.
+loops2.c:11:62: note: no optab.
+loops2.c:11:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:11:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:11:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:11:79: note: not consecutive access *_32 = _31;
+loops2.c:11:79: note: not consecutive access _44 = *_45;
+loops2.c:11:79: note: not consecutive access _35 = *_42;
+loops2.c:11:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:11:79: note: not vectorized: not enough data-refs in basic block.
+loops2.c:11:87: note: not vectorized: no vectype for stmt: vect__4.225_80 = MEM[(const s16 *)vectp_b.223_78];
+ scalar_type: const vector(2) short int
+loops2.c:11:87: note: not vectorized: no vectype for stmt: vect__7.229_86 = MEM[(const s16 *)vectp_c.227_84];
+ scalar_type: const vector(2) short int
+loops2.c:11:87: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.233_92] = vect__11.232_89;
+ scalar_type: vector(2) short int
+loops2.c:11:87: note: not vectorized: no grouped stores in basic block.
+loops2.c:11:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:11:62: note: not consecutive access *_9 = _10;
+loops2.c:11:62: note: not consecutive access _3 = *_2;
+loops2.c:11:62: note: not consecutive access _6 = *_5;
+loops2.c:11:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:11:79: note: not consecutive access *_61 = _62;
+loops2.c:11:79: note: not consecutive access _55 = *_54;
+loops2.c:11:79: note: not consecutive access _58 = *_57;
+loops2.c:11:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:11:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:12:62: note: Unknown misalignment, naturally aligned
+loops2.c:12:62: note: Unknown misalignment, naturally aligned
+loops2.c:12:62: note: Unknown misalignment, naturally aligned
+loops2.c:12:62: note: not ssa-name.
+loops2.c:12:62: note: use not simple.
+loops2.c:12:62: note: not ssa-name.
+loops2.c:12:62: note: use not simple.
+loops2.c:12:62: note: not ssa-name.
+loops2.c:12:62: note: use not simple.
+loops2.c:12:62: note: not ssa-name.
+loops2.c:12:62: note: use not simple.
+loops2.c:12:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:12:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:12:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:12:79: note: not consecutive access *_23 = _19;
+loops2.c:12:79: note: not consecutive access _26 = *_33;
+loops2.c:12:79: note: not consecutive access _24 = *_25;
+loops2.c:12:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:12:79: note: not vectorized: not enough data-refs in basic block.
+loops2.c:12:87: note: not vectorized: no vectype for stmt: vect__4.258_71 = MEM[(const s16 *)vectp_b.256_69];
+ scalar_type: const vector(2) short int
+loops2.c:12:87: note: not vectorized: no vectype for stmt: vect__6.261_76 = MEM[(const s16 *)vectp_c.259_74];
+ scalar_type: const vector(2) short int
+loops2.c:12:87: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.263_80] = vect__8.262_77;
+ scalar_type: vector(2) short int
+loops2.c:12:87: note: not vectorized: no grouped stores in basic block.
+loops2.c:12:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:12:62: note: not consecutive access *_6 = _7;
+loops2.c:12:62: note: not consecutive access _3 = *_2;
+loops2.c:12:62: note: not consecutive access _5 = *_4;
+loops2.c:12:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:12:79: note: not consecutive access *_52 = _53;
+loops2.c:12:79: note: not consecutive access _49 = *_48;
+loops2.c:12:79: note: not consecutive access _51 = *_50;
+loops2.c:12:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:12:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:13:62: note: Unknown misalignment, naturally aligned
+loops2.c:13:62: note: Unknown misalignment, naturally aligned
+loops2.c:13:62: note: Unknown misalignment, naturally aligned
+loops2.c:13:62: note: not ssa-name.
+loops2.c:13:62: note: use not simple.
+loops2.c:13:62: note: not ssa-name.
+loops2.c:13:62: note: use not simple.
+loops2.c:13:62: note: not ssa-name.
+loops2.c:13:62: note: use not simple.
+loops2.c:13:62: note: not ssa-name.
+loops2.c:13:62: note: use not simple.
+loops2.c:13:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:13:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:13:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:13:79: note: not consecutive access *_23 = _19;
+loops2.c:13:79: note: not consecutive access _24 = *_25;
+loops2.c:13:79: note: not consecutive access _26 = *_33;
+loops2.c:13:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:13:79: note: not vectorized: not enough data-refs in basic block.
+loops2.c:13:87: note: not vectorized: no vectype for stmt: vect__4.288_71 = MEM[(const s16 *)vectp_c.286_69];
+ scalar_type: const vector(2) short int
+loops2.c:13:87: note: not vectorized: no vectype for stmt: vect__6.291_76 = MEM[(const s16 *)vectp_b.289_74];
+ scalar_type: const vector(2) short int
+loops2.c:13:87: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.293_80] = vect__8.292_77;
+ scalar_type: vector(2) short int
+loops2.c:13:87: note: not vectorized: no grouped stores in basic block.
+loops2.c:13:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:13:62: note: not consecutive access *_6 = _7;
+loops2.c:13:62: note: not consecutive access _5 = *_4;
+loops2.c:13:62: note: not consecutive access _3 = *_2;
+loops2.c:13:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:13:79: note: not consecutive access *_52 = _53;
+loops2.c:13:79: note: not consecutive access _51 = *_50;
+loops2.c:13:79: note: not consecutive access _49 = *_48;
+loops2.c:13:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:13:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:14:62: note: Unknown misalignment, naturally aligned
+loops2.c:14:62: note: Unknown misalignment, naturally aligned
+loops2.c:14:62: note: Unknown misalignment, naturally aligned
+loops2.c:14:62: note: not ssa-name.
+loops2.c:14:62: note: use not simple.
+loops2.c:14:62: note: not ssa-name.
+loops2.c:14:62: note: use not simple.
+loops2.c:14:62: note: not ssa-name.
+loops2.c:14:62: note: use not simple.
+loops2.c:14:62: note: not ssa-name.
+loops2.c:14:62: note: use not simple.
+loops2.c:14:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:14:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:14:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:14:79: note: not consecutive access *_128 = _129;
+loops2.c:14:79: note: not consecutive access _127 = *_126;
+loops2.c:14:79: note: not consecutive access _125 = *_124;
+loops2.c:14:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:14:79: note: not consecutive access *_141 = _142;
+loops2.c:14:79: note: not consecutive access _140 = *_139;
+loops2.c:14:79: note: not consecutive access _138 = *_137;
+loops2.c:14:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:14:79: note: not consecutive access *_18 = _17;
+loops2.c:14:79: note: not consecutive access _22 = *_23;
+loops2.c:14:79: note: not consecutive access _24 = *_30;
+loops2.c:14:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:14:79: note: not vectorized: not enough data-refs in basic block.
+loops2.c:14:87: note: not vectorized: no vectype for stmt: vect__3.318_66 = MEM[(const s8 *)vectp_c.316_64];
+ scalar_type: const vector(4) signed char
+loops2.c:14:87: note: not vectorized: no vectype for stmt: vect__5.321_70 = MEM[(const s8 *)vectp_b.319_68];
+ scalar_type: const vector(4) signed char
+loops2.c:14:87: note: not vectorized: no vectype for stmt: MEM[(s8 *)vectp_a.323_73] = vect__7.322_71;
+ scalar_type: vector(4) signed char
+loops2.c:14:87: note: not vectorized: no grouped stores in basic block.
+loops2.c:14:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:14:62: note: not consecutive access *_5 = _6;
+loops2.c:14:62: note: not consecutive access _4 = *_3;
+loops2.c:14:62: note: not consecutive access _2 = *_1;
+loops2.c:14:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:14:62: note: not consecutive access *_83 = _84;
+loops2.c:14:62: note: not consecutive access _82 = *_81;
+loops2.c:14:62: note: not consecutive access _80 = *_79;
+loops2.c:14:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:14:62: note: not consecutive access *_94 = _95;
+loops2.c:14:62: note: not consecutive access _93 = *_92;
+loops2.c:14:62: note: not consecutive access _91 = *_90;
+loops2.c:14:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:14:62: note: not consecutive access *_105 = _106;
+loops2.c:14:62: note: not consecutive access _104 = *_103;
+loops2.c:14:62: note: not consecutive access _102 = *_101;
+loops2.c:14:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:14:62: note: not consecutive access *_116 = _117;
+loops2.c:14:62: note: not consecutive access _115 = *_114;
+loops2.c:14:62: note: not consecutive access _113 = *_112;
+loops2.c:14:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:14:79: note: not consecutive access *_48 = _49;
+loops2.c:14:79: note: not consecutive access _47 = *_46;
+loops2.c:14:79: note: not consecutive access _45 = *_44;
+loops2.c:14:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:14:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:15:62: note: Unknown misalignment, naturally aligned
+loops2.c:15:62: note: Unknown misalignment, naturally aligned
+loops2.c:15:62: note: Unknown misalignment, naturally aligned
+loops2.c:15:62: note: not ssa-name.
+loops2.c:15:62: note: use not simple.
+loops2.c:15:62: note: not ssa-name.
+loops2.c:15:62: note: use not simple.
+loops2.c:15:62: note: not ssa-name.
+loops2.c:15:62: note: use not simple.
+loops2.c:15:62: note: not ssa-name.
+loops2.c:15:62: note: use not simple.
+loops2.c:15:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:15:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:15:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:15:79: note: not consecutive access *_128 = _129;
+loops2.c:15:79: note: not consecutive access _127 = *_126;
+loops2.c:15:79: note: not consecutive access _125 = *_124;
+loops2.c:15:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:15:79: note: not consecutive access *_141 = _142;
+loops2.c:15:79: note: not consecutive access _140 = *_139;
+loops2.c:15:79: note: not consecutive access _138 = *_137;
+loops2.c:15:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:15:79: note: not consecutive access *_18 = _17;
+loops2.c:15:79: note: not consecutive access _22 = *_23;
+loops2.c:15:79: note: not consecutive access _24 = *_30;
+loops2.c:15:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:15:79: note: not vectorized: not enough data-refs in basic block.
+loops2.c:15:87: note: not vectorized: no vectype for stmt: vect__3.348_66 = MEM[(const u8 *)vectp_c.346_64];
+ scalar_type: const vector(4) unsigned char
+loops2.c:15:87: note: not vectorized: no vectype for stmt: vect__5.351_70 = MEM[(const u8 *)vectp_b.349_68];
+ scalar_type: const vector(4) unsigned char
+loops2.c:15:87: note: not vectorized: no vectype for stmt: MEM[(u8 *)vectp_a.353_73] = vect__7.352_71;
+ scalar_type: vector(4) unsigned char
+loops2.c:15:87: note: not vectorized: no grouped stores in basic block.
+loops2.c:15:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:15:62: note: not consecutive access *_5 = _6;
+loops2.c:15:62: note: not consecutive access _4 = *_3;
+loops2.c:15:62: note: not consecutive access _2 = *_1;
+loops2.c:15:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:15:62: note: not consecutive access *_83 = _84;
+loops2.c:15:62: note: not consecutive access _82 = *_81;
+loops2.c:15:62: note: not consecutive access _80 = *_79;
+loops2.c:15:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:15:62: note: not consecutive access *_94 = _95;
+loops2.c:15:62: note: not consecutive access _93 = *_92;
+loops2.c:15:62: note: not consecutive access _91 = *_90;
+loops2.c:15:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:15:62: note: not consecutive access *_105 = _106;
+loops2.c:15:62: note: not consecutive access _104 = *_103;
+loops2.c:15:62: note: not consecutive access _102 = *_101;
+loops2.c:15:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:15:62: note: not consecutive access *_116 = _117;
+loops2.c:15:62: note: not consecutive access _115 = *_114;
+loops2.c:15:62: note: not consecutive access _113 = *_112;
+loops2.c:15:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:15:79: note: not consecutive access *_48 = _49;
+loops2.c:15:79: note: not consecutive access _47 = *_46;
+loops2.c:15:79: note: not consecutive access _45 = *_44;
+loops2.c:15:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:15:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:16:46: note: not vectorized: unsupported data-type int
+loops2.c:16:46: note: can't determine vectorization factor.
+loops2.c:16:46: note: not vectorized: not enough data-refs in basic block.
+loops2.c:16:46: note: not vectorized: no grouped stores in basic block.
+loops2.c:16:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:17:46: note: Unknown misalignment, naturally aligned
+loops2.c:17:46: note: Unknown misalignment, naturally aligned
+loops2.c:17:46: note: not ssa-name.
+loops2.c:17:46: note: use not simple.
+loops2.c:17:46: note: not ssa-name.
+loops2.c:17:46: note: use not simple.
+loops2.c:17:46: note: not vectorized: not enough data-refs in basic block.
+loops2.c:17:46: note: not vectorized: not enough data-refs in basic block.
+loops2.c:17:46: note: not vectorized: not enough data-refs in basic block.
+loops2.c:17:63: note: not consecutive access *_8 = _7;
+loops2.c:17:63: note: not consecutive access _15 = *_16;
+loops2.c:17:63: note: not vectorized: no grouped stores in basic block.
+loops2.c:17:63: note: not vectorized: not enough data-refs in basic block.
+loops2.c:17:71: note: not vectorized: no vectype for stmt: vect__4.387_63 = MEM[(const s16 *)vectp_b.385_61];
+ scalar_type: const vector(2) short int
+loops2.c:17:71: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.389_68] = vect__6.388_65;
+ scalar_type: vector(2) short int
+loops2.c:17:71: note: not vectorized: no grouped stores in basic block.
+loops2.c:17:71: note: not vectorized: not enough data-refs in basic block.
+loops2.c:17:46: note: not consecutive access *_4 = _5;
+loops2.c:17:46: note: not consecutive access _3 = *_2;
+loops2.c:17:46: note: not vectorized: no grouped stores in basic block.
+loops2.c:17:63: note: not consecutive access *_45 = _46;
+loops2.c:17:63: note: not consecutive access _44 = *_43;
+loops2.c:17:63: note: not vectorized: no grouped stores in basic block.
+loops2.c:17:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:18:46: note: Unknown misalignment, naturally aligned
+loops2.c:18:46: note: Unknown misalignment, naturally aligned
+loops2.c:18:46: note: not ssa-name.
+loops2.c:18:46: note: use not simple.
+loops2.c:18:46: note: not ssa-name.
+loops2.c:18:46: note: use not simple.
+loops2.c:18:46: note: not vectorized: not enough data-refs in basic block.
+loops2.c:18:46: note: not vectorized: not enough data-refs in basic block.
+loops2.c:18:46: note: not vectorized: not enough data-refs in basic block.
+loops2.c:18:63: note: not consecutive access *_108 = _109;
+loops2.c:18:63: note: not consecutive access _107 = *_106;
+loops2.c:18:63: note: not vectorized: no grouped stores in basic block.
+loops2.c:18:63: note: not consecutive access *_119 = _120;
+loops2.c:18:63: note: not consecutive access _118 = *_117;
+loops2.c:18:63: note: not vectorized: no grouped stores in basic block.
+loops2.c:18:63: note: not consecutive access *_6 = _22;
+loops2.c:18:63: note: not consecutive access _7 = *_14;
+loops2.c:18:63: note: not vectorized: no grouped stores in basic block.
+loops2.c:18:63: note: not vectorized: not enough data-refs in basic block.
+loops2.c:18:71: note: not vectorized: no vectype for stmt: vect__3.411_59 = MEM[(const u8 *)vectp_b.409_57];
+ scalar_type: const vector(4) unsigned char
+loops2.c:18:71: note: not vectorized: no vectype for stmt: MEM[(u8 *)vectp_a.413_63] = vect__5.412_61;
+ scalar_type: vector(4) unsigned char
+loops2.c:18:71: note: not vectorized: no grouped stores in basic block.
+loops2.c:18:71: note: not vectorized: not enough data-refs in basic block.
+loops2.c:18:46: note: not consecutive access *_3 = _4;
+loops2.c:18:46: note: not consecutive access _2 = *_1;
+loops2.c:18:46: note: not vectorized: no grouped stores in basic block.
+loops2.c:18:46: note: not consecutive access *_71 = _72;
+loops2.c:18:46: note: not consecutive access _70 = *_69;
+loops2.c:18:46: note: not vectorized: no grouped stores in basic block.
+loops2.c:18:46: note: not consecutive access *_80 = _81;
+loops2.c:18:46: note: not consecutive access _79 = *_78;
+loops2.c:18:46: note: not vectorized: no grouped stores in basic block.
+loops2.c:18:46: note: not consecutive access *_89 = _90;
+loops2.c:18:46: note: not consecutive access _88 = *_87;
+loops2.c:18:46: note: not vectorized: no grouped stores in basic block.
+loops2.c:18:46: note: not consecutive access *_98 = _99;
+loops2.c:18:46: note: not consecutive access _97 = *_96;
+loops2.c:18:46: note: not vectorized: no grouped stores in basic block.
+loops2.c:18:63: note: not consecutive access *_41 = _42;
+loops2.c:18:63: note: not consecutive access _40 = *_39;
+loops2.c:18:63: note: not vectorized: no grouped stores in basic block.
+loops2.c:18:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:19:54: note: not vectorized: unsupported data-type int
+loops2.c:19:54: note: can't determine vectorization factor.
+loops2.c:19:54: note: not vectorized: not enough data-refs in basic block.
+loops2.c:19:54: note: not vectorized: no grouped stores in basic block.
+loops2.c:19:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:20:47: note: Unknown misalignment, naturally aligned
+loops2.c:20:47: note: Unknown misalignment, naturally aligned
+loops2.c:20:47: note: not ssa-name.
+loops2.c:20:47: note: use not simple.
+loops2.c:20:47: note: not ssa-name.
+loops2.c:20:47: note: use not simple.
+loops2.c:20:47: note: no optab.
+loops2.c:20:47: note: no optab.
+loops2.c:20:47: note: not vectorized: not enough data-refs in basic block.
+loops2.c:20:47: note: not vectorized: not enough data-refs in basic block.
+loops2.c:20:47: note: not vectorized: not enough data-refs in basic block.
+loops2.c:20:64: note: not consecutive access *_23 = _22;
+loops2.c:20:64: note: not consecutive access _26 = *_32;
+loops2.c:20:64: note: not vectorized: no grouped stores in basic block.
+loops2.c:20:64: note: not vectorized: not enough data-refs in basic block.
+loops2.c:20:72: note: not vectorized: no vectype for stmt: vect__4.444_70 = MEM[(const s16 *)vectp_b.442_68];
+ scalar_type: const vector(2) short int
+loops2.c:20:72: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.448_77] = vect__8.447_74;
+ scalar_type: vector(2) short int
+loops2.c:20:72: note: not vectorized: no grouped stores in basic block.
+loops2.c:20:72: note: not vectorized: not enough data-refs in basic block.
+loops2.c:20:47: note: not consecutive access *_6 = _7;
+loops2.c:20:47: note: not consecutive access _3 = *_2;
+loops2.c:20:47: note: not vectorized: no grouped stores in basic block.
+loops2.c:20:64: note: not consecutive access *_51 = _52;
+loops2.c:20:64: note: not consecutive access _48 = *_47;
+loops2.c:20:64: note: not vectorized: no grouped stores in basic block.
+loops2.c:20:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:21:54: note: Unknown misalignment, naturally aligned
+loops2.c:21:54: note: Unknown misalignment, naturally aligned
+loops2.c:21:54: note: not ssa-name.
+loops2.c:21:54: note: use not simple.
+loops2.c:21:54: note: not ssa-name.
+loops2.c:21:54: note: use not simple.
+loops2.c:21:54: note: no optab.
+loops2.c:21:54: note: no optab.
+loops2.c:21:54: note: not vectorized: not enough data-refs in basic block.
+loops2.c:21:54: note: not vectorized: not enough data-refs in basic block.
+loops2.c:21:54: note: not vectorized: not enough data-refs in basic block.
+loops2.c:21:71: note: not consecutive access *_25 = _24;
+loops2.c:21:71: note: not consecutive access _28 = *_35;
+loops2.c:21:71: note: not vectorized: no grouped stores in basic block.
+loops2.c:21:71: note: not vectorized: not enough data-refs in basic block.
+loops2.c:21:79: note: not vectorized: no vectype for stmt: vect__4.470_72 = MEM[(const s16 *)vectp_b.468_70];
+ scalar_type: const vector(2) short int
+loops2.c:21:79: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.474_79] = vect__9.473_76;
+ scalar_type: vector(2) short int
+loops2.c:21:79: note: not vectorized: no grouped stores in basic block.
+loops2.c:21:79: note: not vectorized: not enough data-refs in basic block.
+loops2.c:21:54: note: not consecutive access *_7 = _8;
+loops2.c:21:54: note: not consecutive access _3 = *_2;
+loops2.c:21:54: note: not vectorized: no grouped stores in basic block.
+loops2.c:21:71: note: not consecutive access *_53 = _54;
+loops2.c:21:71: note: not consecutive access _50 = *_49;
+loops2.c:21:71: note: not vectorized: no grouped stores in basic block.
+loops2.c:21:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:22:48: note: Unknown misalignment, naturally aligned
+loops2.c:22:48: note: Unknown misalignment, naturally aligned
+loops2.c:22:48: note: not ssa-name.
+loops2.c:22:48: note: use not simple.
+loops2.c:22:48: note: not ssa-name.
+loops2.c:22:48: note: use not simple.
+loops2.c:22:48: note: no optab.
+loops2.c:22:48: note: no optab.
+loops2.c:22:48: note: not vectorized: not enough data-refs in basic block.
+loops2.c:22:48: note: not vectorized: not enough data-refs in basic block.
+loops2.c:22:48: note: not vectorized: not enough data-refs in basic block.
+loops2.c:22:65: note: not consecutive access *_18 = _17;
+loops2.c:22:65: note: not consecutive access _24 = *_25;
+loops2.c:22:65: note: not vectorized: no grouped stores in basic block.
+loops2.c:22:65: note: not vectorized: not enough data-refs in basic block.
+loops2.c:22:73: note: not vectorized: no vectype for stmt: vect__4.496_71 = MEM[(const s16 *)vectp_b.494_69];
+ scalar_type: const vector(2) short int
+loops2.c:22:73: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.501_79] = vect__8.500_76;
+ scalar_type: vector(2) short int
+loops2.c:22:73: note: not vectorized: no grouped stores in basic block.
+loops2.c:22:73: note: not vectorized: not enough data-refs in basic block.
+loops2.c:22:48: note: not consecutive access *_6 = _7;
+loops2.c:22:48: note: not consecutive access _3 = *_2;
+loops2.c:22:48: note: not vectorized: no grouped stores in basic block.
+loops2.c:22:65: note: not consecutive access *_53 = _54;
+loops2.c:22:65: note: not consecutive access _50 = *_49;
+loops2.c:22:65: note: not vectorized: no grouped stores in basic block.
+loops2.c:22:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:23:56: note: not vectorized: unsupported data-type int
+loops2.c:23:56: note: can't determine vectorization factor.
+loops2.c:23:56: note: not vectorized: not enough data-refs in basic block.
+loops2.c:23:56: note: not vectorized: not enough data-refs in basic block.
+loops2.c:23:56: note: not vectorized: no grouped stores in basic block.
+loops2.c:23:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:24:62: note: Unknown misalignment, naturally aligned
+loops2.c:24:62: note: Unknown misalignment, naturally aligned
+loops2.c:24:62: note: Unknown misalignment, naturally aligned
+loops2.c:24:62: note: not ssa-name.
+loops2.c:24:62: note: use not simple.
+loops2.c:24:62: note: not ssa-name.
+loops2.c:24:62: note: use not simple.
+loops2.c:24:62: note: no optab.
+loops2.c:24:62: note: not ssa-name.
+loops2.c:24:62: note: use not simple.
+loops2.c:24:62: note: not ssa-name.
+loops2.c:24:62: note: use not simple.
+loops2.c:24:62: note: no optab.
+loops2.c:24:62: note: op not supported by target.
+loops2.c:24:62: note: not vectorized: relevant stmt not supported: _9 = _5 * _8;
+loops2.c:24:62: note: bad operation or unsupported loop bound.
+loops2.c:24:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:24:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:24:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:25:47: note: not vectorized: not enough data-refs in basic block.
+loops2.c:25:72: note: not vectorized: not enough data-refs in basic block.
+loops2.c:25:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:35: note: Unknown misalignment, naturally aligned
+loops2.c:26:35: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:35: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:35: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:52: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:52: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:60: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.543_53] = vect_cst__50;
+ scalar_type: vector(2) short int
+loops2.c:26:60: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:60: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:35: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:35: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:35: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:35: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:52: note: not vectorized: not enough data-refs in basic block.
+loops2.c:26:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:27:58: note: not vectorized: unsupported data-type int
+loops2.c:27:58: note: can't determine vectorization factor.
+loops2.c:27:58: note: not vectorized: not enough data-refs in basic block.
+loops2.c:27:58: note: not vectorized: no grouped stores in basic block.
+loops2.c:27:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:30:3: note: not vectorized: unsupported data-type int
+loops2.c:30:3: note: can't determine vectorization factor.
+loops2.c:30:3: note: not vectorized: not enough data-refs in basic block.
+loops2.c:30:3: note: not vectorized: no grouped stores in basic block.
+loops2.c:30:3: note: not vectorized: not enough data-refs in basic block.
+loops2.c:32:3: note: not vectorized: unsupported data-type int
+loops2.c:32:3: note: can't determine vectorization factor.
+loops2.c:32:3: note: not vectorized: not enough data-refs in basic block.
+loops2.c:32:3: note: not vectorized: no grouped stores in basic block.
+loops2.c:32:3: note: not vectorized: not enough data-refs in basic block.
+loops2.c:33:44: note: Unknown misalignment, naturally aligned
+loops2.c:33:44: note: Unknown misalignment, naturally aligned
+loops2.c:33:44: note: not ssa-name.
+loops2.c:33:44: note: use not simple.
+loops2.c:33:44: note: not ssa-name.
+loops2.c:33:44: note: use not simple.
+loops2.c:33:44: note: not vectorized: not enough data-refs in basic block.
+loops2.c:33:44: note: not vectorized: not enough data-refs in basic block.
+loops2.c:33:44: note: not vectorized: not enough data-refs in basic block.
+loops2.c:33:61: note: not consecutive access *_108 = _109;
+loops2.c:33:61: note: not consecutive access _107 = *_106;
+loops2.c:33:61: note: not vectorized: no grouped stores in basic block.
+loops2.c:33:61: note: not consecutive access *_119 = _120;
+loops2.c:33:61: note: not consecutive access _118 = *_117;
+loops2.c:33:61: note: not vectorized: no grouped stores in basic block.
+loops2.c:33:61: note: not consecutive access *_6 = _22;
+loops2.c:33:61: note: not consecutive access _7 = *_14;
+loops2.c:33:61: note: not vectorized: no grouped stores in basic block.
+loops2.c:33:61: note: not vectorized: not enough data-refs in basic block.
+loops2.c:33:69: note: not vectorized: no vectype for stmt: vect__3.592_59 = MEM[(const s8 *)vectp_b.590_57];
+ scalar_type: const vector(4) signed char
+loops2.c:33:69: note: not vectorized: no vectype for stmt: MEM[(s8 *)vectp_a.594_63] = vect__5.593_61;
+ scalar_type: vector(4) signed char
+loops2.c:33:69: note: not vectorized: no grouped stores in basic block.
+loops2.c:33:69: note: not vectorized: not enough data-refs in basic block.
+loops2.c:33:44: note: not consecutive access *_3 = _4;
+loops2.c:33:44: note: not consecutive access _2 = *_1;
+loops2.c:33:44: note: not vectorized: no grouped stores in basic block.
+loops2.c:33:44: note: not consecutive access *_71 = _72;
+loops2.c:33:44: note: not consecutive access _70 = *_69;
+loops2.c:33:44: note: not vectorized: no grouped stores in basic block.
+loops2.c:33:44: note: not consecutive access *_80 = _81;
+loops2.c:33:44: note: not consecutive access _79 = *_78;
+loops2.c:33:44: note: not vectorized: no grouped stores in basic block.
+loops2.c:33:44: note: not consecutive access *_89 = _90;
+loops2.c:33:44: note: not consecutive access _88 = *_87;
+loops2.c:33:44: note: not vectorized: no grouped stores in basic block.
+loops2.c:33:44: note: not consecutive access *_98 = _99;
+loops2.c:33:44: note: not consecutive access _97 = *_96;
+loops2.c:33:44: note: not vectorized: no grouped stores in basic block.
+loops2.c:33:61: note: not consecutive access *_41 = _42;
+loops2.c:33:61: note: not consecutive access _40 = *_39;
+loops2.c:33:61: note: not vectorized: no grouped stores in basic block.
+loops2.c:33:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:62: note: Unknown misalignment, naturally aligned
+loops2.c:35:62: note: Unknown misalignment, naturally aligned
+loops2.c:35:62: note: Unknown misalignment, naturally aligned
+loops2.c:35:62: note: not ssa-name.
+loops2.c:35:62: note: use not simple.
+loops2.c:35:62: note: not ssa-name.
+loops2.c:35:62: note: use not simple.
+loops2.c:35:62: note: not ssa-name.
+loops2.c:35:62: note: use not simple.
+loops2.c:35:62: note: not ssa-name.
+loops2.c:35:62: note: use not simple.
+loops2.c:35:62: note: no optab.
+loops2.c:35:62: note: no optab.
+loops2.c:35:62: note: no optab.
+loops2.c:35:62: note: not ssa-name.
+loops2.c:35:62: note: use not simple.
+loops2.c:35:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:87: note: not consecutive access _48 = *_47;
+loops2.c:35:87: note: not consecutive access _50 = *_49;
+loops2.c:35:87: note: not vectorized: no grouped stores in basic block.
+loops2.c:35:79: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:87: note: not vectorized: no vectype for stmt: vect__4.616_101 = MEM[(const s16 *)vectp_b.614_99];
+ scalar_type: const vector(2) short int
+loops2.c:35:87: note: not vectorized: no vectype for stmt: vect__6.619_106 = MEM[(const s16 *)vectp_c.617_104];
+ scalar_type: const vector(2) short int
+loops2.c:35:87: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.625_115] = vect_iftmp.624_112;
+ scalar_type: vector(2) short int
+loops2.c:35:87: note: not vectorized: no grouped stores in basic block.
+loops2.c:35:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:87: note: not consecutive access _2 = *_1;
+loops2.c:35:87: note: not consecutive access _4 = *_3;
+loops2.c:35:87: note: not vectorized: no grouped stores in basic block.
+loops2.c:35:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:87: note: not consecutive access _75 = *_74;
+loops2.c:35:87: note: not consecutive access _77 = *_76;
+loops2.c:35:87: note: not vectorized: no grouped stores in basic block.
+loops2.c:35:79: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:87: note: not vectorized: not enough data-refs in basic block.
+loops2.c:35:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:38:60: note: step unknown.
+loops2.c:38:60: note: not vectorized: unsupported data-type int
+loops2.c:38:60: note: can't determine vectorization factor.
+loops2.c:38:60: note: not vectorized: not enough data-refs in basic block.
+loops2.c:38:60: note: not vectorized: no grouped stores in basic block.
+loops2.c:38:102: note: not vectorized: not enough data-refs in basic block.
+loops2.c:39:60: note: step unknown.
+loops2.c:39:60: note: not vectorized: unsupported data-type int
+loops2.c:39:60: note: can't determine vectorization factor.
+loops2.c:39:60: note: not vectorized: not enough data-refs in basic block.
+loops2.c:39:60: note: not vectorized: no grouped stores in basic block.
+loops2.c:39:102: note: not vectorized: not enough data-refs in basic block.
+loops2.c:40:60: note: step unknown.
+loops2.c:40:60: note: not vectorized: unsupported data-type int
+loops2.c:40:60: note: can't determine vectorization factor.
+loops2.c:40:60: note: not vectorized: not enough data-refs in basic block.
+loops2.c:40:60: note: not vectorized: no grouped stores in basic block.
+loops2.c:40:102: note: not vectorized: not enough data-refs in basic block.
+loops2.c:41:44: note: step unknown.
+loops2.c:41:44: note: not vectorized: unsupported data-type int
+loops2.c:41:44: note: can't determine vectorization factor.
+loops2.c:41:44: note: not vectorized: not enough data-refs in basic block.
+loops2.c:41:44: note: not vectorized: not enough data-refs in basic block.
+loops2.c:41:81: note: not vectorized: not enough data-refs in basic block.
+loops2.c:42:44: note: step unknown.
+loops2.c:42:44: note: not vectorized: unsupported data-type int
+loops2.c:42:44: note: can't determine vectorization factor.
+loops2.c:42:44: note: not vectorized: not enough data-refs in basic block.
+loops2.c:42:44: note: not vectorized: not enough data-refs in basic block.
+loops2.c:42:81: note: not vectorized: not enough data-refs in basic block.
+loops2.c:44:45: note: step unknown.
+loops2.c:44:45: note: reduction: not commutative/associative: s_14 = (s16) _7;
+loops2.c:44:45: note: Unknown def-use cycle pattern.
+loops2.c:44:45: note: Unsupported pattern.
+loops2.c:44:45: note: not vectorized: unsupported use in stmt.
+loops2.c:44:45: note: unexpected pattern.
+loops2.c:44:45: note: not vectorized: not enough data-refs in basic block.
+loops2.c:44:45: note: not vectorized: not enough data-refs in basic block.
+loops2.c:44:82: note: not vectorized: not enough data-refs in basic block.
+loops2.c:46:50: note: not vectorized: unsupported data-type int
+loops2.c:46:50: note: can't determine vectorization factor.
+loops2.c:46:50: note: not vectorized: not enough data-refs in basic block.
+loops2.c:46:50: note: not vectorized: not enough data-refs in basic block.
+loops2.c:46:97: note: not vectorized: not enough data-refs in basic block.
+loops2.c:47:51: note: Unknown misalignment, naturally aligned
+loops2.c:47:51: note: not ssa-name.
+loops2.c:47:51: note: use not simple.
+loops2.c:47:51: note: not ssa-name.
+loops2.c:47:51: note: use not simple.
+loops2.c:47:51: note: reduc op not supported by target.
+loops2.c:47:51: note: reduc op not supported by target.
+loops2.c:47:51: note: not vectorized: not enough data-refs in basic block.
+loops2.c:47:51: note: not vectorized: not enough data-refs in basic block.
+loops2.c:47:51: note: not vectorized: not enough data-refs in basic block.
+loops2.c:47:76: note: not vectorized: no vectype for stmt: vect__4.696_34 = MEM[(const s16 *)vectp_b.694_32];
+ scalar_type: const vector(2) short int
+loops2.c:47:76: note: not vectorized: not enough data-refs in basic block.
+loops2.c:47:76: note: not vectorized: not enough data-refs in basic block.
+loops2.c:47:51: note: not vectorized: not enough data-refs in basic block.
+loops2.c:47:51: note: not vectorized: not enough data-refs in basic block.
+loops2.c:47:51: note: not vectorized: not enough data-refs in basic block.
+loops2.c:47:68: note: not vectorized: not enough data-refs in basic block.
+loops2.c:47:98: note: not vectorized: not enough data-refs in basic block.
+loops2.c:48:57: note: step unknown.
+loops2.c:48:57: note: not vectorized: unsupported data-type int
+loops2.c:48:57: note: can't determine vectorization factor.
+loops2.c:48:57: note: not vectorized: not enough data-refs in basic block.
+loops2.c:48:57: note: not vectorized: no grouped stores in basic block.
+loops2.c:48:119: note: not vectorized: not enough data-refs in basic block.
+loops2.c:51:59: note: Unknown misalignment, naturally aligned
+loops2.c:51:59: note: Unknown misalignment, naturally aligned
+loops2.c:51:59: note: Unknown misalignment, naturally aligned
+loops2.c:51:59: note: not ssa-name.
+loops2.c:51:59: note: use not simple.
+loops2.c:51:59: note: not ssa-name.
+loops2.c:51:59: note: use not simple.
+loops2.c:51:59: note: no optab.
+loops2.c:51:59: note: not ssa-name.
+loops2.c:51:59: note: use not simple.
+loops2.c:51:59: note: not ssa-name.
+loops2.c:51:59: note: use not simple.
+loops2.c:51:59: note: no optab.
+loops2.c:51:59: note: no optab.
+loops2.c:51:6: note: not vectorized: not enough data-refs in basic block.
+loops2.c:51:77: note: not consecutive access *_27 = _26;
+loops2.c:51:77: note: not consecutive access _33 = *_40;
+loops2.c:51:77: note: not consecutive access _30 = *_31;
+loops2.c:51:77: note: not vectorized: no grouped stores in basic block.
+loops2.c:51:77: note: not vectorized: not enough data-refs in basic block.
+loops2.c:51:85: note: not vectorized: no vectype for stmt: vect__4.725_81 = MEM[(const s16 *)vectp_b.723_79];
+ scalar_type: const vector(2) short int
+loops2.c:51:85: note: not vectorized: no vectype for stmt: vect__7.729_87 = MEM[(const s16 *)vectp_c.727_85];
+ scalar_type: const vector(2) short int
+loops2.c:51:85: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.733_93] = vect__11.732_90;
+ scalar_type: vector(2) short int
+loops2.c:51:85: note: not vectorized: no grouped stores in basic block.
+loops2.c:51:85: note: not vectorized: not enough data-refs in basic block.
+loops2.c:51:77: note: not consecutive access *_65 = _66;
+loops2.c:51:77: note: not consecutive access _59 = *_58;
+loops2.c:51:77: note: not consecutive access _62 = *_61;
+loops2.c:51:77: note: not vectorized: no grouped stores in basic block.
+loops2.c:51:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:52:59: note: Unknown misalignment, naturally aligned
+loops2.c:52:59: note: Unknown misalignment, naturally aligned
+loops2.c:52:59: note: Unknown misalignment, naturally aligned
+loops2.c:52:59: note: not ssa-name.
+loops2.c:52:59: note: use not simple.
+loops2.c:52:59: note: not ssa-name.
+loops2.c:52:59: note: use not simple.
+loops2.c:52:59: note: no optab.
+loops2.c:52:59: note: not ssa-name.
+loops2.c:52:59: note: use not simple.
+loops2.c:52:59: note: not ssa-name.
+loops2.c:52:59: note: use not simple.
+loops2.c:52:59: note: no optab.
+loops2.c:52:59: note: no optab.
+loops2.c:52:6: note: not vectorized: not enough data-refs in basic block.
+loops2.c:52:77: note: not consecutive access *_27 = _26;
+loops2.c:52:77: note: not consecutive access _33 = *_40;
+loops2.c:52:77: note: not consecutive access _30 = *_31;
+loops2.c:52:77: note: not vectorized: no grouped stores in basic block.
+loops2.c:52:77: note: not vectorized: not enough data-refs in basic block.
+loops2.c:52:85: note: not vectorized: no vectype for stmt: vect__4.758_81 = MEM[(const s16 *)vectp_b.756_79];
+ scalar_type: const vector(2) short int
+loops2.c:52:85: note: not vectorized: no vectype for stmt: vect__7.762_87 = MEM[(const s16 *)vectp_c.760_85];
+ scalar_type: const vector(2) short int
+loops2.c:52:85: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.766_93] = vect__11.765_90;
+ scalar_type: vector(2) short int
+loops2.c:52:85: note: not vectorized: no grouped stores in basic block.
+loops2.c:52:85: note: not vectorized: not enough data-refs in basic block.
+loops2.c:52:77: note: not consecutive access *_65 = _66;
+loops2.c:52:77: note: not consecutive access _59 = *_58;
+loops2.c:52:77: note: not consecutive access _62 = *_61;
+loops2.c:52:77: note: not vectorized: no grouped stores in basic block.
+loops2.c:52:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:53:58: note: Unknown misalignment, naturally aligned
+loops2.c:53:58: note: Unknown misalignment, naturally aligned
+loops2.c:53:58: note: Unknown misalignment, naturally aligned
+loops2.c:53:58: note: not ssa-name.
+loops2.c:53:58: note: use not simple.
+loops2.c:53:58: note: not ssa-name.
+loops2.c:53:58: note: use not simple.
+loops2.c:53:58: note: no optab.
+loops2.c:53:58: note: not ssa-name.
+loops2.c:53:58: note: use not simple.
+loops2.c:53:58: note: not ssa-name.
+loops2.c:53:58: note: use not simple.
+loops2.c:53:58: note: no optab.
+loops2.c:53:58: note: no optab.
+loops2.c:53:1: note: not vectorized: no vectype for stmt: vect__3.784_40 = MEM[(const s8 *)b_14(D)];
+ scalar_type: const vector(4) signed char
+loops2.c:53:1: note: not vectorized: no vectype for stmt: vect__6.788_31 = MEM[(const s8 *)c_15(D)];
+ scalar_type: const vector(4) signed char
+loops2.c:53:1: note: not vectorized: no vectype for stmt: MEM[(s8 *)a_16(D)] = vect__10.791_28;
+ scalar_type: vector(4) signed char
+loops2.c:53:1: note: not vectorized: no grouped stores in basic block.
+loops2.c:54:1: note: not ssa-name.
+loops2.c:54:1: note: use not simple.
+loops2.c:54:1: note: not ssa-name.
+loops2.c:54:1: note: use not simple.
+loops2.c:54:1: note: not ssa-name.
+loops2.c:54:1: note: use not simple.
+loops2.c:54:1: note: not ssa-name.
+loops2.c:54:1: note: use not simple.
+loops2.c:54:1: note: no optab.
+loops2.c:54:1: note: no optab.
+loops2.c:54:1: note: not ssa-name.
+loops2.c:54:1: note: use not simple.
+loops2.c:54:1: note: not ssa-name.
+loops2.c:54:1: note: use not simple.
+loops2.c:54:1: note: not ssa-name.
+loops2.c:54:1: note: use not simple.
+loops2.c:54:1: note: not ssa-name.
+loops2.c:54:1: note: use not simple.
+loops2.c:54:1: note: no optab.
+loops2.c:54:1: note: no optab.
+loops2.c:54:1: note: no optab.
+loops2.c:54:1: note: no optab.
+loops2.c:55:57: note: step unknown.
+loops2.c:55:57: note: not vectorized: unsupported data-type int
+loops2.c:55:57: note: can't determine vectorization factor.
+loops2.c:55:57: note: not vectorized: no grouped stores in basic block.
+loops2.c:55:100: note: not vectorized: not enough data-refs in basic block.
+loops2.c:58:24: note: Unknown misalignment, naturally aligned
+loops2.c:58:24: note: Unknown misalignment, naturally aligned
+loops2.c:58:24: note: Unknown misalignment, naturally aligned
+loops2.c:58:24: note: num. args = 4 (not unary/binary/ternary op).
+loops2.c:58:24: note: not ssa-name.
+loops2.c:58:24: note: use not simple.
+loops2.c:58:24: note: no optab.
+loops2.c:58:24: note: num. args = 4 (not unary/binary/ternary op).
+loops2.c:58:24: note: not ssa-name.
+loops2.c:58:24: note: use not simple.
+loops2.c:58:24: note: no optab.
+loops2.c:58:24: note: no optab.
+loops2.c:58:6: note: not vectorized: not enough data-refs in basic block.
+loops2.c:58:42: note: not consecutive access GA[i_24] = _13;
+loops2.c:58:42: note: not consecutive access _20 = GB[i_24];
+loops2.c:58:42: note: not consecutive access _18 = GC[i_24];
+loops2.c:58:42: note: not vectorized: no grouped stores in basic block.
+loops2.c:58:42: note: not vectorized: not enough data-refs in basic block.
+loops2.c:58:51: note: not vectorized: no vectype for stmt: vect__1.831_63 = MEM[(short int *)vectp_GB.829_61];
+ scalar_type: vector(2) short int
+loops2.c:58:51: note: not vectorized: no vectype for stmt: vect__3.835_69 = MEM[(short int *)vectp_GC.833_67];
+ scalar_type: vector(2) short int
+loops2.c:58:51: note: not vectorized: no vectype for stmt: MEM[(short int *)vectp_GA.839_75] = vect__6.838_72;
+ scalar_type: vector(2) short int
+loops2.c:58:51: note: not vectorized: no grouped stores in basic block.
+loops2.c:58:51: note: not vectorized: not enough data-refs in basic block.
+loops2.c:58:42: note: not consecutive access GA[i_40] = _48;
+loops2.c:58:42: note: not consecutive access _43 = GB[i_40];
+loops2.c:58:42: note: not consecutive access _45 = GC[i_40];
+loops2.c:58:42: note: not vectorized: no grouped stores in basic block.
+loops2.c:58:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:61:59: note: versioning for alias required: can't determine dependence between *_3 and *_10
+loops2.c:61:59: note: versioning for alias required: can't determine dependence between *_6 and *_10
+loops2.c:61:59: note: Unknown misalignment, naturally aligned
+loops2.c:61:59: note: Unknown misalignment, naturally aligned
+loops2.c:61:59: note: Unknown misalignment, naturally aligned
+loops2.c:61:59: note: not ssa-name.
+loops2.c:61:59: note: use not simple.
+loops2.c:61:59: note: not ssa-name.
+loops2.c:61:59: note: use not simple.
+loops2.c:61:59: note: no optab.
+loops2.c:61:59: note: not ssa-name.
+loops2.c:61:59: note: use not simple.
+loops2.c:61:59: note: not ssa-name.
+loops2.c:61:59: note: use not simple.
+loops2.c:61:59: note: no optab.
+loops2.c:61:59: note: no optab.
+loops2.c:61:59: note: not vectorized: not enough data-refs in basic block.
+loops2.c:61:59: note: not vectorized: not enough data-refs in basic block.
+loops2.c:61:59: note: not vectorized: not enough data-refs in basic block.
+loops2.c:61:59: note: not vectorized: not enough data-refs in basic block.
+loops2.c:61:76: note: not consecutive access *_65 = _66;
+loops2.c:61:76: note: not consecutive access _59 = *_58;
+loops2.c:61:76: note: not consecutive access _62 = *_61;
+loops2.c:61:76: note: not vectorized: no grouped stores in basic block.
+loops2.c:61:76: note: not vectorized: not enough data-refs in basic block.
+loops2.c:61:84: note: not vectorized: no vectype for stmt: vect__4.864_110 = MEM[(const s16 *)vectp_b.862_108];
+ scalar_type: const vector(2) short int
+loops2.c:61:84: note: not vectorized: no vectype for stmt: vect__7.868_116 = MEM[(const s16 *)vectp_c.866_114];
+ scalar_type: const vector(2) short int
+loops2.c:61:84: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.872_122] = vect__11.871_119;
+ scalar_type: vector(2) short int
+loops2.c:61:84: note: not vectorized: no grouped stores in basic block.
+loops2.c:61:84: note: not vectorized: not enough data-refs in basic block.
+loops2.c:61:59: note: not consecutive access *_9 = _10;
+loops2.c:61:59: note: not consecutive access _3 = *_2;
+loops2.c:61:59: note: not consecutive access _6 = *_5;
+loops2.c:61:59: note: not vectorized: no grouped stores in basic block.
+loops2.c:61:76: note: not consecutive access *_91 = _92;
+loops2.c:61:76: note: not consecutive access _85 = *_84;
+loops2.c:61:76: note: not consecutive access _88 = *_87;
+loops2.c:61:76: note: not vectorized: no grouped stores in basic block.
+loops2.c:61:59: note: not vectorized: no grouped stores in basic block.
+loops2.c:61:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:62:59: note: versioning for alias required: can't determine dependence between *_2 and *_9
+loops2.c:62:59: note: versioning for alias required: can't determine dependence between *_5 and *_9
+loops2.c:62:59: note: Unknown misalignment, naturally aligned
+loops2.c:62:59: note: Unknown misalignment, naturally aligned
+loops2.c:62:59: note: Unknown misalignment, naturally aligned
+loops2.c:62:59: note: not ssa-name.
+loops2.c:62:59: note: use not simple.
+loops2.c:62:59: note: not ssa-name.
+loops2.c:62:59: note: use not simple.
+loops2.c:62:59: note: no optab.
+loops2.c:62:59: note: not ssa-name.
+loops2.c:62:59: note: use not simple.
+loops2.c:62:59: note: not ssa-name.
+loops2.c:62:59: note: use not simple.
+loops2.c:62:59: note: no optab.
+loops2.c:62:59: note: no optab.
+loops2.c:62:59: note: not vectorized: not enough data-refs in basic block.
+loops2.c:62:59: note: not vectorized: not enough data-refs in basic block.
+loops2.c:62:59: note: not vectorized: not enough data-refs in basic block.
+loops2.c:62:59: note: not vectorized: not enough data-refs in basic block.
+loops2.c:62:76: note: not consecutive access *_184 = _185;
+loops2.c:62:76: note: not consecutive access _178 = *_177;
+loops2.c:62:76: note: not consecutive access _181 = *_180;
+loops2.c:62:76: note: not vectorized: no grouped stores in basic block.
+loops2.c:62:76: note: not consecutive access *_200 = _201;
+loops2.c:62:76: note: not consecutive access _194 = *_193;
+loops2.c:62:76: note: not consecutive access _197 = *_196;
+loops2.c:62:76: note: not vectorized: no grouped stores in basic block.
+loops2.c:62:76: note: not consecutive access *_62 = _63;
+loops2.c:62:76: note: not consecutive access _56 = *_55;
+loops2.c:62:76: note: not consecutive access _59 = *_58;
+loops2.c:62:76: note: not vectorized: no grouped stores in basic block.
+loops2.c:62:76: note: not vectorized: not enough data-refs in basic block.
+loops2.c:62:84: note: not vectorized: no vectype for stmt: vect__3.906_104 = MEM[(const s8 *)vectp_b.904_102];
+ scalar_type: const vector(4) signed char
+loops2.c:62:84: note: not vectorized: no vectype for stmt: vect__6.910_109 = MEM[(const s8 *)vectp_c.908_107];
+ scalar_type: const vector(4) signed char
+loops2.c:62:84: note: not vectorized: no vectype for stmt: MEM[(s8 *)vectp_a.914_114] = vect__10.913_112;
+ scalar_type: vector(4) signed char
+loops2.c:62:84: note: not vectorized: no grouped stores in basic block.
+loops2.c:62:84: note: not vectorized: not enough data-refs in basic block.
+loops2.c:62:59: note: not consecutive access *_8 = _9;
+loops2.c:62:59: note: not consecutive access _2 = *_1;
+loops2.c:62:59: note: not consecutive access _5 = *_4;
+loops2.c:62:59: note: not vectorized: no grouped stores in basic block.
+loops2.c:62:59: note: not consecutive access *_127 = _128;
+loops2.c:62:59: note: not consecutive access _121 = *_120;
+loops2.c:62:59: note: not consecutive access _124 = *_123;
+loops2.c:62:59: note: not vectorized: no grouped stores in basic block.
+loops2.c:62:59: note: not consecutive access *_141 = _142;
+loops2.c:62:59: note: not consecutive access _135 = *_134;
+loops2.c:62:59: note: not consecutive access _138 = *_137;
+loops2.c:62:59: note: not vectorized: no grouped stores in basic block.
+loops2.c:62:59: note: not consecutive access *_155 = _156;
+loops2.c:62:59: note: not consecutive access _149 = *_148;
+loops2.c:62:59: note: not consecutive access _152 = *_151;
+loops2.c:62:59: note: not vectorized: no grouped stores in basic block.
+loops2.c:62:59: note: not consecutive access *_169 = _170;
+loops2.c:62:59: note: not consecutive access _163 = *_162;
+loops2.c:62:59: note: not consecutive access _166 = *_165;
+loops2.c:62:59: note: not vectorized: no grouped stores in basic block.
+loops2.c:62:76: note: not consecutive access *_86 = _87;
+loops2.c:62:76: note: not consecutive access _80 = *_79;
+loops2.c:62:76: note: not consecutive access _83 = *_82;
+loops2.c:62:76: note: not vectorized: no grouped stores in basic block.
+loops2.c:62:59: note: not vectorized: no grouped stores in basic block.
+loops2.c:62:1: note: not vectorized: not enough data-refs in basic block.
+
+loops2.c:63:46: note: versioning for alias required: can't determine dependence between *_6 and *_3
+loops2.c:63:46: note: Unknown misalignment, naturally aligned
+loops2.c:63:46: note: Unknown misalignment, naturally aligned
+loops2.c:63:46: note: Unknown misalignment, naturally aligned
+loops2.c:63:46: note: not ssa-name.
+loops2.c:63:46: note: use not simple.
+loops2.c:63:46: note: not ssa-name.
+loops2.c:63:46: note: use not simple.
+loops2.c:63:46: note: no optab.
+loops2.c:63:46: note: not ssa-name.
+loops2.c:63:46: note: use not simple.
+loops2.c:63:46: note: not ssa-name.
+loops2.c:63:46: note: use not simple.
+loops2.c:63:46: note: no optab.
+loops2.c:63:46: note: no optab.
+loops2.c:63:46: note: not vectorized: not enough data-refs in basic block.
+loops2.c:63:46: note: not vectorized: not enough data-refs in basic block.
+loops2.c:63:46: note: not vectorized: not enough data-refs in basic block.
+loops2.c:63:46: note: not vectorized: not enough data-refs in basic block.
+loops2.c:63:63: note: not consecutive access _50 = *_49;
+loops2.c:63:63: note: not consecutive access *_49 = _56;
+loops2.c:63:63: note: not consecutive access _53 = *_52;
+loops2.c:63:63: note: not vectorized: no grouped stores in basic block.
+loops2.c:63:63: note: not vectorized: not enough data-refs in basic block.
+loops2.c:63:71: note: not vectorized: no vectype for stmt: vect__4.947_99 = MEM[(s16 *)vectp_a.945_97];
+ scalar_type: vector(2) short int
+loops2.c:63:71: note: not vectorized: no vectype for stmt: vect__7.951_105 = MEM[(const s16 *)vectp_b.949_103];
+ scalar_type: const vector(2) short int
+loops2.c:63:71: note: not vectorized: no vectype for stmt: MEM[(s16 *)vectp_a.955_111] = vect__10.954_108;
+ scalar_type: vector(2) short int
+loops2.c:63:71: note: not vectorized: no grouped stores in basic block.
+loops2.c:63:71: note: not vectorized: not enough data-refs in basic block.
+loops2.c:63:46: note: not consecutive access _3 = *_2;
+loops2.c:63:46: note: not consecutive access *_2 = _9;
+loops2.c:63:46: note: not consecutive access _6 = *_5;
+loops2.c:63:46: note: not vectorized: no grouped stores in basic block.
+loops2.c:63:63: note: not consecutive access _75 = *_74;
+loops2.c:63:63: note: not consecutive access *_74 = _81;
+loops2.c:63:63: note: not consecutive access _78 = *_77;
+loops2.c:63:63: note: not vectorized: no grouped stores in basic block.
+loops2.c:63:46: note: not vectorized: no grouped stores in basic block.
+loops2.c:63:1: note: not vectorized: not enough data-refs in basic block.
+loops2.c:66:1: note: not ssa-name.
+loops2.c:66:1: note: use not simple.
+loops2.c:66:1: note: not ssa-name.
+loops2.c:66:1: note: use not simple.
+loops2.c:66:1: note: not ssa-name.
+loops2.c:66:1: note: use not simple.
+loops2.c:66:1: note: not ssa-name.
+loops2.c:66:1: note: use not simple.
+loops2.c:66:1: note: no optab.
+loops2.c:66:1: note: no optab.
+loops2.c:66:1: note: not ssa-name.
+loops2.c:66:1: note: use not simple.
+loops2.c:66:1: note: not ssa-name.
+loops2.c:66:1: note: use not simple.
+loops2.c:66:1: note: not ssa-name.
+loops2.c:66:1: note: use not simple.
+loops2.c:66:1: note: not ssa-name.
+loops2.c:66:1: note: use not simple.
+loops2.c:66:1: note: no optab.
+loops2.c:66:1: note: no optab.
+loops2.c:66:1: note: no optab.
+loops2.c:66:1: note: no optab.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: no optab.
+loops2.c:67:1: note: no optab.
+loops2.c:67:1: note: no optab.
+loops2.c:67:1: note: no optab.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: not ssa-name.
+loops2.c:67:1: note: use not simple.
+loops2.c:67:1: note: no optab.
+loops2.c:67:1: note: no optab.
+loops2.c:67:1: note: no optab.
+loops2.c:67:1: note: no optab.
+loops2.c:67:1: note: no optab.
+loops2.c:67:1: note: no optab.
+loops2.c:67:1: note: no optab.
+loops2.c:67:1: note: no optab.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:70:3: note: not ssa-name.
+loops2.c:70:3: note: use not simple.
+loops2.c:73:62: note: not vectorized: no vectype for stmt: _4 = *_3;
+ scalar_type: const int
+loops2.c:73:62: note: bad data references.
+loops2.c:73:62: note: not vectorized: not enough data-refs in basic block.
+loops2.c:73:62: note: not vectorized: no vectype for stmt: _4 = *_3;
+ scalar_type: const int
+loops2.c:73:62: note: not vectorized: no vectype for stmt: _6 = *_5;
+ scalar_type: const int
+loops2.c:73:62: note: not vectorized: no vectype for stmt: *_7 = _8;
+ scalar_type: int
+loops2.c:73:62: note: not vectorized: no grouped stores in basic block.
+loops2.c:73:1: note: not vectorized: not enough data-refs in basic block.

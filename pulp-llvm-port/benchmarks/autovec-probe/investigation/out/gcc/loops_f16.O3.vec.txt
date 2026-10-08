@@ -1,0 +1,9 @@
+loops_f16.c:11:54: note: loop vectorized
+loops_f16.c:12:71: note: loop vectorized
+loops_f16.c:13:64: note: loop vectorized
+loops_f16.c:14:56: note: loop vectorized
+loops_f16.c:15:57: note: loop vectorized
+loops_f16.c:18:53: note: loop vectorized
+loops_f16.c:20:53: note: loop vectorized
+loops_f16.c:20:53: note: loop versioned for vectorization because of possible aliasing
+loops_f16.c:21:52: note: loop vectorized

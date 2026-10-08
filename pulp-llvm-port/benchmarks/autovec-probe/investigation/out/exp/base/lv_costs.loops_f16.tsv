@@ -1,0 +1,10 @@
+win_f16	7	-	LV: Selecting VF: 1	LV: Interleaving to reduce branch cost.
+win_f16_o	7	-	LV: Selecting VF: 1	LV: Interleaving to reduce branch cost.
+add_f16	7	-	LV: Selecting VF: 1	LV: Interleaving to reduce branch cost.
+axpy_f16	6	-	LV: Selecting VF: 1	LV: Interleaving to reduce branch cost.
+scale_f16	6	-	LV: Selecting VF: 1	LV: Interleaving to reduce branch cost.
+max_f16	7	VF2=14 (7.0/lane);	LV: Selecting VF: 1	LV: Interleaving to reduce branch cost.
+magsq_f16	10	-	LV: Selecting VF: 1	LV: Interleaving to reduce branch cost.
+dot_f16	5	-	LV: Selecting VF: 1	LV: Interleaving to reduce branch cost.
+win_f16_nr	7	-	LV: Selecting VF: 1	LV: Interleaving is not beneficial.
+win_f16_k256	7	-	LV: Selecting VF: 1	LV: Interleaving to reduce branch cost.

@@ -1,0 +1,52 @@
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+remark: <unknown>:0:0: the cost-model indicates that vectorization is not beneficial
+remark: <unknown>:0:0: the cost-model indicates that interleaving is not beneficial
+remark: <unknown>:0:0: Cannot SLP vectorize list: vectorization was impossible with available vectorization factors
+opt: /tmp/claude-1000/-home-ubuntu-llvm-project/8aeebf17-9c73-413d-b44d-f6985f3428f5/scratchpad/b156-wt/llvm/include/llvm/Support/Casting.h:578: decltype(auto) llvm::cast(From *) [To = llvm::VectorType, From = llvm::Type]: Assertion `isa<To>(Val) && "cast<Ty>() argument of incompatible type!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: /tmp/claude-1000/-home-ubuntu-llvm-project/8aeebf17-9c73-413d-b44d-f6985f3428f5/scratchpad/b156-build/bin/opt -passes=default<O3> -pass-remarks=loop-vectorize|slp-vectorizer -pass-remarks-missed=loop-vectorize|slp-vectorizer /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/base/loops_f16.O0.ll -S -o /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/base/loops_f16.opt.ll
+1.	Running pass "function<eager-inv>(float2int,lower-constant-intrinsics,chr,loop(loop-rotate<header-duplication;no-prepare-for-lto>,loop-deletion),loop-distribute,inject-tli-mappings,loop-vectorize<no-interleave-forced-only;no-vectorize-forced-only;>,infer-alignment,loop-load-elim,instcombine<max-iterations=1;no-verify-fixpoint>,simplifycfg<bonus-inst-threshold=1;forward-switch-cond;switch-range-to-icmp;switch-to-lookup;no-keep-loops;hoist-common-insts;no-hoist-loads-stores-with-cond-faulting;sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,slp-vectorizer,vector-combine,instcombine<max-iterations=1;no-verify-fixpoint>,loop-unroll<O3>,transform-warning,sroa<preserve-cfg>,infer-alignment,instcombine<max-iterations=1;no-verify-fixpoint>,loop-mssa(licm<allowspeculation>),alignment-from-assumptions,loop-sink,instsimplify,div-rem-pairs,tailcallelim,simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;no-hoist-common-insts;hoist-loads-stores-with-cond-faulting;no-sink-common-insts;speculate-blocks;simplify-cond-branch;speculate-unpredictables>)" on module "/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/base/loops_f16.O0.ll"
+2.	Running pass "loop-vectorize<no-interleave-forced-only;no-vectorize-forced-only;>" on function "dot_f16"
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  opt       0x0000653020d5b9d8 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  opt       0x0000653020d5950e llvm::sys::RunSignalHandlers() + 238
+2  opt       0x0000653020d5c208
+3  libc.so.6 0x00007e53f4645330
+4  libc.so.6 0x00007e53f469ec0c pthread_kill + 284
+5  libc.so.6 0x00007e53f464527e gsignal + 30
+6  libc.so.6 0x00007e53f46288ff abort + 223
+7  libc.so.6 0x00007e53f462881b
+8  libc.so.6 0x00007e53f463b517
+9  opt       0x00006530222456a7 llvm::VPReductionRecipe::computeCost(llvm::ElementCount, llvm::VPCostContext&) const + 567
+10 opt       0x0000653022239e36 llvm::VPRecipeBase::cost(llvm::ElementCount, llvm::VPCostContext&) + 630
+11 opt       0x00006530221ccd7b llvm::LoopVectorizationPlanner::emitInvalidCostRemarks(llvm::OptimizationRemarkEmitter*) + 3371
+12 opt       0x00006530221fa48d llvm::LoopVectorizePass::processLoop(llvm::Loop*) + 9021
+13 opt       0x00006530222011fb llvm::LoopVectorizePass::runImpl(llvm::Function&) + 395
+14 opt       0x0000653022201a58 llvm::LoopVectorizePass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) + 1080
+15 opt       0x00006530220af3fd
+16 opt       0x0000653020f6c577 llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function>>::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) + 439
+17 opt       0x00006530220a729d
+18 opt       0x0000653020f70f81 llvm::ModuleToFunctionPassAdaptor::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) + 481
+19 opt       0x000065302209f04d
+20 opt       0x0000653020f6b337 llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module>>::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) + 439
+21 opt       0x0000653022028cb3 llvm::runPassPipeline(llvm::StringRef, llvm::Module&, llvm::TargetMachine*, llvm::TargetLibraryInfoImpl*, llvm::ToolOutputFile*, llvm::ToolOutputFile*, llvm::ToolOutputFile*, llvm::StringRef, llvm::ArrayRef<llvm::PassPlugin>, llvm::ArrayRef<std::function<void (llvm::PassBuilder&)>>, llvm::opt_tool::OutputKind, llvm::opt_tool::VerifierKind, bool, bool, bool, bool, bool, bool, bool) + 13331
+22 opt       0x0000653020d23432 optMain + 7314
+23 libc.so.6 0x00007e53f462a1ca
+24 libc.so.6 0x00007e53f462a28b __libc_start_main + 139
+25 opt       0x0000653020d1d165 _start + 37

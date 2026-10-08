@@ -1,0 +1,34 @@
+llc: /work/src/llvm/lib/Target/RISCV/RISCVSubtarget.h:203: unsigned int llvm::RISCVSubtarget::getELen() const: Assertion `hasVInstructions() && "Expected V extension"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: /home/ubuntu/llvm-project/pulp-llvm-port/toolchains/port-20-bench/bin/llc -O3 -verify-machineinstrs /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/ualign/loops3.int16.ll -o /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/ualign/loops3.int16.s
+1.	Running pass 'Function Pass Manager' on module '/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/exp/ualign/loops3.int16.ll'.
+2.	Running pass 'RISC-V DAG->DAG Pattern Instruction Selection' on function '@int16'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x000059e7841f7218 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc       0x000059e7841f4dee llvm::sys::RunSignalHandlers() + 238
+2  llc       0x000059e7841f78c8
+3  libc.so.6 0x000070c4d2645330
+4  libc.so.6 0x000070c4d269ec0c pthread_kill + 284
+5  libc.so.6 0x000070c4d264527e gsignal + 30
+6  libc.so.6 0x000070c4d26288ff abort + 223
+7  libc.so.6 0x000070c4d262881b
+8  libc.so.6 0x000070c4d263b517
+9  llc       0x000059e782b31c38
+10 llc       0x000059e782b318a1
+11 llc       0x000059e783eac24c
+12 llc       0x000059e783e3e901
+13 llc       0x000059e783df139b
+14 llc       0x000059e783deeec9 llvm::SelectionDAG::Combine(llvm::CombineLevel, llvm::BatchAAResults*, llvm::CodeGenOptLevel) + 2137
+15 llc       0x000059e783fdfb0e llvm::SelectionDAGISel::CodeGenAndEmitDAG() + 1262
+16 llc       0x000059e783fde786 llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 6454
+17 llc       0x000059e783fdbbe1 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 593
+18 llc       0x000059e783fd9459 llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 169
+19 llc       0x000059e7831d56e6 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 694
+20 llc       0x000059e78374f735 llvm::FPPassManager::runOnFunction(llvm::Function&) + 677
+21 llc       0x000059e783757b62 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+22 llc       0x000059e7837501cc llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1932
+23 llc       0x000059e782acce10 main + 9632
+24 libc.so.6 0x000070c4d262a1ca
+25 libc.so.6 0x000070c4d262a28b __libc_start_main + 139
+26 llc       0x000059e782ac6c65 _start + 37

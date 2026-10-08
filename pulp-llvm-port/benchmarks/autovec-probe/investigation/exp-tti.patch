@@ -1,0 +1,35 @@
+diff --git a/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp b/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp
+index f0a8b92401b6..d59e144bfd35 100644
+--- a/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp
++++ b/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.cpp
+@@ -331,6 +331,8 @@ RISCVTTIImpl::getRegisterBitWidth(TargetTransformInfo::RegisterKind K) const {
+   case TargetTransformInfo::RGK_Scalar:
+     return TypeSize::getFixed(ST->getXLen());
+   case TargetTransformInfo::RGK_FixedWidthVector:
++    if (!ST->hasVInstructions() && ST->hasPULPExtV2())
++      return TypeSize::getFixed(32); // B156 EXPERIMENT
+     return TypeSize::getFixed(
+         ST->useRVVForFixedLengthVectors() ? LMUL * ST->getRealMinVLen() : 0);
+   case TargetTransformInfo::RGK_ScalableVector:
+diff --git a/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.h b/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.h
+index c9d8ce6229a7..4731b90caace 100644
+--- a/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.h
++++ b/llvm/lib/Target/RISCV/RISCVTargetTransformInfo.h
+@@ -136,6 +136,8 @@ public:
+                              TTI::PeelingPreferences &PP);
+ 
+   unsigned getMinVectorRegisterBitWidth() const {
++    if (!ST->hasVInstructions() && ST->hasPULPExtV2())
++      return 32; // B156 EXPERIMENT
+     return ST->useRVVForFixedLengthVectors() ? 16 : 0;
+   }
+ 
+@@ -383,6 +385,8 @@ public:
+       // only register that can be used to hold a mask.
+       // FIXME: Should we conservatively return 31 as the number of usable
+       // vector registers?
++      if (!ST->hasVInstructions() && ST->hasPULPExtV2())
++        return 31; // B156 EXPERIMENT: packed vectors live in GPRs
+       return ST->hasVInstructions() ? 32 : 0;
+     }
+     llvm_unreachable("unknown register class");

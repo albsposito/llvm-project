@@ -1,0 +1,35 @@
+llc: /work/src/llvm/lib/Target/RISCV/RISCVSubtarget.cpp:176: unsigned int llvm::RISCVSubtarget::getMinRVVVectorSizeInBits() const: Assertion `hasVInstructions() && "Tried to get vector length without Zve or V extension support!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: /home/ubuntu/llvm-project/pulp-llvm-port/toolchains/port-20-bench/bin/llc -mtriple=riscv32-unknown-elf -mattr=+m,+c,+xgap,+xpulpv,+xpulpfvec,+xpulpf16alt,+zfinx,+zhinx,+zhinxmin,+zicsr,+zmmul,+unaligned-scalar-mem -target-abi=ilp32 -O2 -verify-machineinstrs /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/backend/v2i16.interleaved_load_factor2.ll -o /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/backend/v2i16.interleaved_load_factor2.s
+1.	Running pass 'Function Pass Manager' on module '/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/backend/v2i16.interleaved_load_factor2.ll'.
+2.	Running pass 'RISC-V DAG->DAG Pattern Instruction Selection' on function '@f'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x000057596aa81218 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc       0x000057596aa7edee llvm::sys::RunSignalHandlers() + 238
+2  llc       0x000057596aa818c8
+3  libc.so.6 0x0000746d51245330
+4  libc.so.6 0x0000746d5129ec0c pthread_kill + 284
+5  libc.so.6 0x0000746d5124527e gsignal + 30
+6  libc.so.6 0x0000746d512288ff abort + 223
+7  libc.so.6 0x0000746d5122881b
+8  libc.so.6 0x0000746d5123b517
+9  llc       0x00005759694563aa
+10 llc       0x00005759693b9f0d
+11 llc       0x000057596a72b88c
+12 llc       0x000057596a6be7ce
+13 llc       0x000057596a67b36b
+14 llc       0x000057596a678ec9 llvm::SelectionDAG::Combine(llvm::CombineLevel, llvm::BatchAAResults*, llvm::CodeGenOptLevel) + 2137
+15 llc       0x000057596a869b0e llvm::SelectionDAGISel::CodeGenAndEmitDAG() + 1262
+16 llc       0x000057596a868786 llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 6454
+17 llc       0x000057596a865be1 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 593
+18 llc       0x000057596a863459 llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 169
+19 llc       0x0000575969a5f6e6 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 694
+20 llc       0x0000575969fd9735 llvm::FPPassManager::runOnFunction(llvm::Function&) + 677
+21 llc       0x0000575969fe1b62 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+22 llc       0x0000575969fda1cc llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1932
+23 llc       0x0000575969356e10 main + 9632
+24 libc.so.6 0x0000746d5122a1ca
+25 libc.so.6 0x0000746d5122a28b __libc_start_main + 139
+26 llc       0x0000575969350c65 _start + 37
+timeout: the monitored command dumped core

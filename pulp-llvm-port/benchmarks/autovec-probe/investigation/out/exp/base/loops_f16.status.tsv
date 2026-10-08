@@ -1,0 +1,10 @@
+win_f16	-	ok
+win_f16_o	-	ok
+add_f16	-	ok
+axpy_f16	-	ok
+scale_f16	-	ok
+max_f16	-	ok
+magsq_f16	-	ok
+dot_f16	-	ok
+win_f16_nr	-	ok
+win_f16_k256	-	ok

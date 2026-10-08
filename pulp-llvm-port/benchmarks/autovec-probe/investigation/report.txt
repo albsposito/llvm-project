@@ -1,0 +1,447 @@
+# B156: why clang emits no GAP9 packed SIMD for plain C loops, and what enabling it takes
+
+(Markdown content. Saved as report.txt because the Write tool refuses .md files in this harness.)
+
+Investigation only. No compiler source on any branch was changed, nothing was committed.
+Date 2026-10-07. Compiler: integration head `26e7268c3127` (`toolchains/port-20-bench`, assertions on).
+Reference: GAP9 GCC 7.1.1. Simulator: GVSoC `ri5ky_testbench` (`benchmarks/gap9-sweep/sim`).
+
+Everything below is reproduced by `./reproduce.sh` in this directory (section 7 lists the files).
+
+## Summary
+
+**Root cause.** The loop vectorizer, the SLP vectorizer and VectorCombine all run at -O2/-O3, and all three
+return on their first line because the RISC-V target tells them the machine has **zero vector registers and a
+0-bit vector register** unless the RVV extension is enabled. The PULP packed types `v2i16`/`v4i8` are legal in the
+back end, and the cost model already prices them as legal, but the three "is there a vector unit" hooks only
+know about RVV. No flag or pragma gets past that gate.
+
+**What an experiment shows.** With a 6-line private patch that answers "31 registers, 32 bits" for xgap9
+(`exp-tti.patch`, scratch build, not proposed as the fix), 30 probe loops and 5 straight-line blocks vectorize
+(35 of the 45 functions in `loops2.c`) and the back end selects `pv.*` instructions for them. All 44 simulated
+loops give the same results as GCC -O2 and as stock clang, at 11 lengths and 8 pointer-alignment combinations.
+With misaligned word access also allowed, the simple loops reach GCC -O3 speed (add16: 684 cycles against GCC's
+686; stock clang 2074). Clang then also vectorizes loops GCC does not (abs, clip, average, and with a forced
+option the 16-bit dot product: 552 cycles against GCC's 1051).
+
+**What stands between the experiment and a shippable feature.**
+
+1. Misaligned packed loads and stores are split into byte/half accesses today, which makes vectorized code
+   barely faster than scalar and sometimes slower. GAP9 GCC uses misaligned `lw`/`sw` freely, also in scalar code.
+2. Three back-end crashes are reachable as soon as the vectorizers run (one of them in the SDK's `FftLibraryFix.c`).
+3. The cost model accepts loops the back end then scalarises (multiply, saturating add, variable shift).
+4. Half precision cannot be vectorized at all: `<2 x half>` is not a legal type and the 82 packed
+   float instructions have no selection patterns (existing backlog B90 task T5 / B115).
+
+**Size of the work** (details in section 6): about 150-300 lines of compiler code plus tests for GCC parity on
+simple integer loops, 150-250 more for dot products and sum reductions, and 500-800 for half precision, most of
+which is B90-T5 and is needed anyway. Uncertainty is roughly +/-50%; the largest unknowns are code size at -O2
+and whether the hardware-loop pass converts the vector loop.
+
+## 1. Do the vectorizers run, and what do they decide?
+
+They are in the pipeline and return immediately.
+
+```
+$ opt -passes='default<O3>' -debug-pass-manager loops.O0.ll      (stock opt, xgap9 features)
+Running pass: LoopVectorizePass on add16 (16 instructions)
+Running pass: SLPVectorizerPass on add16 (14 instructions)
+Running pass: VectorCombinePass on add16 (14 instructions)
+
+$ opt -passes='default<O3>' -debug-only=loop-vectorize,SLP loops.O0.ll
+SLP: Didn't find any vector registers for target, abort.         (3 times, once per function)
+```
+
+The loop vectorizer prints nothing at all, not even "LV: Checking a loop", and
+`-Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize` produce no remark. That is the early exit at the
+top of the pass, before any loop is looked at:
+
+| pass | gate (upstream llvmorg-20.1.8, same lines in the fork) | condition that fires for xgap9 |
+|---|---|---|
+| loop vectorizer | `llvm/lib/Transforms/Vectorize/LoopVectorize.cpp:10767-10769` | `getNumberOfRegisters(vector class) == 0` and `getMaxInterleaveFactor(1) < 2` |
+| SLP vectorizer | `llvm/lib/Transforms/Vectorize/SLPVectorizer.cpp:18540` | `getNumberOfRegisters(vector class) == 0` |
+| VectorCombine | `llvm/lib/Transforms/Vectorize/VectorCombine.cpp:3160` | `getNumberOfRegisters(vector class) == 0` |
+
+## 2. What the target tells them
+
+Line numbers are in `wt/int-20` at `26e7268c3127`.
+
+| hook | answer for xgap9 without V | where it comes from |
+|---|---|---|
+| `getNumberOfRegisters(VRRC)` | **0** | `RISCVTargetTransformInfo.h:371-387`: `ST->hasVInstructions() ? 32 : 0` |
+| `getRegisterClassForType(Vector=true)` | `VRRC` (the RVV class) | `RISCVTargetTransformInfo.h:394-396` |
+| `getRegisterBitWidth(RGK_FixedWidthVector)` | **0 bits** | `RISCVTargetTransformInfo.cpp:327-336`: `useRVVForFixedLengthVectors() ? LMUL*VLEN : 0`; `useRVVForFixedLengthVectors()` needs `hasVInstructions()` (`RISCVSubtarget.cpp:199-202`) |
+| `getRegisterBitWidth(RGK_ScalableVector)` | 0 | same function |
+| `getMaxInterleaveFactor(VF)` | **1** for every VF | `RISCVTargetTransformInfo.h:359-366` and `RISCVSubtarget.h:258-260` (`hasVInstructions() ? MaxInterleaveFactor : 1`) |
+| `getMinVectorRegisterBitWidth()` | **0** | `RISCVTargetTransformInfo.h:138-140` |
+| `getMaximumVF(elem, opcode)` (SLP) | 1 | `RISCVTargetTransformInfo.cpp:2411-2424`: `max(1, 0 / ElemWidth)` |
+| `isLegalMaskedLoad/Store` | false | `RISCVTargetTransformInfo.h:226-234` (`!hasVInstructions()`) |
+| `supportsScalableVectors`, `enableScalableVectorization` | false | `RISCVTargetTransformInfo.h:97-99` |
+| `enableInterleavedAccessVectorization()` | **true**, unconditionally | `RISCVTargetTransformInfo.h:368` (matters once the gate is open, see crashes C2/C3) |
+| are `v2i16`/`v4i8` legal for the cost model? | **yes** | `RISCVISelLowering.cpp:140-143` registers both in GPR classes, so `getTypeLegalizationCost` returns them unsplit |
+
+The cost model is therefore already usable. `opt -passes='print<cost-model>'` on `cost.ll` with the stock opt
+(`out/cost.default.txt`):
+
+| instruction | cost | comment |
+|---|---:|---|
+| `add <2 x i16>`, `add <4 x i8>` | 1 | correct (`pv.add.h/.b`) |
+| `shl`/`ashr <2 x i16>`, `icmp`, `smin` | 1 | correct |
+| `load`/`store <2 x i16>` align 4 | 1 | correct (`lw`/`sw`) |
+| `load`/`store <2 x i16>` align 2, `<4 x i8>` align 1 | 1 | **too low today**: the back end emits 4 / 10 instructions (section 4) |
+| `select <2 x i1>` | 3 | real code is 5 instructions |
+| `mul <2 x i16>` / `<4 x i8>` | 5 / 7 | too low: no packed multiply exists, real code is 7 / 14 instructions |
+| `sadd.sat <2 x i16>` | 11 | scalarised in the back end |
+| `sext <2 x i16> to <2 x i32>` | 3 | |
+| `add <4 x i16>` | 2 | split in two |
+| `fmul <2 x half>` | 4 | not a legal type, scalarised |
+
+**RVV-only assumptions.**
+
+- The three gate hooks above. They are the whole reason for B156.
+- The cost functions were already made safe for PULP in the fork, by returning before the RVV code that asserts
+  in `getMinRVVVectorSizeInBits()`: `getShuffleCost` (`RISCVTargetTransformInfo.cpp:396-401`),
+  `getScalarizationOverhead` (`:693-698`), `getVectorInstrCost` (`:1984-1989`), `getMemoryOpCost` (`:1800-1804`),
+  and the `!useRVVForFixedLengthVectors()` early returns in the arithmetic, compare, cast and reduction costs.
+  With the gate open none of these asserted on 45 + 13 + 10 probe loops and 35 SDK files. But the three guards
+  return a **flat cost of 1 for any fixed vector**, including `<8 x i16>` shuffles and full scalarisation. That was
+  harmless while nothing asked; it is wrong once the vectorizers ask.
+- The "assert RVV-VLEN" of the old LLVM 18 fork (`benchmarks/gap9-sweep/report.md`, k01/k05 at -O3) is still
+  present in the **back end**, not in TTI: `RISCVTargetLowering::isExtractSubvectorCheap`
+  (`RISCVISelLowering.cpp:2320-2340`) reads `getRealMinVLen()` for every fixed vector, and `isInterleaveShuffle`
+  (`:4657-4660`, called from `isShuffleMaskLegal` `:5880`) reads `getELen()`. Both assert without V. They are
+  only reached by vector IR wider than one packed register, which the vectorizers produce (crashes C2 and C3).
+- Upstream has no answer to copy. Its later support for GPR-held vectors (P extension, `dfdc69b4c27d`,
+  `6d516c6e28a1`, `4540415f19d9`, first released in llvmorg-23.1.0) added the same kind of cost-function guards
+  the fork has, and still returns `hasVInstructions() ? 32 : 0` for the vector register count. Upstream RISC-V
+  does not auto-vectorize to GPR-held vectors in any release in this clone. Upstream's CORE-V `XCVsimd` at
+  20.1.8 is assembler-only (`RISCVInstrInfoXCV.td:396`), with no vector types in `RISCVISelLowering.cpp`.
+
+## 3. Can it be forced without source changes?
+
+**No.** Every flag was tried on `../loops.c` with the stock clang; all give 0 packed instructions.
+
+| attempt | result | why |
+|---|---|---|
+| `-mllvm -force-vector-width=2` / `=4` | 0 `pv.*` | read inside the vectorizer, after the gate |
+| `-mllvm -force-target-max-vector-interleave=2` | 0 | only read in `selectInterleaveCount` (`LoopVectorize.cpp:4968`), not at the gate |
+| `-mllvm -force-target-num-vector-regs=16` (also with forced width) | 0 | only read in the register-pressure estimate (`LoopVectorize.cpp:4941`) |
+| `-mllvm -riscv-v-fixed-length-vector-lmul-max=8` | 0 | multiplies a VLEN of 0 |
+| `-mllvm -vectorizer-min-trip-count=1` | 0 | after the gate |
+| `-fslp-vectorize` | 0 | already on; SLP aborts at its gate |
+| `#pragma clang loop vectorize(enable) vectorize_width(2)` (`pragma.c`) | 0, and clang warns `loop not vectorized: the optimizer was unable to perform the requested transformation` | pragma is read after the gate |
+| adding V: `-march=rv32imcv_xgap9` | rejected: `'f' and 'zfinx' extensions are incompatible` | and RVV code would not run on the chip anyway |
+
+### The experiment: open the gate in a private build
+
+`exp-tti.patch` (6 added lines, scratch worktree and build outside the port tree) makes the three hooks answer
+31 registers / 32 bits / minimum 32 bits when Xpulpv2 is present and V is not. Only `opt` comes from that build;
+clang's front end and `llc` are the stock toolchain. Two configurations: as is ("exp"), and with the existing
+target feature `unaligned-scalar-mem` added ("exp-ualign").
+
+**What the vectorizers do** (`out/exp/*/loops2.status.tsv`, `out/exp/base/lv_costs.loops2.tsv`):
+
+- 30 loops in `loops2.c` are vectorized at VF 2 (16-bit) or VF 4 (8-bit), interleave count 1; 5 straight-line
+  blocks are SLP-vectorized. Example decision for add16: scalar cost 6, VF 2 cost 6 (3.0 per lane), VF 2 chosen.
+- Reductions into an `int` (dot16, dot8, sum16, sum8, max16r, sad8) and 32-bit loops are left scalar: "Vectorization
+  is possible but not beneficial", because `<2 x i32>` is not a legal type. Nothing bad happens to them.
+- Half-precision loops are left scalar for the same reason (`<2 x half>` not legal, VF 1 chosen).
+- At -O2 the same loops vectorize (GCC only vectorizes at -O3). At -Os 3 loops and 4 SLP blocks. At -O1/-Oz none.
+
+**What the back end does with that IR.** Add16, experiment with `unaligned-scalar-mem`, as simulated:
+
+```
+        lp.setup x0, t1, 8          # hardware loop
+        p.lw     t1, 4(a4!)
+        p.lw     a5, 4(t2!)
+        pv.add.h a5, a5, t1
+        p.sw     a5, 4(t0!)
+```
+
+This is GCC's vector body instruction for instruction. Without `unaligned-scalar-mem` the same loop is 15
+instructions for 2 elements (`lhu lhu lhu lhu slli or slli or pv.add.h srli sh sh addi addi addi`).
+
+**Correctness and speed on GVSoC** (`run_sim.sh`, `simdrv.c`; `out/sim/table.tsv` has all 44 loops). Cycles for
+256 elements, "all pointers 4-byte aligned / all pointers off by one element". Results are hashed over 11
+lengths (0 to 65) and all 8 alignment combinations of the three pointers.
+
+| loop | GCC -O2 | GCC -O3 | stock clang -O3 | exp | exp-ualign | exp-ualign, no hw loop | forced VF 2, in-loop reductions |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| add16 | 1312 / 1306 | 686 / 691 | 2074 / 2074 | 1964 / 1964 | 684 / 1067 | 1062 / 1318 | 684 / 1067 |
+| add8 | 1308 / 1302 | 365 / 381 | 2073 / 2073 | 2031 / 2031 | 364 / 555 | 550 / 678 | 1834 / 1834 |
+| min16 | 1312 / 1306 | 686 / 693 | 2074 / 2074 | 1963 / 1963 | 684 / 1067 | 1062 / 1318 | 684 / 1067 |
+| shr16 | 1057 / 1051 | 558 / 563 | 1819 / 1819 | 1325 / 1325 | 556 / 811 | 935 / 1063 | 556 / 811 |
+| abs16 | 1057 / 1051 | 1054 / 1054 | 1819 / 1819 | 1323 / 1323 | 556 / 811 | 934 / 1062 | 555 / 810 |
+| clip16 | 1315 / 1309 | 1312 / 1312 | 1819 / 1819 | 1456 / 1456 | 687 / 942 | 1066 / 1194 | 687 / 942 |
+| sel16 | 2208 / 2203 | 942 / 950 | 2842 / 2842 | 2220 / 2220 | 939 / 1322 | 1318 / 1574 | 939 / 1322 |
+| avg8 | 1308 / 1302 | 1305 / 1305 | 2330 / 2330 | 2225 / 2225 | 556 / 747 | 743 / 871 | 2092 / 2092 |
+| relu8 | 1053 / 1047 | 301 / 315 | 1818 / 1818 | 1325 / 1325 | 300 / 427 | 487 / 551 | 1324 / 1324 |
+| mul16 | 1312 / 1306 | 1309 / 1309 | 2074 / 2074 | **2219** / 2219 | 1323 / 1706 | 1702 / 1958 | 1323 / 1706 |
+| sat16 | 2337 / 2331 | 2334 / 2334 | 2330 / 2330 | **2475** / 2475 | 1580 / 1963 | 1958 / 2214 | 1579 / 1962 |
+| scale16 | 1058 / 1052 | 686 / 691 | 2075 / 2075 | 1836 / 1836 | 1323 / 1578 | 1702 / 1830 | 1323 / 1578 |
+| dot16 | 1054 / 1048 | 1051 / 1051 | 1053 / 1053 | 1054 / 1054 | 1053 / 1053 | 1053 / 1053 | **552** / 808 |
+| dot8 | 1050 / 1044 | 1047 / 1047 | 1052 / 1052 | 1052 / 1052 | 1052 / 1052 | 1052 / 1052 | 2472 / 2472 |
+| max16rn | 803 / 797 | 430 / 558 | 803 / 803 | 816 / 816 | 433 / 561 | 433 / 561 | 433 / 561 |
+| add16_k64 | 347 / 341 | 203 / 205 | 536 / 536 | 588 / 588 | 208 / 295 | 208 / 295 | 208 / 295 |
+| add16_nr (no restrict) | 1312 / 1306 | 703 / 708 | 2074 / 2074 | 1971 / 1971 | 691 / 1074 | 1069 / 1325 | 689 / 1072 |
+| add16_ovl (overlapping) | 1314 / 1308 | 1325 / 1325 | 2076 / 2076 | 2090 / 2090 | 2090 / 2090 | 2090 / 2090 | 2089 / 2089 |
+| slp_add8 | 42 / 36 | 28 / 30 | 41 / 41 | 53 / 53 | 30 / 32 | 30 / 32 | 30 / 32 |
+
+What the table says:
+
+- **Results:** 43 of 44 loops are identical across all nine builds, including the overlapping-pointer calls of
+  the no-restrict loops and both forced variants. The one difference is GCC -O3 on max16rn, and it is the
+  simulator: GCC's reduction epilogue uses `pv.shuffle2.h`, whose operands GVSoC swaps (existing backlog B113).
+  Clang's experimental code for that loop uses `pv.extract.h` + `p.max` and agrees with the scalar builds.
+- **With misaligned word access allowed, the experiment equals GCC -O3** on every loop GCC vectorizes
+  (add, sub, and, min, max, shift by constant, add constant, compare-select, relu), and beats it on
+  abs16, clip16 and avg8, which GCC leaves scalar.
+- **Without it the gain is small and two loops get slower than stock clang** (mul16 +7%, sat16 +6%).
+- **Pointers that are not 4-byte aligned cost one extra cycle per access** in the simulator (add16: 1067 instead
+  of 684). GCC avoids most of that by peeling scalar iterations until one pointer is aligned; LLVM's loop vectorizer
+  has no alignment peeling. Even fully misaligned, the vector loop is faster than GCC's scalar loop (1067 against 1312).
+- **The hardware loop decides between "parity" and "half of the gain".** The column "no hw loop" is the same
+  module handed to `llc` as text instead of bitcode: identical IR, different use-list order, and the PULP
+  hardware-loop pass no longer converts the vector loop (10 `lp.setup` in the object instead of 34). Add16 is then
+  1062 cycles instead of 684. This is existing backlog B23 (stock clang's scalar add16 has no hardware loop either,
+  which is why it needs 2074 cycles against GCC -O2's 1312).
+- **Forced in-loop reduction gives `p.lw p.lw pv.sdotsp.h` for the 16-bit dot product**, 552 cycles against 1051
+  for GCC -O3, which does not vectorize it. The same option makes 8-bit dot products slower (2472), because the
+  back end has no match for the 4-lane form (section 4).
+
+**Crashes found.** B147 and B148 were checked and are not re-reported. New ones, each with a minimal reproducer
+that fails on the **stock** tools:
+
+| id | reproducer | failure | reached from C (with the gate open) |
+|---|---|---|---|
+| C1 | `crashes/c1_vecreduce_add_cannot_select.ll` | `LLVM ERROR: Cannot select: i32 = vecreduce_add` on v2i16/v4i8. `RISCVISelLowering.cpp:678` marks `VECREDUCE_ADD` Legal for both types and no pattern selects it. | `short s; s += b[i]` (loops2.c `sum16n`) |
+| C2 | `crashes/c2_isExtractSubvectorCheap_vlen_assert.ll` | assertion `Tried to get vector length without Zve or V extension support!` in `isExtractSubvectorCheap`, from `DAGCombiner::reduceBuildVecToShuffle` and `visitEXTRACT_SUBVECTOR` | `o[i]=in[2*i]+in[2*i+1]`, `a[i]=b[2*i]` (loops3.c), **SDK `FftLibraryFix.c` `Radix2FFT_DIF_Scalar`**, a 16-bit max reduction at forced VF 4 |
+| C3 | `crashes/c3_isShuffleMaskLegal_elen_assert.ll` | assertion `Expected V extension` in `isInterleaveShuffle` via `isShuffleMaskLegal`, from `DAGCombiner::foldShuffleOfConcatUndefs` | `o[2*i]=a[i]; o[2*i+1]=b[i]` (loops3.c `int16`) |
+| C4 | `crashes/c4_lv_remark_ordered_fadd_generic.ll` | `opt` assertion in `VPReductionRecipe::computeCost`, called from `emitInvalidCostRemarks`, only when a loop-vectorize remark option is on | float16 dot-product style loops. **Not PULP code**: it reproduces on the stock opt with plain RVV features. With the gate open and a remark option, the experimental opt asserted on 8 of the 35 SDK DSP files. |
+
+The masked load/store probes also abort, with B148's message (`Cannot use trunc store to convert to or from a
+vector!`); the scalariser turns the `<N x i1>` mask into an integer. Same root as B148, so not counted. The loop
+vectorizer does not emit masked operations for xgap9 (`isLegalMaskedLoad` is false).
+
+## 4. Back-end coverage
+
+180 hand-written functions (`gen_backend.py` writes `backend/*.ll`), each through
+`llc -O2 -verify-machineinstrs` with the feature list clang uses for xgap9. Raw results:
+`out/backend.default.tsv`, and `out/backend.unaligned.tsv` with `+unaligned-scalar-mem`.
+"packed" = selected to `pv.*` with no per-lane code. The machine verifier reported nothing on any file.
+
+| operation | `<2 x i16>` | `<4 x i8>` |
+|---|---|---|
+| add, sub, and, or, xor | packed, 1 instruction | packed, 1 |
+| shl, lshr, ashr by a vector | packed, 1 | packed, 1 |
+| shift / add / max by a constant splat | packed, but 2 instructions (`pv.add.sci` to build the splat, then the op); GCC uses the `.sci` form, 1 instruction | same |
+| op with a splatted scalar | packed, 2 (`pv.add.sc.h` splat + op) instead of the `.sc` form | same |
+| mul, mul by constant | **scalarised**: 4 `pv.extract` + 2 `mul` + `pv.pack` (the instruction set has no packed multiply) | scalarised, 14 instructions |
+| sdiv, udiv | scalarised | scalarised |
+| smin, smax, umin, umax | packed, 1 | packed, 1 |
+| abs | packed, 1 (`pv.abs`) | packed, 1 |
+| uadd.sat, usub.sat | packed, 4 and 2 instructions | packed |
+| sadd.sat, ssub.sat | scalarised (extract, add, `p.clip`, pack) | scalarised |
+| icmp eq/slt/ugt to a mask | packed, 1 (`pv.cmp*`) | packed, 1 |
+| icmp + select (general) | packed, 5 (`pv.cmplt`, `pv.cmpge`, 2 `pv.and`, `pv.or`); the second compare could be an xor | same |
+| icmp + select in min/max shape | packed, 1 (`pv.min`) | packed, 1 |
+| select on a scalar condition | scalar branch on the register, fine | fine |
+| load / store, 4-byte aligned | `lw` / `sw`, 1 | 1 |
+| load / store, natural alignment (2 / 1) | **split**: 4 / 3 instructions | **split**: 10 / 7 instructions |
+| the same with `+unaligned-scalar-mem` | `lw` / `sw`, and `p.lw` / `p.sw` post-increment in loops | same |
+| masked load / store | crash (B148 family) | crash (B148 family) |
+| extractelement, constant index | `pv.extract(u)`, 1 | 1 |
+| extractelement, variable index | `pv.shuffle`, 1 | 1 |
+| insertelement, constant / variable index | `pv.insert`, 1 / `p.insert`+`p.insertr`, 3 | same |
+| build from scalars | `pv.pack.h`, 1 | `pv.packhi.b` + `pv.packlo.b` |
+| splat of a scalar / of a constant | 1 / 1 | 1 / 1 |
+| non-splat constant | `li` per lane + pack (B115) | same |
+| shuffle: reverse | 1 (`pv.shuffle.sci.h`) | 1 (`pv.shufflei0.sci.b`) |
+| shuffle: two sources (interleave low, take odd lanes) | `pv.shuffle2` + mask constant, 2-3 | same |
+| interleaved load (wide load + strided shuffles) | **crash C2** | **crash C2** |
+| interleaving shuffle to a wider vector | **crash C3** | (same code path) |
+| vector.reduce.add, same element width | **crash C1** | **crash C1** |
+| vector.reduce and/or/xor/mul/smin/smax/umin/umax | scalarised, small: 2 extracts + 1 scalar op | 4 extracts + 3 ops |
+| sext / zext to `<N x i32>` | N `pv.extract(u)`, one register per lane | same |
+| trunc from `<N x i32>` | `pv.pack` | `pv.packhi`/`pv.packlo` |
+| reduce.add(mul(sext, sext)), the dot product | **`pv.dotsp.h`, 1**; with an accumulator `pv.sdotsp.h`; unsigned `pv.dotup.h` / `pv.sdotup.h` | **not matched**: 8 extracts + `mul`/`p.mac` |
+| reduce.add(sext) (sum) | 2 extracts + add (could be `pv.dotsp.sci.h` with 1) | 4 extracts + 3 adds |
+| dot-product loop, vector accumulator phi | scalarised (extracts + `p.mac`) | scalarised |
+| dot-product loop, scalar accumulator (in-loop reduction), unaligned on | **`p.lw p.lw pv.sdotsp.h`** | scalarised |
+
+| operation | `<2 x half>` | `<2 x bfloat>` |
+|---|---|---|
+| fadd, fsub, fmul, fdiv, fneg, fabs, sqrt, minnum, maxnum, fmuladd | scalarised to two `f*.h` each; no `vf*.h` is ever selected | scalarised through single precision: `f*.s` plus `__truncsfbf2` calls |
+| load, store | two `lh` / `sh` | two `lh` / `sh` |
+| fcmp + select | scalar compare and branch | scalar |
+| sitofp / fptosi with `<2 x i16>` | scalar `fcvt` per lane | scalar, with calls |
+
+Neither float type is legal (`RISCVISelLowering.cpp:140-143` registers only `v2i16` and `v4i8`), and
+`RISCVInstrInfoXpulpfloat.td` defines the 82 packed instructions for the assembler only.
+
+## 5. What GAP9 GCC does
+
+`out/gcc/*.s`, `-fopt-info-vec` output in `out/gcc/*.vec.txt`. GCC vectorizes **only at -O3**; at -O2 there is
+no packed instruction in any probe.
+
+| loop kind (file `loops2.c`, `loops3.c`) | GCC -O3 | packed body |
+|---|---|---|
+| add, sub, and (16-bit, 8-bit) | vectorized | `pv.add.h/.b`, `pv.sub.h`, `pv.and.h` |
+| min, max, unsigned max | vectorized | `pv.min.h`, `pv.max.b`, `pv.maxu.b` |
+| shift by a constant | vectorized | `pv.sra.sci.h`, `pv.sll.sci.b` |
+| shift by a loop-invariant variable | **not** vectorized | |
+| add a constant / add a scalar argument | vectorized | `pv.add.sci.h` / `pv.add.sc.h` splat + `pv.add.h` |
+| scale by the constant 3 | vectorized as shift + add | `pv.sll.sci.h` + `pv.add.h` |
+| multiply, Q15 scale `(b*k)>>15` | **not** vectorized ("no optab": no packed multiply) | |
+| abs | **not** vectorized | |
+| saturating add, clip to a range, rounding average | **not** vectorized | |
+| relu `max(x, 0)` | vectorized | `pv.max.sci.b` |
+| compare + select | vectorized | `pv.cmpgt.h` + `pv.sub.h` + `pv.and.h` |
+| copy | library call (`tail memcpy`) | |
+| fill with a scalar | vectorized | `pv.add.sc.h` splat, then `p.sw` |
+| dot product (16-bit, 8-bit, unsigned 8-bit) into `int` | **not** vectorized ("unsupported data-type int") | |
+| sum, max, sum of absolute differences into `int` | **not** vectorized | |
+| max into a `short` | vectorized | `pv.max.h`, epilogue `pv.shuffle2.h` + `pv.extract.h` |
+| de-interleave `in[2i]+in[2i+1]`, interleave, reverse, array of 2-field structs | vectorized | `pv.pack.h`/`pv.pack.h.h`, `pv.shuffle.sci.h`, `pv.shuffleI0.sci.b` |
+| conditional store, widening/narrowing copies, gather, strided load, early exit | not vectorized | |
+| 32-bit elements | not vectorized | |
+| 2 or 4 statements in a row, struct of 4 bytes (SLP) | vectorized | one `pv.add.h/.b`, 5 instructions in total |
+
+Float16 (`loops_f16.c`, shaped like the SDK's `WindowingReal2Real_f16` and `CmplxMagSquared_f16`, the two stages
+`benchmarks/dsp-bench/mfcc-app/report.md` names):
+
+| loop | GCC -O3 | packed body |
+|---|---|---|
+| window `frame[i] *= win[i]` (in place and out of place) | vectorized | `p.lw p.lw vfmul.h p.sw` |
+| add | vectorized | `vfadd.h` |
+| `y[i] += k*x[i]` | vectorized | `pv.add.sc.h` splat + `vfmac.h` |
+| scale by a scalar | vectorized | `vfmul.h` |
+| power spectrum `re*re + im*im` from interleaved input | vectorized | `pv.pack.h`, `pv.pack.h.h`, `vfmul.h`, `vfmac.h` |
+| max (compare + select) | not vectorized | |
+| dot product into a float16 | not vectorized (strict FP order) | |
+
+**Trip counts.** Unknown `n`: full shape below. Known 64 or 63: the same shape with the count as a constant
+(34 / 26 instructions). Known 4 bytes or 2 halves: one straight-line packed operation, 5 instructions. Global
+arrays with a known count are treated like pointers (GCC still emits the alignment prologue).
+
+**`restrict`.** Without it GCC emits a run-time overlap test (`p.sletu` comparisons of the pointer ranges) and
+keeps both versions: "loop versioned for vectorization because of possible aliasing". Add16 grows from 47 to
+72 instructions with two hardware loops, and costs about 17 extra cycles per call.
+
+**Loop shape** (add16, unknown `n`, 47 instructions against 12 at -O2):
+
+1. Guard for `n <= 0`, and a jump to the scalar code when `n` is too small.
+2. **Alignment peeling**: if the first load pointer is not 4-byte aligned, one scalar iteration (up to 3 for
+   bytes). Only that one pointer is aligned; the other load and the store use plain `p.lw`/`p.sw` at whatever
+   alignment they have. So GAP9 GCC treats misaligned word access as legal.
+3. **Hardware loop around the packed body**: `lp.setup` then `p.lw !`, `p.lw !`, `pv.add.h`, `p.sw !`
+   (4 instructions for 2 elements, post-increment on all three pointers).
+4. **Remainder**: straight-line scalar code for the last 1 iteration (16-bit) or up to 3 (8-bit), not a loop.
+
+GCC also uses misaligned access in scalar code, and clang does not (`unaligned_scalar.c`):
+
+```
+int rd(const struct P *p){ return p->v; }      /* packed struct, v at offset 1 */
+GCC -O2:    lw a0,1(a0)                                    1 instruction
+clang -O2:  4 x lbu, 3 x slli, 3 x or                      10 instructions
+clang -O2 -mno-strict-align:  lw a0, 1(a0)
+```
+
+## 6. Estimate of work
+
+Nothing here was implemented. Line counts are for compiler code; tests come on top.
+
+### List A: GCC parity on simple integer loops
+
+| # | change | where | lines | note |
+|---|---|---|---:|---|
+| A1 | Answer the three gate hooks for Xpulpv2 without V: vector register count, 32-bit fixed vector register, minimum vector register 32. Report GPR as the vector register class so register pressure is counted against the 31 GPRs. Keep the interleave factor at 1. | `RISCVTargetTransformInfo.h:138, 371-396`, `RISCVTargetTransformInfo.cpp:327` | 10-15 | The experiment's 6 lines are this, minus the register class. Comparable upstream targets do exactly this: `LoongArchTargetTransformInfo.cpp:22-52`, `WebAssemblyTargetTransformInfo.cpp:26-43`, `ARMTargetTransformInfo.h:150-183`. |
+| A2 | Make misaligned packed loads/stores one `lw`/`sw`. Either (a) xgap9 turns on `unaligned-scalar-mem`, as GAP9 GCC assumes for all code, or (b) only for the packed types: make LOAD/STORE of `v2i16`/`v4i8` legal with their own patterns (including post-increment) instead of promoting to an aligned `i32`, and return true from `allowsMisalignedMemoryAccesses`. | (a) `RISCVFeatures.td` near `:1514`, 2 lines. (b) `RISCVISelLowering.cpp:678-680, 22546-22566`, `RISCVInstrInfoXpulp.td` | 2, or 60-100 | Without this the feature is not worth enabling (table in section 3). (a) changes scalar code in the whole SDK (shorter `memcpy` expansions, packed structs) and shifts inlining decisions; (b) is narrow but must not bring back the DAG-combiner loop fixed in B89. Until then `getMemoryOpCost` must report the real cost of an under-aligned packed access (10 lines). |
+| A3 | Fix the crashes the vectorizers reach: C1 (drop the Legal marking or add `pv.dotup.sci`-with-1 patterns), C2 and C3 (return false early when the type is not an RVV type), then audit the other `getRealMinVLen()` / `getELen()` users in `RISCVISelLowering.cpp` for fixed vectors without V. | `RISCVISelLowering.cpp:678, 2320, 4657, 5880` | 15-40 | C2 is hit by SDK code. These three are worth fixing independently of B156: they fail today on hand-written IR. |
+| A4 | Cost model for what the back end scalarises: multiply, signed saturating add/sub, division, shift by a non-splat amount, casts to and from `<N x i32>`, interleaved and strided accesses (or switch `enableInterleavedAccessVectorization` off for PULP), gathers. Replace the three flat "cost 1" guards with real numbers for wider-than-register vectors. | `RISCVTargetTransformInfo.cpp:396, 693, 743, 1276, 1809, 1984, 2132` and the intrinsic costs at `:986` | 60-120 | Needed so that mul16 / sat16 / scale16 are left scalar (they regress or gain nothing). Today the per-lane cost includes the loop overhead, so a vector multiply at cost 5 still wins on paper (5.0 per lane against 6 scalar). |
+| A5 | Selection quality: use the `.sci` / `.sc` instruction forms when one operand is a constant or scalar splat (constant splats arrive as BUILD_VECTOR, the patterns only match SPLAT_VECTOR); cheaper general select. | `RISCVInstrInfoXpulp.td:1513-1545`, or a small lowering in `RISCVISelLowering.cpp` | 20-40 | One instruction per loop iteration, or a hoisted one. Not required for correctness. |
+| A6 | Loop shape and policy: hardware loop on the vector loop (existing B23), do not fully unroll small constant-count vector loops (add16_k64 becomes 32 copies, 175 instructions against GCC's 34), decide the optimisation levels. | `PULPHardwareLoops`, `RISCVTTIImpl::getUnrollingPreferences`, clang driver | 10-30 plus B23 | LLVM would vectorize at -O2 as well; GCC does it only at -O3. |
+| A7 | Tests: cost-model and LoopVectorize/SLP tests for xgap9, CodeGen tests for the new patterns and the three crash fixes. | `llvm/test/Analysis/CostModel/RISCV`, `llvm/test/Transforms/{LoopVectorize,SLPVectorizer}/RISCV`, `llvm/test/CodeGen/RISCV` | 300-500 of tests | CHECK lines generated by the update scripts. |
+
+Total for list A: about 150-300 lines of compiler code, in roughly 8-12 tasks of this harness's usual size,
+plus a validation round (SDK compile survey, dsp-bench, MFCC, the hardware-loop fuzzer with vectorization on).
+
+### List B: reductions and dot products (`pv.dotsp` / `pv.sdotsp`)
+
+| # | change | where | lines | note |
+|---|---|---|---:|---|
+| B1 | Prefer in-loop reductions for integer add on PULP and give the extend-multiply-accumulate and extend-accumulate reductions their real cost (1 instruction). | new `preferInLoopReduction`, `getMulAccReductionCost`, extend `getExtendedReductionCost` (`RISCVTargetTransformInfo.cpp:1706`) | 40-60 | Upstream precedent is Arm MVE, whose `VMLADAVA` is the same idea: `ARMTargetTransformInfo.cpp:1785-1843` and `:2636`, used by `LoopVectorize.cpp:5889-5953` and `:6995`. The experiment proves the vectorizer side works: `-prefer-inloop-reductions -force-vector-width=2` produces `p.lw p.lw pv.sdotsp.h`, 552 cycles against 1051. |
+| B2 | Recognise the dot product before type legalisation instead of relying on the expansion order: a target combine on `vecreduce_add(mul(ext, ext))` and `vecreduce_add(ext)` to dot-product nodes, signed/unsigned/mixed, with and without accumulator. | `RISCVISelLowering.cpp` (new combine), `RISCVInstrInfoXpulp.td:1610-1711` | 80-150 | Today the 2-lane forms match by luck of how the reduction is expanded; the 4-lane forms do not match at all (dot8 gets slower when forced). |
+| B3 | Sum and sum-of-absolute-differences as a dot product with a splat of 1 (`pv.sdotsp.sci`, `pv.sdotup.sci`); narrow sums (C1). | same | 20-40 | |
+
+Total for list B: about 150-250 lines, 4-6 tasks. This goes beyond GCC parity: GCC vectorizes none of these.
+
+### List C: half precision
+
+| # | change | where | lines | note |
+|---|---|---|---:|---|
+| C1 | Make `<2 x half>` (and `<2 x bfloat>`) legal GPR-held types with selection patterns for the packed instructions: add, sub, mul, div, min, max, sqrt, neg, abs, multiply-accumulate, compares, lane insert/extract/pack, load/store, int conversions; calling convention as GCC. | `RISCVISelLowering.cpp:140`, `RISCVInstrInfoXpulpfloat.td:203-270`, `RISCVCallingConv` | 400-700 | This is backlog B90 task T5 (and B115). It is what the SDK's explicit `v2h` code needs, and it is where the 1.5x float16 MFCC gap comes from. Not specific to auto-vectorization. |
+| C2 | Then the vectorizer part: costs for the legal FP types, and `fmuladd` to `vfmac`. | `RISCVTargetTransformInfo.cpp` | 30-60 | After C1 the gate from A1 is enough for the window, add, scale and axpy loops. The power-spectrum loop additionally needs the interleaved-load path (A4, crash C2 fixed). |
+
+Total for list C: about 500-800 lines, 8-12 tasks, nearly all of it B90-T5.
+
+### Risks
+
+- **Correctness.** The experiment's integer code was right on every loop simulated, but the coverage is 44 small
+  loops, 11 lengths and 8 alignment combinations, on a simulator with known packed-instruction bugs (B113 `pv.shuffle2`, B151 `vfmre`).
+  Lane order and misaligned access should be confirmed on the board before this is on by default. The
+  hardware-loop fuzzer generates exactly the kind of loops that will now vectorize and should be rerun.
+- **Misaligned access.** The claim that it is legal and costs one cycle rests on GCC's generated code and on
+  GVSoC. It has not been measured on a board in this investigation.
+- **Hardware loops.** The gain halves when the vector loop does not become a hardware loop, and whether it does
+  currently depends on IR use-list order (B23). The scalar remainder loop is a second loop per function; the
+  pass must not regress on functions that now contain two (earlier B03/B82 were about duplicate setups).
+- **Post-increment.** The vector body needs `p.lw`/`p.sw` post-increment on a packed type; this works today
+  (`RISCVISelLowering.cpp:736-742`) but only once the access is a single word (A2). The fork deliberately has no
+  post-increment `f32` store because the hardware-loop pass rejects a store as induction update (`:744-749`);
+  the same interaction should be checked for `p.sw` of a packed value. In the experiment it formed a hardware loop
+  with `p.sw` as the last instruction.
+- **Cost-model regressions on SDK code.** Static sweep of the 35 DSP library files (`sdk_sweep.sh`,
+  `out/sdk/*.tsv`), vectorizers on, misaligned access on for both sides: 14 loops and 8 SLP groups vectorize in 5
+  fixed-point files, 1 file crashes `llc` (C2), 28 functions change. Fixed-point FIR, MatMul, DCT and zero-padding
+  functions grow by 7-70% in instruction count (KerFirSeqBaseline 40 to 64, KerParMatMulDSP_Fix16 606 to 692)
+  with the same number of `pv.sdotsp.h`; whether they get faster was not measured. A second effect is easy to
+  miss: **VectorCombine also switches on**, and it rewrites the SDK's hand-written vector code. In the float16alt
+  FFT/DFT files the number of `pv.extract.h` drops (22 to 10 in `_DIT_DFT_MR`) and inlining decisions change
+  (four `Ker*DftMR_Real_f16` wrappers shrink from about 110 to 30 instructions because a callee is no longer
+  inlined). None of that was simulated.
+- **Code size.** On the probe file, .text at -O2 goes from 1430 to 3376 bytes and at -O3 to 4888 (GCC -O3:
+  4904; GCC -O2: 1430). At -Os it shrinks slightly (1392 to 1262). The SDK builds mostly at -O2/-Os, so
+  whether to vectorize at -O2 is an owner decision.
+- **Remark crash C4.** Anyone building with `-Rpass-missed=loop-vectorize` hits an upstream assertion on
+  float16 reduction loops once vectorization is on.
+- **Fork surface.** There is no upstream RISC-V precedent for auto-vectorizing to GPR-held vectors (section 2),
+  so A1, A4 and B1 are fork-only code in `RISCVTargetTransformInfo.*` that every future port carries.
+
+### Uncertainty
+
+List A's line count is well grounded: A1 was built and run, A2(a) was run as a feature flag, A3's three
+crashes have reproducers and an obvious place to fix. The spread comes from A2 (2 lines or 100, an owner choice)
+and A4 (how many scalarised operations need a tuned cost; I found five, the SDK may have more). List B rests on
+one forced experiment for the 16-bit case and on reading the patterns for the 8-bit case. List C is an estimate
+from the instruction list, not from an experiment. Performance numbers are GVSoC cycles on one core; no board
+measurement was made, and the SDK kernels were only compared statically.
+
+## 7. Files
+
+| file | what it is |
+|---|---|
+| `reproduce.sh` | runs everything; with `EXP_OPT=<opt>` also the experiment |
+| `loops2.c`, `loops3.c`, `loops_f16.c`, `pragma.c`, `unaligned_scalar.c` | C probes (45 + 13 + 10 loops) |
+| `cost.ll` | cost-model query for the packed types |
+| `gen_backend.py`, `run_backend.sh`, `backend/*.ll` | back-end coverage (180 functions) |
+| `crashes/c1..c4*.ll` | minimal reproducers, with the command line in each file |
+| `exp-tti.patch` | the 6-line experimental patch (not a proposed fix) |
+| `run_exp.sh`, `lv_costs.sh` | experiment: per-function vectorization, back-end status, cost decisions |
+| `simdrv.c`, `run_sim.sh` | GVSoC correctness and cycle comparison of nine builds |
+| `sdk_sweep.sh` | static sweep of the SDK DSP library |
+| `asm_table.py` | per-function packed-instruction / hardware-loop / size table from assembly |
+| `out/` | results of the runs quoted here (`backend.*.tsv`, `sim/table.tsv`, `sdk/*.tsv`, `exp/`, `gcc/`, `clang/`) |
+
+The experimental `opt` used for this report is in a scratch worktree and build directory outside the port tree
+(detached at `26e7268c3127`); the header of `reproduce.sh` has the commands to rebuild it (about 12 minutes).

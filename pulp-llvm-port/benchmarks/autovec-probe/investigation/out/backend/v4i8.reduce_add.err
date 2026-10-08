@@ -1,0 +1,35 @@
+LLVM ERROR: Cannot select: t8: i32 = vecreduce_add t2
+  t2: v4i8,ch = CopyFromReg t0, Register:v4i8 %0
+    t1: v4i8 = Register %0
+In function: f
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: /home/ubuntu/llvm-project/pulp-llvm-port/toolchains/port-20-bench/bin/llc -mtriple=riscv32-unknown-elf -mattr=+m,+c,+xgap,+xpulpv,+xpulpfvec,+xpulpf16alt,+zfinx,+zhinx,+zhinxmin,+zicsr,+zmmul,+unaligned-scalar-mem -target-abi=ilp32 -O2 -verify-machineinstrs /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/backend/v4i8.reduce_add.ll -o /home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/out/backend/v4i8.reduce_add.s
+1.	Running pass 'Function Pass Manager' on module '/home/ubuntu/llvm-project/pulp-llvm-port/benchmarks/autovec-probe/investigation/backend/v4i8.reduce_add.ll'.
+2.	Running pass 'RISC-V DAG->DAG Pattern Instruction Selection' on function '@f'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x000062f0cb810218 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc       0x000062f0cb80ddee llvm::sys::RunSignalHandlers() + 238
+2  llc       0x000062f0cb8108c8
+3  libc.so.6 0x00007f5538e45330
+4  libc.so.6 0x00007f5538e9ec0c pthread_kill + 284
+5  libc.so.6 0x00007f5538e4527e gsignal + 30
+6  libc.so.6 0x00007f5538e288ff abort + 223
+7  llc       0x000062f0cb77c66c llvm::report_fatal_error(llvm::Twine const&, bool) + 428
+8  llc       0x000062f0cb6075b4 llvm::SelectionDAGISel::CannotYetSelect(llvm::SDNode*) + 548
+9  llc       0x000062f0cb60662a llvm::SelectionDAGISel::SelectCodeCommon(llvm::SDNode*, unsigned char const*, unsigned int) + 21082
+10 llc       0x000062f0ca21cc1c
+11 llc       0x000062f0cb5fae9f llvm::SelectionDAGISel::DoInstructionSelection() + 1359
+12 llc       0x000062f0cb5f9e42 llvm::SelectionDAGISel::CodeGenAndEmitDAG() + 6178
+13 llc       0x000062f0cb5f7786 llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 6454
+14 llc       0x000062f0cb5f4be1 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 593
+15 llc       0x000062f0cb5f2459 llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 169
+16 llc       0x000062f0ca7ee6e6 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 694
+17 llc       0x000062f0cad68735 llvm::FPPassManager::runOnFunction(llvm::Function&) + 677
+18 llc       0x000062f0cad70b62 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+19 llc       0x000062f0cad691cc llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1932
+20 llc       0x000062f0ca0e5e10 main + 9632
+21 libc.so.6 0x00007f5538e2a1ca
+22 libc.so.6 0x00007f5538e2a28b __libc_start_main + 139
+23 llc       0x000062f0ca0dfc65 _start + 37
+timeout: the monitored command dumped core
