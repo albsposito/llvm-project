@@ -1,0 +1,272 @@
+diff --git a/pulp-llvm-port/notes/19/H001.md b/pulp-llvm-port/notes/19/H001.md
+new file mode 100644
+index 000000000000..63354ded3f68
+--- /dev/null
++++ b/pulp-llvm-port/notes/19/H001.md
+@@ -0,0 +1,23 @@
++# 19/H001: Audited baseline test renames
++
++## What upstream changed
++LLVM 19 renamed eight tests documented by T001/T003: four exact vp.splice relocations, two exact spelling corrections, and updated inline assembly and saturating truncation tests. Every destination PASSes round 1.
++
++## Why this is equivalent
++Optional --baseline-renames maps only missing baseline PASS identities to candidate PASS identities, carrying full upstream SHA-1 provenance in the report. Duplicate sources/destinations, self mappings, chains, non-baseline sources, present sources and missing/non-PASS destinations fail closed. Candidate failures and fork inventory checks remain independent. lit.sh accepts the file as optional sixth argument; default behavior is unchanged. Hash syntax is checked mechanically; provenance semantics require independent review.
++
++## What breaks if this is wrong
++Wrong identity evidence could misattribute coverage. Tests exercise valid mapping, missing/failed/skipped destinations, invalid evidence, duplicates, present sources, unrelated failures and fork inventory preservation. All 18 harness tests and bash -n pass. The real round-1 comparison drops from fourteen to six problems, removing precisely eight stale identities; all six failures remain.
++
++## Upstream reference
++- `7855703194232a94d321dceea27b45cee0c91f73`: `llvm/test/CodeGen/RISCV/vp-splice.ll` -> `llvm/test/CodeGen/RISCV/rvv/vp-splice.ll`
++- `7855703194232a94d321dceea27b45cee0c91f73`: `llvm/test/CodeGen/RISCV/vp-splice-fixed-vectors.ll` -> `llvm/test/CodeGen/RISCV/rvv/vp-splice-fixed-vectors.ll`
++- `7855703194232a94d321dceea27b45cee0c91f73`: `llvm/test/CodeGen/RISCV/vp-splice-mask-vectors.ll` -> `llvm/test/CodeGen/RISCV/rvv/vp-splice-mask-vectors.ll`
++- `7855703194232a94d321dceea27b45cee0c91f73`: `llvm/test/CodeGen/RISCV/vp-splice-mask-fixed-vectors.ll` -> `llvm/test/CodeGen/RISCV/rvv/vp-splice-mask-fixed-vectors.ll`
++- `10a55caccf4e2d397f94c1455b93d774591be45f`: `llvm/test/CodeGen/RISCV/inline-asm-S-constraint.ll` -> `llvm/test/CodeGen/RISCV/inline-asm-s-constraint.ll`
++- `b13f799616939933373610c7458687ae88fa414d`: `llvm/test/CodeGen/RISCV/rvv/fixed-vectors-fround-costrained-sdnode.ll` -> `llvm/test/CodeGen/RISCV/rvv/fixed-vectors-fround-constrained-sdnode.ll`
++- `b13f799616939933373610c7458687ae88fa414d`: `llvm/test/CodeGen/RISCV/rvv/fround-costrained-sdnode.ll` -> `llvm/test/CodeGen/RISCV/rvv/fround-constrained-sdnode.ll`
++- `0afc884e874043bf5207d561ab82b107e8860d41`: `llvm/test/CodeGen/RISCV/rvv/trunc-sat-clip.ll` -> `llvm/test/CodeGen/RISCV/rvv/fixed-vectors-trunc-sat-clip.ll`
++
++## Isolation
++Main base 05fb8af658ad55d79726e4815bedddde8fed2175. Snapshot 79aeb169e7af preserves existing dirty lit.sh, integrate.py and test_harness.py; notes/19/H001-base.patch records prerequisite differences. Apply ONLY the subsequent H001 implementation delta after independent review, not snapshot. No main checkout or LLVM test modifications. Mapping and real report live in this worktree steps/19.
+diff --git a/pulp-llvm-port/scripts/lit.sh b/pulp-llvm-port/scripts/lit.sh
+index 36ca25cfdf1c..02ae7817c298 100755
+--- a/pulp-llvm-port/scripts/lit.sh
++++ b/pulp-llvm-port/scripts/lit.sh
+@@ -1,12 +1,12 @@
+ #!/usr/bin/env bash
+ # Run the green-defining test suite for a worktree and diff it against a baseline.
+-#   scripts/lit.sh <worktree> <build-dir> <jobs> <out-dir> [baseline-lit.json]
++#   scripts/lit.sh <worktree> <build-dir> <jobs> <out-dir> [baseline-lit.json] [baseline-renames.json]
+ # Writes <out-dir>/lit.json (lit results), <out-dir>/unit.json (RISCVISAInfo gtest) and
+ # <out-dir>/lit_diff.json (lit_diff.py report). Exit status is lit_diff.py's (0 = green).
+ set -uo pipefail
+ here="$(cd "$(dirname "$0")" && pwd)"
+ source "$here/../config.env"
+-wt="$1"; bd="$2"; jobs="$3"; out="$4"; baseline="${5:-}"
++wt="$1"; bd="$2"; jobs="$3"; out="$4"; baseline="${5:-}"; renames="${6:-}"
+ mkdir -p "$out"
+ "$here/in-builder.sh" bash -c '
+ set -uo pipefail
+@@ -35,4 +35,5 @@ rc=$?
+ args=(--candidate "$out/lit.json" --fork-tests "$here/../data/fork-tests.txt" --out "$out/lit_diff.json"
+       --known-failures "$here/../data/known-failures.txt")
+ [ -n "$baseline" ] && args+=(--baseline "$baseline")
++[ -n "$renames" ] && args+=(--baseline-renames "$renames")
+ python3 "$here/lit_diff.py" "${args[@]}"
+diff --git a/pulp-llvm-port/scripts/lit_diff.py b/pulp-llvm-port/scripts/lit_diff.py
+index 871383431657..f031ba776673 100755
+--- a/pulp-llvm-port/scripts/lit_diff.py
++++ b/pulp-llvm-port/scripts/lit_diff.py
+@@ -14,6 +14,7 @@ Exit 0 when green, 1 otherwise. Failures are grouped by test directory for task
+ """
+ import argparse
+ import json
++import re
+ import sys
+ from collections import defaultdict
+ from pathlib import Path
+@@ -33,12 +34,48 @@ def to_repo_path(name):
+     return SUITE_PREFIX.get(suite, suite + "/") + rel
+ 
+ 
++def load_renames(path, base, candidate):
++    """Explicit upstream identity changes, only for absent baseline PASS tests.
++
++    JSON is a list of {source, destination, upstream_commit} objects using repo
++    paths and full upstream SHA-1s. Evidence is reviewed separately; the hash is
++    retained in the report so a passing comparison remains auditable.
++    """
++    entries = json.loads(Path(path).read_text())
++    if not isinstance(entries, list):
++        raise ValueError("baseline renames must be a list")
++    sources, destinations = set(), set()
++    baseline = {to_repo_path(n): c for n, c in base.items()}
++    for entry in entries:
++        if not isinstance(entry, dict):
++            raise ValueError("baseline rename must be an object")
++        src, dst, sha = (entry.get(k) for k in ("source", "destination", "upstream_commit"))
++        if not all(isinstance(v, str) and v for v in (src, dst, sha)):
++            raise ValueError("rename requires source, destination and upstream_commit")
++        if not re.fullmatch(r"[0-9a-f]{40}", sha):
++            raise ValueError(f"rename {src}: upstream_commit must be a full SHA-1")
++        if src in sources or dst in destinations or src == dst:
++            raise ValueError(f"duplicate or self rename: {src} -> {dst}")
++        sources.add(src)
++        destinations.add(dst)
++        if baseline.get(src) != "PASS":
++            raise ValueError(f"rename source is not a baseline PASS: {src}")
++        if src in candidate:
++            raise ValueError(f"rename source still exists in candidate: {src}")
++        if candidate.get(dst) != "PASS":
++            raise ValueError(f"rename destination must PASS: {dst} ({candidate.get(dst, 'MISSING')})")
++    if sources & destinations:
++        raise ValueError("chained baseline renames are ambiguous")
++    return entries
++
++
+ def main():
+     ap = argparse.ArgumentParser()
+     ap.add_argument("--candidate", required=True)
+     ap.add_argument("--baseline")
+     ap.add_argument("--fork-tests", required=True)
+     ap.add_argument("--known-failures", help="owner-approved list of repo-relative tests that fail at the 18 baseline")
++    ap.add_argument("--baseline-renames", help="reviewed JSON upstream test identities with provenance SHA-1s")
+     ap.add_argument("--out")
+     args = ap.parse_args()
+     cand = load(args.candidate)
+@@ -51,7 +88,17 @@ def main():
+     fork_tests = [l.strip() for l in Path(args.fork_tests).read_text().splitlines()
+                   if l.strip() and "/test/" in l and not l.startswith("#") and l.strip() not in known]
+ 
++    renames = []
++    mapping_errors = []
++    if args.baseline_renames:
++        try:
++            renames = load_renames(args.baseline_renames, base, by_path)
++        except (OSError, ValueError, TypeError) as exc:
++            mapping_errors.append(str(exc))
++    renamed = {entry["source"]: entry["destination"] for entry in renames}
+     problems = []
++    for error in mapping_errors:
++        problems.append({"test": "harness/baseline-renames", "problem": error})
+     for name, code in cand.items():
+         if code in BAD and to_repo_path(name) not in known:
+             problems.append({"test": to_repo_path(name), "problem": code})
+@@ -63,6 +110,8 @@ def main():
+             problems.append({"test": t, "problem": f"fork test is {code}, not PASS"})
+     for name, code in base.items():
+         new = cand.get(name, "MISSING")
++        if new == "MISSING" and to_repo_path(name) in renamed:
++            new = by_path[renamed[to_repo_path(name)]]
+         if code == "PASS" and new != "PASS" and new not in BAD:
+             problems.append({"test": to_repo_path(name), "problem": f"regressed from PASS to {new}"})
+ 
+@@ -75,6 +124,9 @@ def main():
+     report = {"green": not problems, "totals": dict(counts), "problems": len(problems),
+               "groups": [{"dir": d, "count": len(ps), "tests": ps} for d, ps in
+                          sorted(groups.items(), key=lambda kv: -len(kv[1]))]}
++    if args.baseline_renames:
++        report["baseline_renames"] = renames
++        report["mapping_errors"] = mapping_errors
+     text = json.dumps(report, indent=2)
+     if args.out:
+         Path(args.out).write_text(text)
+diff --git a/pulp-llvm-port/steps/19/baseline-renames.json b/pulp-llvm-port/steps/19/baseline-renames.json
+new file mode 100644
+index 000000000000..6e4c338b11af
+--- /dev/null
++++ b/pulp-llvm-port/steps/19/baseline-renames.json
+@@ -0,0 +1,42 @@
++[
++  {
++    "source": "llvm/test/CodeGen/RISCV/vp-splice.ll",
++    "destination": "llvm/test/CodeGen/RISCV/rvv/vp-splice.ll",
++    "upstream_commit": "7855703194232a94d321dceea27b45cee0c91f73"
++  },
++  {
++    "source": "llvm/test/CodeGen/RISCV/vp-splice-fixed-vectors.ll",
++    "destination": "llvm/test/CodeGen/RISCV/rvv/vp-splice-fixed-vectors.ll",
++    "upstream_commit": "7855703194232a94d321dceea27b45cee0c91f73"
++  },
++  {
++    "source": "llvm/test/CodeGen/RISCV/vp-splice-mask-vectors.ll",
++    "destination": "llvm/test/CodeGen/RISCV/rvv/vp-splice-mask-vectors.ll",
++    "upstream_commit": "7855703194232a94d321dceea27b45cee0c91f73"
++  },
++  {
++    "source": "llvm/test/CodeGen/RISCV/vp-splice-mask-fixed-vectors.ll",
++    "destination": "llvm/test/CodeGen/RISCV/rvv/vp-splice-mask-fixed-vectors.ll",
++    "upstream_commit": "7855703194232a94d321dceea27b45cee0c91f73"
++  },
++  {
++    "source": "llvm/test/CodeGen/RISCV/inline-asm-S-constraint.ll",
++    "destination": "llvm/test/CodeGen/RISCV/inline-asm-s-constraint.ll",
++    "upstream_commit": "10a55caccf4e2d397f94c1455b93d774591be45f"
++  },
++  {
++    "source": "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-fround-costrained-sdnode.ll",
++    "destination": "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-fround-constrained-sdnode.ll",
++    "upstream_commit": "b13f799616939933373610c7458687ae88fa414d"
++  },
++  {
++    "source": "llvm/test/CodeGen/RISCV/rvv/fround-costrained-sdnode.ll",
++    "destination": "llvm/test/CodeGen/RISCV/rvv/fround-constrained-sdnode.ll",
++    "upstream_commit": "b13f799616939933373610c7458687ae88fa414d"
++  },
++  {
++    "source": "llvm/test/CodeGen/RISCV/rvv/trunc-sat-clip.ll",
++    "destination": "llvm/test/CodeGen/RISCV/rvv/fixed-vectors-trunc-sat-clip.ll",
++    "upstream_commit": "0afc884e874043bf5207d561ab82b107e8860d41"
++  }
++]
+diff --git a/pulp-llvm-port/tests/test_harness.py b/pulp-llvm-port/tests/test_harness.py
+index e42152872f18..4ca805ec4ddb 100755
+--- a/pulp-llvm-port/tests/test_harness.py
++++ b/pulp-llvm-port/tests/test_harness.py
+@@ -282,7 +282,7 @@ class PolicyAndIntegrateTest(unittest.TestCase):
+ 
+ 
+ class LitDiffTest(unittest.TestCase):
+-    def run_diff(self, cand, base=None):
++    def run_diff(self, cand, base=None, renames=None):
+         with tempfile.TemporaryDirectory() as tmp:
+             c = Path(tmp) / "c.json"
+             c.write_text(json.dumps({"tests": [{"name": n, "code": k} for n, k in cand.items()]}))
+@@ -293,6 +293,10 @@ class LitDiffTest(unittest.TestCase):
+                 b = Path(tmp) / "b.json"
+                 b.write_text(json.dumps({"tests": [{"name": n, "code": k} for n, k in base.items()]}))
+                 args += ["--baseline", str(b)]
++            if renames is not None:
++                m = Path(tmp) / "renames.json"
++                m.write_text(json.dumps(renames))
++                args += ["--baseline-renames", str(m)]
+             r = py("lit_diff.py", *args)
+             return r.returncode, json.loads((Path(tmp) / "o.json").read_text())
+ 
+@@ -311,6 +315,47 @@ class LitDiffTest(unittest.TestCase):
+         self.assertEqual(problems["llvm/test/MC/RISCV/rv32xssr-valid.s"], "fork test did not run")
+         self.assertEqual(problems["llvm/test/CodeGen/RISCV/add.ll"], "regressed from PASS to XFAIL")
+ 
++    def test_evidence_backed_rename_and_rejection_cases(self):
++        source = "llvm/test/CodeGen/RISCV/old.ll"
++        dest = "llvm/test/CodeGen/RISCV/new.ll"
++        base = {"LLVM :: CodeGen/RISCV/old.ll": "PASS"}
++        cand = {"LLVM :: CodeGen/RISCV/xpulp-hwloop.ll": "PASS",
++                "LLVM :: MC/RISCV/rv32xssr-valid.s": "PASS",
++                "LLVM :: CodeGen/RISCV/new.ll": "PASS"}
++        entry = {"source": source, "destination": dest, "upstream_commit": "a" * 40}
++        rc, report = self.run_diff(cand, base, [entry])
++        self.assertEqual(rc, 0, report)
++        self.assertEqual(report["baseline_renames"], [entry])
++        self.assertEqual(self.run_diff(cand, base)[0], 1)
++        for code in (None, "FAIL", "UNRESOLVED", "TIMEOUT", "XPASS", "XFAIL", "UNSUPPORTED"):
++            with self.subTest(destination=code):
++                changed = dict(cand)
++                if code is None:
++                    del changed["LLVM :: CodeGen/RISCV/new.ll"]
++                else:
++                    changed["LLVM :: CodeGen/RISCV/new.ll"] = code
++                rc, report = self.run_diff(changed, base, [entry])
++                self.assertEqual(rc, 1)
++                self.assertTrue(report["mapping_errors"])
++                if code == "FAIL":
++                    self.assertTrue(any(t["problem"] == "FAIL" for g in report["groups"] for t in g["tests"]))
++        for entries in ([entry, entry], [entry, {**entry, "source": source + "2"}],
++                        [{**entry, "upstream_commit": "missing"}],
++                        [{**entry, "source": dest}], ["invalid"]):
++            with self.subTest(entries=entries):
++                self.assertTrue(self.run_diff(cand, base, entries)[1]["mapping_errors"])
++        present = {**cand, "LLVM :: CodeGen/RISCV/old.ll": "FAIL"}
++        self.assertEqual(self.run_diff(present, base, [entry])[0], 1)
++        unrelated = {**cand, "LLVM :: CodeGen/RISCV/other.ll": "FAIL"}
++        self.assertEqual(self.run_diff(unrelated, base, [entry])[0], 1)
++        # Baseline identity mapping never waives the fork inventory requirement.
++        fork_entry = {**entry, "source": "llvm/test/CodeGen/RISCV/xpulp-hwloop.ll"}
++        missing_fork = dict(cand)
++        del missing_fork["LLVM :: CodeGen/RISCV/xpulp-hwloop.ll"]
++        rc, report = self.run_diff(missing_fork, {"LLVM :: CodeGen/RISCV/xpulp-hwloop.ll": "PASS"}, [fork_entry])
++        self.assertEqual(rc, 1)
++        self.assertTrue(any(t["problem"] == "fork test did not run" for g in report["groups"] for t in g["tests"]))
++
+ 
+ DIS_REF = """
+ 00000000 <gemm>:

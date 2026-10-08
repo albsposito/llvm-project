@@ -1,0 +1,27 @@
+{
+  "status": "ready_for_review",
+  "branch": "work/19/H001",
+  "head": "a1a15e546210bde8fff1e79074aef8b52455f2e6",
+  "tree": "dabd4ff63918c41ac8eb34c854672d1a47a1fcc2",
+  "snapshot": "79aeb169e7af",
+  "review_range": "79aeb169e7af..a1a15e546210bde8fff1e79074aef8b52455f2e6",
+  "files": [
+    "pulp-llvm-port/notes/19/H001.md",
+    "pulp-llvm-port/notes/19/H002.md",
+    "pulp-llvm-port/scripts/integrate.py",
+    "pulp-llvm-port/scripts/lit.sh",
+    "pulp-llvm-port/scripts/lit_diff.py",
+    "pulp-llvm-port/scripts/unit_report.py",
+    "pulp-llvm-port/steps/19/baseline-renames.json",
+    "pulp-llvm-port/tests/test_harness.py",
+    "pulp-llvm-port/tests/test_unit_gate.py"
+  ],
+  "patch": "tasks/19/H001-H002.patch",
+  "tests": [
+    "All 22 harness tests PASS",
+    "bash -n scripts/lit.sh PASS",
+    "Actual round 1 both mapping and unit evidence: red, six lit problems retained"
+  ],
+  "resolution": "Only conflict: adjacent lit_diff report additions; retained both baseline_renames/mapping_errors and unit result/green conjunction. Original H001/H002 notes preserved. Main untouched.",
+  "review_rejection_resolved": "H002 now includes required Upstream reference heading with harness-only applicability and source references."
+}
