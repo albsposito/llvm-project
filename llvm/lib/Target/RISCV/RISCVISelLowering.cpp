@@ -758,6 +758,12 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
       setOperationAction(ISD::UDIVREM, VT, Expand);
       setOperationAction(ISD::SMUL_LOHI, VT, Expand);
       setOperationAction(ISD::UMUL_LOHI, VT, Expand);
+      // No packed multiply-high either. Without this the generic default
+      // (Legal) lets DAGCombiner's BuildSDIV/BuildUDIV turn a vector div/rem
+      // by a constant into MULHS/MULHU, which no pattern selects ("Cannot
+      // select: v2i16 = mulhs"). Expand makes it keep the SDIV/UDIV, which is
+      // unrolled into scalar divisions by a constant.
+      setOperationAction({ISD::MULHS, ISD::MULHU}, VT, Expand);
     }
 
     setLoadExtAction(ISD::EXTLOAD, MVT::v2i16, MVT::v2i8, Expand);
