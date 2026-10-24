@@ -33,8 +33,12 @@
 // share mnemonics and some encodings, so this file uses its own decoder
 // namespace and _INX record names, the way upstream separates Zhinx from Zfh.
 //
-// Selection patterns for scalar bfloat16 (task 20/F053) are at the end of
-// this file; the packed instructions are still MC only.
+// Selection patterns for scalar bfloat16 (task 20/F053) and for the packed
+// v2f16/v2bf16 types (task 20/F060) are at the end of this file.
+//
+// The packed operands use register class GPRAV2 (the GPRs, typed v2i16,
+// v2f16 and v2bf16; RISCVRegisterInfo.td), as the Xpulpv2 pv.*.h
+// instructions do; the encoding and the assembly syntax are those of GPR.
 //
 //===----------------------------------------------------------------------===//
 
@@ -71,7 +75,12 @@ class XpulpFPFMA_AH<RISCVOpcode opcode, string opcodestr>
 defvar XpulpVFmtH = 0b10;
 defvar XpulpVFmtAH = 0b01;
 
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0, mayRaiseFPException = 1 in {
+// The packed ops that round use the dynamic rounding mode (frm): GVSoC's
+// Xfvec model and GAP9 silicon (board t10: vfcvt follows frm). They get
+// Uses = [FRM] so that they are not moved across a write of frm; the ops that
+// do not round (sign injection, min/max, compares, fclass) clear it.
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, mayRaiseFPException = 1,
+    Uses = [FRM] in {
 class XpulpVF_rr<bits<5> op, bit r, bits<2> vfmt, dag outs, dag ins,
                  string opcodestr>
     : RVInstR<{0b10, op}, {r, vfmt}, OPC_OP, outs, ins, opcodestr,
@@ -84,28 +93,29 @@ class XpulpVF_r<bits<5> op, bits<5> rs2val, bit r, bits<2> vfmt,
   let rs2 = rs2val;
 }
 
-// Ops that read rd (vfmac, vfmre, vfcpka): rd is tied, as in XCV cv.mac.
+// Ops that read rd (vfmac, vfmre): rd is tied, as in XCV cv.mac.
 let Constraints = "$rd = $rd_wb" in
 class XpulpVF_rrr<bits<5> op, bit r, bits<2> vfmt, DAGOperand rs1ty,
                   DAGOperand rs2ty, string opcodestr>
-    : RVInstR<{0b10, op}, {r, vfmt}, OPC_OP, (outs GPR:$rd_wb),
-              (ins GPR:$rd, rs1ty:$rs1, rs2ty:$rs2), opcodestr,
+    : RVInstR<{0b10, op}, {r, vfmt}, OPC_OP, (outs GPRAV2:$rd_wb),
+              (ins GPRAV2:$rd, rs1ty:$rs1, rs2ty:$rs2), opcodestr,
               "$rd, $rs1, $rs2">, Sched<[]>;
-} // hasSideEffects = 0, mayLoad = 0, mayStore = 0, mayRaiseFPException = 1
+} // hasSideEffects = 0, mayLoad = 0, mayStore = 0, mayRaiseFPException = 1,
+  // Uses = [FRM]
 
 // Plain and .r forms of a two-operand packed op. In the .r form rs2 is a
 // scalar half (low 16 bits of the GPR).
-multiclass XpulpVF_rr_m<bits<5> op, string mnemonic, DAGOperand rdty = GPR> {
+multiclass XpulpVF_rr_m<bits<5> op, string mnemonic, DAGOperand rdty = GPRAV2> {
   def _H_INX : XpulpVF_rr<op, 0, XpulpVFmtH, (outs rdty:$rd),
-                          (ins GPR:$rs1, GPR:$rs2), mnemonic # ".h">;
+                          (ins GPRAV2:$rs1, GPRAV2:$rs2), mnemonic # ".h">;
   def _R_H_INX : XpulpVF_rr<op, 1, XpulpVFmtH, (outs rdty:$rd),
-                            (ins GPR:$rs1, FPR16INX:$rs2), mnemonic # ".r.h">;
+                            (ins GPRAV2:$rs1, FPR16INX:$rs2), mnemonic # ".r.h">;
 }
-multiclass XpulpVF_rr_ah_m<bits<5> op, string mnemonic, DAGOperand rdty = GPR> {
+multiclass XpulpVF_rr_ah_m<bits<5> op, string mnemonic, DAGOperand rdty = GPRAV2> {
   def _AH_INX : XpulpVF_rr<op, 0, XpulpVFmtAH, (outs rdty:$rd),
-                           (ins GPR:$rs1, GPR:$rs2), mnemonic # ".ah">;
+                           (ins GPRAV2:$rs1, GPRAV2:$rs2), mnemonic # ".ah">;
   def _R_AH_INX : XpulpVF_rr<op, 1, XpulpVFmtAH, (outs rdty:$rd),
-                             (ins GPR:$rs1, FPR16AHINX:$rs2), mnemonic # ".r.ah">;
+                             (ins GPRAV2:$rs1, FPR16AHINX:$rs2), mnemonic # ".r.ah">;
 }
 
 //===----------------------------------------------------------------------===//
@@ -204,16 +214,18 @@ multiclass XpulpVFArith_m<bits<5> op, string mnemonic> {
   let Predicates = [HasVendorXpulpfvec, HasVendorXpulpf16alt] in
   defm NAME : XpulpVF_rr_ah_m<op, mnemonic>;
 }
-// vfmac/vfmre: rd += / -= rs1 * rs2 lane-wise; rd is read.
+// vfmac: rd = rd + rs1 * rs2 lane-wise. vfmre: rd = rs1 * rs2 - rd on GAP9
+// silicon (board-pack t8, B151); GVSoC computes rd - rs1 * rs2, which is wrong.
+// Both read rd.
 multiclass XpulpVFMac_m<bits<5> op, string mnemonic> {
   let Predicates = [HasVendorXpulpfvec, HasStdExtZhinx] in {
-  def _H_INX   : XpulpVF_rrr<op, 0, XpulpVFmtH, GPR, GPR, mnemonic # ".h">;
-  def _R_H_INX : XpulpVF_rrr<op, 1, XpulpVFmtH, GPR, FPR16INX,
+  def _H_INX   : XpulpVF_rrr<op, 0, XpulpVFmtH, GPRAV2, GPRAV2, mnemonic # ".h">;
+  def _R_H_INX : XpulpVF_rrr<op, 1, XpulpVFmtH, GPRAV2, FPR16INX,
                              mnemonic # ".r.h">;
   }
   let Predicates = [HasVendorXpulpfvec, HasVendorXpulpf16alt] in {
-  def _AH_INX   : XpulpVF_rrr<op, 0, XpulpVFmtAH, GPR, GPR, mnemonic # ".ah">;
-  def _R_AH_INX : XpulpVF_rrr<op, 1, XpulpVFmtAH, GPR, FPR16AHINX,
+  def _AH_INX   : XpulpVF_rrr<op, 0, XpulpVFmtAH, GPRAV2, GPRAV2, mnemonic # ".ah">;
+  def _R_AH_INX : XpulpVF_rrr<op, 1, XpulpVFmtAH, GPRAV2, FPR16AHINX,
                               mnemonic # ".r.ah">;
   }
 }
@@ -223,80 +235,91 @@ defm VFADD  : XpulpVFArith_m<0b00001, "vfadd">;
 defm VFSUB  : XpulpVFArith_m<0b00010, "vfsub">;
 defm VFMUL  : XpulpVFArith_m<0b00011, "vfmul">;
 defm VFDIV  : XpulpVFArith_m<0b00100, "vfdiv">;
+let Uses = []<Register> in {
 defm VFMIN  : XpulpVFArith_m<0b00101, "vfmin">;
 defm VFMAX  : XpulpVFArith_m<0b00110, "vfmax">;
+}
 defm VFMAC  : XpulpVFMac_m<0b01000, "vfmac">;
 defm VFMRE  : XpulpVFMac_m<0b01001, "vfmre">;
-let mayRaiseFPException = 0 in {
+let mayRaiseFPException = 0, Uses = []<Register> in {
 defm VFSGNJ  : XpulpVFArith_m<0b01101, "vfsgnj">;
 defm VFSGNJN : XpulpVFArith_m<0b01110, "vfsgnjn">;
 defm VFSGNJX : XpulpVFArith_m<0b01111, "vfsgnjx">;
 }
-// Compares write a lane mask to rd.
+// Compares write a lane mask to rd: 0 or 1 in each 16-bit lane on GAP9
+// silicon (board-pack t3, B99; GVSoC writes a bit mask instead).
+let Uses = []<Register> in {
 defm VFEQ : XpulpVFArith_m<0b10000, "vfeq">;
 defm VFNE : XpulpVFArith_m<0b10001, "vfne">;
 defm VFLT : XpulpVFArith_m<0b10010, "vflt">;
 defm VFGE : XpulpVFArith_m<0b10011, "vfge">;
 defm VFLE : XpulpVFArith_m<0b10100, "vfle">;
 defm VFGT : XpulpVFArith_m<0b10101, "vfgt">;
+}
 
 let Predicates = [HasVendorXpulpfvec, HasStdExtZhinx] in {
-def VFSQRT_H_INX  : XpulpVF_r<0b00111, 0b00000, 0, XpulpVFmtH, GPR, GPR,
+def VFSQRT_H_INX  : XpulpVF_r<0b00111, 0b00000, 0, XpulpVFmtH, GPRAV2, GPRAV2,
                               "vfsqrt.h">;
-let mayRaiseFPException = 0 in
-def VFCLASS_H_INX : XpulpVF_r<0b01100, 0b00001, 0, XpulpVFmtH, GPR, GPR,
+let mayRaiseFPException = 0, Uses = []<Register> in
+def VFCLASS_H_INX : XpulpVF_r<0b01100, 0b00001, 0, XpulpVFmtH, GPRAV2, GPRAV2,
                               "vfclass.h">;
 // Lane-wise binary16 <-> 16-bit integer; the r bit selects unsigned.
-def VFCVT_X_H_INX  : XpulpVF_r<0b01100, 0b00010, 0, XpulpVFmtH, GPR, GPR,
+def VFCVT_X_H_INX  : XpulpVF_r<0b01100, 0b00010, 0, XpulpVFmtH, GPRAV2, GPRAV2,
                                "vfcvt.x.h">;
-def VFCVT_XU_H_INX : XpulpVF_r<0b01100, 0b00010, 1, XpulpVFmtH, GPR, GPR,
+def VFCVT_XU_H_INX : XpulpVF_r<0b01100, 0b00010, 1, XpulpVFmtH, GPRAV2, GPRAV2,
                                "vfcvt.xu.h">;
-def VFCVT_H_X_INX  : XpulpVF_r<0b01100, 0b00011, 0, XpulpVFmtH, GPR, GPR,
+def VFCVT_H_X_INX  : XpulpVF_r<0b01100, 0b00011, 0, XpulpVFmtH, GPRAV2, GPRAV2,
                                "vfcvt.h.x">;
-def VFCVT_H_XU_INX : XpulpVF_r<0b01100, 0b00011, 1, XpulpVFmtH, GPR, GPR,
+def VFCVT_H_XU_INX : XpulpVF_r<0b01100, 0b00011, 1, XpulpVFmtH, GPRAV2, GPRAV2,
                                "vfcvt.h.xu">;
-// Rounds two floats to binary16 into the low lane of rd; the high lane of rd
-// is kept.
-def VFCPKA_H_S_INX : XpulpVF_rrr<0b11000, 0, XpulpVFmtH, FPR32INX, FPR32INX,
-                                 "vfcpka.h.s">;
+// Rounds two floats to binary16: rs1 to lane 0, rs2 to lane 1. It writes all
+// of rd (GVSoC VF_CPK; the review of 20/F040), so rd is not tied.
+def VFCPKA_H_S_INX : XpulpVF_rr<0b11000, 0, XpulpVFmtH, (outs GPRAV2:$rd),
+                                (ins FPR32INX:$rs1, FPR32INX:$rs2),
+                                "vfcpka.h.s">;
 }
 
 let Predicates = [HasVendorXpulpfvec, HasVendorXpulpf16alt] in {
-def VFSQRT_AH_INX  : XpulpVF_r<0b00111, 0b00000, 0, XpulpVFmtAH, GPR, GPR,
+def VFSQRT_AH_INX  : XpulpVF_r<0b00111, 0b00000, 0, XpulpVFmtAH, GPRAV2, GPRAV2,
                                "vfsqrt.ah">;
-let mayRaiseFPException = 0 in
-def VFCLASS_AH_INX : XpulpVF_r<0b01100, 0b00001, 0, XpulpVFmtAH, GPR, GPR,
+let mayRaiseFPException = 0, Uses = []<Register> in
+def VFCLASS_AH_INX : XpulpVF_r<0b01100, 0b00001, 0, XpulpVFmtAH, GPRAV2, GPRAV2,
                                "vfclass.ah">;
-def VFCVT_X_AH_INX  : XpulpVF_r<0b01100, 0b00010, 0, XpulpVFmtAH, GPR, GPR,
+def VFCVT_X_AH_INX  : XpulpVF_r<0b01100, 0b00010, 0, XpulpVFmtAH, GPRAV2, GPRAV2,
                                 "vfcvt.x.ah">;
-def VFCVT_XU_AH_INX : XpulpVF_r<0b01100, 0b00010, 1, XpulpVFmtAH, GPR, GPR,
+def VFCVT_XU_AH_INX : XpulpVF_r<0b01100, 0b00010, 1, XpulpVFmtAH, GPRAV2, GPRAV2,
                                 "vfcvt.xu.ah">;
-def VFCVT_AH_X_INX  : XpulpVF_r<0b01100, 0b00011, 0, XpulpVFmtAH, GPR, GPR,
+def VFCVT_AH_X_INX  : XpulpVF_r<0b01100, 0b00011, 0, XpulpVFmtAH, GPRAV2, GPRAV2,
                                 "vfcvt.ah.x">;
-def VFCVT_AH_XU_INX : XpulpVF_r<0b01100, 0b00011, 1, XpulpVFmtAH, GPR, GPR,
+def VFCVT_AH_XU_INX : XpulpVF_r<0b01100, 0b00011, 1, XpulpVFmtAH, GPRAV2, GPRAV2,
                                 "vfcvt.ah.xu">;
-def VFCPKA_AH_S_INX : XpulpVF_rrr<0b11000, 0, XpulpVFmtAH, FPR32INX, FPR32INX,
-                                  "vfcpka.ah.s">;
+def VFCPKA_AH_S_INX : XpulpVF_rr<0b11000, 0, XpulpVFmtAH, (outs GPRAV2:$rd),
+                                 (ins FPR32INX:$rs1, FPR32INX:$rs2),
+                                 "vfcpka.ah.s">;
 }
 
 // Lane-wise binary16 <-> bfloat16. The vfmt field names the destination
 // format.
 let Predicates = [HasVendorXpulpfvec, HasStdExtZhinx, HasVendorXpulpf16alt] in {
-def VFCVT_H_AH_INX : XpulpVF_r<0b01100, 0b00101, 0, XpulpVFmtH, GPR, GPR,
+def VFCVT_H_AH_INX : XpulpVF_r<0b01100, 0b00101, 0, XpulpVFmtH, GPRAV2, GPRAV2,
                                "vfcvt.h.ah">;
-def VFCVT_AH_H_INX : XpulpVF_r<0b01100, 0b00110, 0, XpulpVFmtAH, GPR, GPR,
+def VFCVT_AH_H_INX : XpulpVF_r<0b01100, 0b00110, 0, XpulpVFmtAH, GPRAV2, GPRAV2,
                                "vfcvt.ah.h">;
 }
 } // DecoderNamespace = "Xpulpfloat"
 
 // Assembler-only aliases accepted by GAP9 GNU as (see above).
 let Predicates = [HasVendorXpulpfvec, HasStdExtZhinx] in {
-def : InstAlias<"vfabs.h $rd, $rs", (VFSGNJX_H_INX GPR:$rd, GPR:$rs, GPR:$rs), 0>;
-def : InstAlias<"vfneg.h $rd, $rs", (VFSGNJN_H_INX GPR:$rd, GPR:$rs, GPR:$rs), 0>;
+def : InstAlias<"vfabs.h $rd, $rs",
+                (VFSGNJX_H_INX GPRAV2:$rd, GPRAV2:$rs, GPRAV2:$rs), 0>;
+def : InstAlias<"vfneg.h $rd, $rs",
+                (VFSGNJN_H_INX GPRAV2:$rd, GPRAV2:$rs, GPRAV2:$rs), 0>;
 }
 let Predicates = [HasVendorXpulpfvec, HasVendorXpulpf16alt] in {
-def : InstAlias<"vfabs.ah $rd, $rs", (VFSGNJX_AH_INX GPR:$rd, GPR:$rs, GPR:$rs), 0>;
-def : InstAlias<"vfneg.ah $rd, $rs", (VFSGNJN_AH_INX GPR:$rd, GPR:$rs, GPR:$rs), 0>;
+def : InstAlias<"vfabs.ah $rd, $rs",
+                (VFSGNJX_AH_INX GPRAV2:$rd, GPRAV2:$rs, GPRAV2:$rs), 0>;
+def : InstAlias<"vfneg.ah $rd, $rs",
+                (VFSGNJN_AH_INX GPRAV2:$rd, GPRAV2:$rs, GPRAV2:$rs), 0>;
 }
 
 //===----------------------------------------------------------------------===//
@@ -428,4 +451,234 @@ def : Pat<(store (bf16 FPR16AHINX:$val),
           (P_SH_rr (INSERT_SUBREG (XLenVT (IMPLICIT_DEF)), FPR16AHINX:$val,
                                   sub_16),
                    (i32 GPR:$base), (i32 GPR:$offset))>;
+}
+
+//===----------------------------------------------------------------------===//
+// Xpulpfvec: packed v2f16 / v2bf16 code generation (task 20/F060, B168)
+//===----------------------------------------------------------------------===//
+
+// GAP9 GCC's v2h (v2f16) and v2ah (v2bf16) are two 16-bit lanes in one GPR,
+// lane 0 in bits 15:0, in register class GPRAV2 (B90 decision 6.3). What is
+// selected follows GAP9 GCC, see benchmarks/fp16-design/tests/gcc_vector.s.
+// Reference: fork f94442e8f886 by Marco Fariselli (its patterns used the
+// Snitch classes and mapped fma(-a, b, c) to vfmre, which is wrong on GAP9).
+
+// A splat (both lanes the same scalar) folds into the .r form, where rs2 is
+// a scalar whose low half is used for both lanes.
+class XpulpVFSplat<ValueType VT, ValueType EltVT>
+    : PatFrag<(ops node:$s), (VT (build_vector (EltVT node:$s), (EltVT node:$s)))>;
+
+// A lane-wise binary op, plain and with a splat second operand (.r form).
+multiclass XpulpVFBinPats<SDPatternOperator Op, string Inst, ValueType VT,
+                          ValueType EltVT, DAGOperand SRC, string Sfx> {
+  def : Pat<(VT (Op GPRAV2:$rs1, GPRAV2:$rs2)),
+            (!cast<Instruction>(Inst # "_" # Sfx # "_INX") GPRAV2:$rs1,
+                                                            GPRAV2:$rs2)>;
+  def : Pat<(VT (Op GPRAV2:$rs1, (XpulpVFSplat<VT, EltVT> SRC:$rs2))),
+            (!cast<Instruction>(Inst # "_R_" # Sfx # "_INX") GPRAV2:$rs1,
+                                                              SRC:$rs2)>;
+}
+
+multiclass XpulpVFArithPats<ValueType VT, ValueType EltVT, DAGOperand SRC,
+                            string Sfx> {
+  defvar Splat = XpulpVFSplat<VT, EltVT>;
+  // The commuted .r forms (splat on the left of fadd, fmul, fmin, fmax) are
+  // generated by TableGen, because those nodes are commutative.
+  defm : XpulpVFBinPats<fadd, "VFADD", VT, EltVT, SRC, Sfx>;
+  defm : XpulpVFBinPats<fsub, "VFSUB", VT, EltVT, SRC, Sfx>;
+  defm : XpulpVFBinPats<fmul, "VFMUL", VT, EltVT, SRC, Sfx>;
+  defm : XpulpVFBinPats<fminnum, "VFMIN", VT, EltVT, SRC, Sfx>;
+  defm : XpulpVFBinPats<fmaxnum, "VFMAX", VT, EltVT, SRC, Sfx>;
+  defm : XpulpVFBinPats<fminimumnum, "VFMIN", VT, EltVT, SRC, Sfx>;
+  defm : XpulpVFBinPats<fmaximumnum, "VFMAX", VT, EltVT, SRC, Sfx>;
+
+  // Sign operations only move the sign bits (GAP9 GCC: vfneg.h, vfabs.h).
+  defvar SGNJ = !cast<Instruction>("VFSGNJ_" # Sfx # "_INX");
+  defvar SGNJN = !cast<Instruction>("VFSGNJN_" # Sfx # "_INX");
+  defvar SGNJX = !cast<Instruction>("VFSGNJX_" # Sfx # "_INX");
+  def : Pat<(VT (fneg GPRAV2:$rs1)), (SGNJN GPRAV2:$rs1, GPRAV2:$rs1)>;
+  def : Pat<(VT (fabs GPRAV2:$rs1)), (SGNJX GPRAV2:$rs1, GPRAV2:$rs1)>;
+  def : Pat<(VT (fcopysign GPRAV2:$rs1, (VT GPRAV2:$rs2))),
+            (SGNJ GPRAV2:$rs1, GPRAV2:$rs2)>;
+  def : Pat<(VT (fcopysign GPRAV2:$rs1, (VT (fneg GPRAV2:$rs2)))),
+            (SGNJN GPRAV2:$rs1, GPRAV2:$rs2)>;
+
+  // Fused multiply-add. vfmac rd, rs1, rs2 is rd + rs1*rs2 (tied
+  // accumulator). vfmre rd, rs1, rs2 is rs1*rs2 - rd on GAP9 silicon (B151,
+  // board-pack t8), so it is selected for a*b - c only; c - a*b is
+  // vfmac(c, -a, b). GVSoC computes vfmre as rd - rs1*rs2 and cannot check
+  // these patterns.
+  defvar MAC = !cast<Instruction>("VFMAC_" # Sfx # "_INX");
+  defvar MACR = !cast<Instruction>("VFMAC_R_" # Sfx # "_INX");
+  defvar MRE = !cast<Instruction>("VFMRE_" # Sfx # "_INX");
+  defvar MRER = !cast<Instruction>("VFMRE_R_" # Sfx # "_INX");
+  def : Pat<(VT (fma GPRAV2:$rs1, GPRAV2:$rs2, GPRAV2:$rd)),
+            (MAC GPRAV2:$rd, GPRAV2:$rs1, GPRAV2:$rs2)>;
+  def : Pat<(VT (fma GPRAV2:$rs1, (Splat SRC:$rs2), GPRAV2:$rd)),
+            (MACR GPRAV2:$rd, GPRAV2:$rs1, SRC:$rs2)>;
+  def : Pat<(VT (fma GPRAV2:$rs1, GPRAV2:$rs2, (VT (fneg GPRAV2:$rd)))),
+            (MRE GPRAV2:$rd, GPRAV2:$rs1, GPRAV2:$rs2)>;
+  def : Pat<(VT (fma GPRAV2:$rs1, (Splat SRC:$rs2), (VT (fneg GPRAV2:$rd)))),
+            (MRER GPRAV2:$rd, GPRAV2:$rs1, SRC:$rs2)>;
+
+  // Two scalars into one register: lane 0 is the first operand, so it goes
+  // to the second (low) source of pv.pack.h (GAP9 GCC: pv.pack.h a0,a1,a0).
+  // A splat is the same instruction with one register twice.
+  def : Pat<(VT (build_vector (EltVT SRC:$lo), (EltVT SRC:$hi))),
+            (PV_PACK_H (INSERT_SUBREG (XLenVT (IMPLICIT_DEF)), SRC:$hi, sub_16),
+                       (INSERT_SUBREG (XLenVT (IMPLICIT_DEF)), SRC:$lo, sub_16))>;
+
+  // Lane 0 is the low half of the register, so it needs no instruction (as
+  // in GAP9 GCC). Lane 1 is shifted down. A scalar half-precision value only uses the low
+  // 16 bits of its register. A run-time lane number is custom-lowered
+  // (RISCVISelLowering.cpp) to a shift.
+  def : Pat<(EltVT (vector_extract (VT GPRAV2:$rs1), 0)),
+            (EltVT (EXTRACT_SUBREG GPRAV2:$rs1, sub_16))>;
+  def : Pat<(EltVT (vector_extract (VT GPRAV2:$rs1), 1)),
+            (EltVT (EXTRACT_SUBREG
+                       (i32 (SRLI (i32 (COPY_TO_REGCLASS GPRAV2:$rs1, GPR)), 16)),
+                       sub_16))>;
+
+  // Bitcasts: every 32-bit packed type and i32 is the same GPR.
+  def : Pat<(VT (bitconvert (i32 GPR:$rs1))), (COPY_TO_REGCLASS GPR:$rs1, GPRAV2)>;
+  def : Pat<(i32 (bitconvert (VT GPRAV2:$rs1))), (COPY_TO_REGCLASS GPRAV2:$rs1, GPR)>;
+  def : Pat<(VT (bitconvert (v4i8 GPRAV4:$rs1))), (COPY_TO_REGCLASS GPRAV4:$rs1, GPRAV2)>;
+  def : Pat<(v4i8 (bitconvert (VT GPRAV2:$rs1))), (COPY_TO_REGCLASS GPRAV2:$rs1, GPRAV4)>;
+  def : Pat<(VT (bitconvert (f32 FPR32INX:$rs1))),
+            (INSERT_SUBREG (VT (IMPLICIT_DEF)), FPR32INX:$rs1, sub_32)>;
+  def : Pat<(f32 (bitconvert (VT GPRAV2:$rs1))), (EXTRACT_SUBREG GPRAV2:$rs1, sub_32)>;
+  def : Pat<(VT (bitconvert (v2i16 GPRAV2:$rs1))), (VT GPRAV2:$rs1)>;
+  def : Pat<(v2i16 (bitconvert (VT GPRAV2:$rs1))), (v2i16 GPRAV2:$rs1)>;
+
+  // Two floats rounded into one register: vfcpka (rs1 to lane 0, rs2 to
+  // lane 1, as GAP9 GCC for (v2h){(float16)x, (float16)y}). It writes all of
+  // rd, so nothing is tied.
+  def : Pat<(VT (build_vector (EltVT (fpround (f32 FPR32INX:$rs1))),
+                              (EltVT (fpround (f32 FPR32INX:$rs2))))),
+            (!cast<Instruction>("VFCPKA_" # Sfx # "_S_INX") FPR32INX:$rs1,
+                                                             FPR32INX:$rs2)>;
+
+  // Lane moves. Shuffles and constant-lane inserts reach instruction
+  // selection as BUILD_VECTORs of lane extracts (RISCVISelLowering.cpp).
+  // pv.shuffle.sci.h takes the lane 0 selector from immediate bit 0 and the
+  // lane 1 selector from bit 1 (B114), so <1,0> is 1 and <1,1> is 3 (GAP9
+  // GCC: pv.shuffle.sci.h a0,a0,1 for the swap). pv.insert.h rd, rs1, i
+  // writes the low half of rs1 into lane i of rd and keeps the other lane.
+  let AddedComplexity = 10 in {
+  def : Pat<(VT (build_vector (EltVT (vector_extract (VT GPRAV2:$rs1), 1)),
+                              (EltVT (vector_extract (VT GPRAV2:$rs1), 0)))),
+            (VT (PV_SHUFFLE_SCI_H GPRAV2:$rs1, 1))>;
+  def : Pat<(VT (build_vector (EltVT (vector_extract (VT GPRAV2:$rs1), 1)),
+                              (EltVT (vector_extract (VT GPRAV2:$rs1), 1)))),
+            (VT (PV_SHUFFLE_SCI_H GPRAV2:$rs1, 3))>;
+  def : Pat<(VT (build_vector (EltVT (vector_extract (VT GPRAV2:$rs1), 0)),
+                              (EltVT (vector_extract (VT GPRAV2:$rd), 1)))),
+            (VT (PV_INSERT_H GPRAV2:$rd,
+                             (i32 (COPY_TO_REGCLASS GPRAV2:$rs1, GPR)), 0))>;
+  }
+  def : Pat<(VT (build_vector (EltVT SRC:$rs1),
+                              (EltVT (vector_extract (VT GPRAV2:$rd), 1)))),
+            (VT (PV_INSERT_H GPRAV2:$rd,
+                             (INSERT_SUBREG (XLenVT (IMPLICIT_DEF)), SRC:$rs1,
+                                            sub_16), 0))>;
+  def : Pat<(VT (build_vector (EltVT (vector_extract (VT GPRAV2:$rd), 0)),
+                              (EltVT SRC:$rs1))),
+            (VT (PV_INSERT_H GPRAV2:$rd,
+                             (INSERT_SUBREG (XLenVT (IMPLICIT_DEF)), SRC:$rs1,
+                                            sub_16), 1))>;
+
+  // 16-bit integer lanes to float lanes; rounding as the scalar fcvt.
+  def : Pat<(VT (sint_to_fp (v2i16 GPRAV2:$rs1))),
+            (!cast<Instruction>("VFCVT_" # Sfx # "_X_INX") GPRAV2:$rs1)>;
+  def : Pat<(VT (uint_to_fp (v2i16 GPRAV2:$rs1))),
+            (!cast<Instruction>("VFCVT_" # Sfx # "_XU_INX") GPRAV2:$rs1)>;
+}
+
+// Compares. GAP9 silicon writes 0 or 1 into each 16-bit lane (B99,
+// board-pack t3; GVSoC writes a bit mask instead and cannot check these),
+// and a v2i16 boolean lane is 0 or -1: 0 - r for a condition the
+// instruction computes (pv.sub.h), r - 1 for its inverse (pv.add.sci.h).
+// Every compare, vfne included, is false when a lane is NaN (silicon,
+// board t14 2026-10-24: UNE from vfne and UO from vfne(a,a) failed), so
+// vfne is only used for NE without NaNs, and the unordered conditions are
+// inverses of ordered ones: UNE = not OEQ, UGE/UGT/ULE/ULT = not
+// OLT/OLE/OGT/OGE, UEQ = not ONE, UO = not O. ONE combines vflt and vfgt,
+// O is vfeq(a,a) and vfeq(b,b), on the 0/1 lanes before the final step.
+multiclass XpulpVFCmpPat<CondCode CC, string Inst, ValueType VT, string Sfx> {
+  def : Pat<(v2i16 (setcc (VT GPRAV2:$rs1), (VT GPRAV2:$rs2), CC)),
+            (PV_SUB_H (v2i16 X0),
+                      (v2i16 (!cast<Instruction>(Inst # "_" # Sfx # "_INX")
+                                  GPRAV2:$rs1, GPRAV2:$rs2)))>;
+}
+multiclass XpulpVFCmpInvPat<CondCode CC, string Inst, ValueType VT,
+                            string Sfx> {
+  def : Pat<(v2i16 (setcc (VT GPRAV2:$rs1), (VT GPRAV2:$rs2), CC)),
+            (PV_ADD_SCI_H
+                 (v2i16 (!cast<Instruction>(Inst # "_" # Sfx # "_INX")
+                             GPRAV2:$rs1, GPRAV2:$rs2)), -1)>;
+}
+multiclass XpulpVFCmpPats<ValueType VT, string Sfx> {
+  defm : XpulpVFCmpPat<SETOEQ, "VFEQ", VT, Sfx>;
+  defm : XpulpVFCmpPat<SETEQ, "VFEQ", VT, Sfx>;
+  defm : XpulpVFCmpInvPat<SETUNE, "VFEQ", VT, Sfx>;
+  defm : XpulpVFCmpPat<SETNE, "VFNE", VT, Sfx>;
+  defm : XpulpVFCmpPat<SETOLT, "VFLT", VT, Sfx>;
+  defm : XpulpVFCmpPat<SETLT, "VFLT", VT, Sfx>;
+  defm : XpulpVFCmpPat<SETOLE, "VFLE", VT, Sfx>;
+  defm : XpulpVFCmpPat<SETLE, "VFLE", VT, Sfx>;
+  defm : XpulpVFCmpPat<SETOGT, "VFGT", VT, Sfx>;
+  defm : XpulpVFCmpPat<SETGT, "VFGT", VT, Sfx>;
+  defm : XpulpVFCmpPat<SETOGE, "VFGE", VT, Sfx>;
+  defm : XpulpVFCmpPat<SETGE, "VFGE", VT, Sfx>;
+  defm : XpulpVFCmpInvPat<SETUGE, "VFLT", VT, Sfx>;
+  defm : XpulpVFCmpInvPat<SETUGT, "VFLE", VT, Sfx>;
+  defm : XpulpVFCmpInvPat<SETULE, "VFGT", VT, Sfx>;
+  defm : XpulpVFCmpInvPat<SETULT, "VFGE", VT, Sfx>;
+
+  defvar LT = !cast<Instruction>("VFLT_" # Sfx # "_INX");
+  defvar GT = !cast<Instruction>("VFGT_" # Sfx # "_INX");
+  defvar EQ = !cast<Instruction>("VFEQ_" # Sfx # "_INX");
+  def : Pat<(v2i16 (setcc (VT GPRAV2:$rs1), (VT GPRAV2:$rs2), SETONE)),
+            (PV_SUB_H (v2i16 X0),
+                      (PV_OR_H (v2i16 (LT GPRAV2:$rs1, GPRAV2:$rs2)),
+                               (v2i16 (GT GPRAV2:$rs1, GPRAV2:$rs2))))>;
+  def : Pat<(v2i16 (setcc (VT GPRAV2:$rs1), (VT GPRAV2:$rs2), SETUEQ)),
+            (PV_ADD_SCI_H
+                 (PV_OR_H (v2i16 (LT GPRAV2:$rs1, GPRAV2:$rs2)),
+                          (v2i16 (GT GPRAV2:$rs1, GPRAV2:$rs2))), -1)>;
+  def : Pat<(v2i16 (setcc (VT GPRAV2:$rs1), (VT GPRAV2:$rs2), SETO)),
+            (PV_SUB_H (v2i16 X0),
+                      (PV_AND_H (v2i16 (EQ GPRAV2:$rs1, GPRAV2:$rs1)),
+                                (v2i16 (EQ GPRAV2:$rs2, GPRAV2:$rs2))))>;
+  def : Pat<(v2i16 (setcc (VT GPRAV2:$rs1), (VT GPRAV2:$rs2), SETUO)),
+            (PV_ADD_SCI_H
+                 (PV_AND_H (v2i16 (EQ GPRAV2:$rs1, GPRAV2:$rs1)),
+                           (v2i16 (EQ GPRAV2:$rs2, GPRAV2:$rs2))), -1)>;
+}
+
+let Predicates = [HasVendorXpulpfvec, HasStdExtZhinx] in {
+defm : XpulpVFArithPats<v2f16, f16, FPR16INX, "H">;
+defm : XpulpVFCmpPats<v2f16, "H">;
+}
+let Predicates = [HasVendorXpulpfvec, HasVendorXpulpf16alt] in {
+defm : XpulpVFArithPats<v2bf16, bf16, FPR16AHINX, "AH">;
+defm : XpulpVFCmpPats<v2bf16, "AH">;
+}
+let Predicates = [HasVendorXpulpfvec, HasStdExtZhinx, HasVendorXpulpf16alt] in {
+def : Pat<(v2f16 (bitconvert (v2bf16 GPRAV2:$rs1))), (v2f16 GPRAV2:$rs1)>;
+def : Pat<(v2bf16 (bitconvert (v2f16 GPRAV2:$rs1))), (v2bf16 GPRAV2:$rs1)>;
+// v2f16 <-> v2bf16. Clang converts each lane through float (exact), so one
+// vfcvt rounds the same way (GAP9 GCC: vfcvt.ah.h for the conversion).
+def : Pat<(v2bf16 (build_vector
+              (bf16 (fpround (f32 (fpextend
+                  (f16 (vector_extract (v2f16 GPRAV2:$rs1), 0)))))),
+              (bf16 (fpround (f32 (fpextend
+                  (f16 (vector_extract (v2f16 GPRAV2:$rs1), 1)))))))),
+          (VFCVT_AH_H_INX GPRAV2:$rs1)>;
+def : Pat<(v2f16 (build_vector
+              (f16 (fpround (f32 (fpextend
+                  (bf16 (vector_extract (v2bf16 GPRAV2:$rs1), 0)))))),
+              (f16 (fpround (f32 (fpextend
+                  (bf16 (vector_extract (v2bf16 GPRAV2:$rs1), 1)))))))),
+          (VFCVT_H_AH_INX GPRAV2:$rs1)>;
 }
