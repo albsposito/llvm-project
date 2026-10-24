@@ -361,6 +361,45 @@ bool PULPFixupHwLoops::fixupLoopLayout(MachineFunction &MF) {
 
     Changed = true;
   }
+
+  // The repeated range starts at the instruction after lp.setup, so the
+  // loop header must be the layout successor of the block holding the setup
+  // instruction (the preheader chosen by PULPHardwareLoops). Block placement
+  // may lay the preheader out after the loop (it is reached through a
+  // branch, e.g. when it is the "else" side of a test in an outer loop); the
+  // setup then names an end address before itself, which the assembler
+  // rejects ("fixup value out of range", B164), and the range would not hold
+  // the loop anyway. Move the preheader right before the header (or, for the
+  // entry block, which cannot move, split the setup off into a block of its
+  // own and move that). Only the layout changes; broken fallthroughs become
+  // branches. Same approach as the latch move above and
+  // ARMBlockPlacement::moveBasicBlock, which moves a WLS target block so that
+  // its branch is forward.
+  for (MachineInstr *MI : Setups) {
+    MachineBasicBlock *SetupMBB = MI->getParent();
+    MachineLoop *L = MLI->getLoopFor(MI->getOperand(0).getMBB());
+    MachineBasicBlock *Header = L->getHeader();
+    if (SetupMBB->isLayoutSuccessor(Header))
+      continue;
+    // The preheader branches to the header only (fixupLoopPreheader relies on
+    // the same); anything else is left as it is.
+    if (SetupMBB->succ_size() != 1 || !SetupMBB->isSuccessor(Header))
+      continue;
+    MachineBasicBlock *Move = SetupMBB;
+    if (SetupMBB == &MF.front()) {
+      Move = splitMBBAt(SetupMBB, *MI);
+      if (Move == SetupMBB)
+        continue;
+    }
+    MachineBasicBlock *BeforeMove = Move->getPrevNode();
+    MachineBasicBlock *AfterMove = Move->getNextNode();
+    MachineBasicBlock *BeforeHeader = Header->getPrevNode();
+    Move->moveBefore(Header);
+    keepFallthrough(BeforeMove, Move, TII);
+    keepFallthrough(Move, AfterMove, TII);
+    keepFallthrough(BeforeHeader, Header, TII);
+    Changed = true;
+  }
   return Changed;
 }
 
