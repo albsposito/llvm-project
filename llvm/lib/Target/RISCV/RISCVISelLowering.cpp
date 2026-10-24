@@ -128,6 +128,9 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
     addRegisterClass(MVT::f64, &RISCV::FPR64RegClass);
   if (Subtarget.hasStdExtZhinxmin())
     addRegisterClass(MVT::f16, &RISCV::GPRF16RegClass);
+  // GAP9 float16alt: bfloat16 in the low half of a GPR, like Zhinx's f16.
+  if (Subtarget.hasVendorXpulpf16alt())
+    addRegisterClass(MVT::bf16, &RISCV::GPRBF16RegClass);
   if (Subtarget.hasStdExtZfinx())
     addRegisterClass(MVT::f32, &RISCV::GPRF32RegClass);
   if (Subtarget.hasStdExtZdinx()) {
@@ -522,6 +525,61 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
       setOperationAction(ISD::FPOWI, MVT::i32, Custom);
   }
 
+  // GAP9 Xpulpf16alt (float16alt = bfloat16 in a GPR, task 20/F053). Set up
+  // like f16 with Zhinx above, minus what the .ah instructions cannot do:
+  // they always round to nearest-even and have no rounding-mode field, so
+  // the ops that need a static rounding mode (lround, ceil/floor/trunc/round,
+  // quiet strict compares) are computed on f32, which is exact for them.
+  // fneg/fabs/fcopysign are Legal and select fsgnjn/fsgnjx/fsgnj.ah, which
+  // only move the sign bit (NaN payloads, signalling ones included, are
+  // kept), as GAP9 GCC's fneg.ah/fabs.ah; they never go through f32.
+  if (Subtarget.hasVendorXpulpf16alt()) {
+    setOperationAction({ISD::FMINNUM, ISD::FMAXNUM, ISD::FMINIMUMNUM,
+                        ISD::FMAXIMUMNUM, ISD::FCANONICALIZE, ISD::STRICT_FADD,
+                        ISD::STRICT_FSUB, ISD::STRICT_FMUL, ISD::STRICT_FDIV,
+                        ISD::STRICT_FSQRT, ISD::STRICT_FMA},
+                       MVT::bf16, Legal);
+    setOperationAction({ISD::LROUND, ISD::LLROUND, ISD::LRINT, ISD::LLRINT,
+                        ISD::STRICT_LROUND, ISD::STRICT_LLROUND,
+                        ISD::STRICT_LRINT, ISD::STRICT_LLRINT},
+                       MVT::bf16, Custom);
+    setOperationAction({ISD::STRICT_FSETCC, ISD::STRICT_FSETCCS}, MVT::bf16,
+                       Promote);
+    setOperationAction(FPRndMode, MVT::bf16, Promote);
+    setOperationAction({ISD::FNEARBYINT, ISD::FMAXIMUM, ISD::FMINIMUM},
+                       MVT::bf16, Promote);
+    setOperationAction({ISD::FREM, ISD::FPOW, ISD::FPOWI, ISD::FCOS,
+                        ISD::FSIN, ISD::FSINCOS, ISD::FEXP, ISD::FEXP2,
+                        ISD::FEXP10, ISD::FLOG, ISD::FLOG2, ISD::FLOG10,
+                        ISD::FLDEXP, ISD::FFREXP, ISD::FTAN, ISD::FACOS,
+                        ISD::FASIN, ISD::FATAN, ISD::FCOSH, ISD::FSINH,
+                        ISD::FTANH, ISD::FATAN2, ISD::FCBRT},
+                       MVT::bf16, Promote);
+    setOperationAction({ISD::STRICT_FCEIL, ISD::STRICT_FFLOOR,
+                        ISD::STRICT_FNEARBYINT, ISD::STRICT_FRINT,
+                        ISD::STRICT_FROUND, ISD::STRICT_FROUNDEVEN,
+                        ISD::STRICT_FTRUNC, ISD::STRICT_FLDEXP},
+                       MVT::bf16, Promote);
+    setCondCodeAction(FPCCToExpand, MVT::bf16, Expand);
+    setOperationAction(ISD::SELECT_CC, MVT::bf16, Expand);
+    setOperationAction(ISD::SELECT, MVT::bf16, Custom);
+    setOperationAction(ISD::BR_CC, MVT::bf16, Expand);
+    setOperationAction(ISD::BITCAST, MVT::i16, Custom);
+    setOperationAction(ISD::STRICT_FP_ROUND, MVT::bf16, Legal);
+    setOperationAction(ISD::STRICT_FP_EXTEND, MVT::f32, Legal);
+    // There is no i64 <-> bfloat16 libcall: i64 -> bf16 goes through f32 (as
+    // LLVM does for a soft-promoted bf16), bf16 -> i64 is extended to f32 by
+    // the type legalizer. GAP9 GCC calls __floatdiohf / __fixohfdi, which
+    // GAP9's libgcc does not have.
+    if (!Subtarget.is64Bit())
+      setOperationAction({ISD::SINT_TO_FP, ISD::UINT_TO_FP,
+                          ISD::STRICT_SINT_TO_FP, ISD::STRICT_UINT_TO_FP},
+                         MVT::i64, Custom);
+    // double -> bfloat16: GAP9 libgcc's name for __truncdfbf2 (GAP9 GCC
+    // calls it too). bf16 -> double is fcvt.s.ah + __extendsfdf2 (exact).
+    setLibcallName(RTLIB::FPROUND_F64_BF16, "__truncdfohf2");
+  }
+
   if (Subtarget.hasStdExtFOrZfinx()) {
     setOperationAction(FPLegalNodeTypes, MVT::f32, Legal);
     setOperationAction(FPRndMode, MVT::f32,
@@ -748,6 +806,10 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
     // advanced by the store loses its hardware loop and gets slower.
     if (Subtarget.hasStdExtZfinx())
       setIndexedLoadAction(ISD::POST_INC, MVT::f32, Legal);
+    // float16alt lives in a GPR too: p.lhu with post-increment, as GAP9 GCC.
+    // Stores stay unindexed for the same hardware-loop reason as f32.
+    if (Subtarget.hasVendorXpulpf16alt())
+      setIndexedLoadAction(ISD::POST_INC, MVT::bf16, Legal);
   }
 
   setBooleanContents(ZeroOrOneBooleanContent);
@@ -2288,7 +2350,7 @@ bool RISCVTargetLowering::isFPImmLegal(const APFloat &Imm, EVT VT,
   else if (VT == MVT::f64)
     IsLegalVT = Subtarget.hasStdExtDOrZdinx();
   else if (VT == MVT::bf16)
-    IsLegalVT = Subtarget.hasStdExtZfbfmin();
+    IsLegalVT = Subtarget.hasStdExtZfbfmin() || Subtarget.hasVendorXpulpf16alt();
 
   if (!IsLegalVT)
     return false;
@@ -3003,10 +3065,20 @@ InstructionCost RISCVTargetLowering::getVSlideVICost(MVT VT) const {
 static SDValue lowerINT_TO_FP(SDValue Op, SelectionDAG &DAG,
                               const RISCVSubtarget &Subtarget) {
   // f16 conversions are promoted to f32 when Zfh/Zhinx are not supported.
-  // bf16 conversions are always promoted to f32.
+  // bf16 conversions are promoted to f32, except with Xpulpf16alt
+  // (fcvt.ah.w[u]) from a legal integer type.
+  bool IsStrict = Op->isStrictFPOpcode();
+  EVT SrcVT = Op.getOperand(IsStrict ? 1 : 0).getValueType();
+  bool SrcIsLegal = SrcVT.bitsLE(Subtarget.getXLenVT());
+  if (Op.getValueType() == MVT::bf16 && Subtarget.hasVendorXpulpf16alt() &&
+      SrcIsLegal)
+    return Op;
+  // Xpulpf16alt sets i64 [SU]INT_TO_FP Custom on RV32 for the bf16 case
+  // only; leave every other result type to the default expansion.
+  if (!SrcIsLegal && Op.getValueType() != MVT::bf16)
+    return SDValue();
   if ((Op.getValueType() == MVT::f16 && !Subtarget.hasStdExtZfhOrZhinx()) ||
       Op.getValueType() == MVT::bf16) {
-    bool IsStrict = Op->isStrictFPOpcode();
 
     SDLoc DL(Op);
     if (IsStrict) {
@@ -3146,9 +3218,13 @@ static SDValue lowerFP_TO_INT(SDValue Op, SelectionDAG &DAG,
   SDValue SrcVal = Op.getOperand(IsStrict ? 1 : 0);
 
   // f16 conversions are promoted to f32 when Zfh/Zhinx is not enabled.
-  // bf16 conversions are always promoted to f32.
+  // bf16 conversions are promoted to f32, except with Xpulpf16alt: GAP9 GCC
+  // converts float16alt to int with fcvt.w[u].ah, which rounds to nearest
+  // (the .ah ops have no rounding-mode field), not toward zero; owner
+  // decision D6 (Q1) is to match GCC.
   if ((SrcVal.getValueType() == MVT::f16 && !Subtarget.hasStdExtZfhOrZhinx()) ||
-      SrcVal.getValueType() == MVT::bf16) {
+      (SrcVal.getValueType() == MVT::bf16 &&
+       !Subtarget.hasVendorXpulpf16alt())) {
     SDLoc DL(Op);
     if (IsStrict) {
       SDValue Ext =
@@ -6846,7 +6922,8 @@ SDValue RISCVTargetLowering::LowerOperation(SDValue Op,
     MVT XLenVT = Subtarget.getXLenVT();
     if (Op0VT == MVT::i16 &&
         ((VT == MVT::f16 && Subtarget.hasStdExtZfhminOrZhinxmin()) ||
-         (VT == MVT::bf16 && Subtarget.hasStdExtZfbfmin()))) {
+         (VT == MVT::bf16 && (Subtarget.hasStdExtZfbfmin() ||
+                              Subtarget.hasVendorXpulpf16alt())))) {
       SDValue NewOp0 = DAG.getNode(ISD::ANY_EXTEND, DL, XLenVT, Op0);
       return DAG.getNode(RISCVISD::FMV_H_X, DL, VT, NewOp0);
     }
@@ -7305,7 +7382,8 @@ SDValue RISCVTargetLowering::LowerOperation(SDValue Op,
     [[fallthrough]];
   case ISD::LROUND:
   case ISD::LLROUND: {
-    assert(Op.getOperand(0).getValueType() == MVT::f16 &&
+    assert((Op.getOperand(0).getValueType() == MVT::f16 ||
+            Op.getOperand(0).getValueType() == MVT::bf16) &&
            "Unexpected custom legalisation");
     SDLoc DL(Op);
     SDValue Ext = DAG.getNode(ISD::FP_EXTEND, DL, MVT::f32, Op.getOperand(0));
@@ -7315,7 +7393,8 @@ SDValue RISCVTargetLowering::LowerOperation(SDValue Op,
   case ISD::STRICT_LLRINT:
   case ISD::STRICT_LROUND:
   case ISD::STRICT_LLROUND: {
-    assert(Op.getOperand(1).getValueType() == MVT::f16 &&
+    assert((Op.getOperand(1).getValueType() == MVT::f16 ||
+            Op.getOperand(1).getValueType() == MVT::bf16) &&
            "Unexpected custom legalisation");
     SDLoc DL(Op);
     SDValue Ext = DAG.getNode(ISD::STRICT_FP_EXTEND, DL, {MVT::f32, MVT::Other},
@@ -13779,7 +13858,8 @@ void RISCVTargetLowering::ReplaceNodeResults(SDNode *N,
     MVT XLenVT = Subtarget.getXLenVT();
     if (VT == MVT::i16 &&
         ((Op0VT == MVT::f16 && Subtarget.hasStdExtZfhminOrZhinxmin()) ||
-         (Op0VT == MVT::bf16 && Subtarget.hasStdExtZfbfmin()))) {
+         (Op0VT == MVT::bf16 && (Subtarget.hasStdExtZfbfmin() ||
+                                 Subtarget.hasVendorXpulpf16alt())))) {
       SDValue FPConv = DAG.getNode(RISCVISD::FMV_X_ANYEXTH, DL, XLenVT, Op0);
       Results.push_back(DAG.getNode(ISD::TRUNCATE, DL, MVT::i16, FPConv));
     } else if (VT == MVT::i32 && Op0VT == MVT::f32 && Subtarget.is64Bit() &&
@@ -19819,6 +19899,7 @@ static bool isSelectPseudo(MachineInstr &MI) {
   case RISCV::Select_GPR_Using_CC_Imm:
   case RISCV::Select_FPR16_Using_CC_GPR:
   case RISCV::Select_FPR16INX_Using_CC_GPR:
+  case RISCV::Select_FPR16AHINX_Using_CC_GPR:
   case RISCV::Select_FPR32_Using_CC_GPR:
   case RISCV::Select_FPR32INX_Using_CC_GPR:
   case RISCV::Select_FPR64_Using_CC_GPR:
@@ -20338,6 +20419,7 @@ RISCVTargetLowering::EmitInstrWithCustomInserter(MachineInstr &MI,
   case RISCV::Select_GPR_Using_CC_Imm:
   case RISCV::Select_FPR16_Using_CC_GPR:
   case RISCV::Select_FPR16INX_Using_CC_GPR:
+  case RISCV::Select_FPR16AHINX_Using_CC_GPR:
   case RISCV::Select_FPR32_Using_CC_GPR:
   case RISCV::Select_FPR32INX_Using_CC_GPR:
   case RISCV::Select_FPR64_Using_CC_GPR:
@@ -22331,9 +22413,11 @@ bool RISCVTargetLowering::getIndexedAddressPartsPulp(
 
   // Xpulp supports i8, i16, and i32 post-increments, plus f32 loads when Zfinx
   // keeps floats in GPRs (selected onto the same p.lw instructions; f32 stores
-  // are rejected earlier because their indexed store action is not Legal).
+  // are rejected earlier because their indexed store action is not Legal), and
+  // bf16 loads with Xpulpf16alt (p.lhu, likewise loads only).
   if (!(VT == MVT::i8 || VT == MVT::i16 || VT == MVT::i32 ||
-        (VT == MVT::f32 && Subtarget.hasStdExtZfinx())))
+        (VT == MVT::f32 && Subtarget.hasStdExtZfinx()) ||
+        (VT == MVT::bf16 && Subtarget.hasVendorXpulpf16alt())))
     return false;
 
   Base = Op->getOperand(0);
@@ -22437,6 +22521,8 @@ bool RISCVTargetLowering::isFMAFasterThanFMulAndFAdd(const MachineFunction &MF,
   case MVT::f16:
     return VT.isVector() ? Subtarget.hasVInstructionsF16()
                          : Subtarget.hasStdExtZfhOrZhinx();
+  case MVT::bf16:
+    return !VT.isVector() && Subtarget.hasVendorXpulpf16alt();
   case MVT::f32:
     return Subtarget.hasStdExtFOrZfinx();
   case MVT::f64:
