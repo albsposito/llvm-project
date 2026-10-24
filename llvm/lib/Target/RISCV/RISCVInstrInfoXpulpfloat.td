@@ -416,9 +416,9 @@ def : Pat<(f16 (fcopysign FPR16INX:$rs1, (bf16 FPR16AHINX:$rs2))),
 
 // Xpulpv2 addressing: register + register (p.lhu / p.sh). Post-increment
 // loads (p.lhu rd, 2(rs1!), as GAP9 GCC) are selected in
-// RISCVISelDAGToDAG.cpp (tryPulpIndexedLoad). Post-increment stores are not
-// enabled, as for f32 (RISCVISelLowering.cpp): the PULP hardware-loop pass
-// does not take a post-increment store as the loop's induction update.
+// RISCVISelDAGToDAG.cpp (tryPulpIndexedLoad); post-increment stores
+// (p.sh rs2, 2(rs1!), as GAP9 GCC) are selected below, like f16/f32 in
+// RISCVInstrInfoXpulp.td.
 let Predicates = [HasVendorXpulpf16alt, HasPULPExtV2] in {
 def : Pat<(bf16 (load (add (i32 GPR:$base), (i32 GPR:$offset)))),
           (EXTRACT_SUBREG (P_LHU_rr (i32 GPR:$base), (i32 GPR:$offset)),
@@ -428,4 +428,13 @@ def : Pat<(store (bf16 FPR16AHINX:$val),
           (P_SH_rr (INSERT_SUBREG (XLenVT (IMPLICIT_DEF)), FPR16AHINX:$val,
                                   sub_16),
                    (i32 GPR:$base), (i32 GPR:$offset))>;
+def : Pat<(post_store (bf16 FPR16AHINX:$val), (i32 GPR:$base), simm12:$offset),
+          (P_SH_ri_PostIncrement
+             (INSERT_SUBREG (XLenVT (IMPLICIT_DEF)), FPR16AHINX:$val, sub_16),
+             (i32 GPR:$base), simm12:$offset)>;
+def : Pat<(post_store (bf16 FPR16AHINX:$val), (i32 GPR:$base),
+                      (i32 GPR:$offset)),
+          (P_SH_rr_PostIncrement
+             (INSERT_SUBREG (XLenVT (IMPLICIT_DEF)), FPR16AHINX:$val, sub_16),
+             (i32 GPR:$base), (i32 GPR:$offset))>;
 }
