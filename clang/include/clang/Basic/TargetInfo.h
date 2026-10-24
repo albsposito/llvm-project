@@ -157,7 +157,7 @@ struct TransferrableTargetInfo {
 
 protected:
   IntType SizeType, IntMaxType, PtrDiffType, IntPtrType, WCharType, WIntType,
-      Char16Type, Char32Type, Int64Type, Int16Type, SigAtomicType,
+      Char16Type, Char32Type, Int64Type, Int32Type, Int16Type, SigAtomicType,
       ProcessIDType;
 
   /// Whether Objective-C's built-in boolean type should be signed char.
@@ -412,6 +412,10 @@ public:
   IntType getUInt64Type() const {
     return getCorrespondingUnsignedType(Int64Type);
   }
+  IntType getInt32Type() const { return Int32Type; }
+  IntType getUInt32Type() const {
+    return getCorrespondingUnsignedType(Int32Type);
+  }
   IntType getInt16Type() const { return Int16Type; }
   IntType getUInt16Type() const {
     return getCorrespondingUnsignedType(Int16Type);
@@ -455,6 +459,13 @@ public:
   /// Return the smallest integer type with at least the specified width.
   virtual IntType getLeastIntTypeByWidth(unsigned BitWidth,
                                          bool IsSigned) const;
+
+  /// Return the type used for int_fastN_t. By default the same type as
+  /// int_leastN_t; a target overrides this when its C library differs.
+  virtual IntType getFastIntTypeByWidth(unsigned BitWidth,
+                                        bool IsSigned) const {
+    return getLeastIntTypeByWidth(BitWidth, IsSigned);
+  }
 
   /// Return floating point type with specified width. On PPC, there are
   /// three possible types for 128-bit floating point: "PPC double-double",

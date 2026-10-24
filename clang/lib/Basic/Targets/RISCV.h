@@ -111,6 +111,21 @@ public:
   bool handleTargetFeatures(std::vector<std::string> &Features,
                             DiagnosticsEngine &Diags) override;
 
+  // PULP: GAP9 GCC (newlib) defines [u]int32_t and [u]int_least32_t as
+  // [unsigned] long but [u]int_fast32_t as [unsigned] int. Int32Type is set
+  // to SignedLong for xgap9 in handleTargetFeatures; least follows it and fast
+  // keeps the default type. Same mechanism as AVR's [u]int16_t (AVR.h).
+  IntType getLeastIntTypeByWidth(unsigned BitWidth,
+                                 bool IsSigned) const override {
+    return BitWidth == 32 ? (IsSigned ? getInt32Type() : getUInt32Type())
+                          : TargetInfo::getLeastIntTypeByWidth(BitWidth,
+                                                               IsSigned);
+  }
+  IntType getFastIntTypeByWidth(unsigned BitWidth,
+                                bool IsSigned) const override {
+    return TargetInfo::getLeastIntTypeByWidth(BitWidth, IsSigned);
+  }
+
   bool hasBitIntType() const override { return true; }
 
   bool hasBFloat16Type() const override { return true; }
