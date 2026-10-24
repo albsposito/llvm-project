@@ -331,6 +331,9 @@ RISCVTTIImpl::getRegisterBitWidth(TargetTransformInfo::RegisterKind K) const {
   case TargetTransformInfo::RGK_Scalar:
     return TypeSize::getFixed(ST->getXLen());
   case TargetTransformInfo::RGK_FixedWidthVector:
+    // PULP packed SIMD: one vector is one 32-bit GPR (v2i16, v4i8).
+    if (hasPULPPackedSIMDOnly())
+      return TypeSize::getFixed(32);
     return TypeSize::getFixed(
         ST->useRVVForFixedLengthVectors() ? LMUL * ST->getRealMinVLen() : 0);
   case TargetTransformInfo::RGK_ScalableVector:
@@ -385,6 +388,67 @@ static VectorType *getVRGatherIndexType(MVT DataVT, const RISCVSubtarget &ST,
   return cast<VectorType>(EVT(IndexVT).getTypeForEVT(C));
 }
 
+// PULP packed SIMD shuffles. Instruction counts are what llc selects for
+// xgap9 (benchmarks/autovec-probe/investigation, report section 4):
+// reverse and single-source permutes of one packed register are one
+// pv.shuffle(.sci), two-source permutes are pv.shuffle2 plus a mask constant.
+// Anything spanning several registers, or a type the legalizer scalarizes,
+// is priced element by element through getVectorInstrCost.
+InstructionCost RISCVTTIImpl::getPULPShuffleCost(
+    TTI::ShuffleKind Kind, FixedVectorType *Tp, ArrayRef<int> Mask,
+    TTI::TargetCostKind CostKind, int Index, VectorType *SubTp,
+    ArrayRef<const Value *> Args, const Instruction *CxtI) {
+  std::pair<InstructionCost, MVT> LT = getTypeLegalizationCost(Tp);
+  if (!LT.first.isValid() || !LT.second.isFixedLengthVector())
+    return BaseT::getShuffleCost(Kind, Tp, Mask, CostKind, Index, SubTp, Args,
+                                 CxtI);
+
+  unsigned RegElts = LT.second.getVectorNumElements();
+  if (LT.first == 1 && Tp->getNumElements() <= RegElts) {
+    switch (Kind) {
+    case TTI::SK_Broadcast:
+    case TTI::SK_Reverse:
+    case TTI::SK_PermuteSingleSrc:
+      return 1;
+    case TTI::SK_Select:
+    case TTI::SK_Transpose:
+    case TTI::SK_Splice:
+    case TTI::SK_PermuteTwoSrc:
+      return 2;
+    default:
+      break;
+    }
+  }
+
+  // Taking a whole packed register out of (or into) a vector that the
+  // legalizer split into packed registers is free.
+  if ((Kind == TTI::SK_ExtractSubvector || Kind == TTI::SK_InsertSubvector) &&
+      SubTp && Index >= 0 && Index % RegElts == 0) {
+    std::pair<InstructionCost, MVT> SubLT = getTypeLegalizationCost(SubTp);
+    if (SubLT.second == LT.second &&
+        cast<FixedVectorType>(SubTp)->getNumElements() % RegElts == 0)
+      return 0;
+  }
+
+  return BaseT::getShuffleCost(Kind, Tp, Mask, CostKind, Index, SubTp, Args,
+                               CxtI);
+}
+
+InstructionCost
+RISCVTTIImpl::getPULPScalarizedOpCost(FixedVectorType *Ty,
+                                      unsigned NumVectorOperands,
+                                      InstructionCost ScalarOpCost,
+                                      TTI::TargetCostKind CostKind) {
+  APInt All = APInt::getAllOnes(Ty->getNumElements());
+  return Ty->getNumElements() * ScalarOpCost +
+         getScalarizationOverhead(Ty, All, /*Insert=*/true, /*Extract=*/false,
+                                  CostKind) +
+         NumVectorOperands * getScalarizationOverhead(Ty, All,
+                                                      /*Insert=*/false,
+                                                      /*Extract=*/true,
+                                                      CostKind);
+}
+
 InstructionCost RISCVTTIImpl::getShuffleCost(TTI::ShuffleKind Kind,
                                              VectorType *Tp, ArrayRef<int> Mask,
                                              TTI::TargetCostKind CostKind,
@@ -398,7 +462,8 @@ InstructionCost RISCVTTIImpl::getShuffleCost(TTI::ShuffleKind Kind,
   // which asserts in getMinRVVVectorSizeInBits(). Mirrors upstream's guard for
   // the P extension (dfdc69b4c27d, 4540415f19d9).
   if (ST->hasPULPExtV2() && isa<FixedVectorType>(Tp))
-    return 1;
+    return getPULPShuffleCost(Kind, cast<FixedVectorType>(Tp), Mask, CostKind,
+                              Index, SubTp, Args, CxtI);
 
   std::pair<InstructionCost, MVT> LT = getTypeLegalizationCost(Tp);
 
@@ -694,8 +759,24 @@ InstructionCost RISCVTTIImpl::getScalarizationOverhead(
   // registers, and V is normally not enabled. Skip the RVV cost analysis,
   // which asserts in getMinRVVVectorSizeInBits(). Mirrors upstream's guard for
   // the P extension (dfdc69b4c27d, 4540415f19d9).
-  if (ST->hasPULPExtV2() && isa<FixedVectorType>(Ty))
-    return 1;
+  if (ST->hasPULPExtV2() && isa<FixedVectorType>(Ty)) {
+    // Lanes are moved with one pv.extract(u) / pv.insert each
+    // (getVectorInstrCost), except that building a whole packed register from
+    // scalars is one pv.pack.h (v2i16) or pv.packlo.b + pv.packhi.b (v4i8).
+    std::pair<InstructionCost, MVT> LT = getTypeLegalizationCost(Ty);
+    if (Insert && DemandedElts.isAllOnes() && LT.first.isValid() &&
+        LT.second.isFixedLengthVector()) {
+      InstructionCost Cost =
+          LT.first * std::max(1u, LT.second.getVectorNumElements() / 2);
+      if (Extract)
+        Cost += BaseT::getScalarizationOverhead(Ty, DemandedElts,
+                                                /*Insert=*/false,
+                                                /*Extract=*/true, CostKind);
+      return Cost;
+    }
+    return BaseT::getScalarizationOverhead(Ty, DemandedElts, Insert, Extract,
+                                           CostKind, VL);
+  }
 
   // A build_vector (which is m1 sized or smaller) can be done in no
   // worse than one vslide1down.vx per element in the type.  We could
@@ -1260,6 +1341,44 @@ RISCVTTIImpl::getIntrinsicInstrCost(const IntrinsicCostAttributes &ICA,
   }
   }
 
+  // PULP packed integer saturating arithmetic (llc, report section 4):
+  // uadd.sat is pv.xor + pv.minu + pv.add (plus a loop-invariant all-ones
+  // splat), usub.sat is pv.maxu + pv.sub, and the signed forms have no packed
+  // equivalent: the back end extracts the lanes, adds and clips each one
+  // (p.clip) and packs them again.
+  // Scalar i8/i16 signed saturating add/sub: add or sub, then p.clip (the
+  // operands come sign-extended from lb/lh or pv.extract).
+  if (ST->hasPULPExtV2() && RetTy->isIntegerTy() &&
+      RetTy->getIntegerBitWidth() < ST->getXLen() &&
+      (ICA.getID() == Intrinsic::sadd_sat ||
+       ICA.getID() == Intrinsic::ssub_sat))
+    return 2;
+
+  if (ST->hasPULPExtV2() && isa<FixedVectorType>(RetTy) &&
+      RetTy->isIntOrIntVectorTy()) {
+    auto LT = getTypeLegalizationCost(RetTy);
+    if (LT.first.isValid() && LT.second.isFixedLengthVector()) {
+      switch (ICA.getID()) {
+      case Intrinsic::uadd_sat:
+        return LT.first * 3;
+      case Intrinsic::usub_sat:
+        return LT.first * 2;
+      case Intrinsic::sadd_sat:
+      case Intrinsic::ssub_sat: {
+        auto *VTy = cast<FixedVectorType>(RetTy);
+        Type *EltTy = VTy->getElementType();
+        IntrinsicCostAttributes ScalarAttrs(ICA.getID(), EltTy,
+                                            {EltTy, EltTy});
+        return getPULPScalarizedOpCost(
+            VTy, /*NumVectorOperands=*/2,
+            getIntrinsicInstrCost(ScalarAttrs, CostKind), CostKind);
+      }
+      default:
+        break;
+      }
+    }
+  }
+
   if (ST->hasVInstructions() && RetTy->isVectorTy()) {
     if (auto LT = getTypeLegalizationCost(RetTy);
         LT.second.isVector()) {
@@ -1281,6 +1400,40 @@ InstructionCost RISCVTTIImpl::getCastInstrCost(unsigned Opcode, Type *Dst,
   bool IsVectorType = isa<VectorType>(Dst) && isa<VectorType>(Src);
   if (!IsVectorType)
     return BaseT::getCastInstrCost(Opcode, Dst, Src, CCH, CostKind, I);
+
+  // PULP packed integer extends and truncates, as llc lowers them for xgap9:
+  // every lane leaves a packed register with one pv.extract(u) (which also
+  // extends it), a packed result is built with pv.pack.h or pv.packlo.b +
+  // pv.packhi.b, and an extend into a packed type then needs a shift pair
+  // (sext) or an and (zext) per register. Types the legalizer scalarizes,
+  // such as <2 x i32>, hold one lane per GPR and need neither step.
+  if (hasPULPPackedSIMDOnly() && CostKind == TTI::TCK_RecipThroughput &&
+      isa<FixedVectorType>(Src) && Src->isIntOrIntVectorTy() &&
+      Dst->isIntOrIntVectorTy() && !Src->getScalarType()->isIntegerTy(1) &&
+      (Opcode == Instruction::SExt || Opcode == Instruction::ZExt ||
+       Opcode == Instruction::Trunc)) {
+    std::pair<InstructionCost, MVT> SrcLT = getTypeLegalizationCost(Src);
+    std::pair<InstructionCost, MVT> DstLT = getTypeLegalizationCost(Dst);
+    bool SrcPacked = SrcLT.first.isValid() && SrcLT.second.isFixedLengthVector();
+    bool DstPacked = DstLT.first.isValid() && DstLT.second.isFixedLengthVector();
+    if (SrcPacked || DstPacked) {
+      bool IsExt = Opcode != Instruction::Trunc;
+      InstructionCost FixPerReg = !IsExt ? 0 : Opcode == Instruction::SExt ? 2 : 1;
+      // Same packed register type on both sides (e.g. <2 x i8> is promoted
+      // to v2i16): an in-register extend, a truncate is free.
+      if (SrcPacked && DstPacked && SrcLT.second == DstLT.second)
+        return DstLT.first * FixPerReg;
+      unsigned NumElts = cast<FixedVectorType>(Src)->getNumElements();
+      InstructionCost Cost = 0;
+      if (SrcPacked)
+        Cost += NumElts;
+      if (DstPacked)
+        Cost += DstLT.first *
+                (std::max(1u, DstLT.second.getVectorNumElements() / 2) +
+                 FixPerReg);
+      return Cost;
+    }
+  }
 
   // FIXME: Need to compute legalizing cost for illegal types.  The current
   // code handles only legal types and those which can be trivially
@@ -1482,6 +1635,13 @@ InstructionCost
 RISCVTTIImpl::getMinMaxReductionCost(Intrinsic::ID IID, VectorType *Ty,
                                      FastMathFlags FMF,
                                      TTI::TargetCostKind CostKind) {
+  // PULP packed SIMD without V: the back end cannot lower an <N x i1>
+  // reduction (or the bitcast <N x i1> -> iN that InstCombine turns it into):
+  // the promoted mask is stored with an extending truncstore and ISel asserts
+  // (int-20 llc, plain RV32 does not). Keep the vectorizers from forming one.
+  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(Ty) &&
+      Ty->getElementType()->isIntegerTy(1))
+    return InstructionCost::getInvalid();
   if (isa<FixedVectorType>(Ty) && !ST->useRVVForFixedLengthVectors())
     return BaseT::getMinMaxReductionCost(IID, Ty, FMF, CostKind);
 
@@ -1588,6 +1748,10 @@ InstructionCost
 RISCVTTIImpl::getArithmeticReductionCost(unsigned Opcode, VectorType *Ty,
                                          std::optional<FastMathFlags> FMF,
                                          TTI::TargetCostKind CostKind) {
+  // PULP without V: no <N x i1> reductions (see getMinMaxReductionCost).
+  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(Ty) &&
+      Ty->getElementType()->isIntegerTy(1))
+    return InstructionCost::getInvalid();
   if (isa<FixedVectorType>(Ty) && !ST->useRVVForFixedLengthVectors())
     return BaseT::getArithmeticReductionCost(Opcode, Ty, FMF, CostKind);
 
@@ -1763,6 +1927,11 @@ InstructionCost RISCVTTIImpl::getMemoryOpCost(unsigned Opcode, Type *Src,
                                               TTI::TargetCostKind CostKind,
                                               TTI::OperandValueInfo OpInfo,
                                               const Instruction *I) {
+  // PULP without V: a load or store of an <N x i1> mask asserts in ISel (the
+  // same truncstore problem as the <N x i1> reductions).
+  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(Src) &&
+      Src->getScalarType()->isIntegerTy(1))
+    return InstructionCost::getInvalid();
   EVT VT = TLI->getValueType(DL, Src, true);
   // Type legalization can't handle structs
   if (VT == MVT::Other)
@@ -1774,6 +1943,42 @@ InstructionCost RISCVTTIImpl::getMemoryOpCost(unsigned Opcode, Type *Src,
     Cost += getStoreImmCost(Src, OpInfo, CostKind);
 
   std::pair<InstructionCost, MVT> LT = getTypeLegalizationCost(Src);
+
+  // PULP packed vectors are loaded and stored as one 32-bit word (LOAD/STORE
+  // of v2i16/v4i8 are promoted to i32 in RISCVISelLowering.cpp).
+  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(Src) &&
+      LT.first.isValid() && LT.second.isFixedLengthVector() &&
+      CostKind == TTI::TCK_RecipThroughput &&
+      (Opcode == Instruction::Load || Opcode == Instruction::Store)) {
+    auto *VTy = cast<FixedVectorType>(Src);
+    // Fewer bits than a register (e.g. <2 x i8>, promoted to v2i16): the
+    // legalizer loads or stores the lanes one by one.
+    if (TypeSize::isKnownLT(DL.getTypeStoreSizeInBits(Src),
+                            LT.second.getSizeInBits())) {
+      InstructionCost EltCost =
+          getMemoryOpCost(Opcode, VTy->getElementType(), Alignment,
+                          AddressSpace, CostKind, OpInfo.getNoProps());
+      APInt All = APInt::getAllOnes(VTy->getNumElements());
+      return Cost + VTy->getNumElements() * EltCost +
+             getScalarizationOverhead(VTy, All, Opcode == Instruction::Load,
+                                      Opcode == Instruction::Store, CostKind);
+    }
+    // A word access below 4-byte alignment without unaligned-scalar-mem is
+    // split by the legalizer into Alignment-sized pieces, which a load then
+    // merges with a shift and an or per piece and a store separates with a
+    // shift per piece: v2i16 at align 2 is 4 / 3 instructions, v4i8 at align 1
+    // 10 / 7 (llc, report section 4). With unaligned-scalar-mem (GAP9, 20/F052)
+    // it is one lw/sw.
+    unsigned RegBytes = LT.second.getStoreSize();
+    unsigned A = Alignment ? Alignment->value() : 1;
+    if (A < RegBytes && !ST->enableUnalignedScalarMem()) {
+      unsigned Pieces = RegBytes / A;
+      unsigned PerReg = Opcode == Instruction::Load ? Pieces + 2 * (Pieces - 1)
+                                                    : Pieces + (Pieces - 1);
+      return Cost + LT.first * PerReg;
+    }
+    return Cost + LT.first;
+  }
 
   InstructionCost BaseCost = [&]() {
     InstructionCost Cost = LT.first;
@@ -1813,6 +2018,16 @@ InstructionCost RISCVTTIImpl::getCmpSelInstrCost(
   if (CostKind != TTI::TCK_RecipThroughput)
     return BaseT::getCmpSelInstrCost(Opcode, ValTy, CondTy, VecPred, CostKind,
                                      Op1Info, Op2Info, I);
+
+  // PULP packed select on a vector condition (VSELECT is expanded): the
+  // inverted mask (a second pv.cmp*), two pv.and and a pv.or (llc, report
+  // section 4). Selects in min/max shape become pv.min/pv.max before this.
+  if (hasPULPPackedSIMDOnly() && Opcode == Instruction::Select &&
+      isa<FixedVectorType>(ValTy) && CondTy && CondTy->isVectorTy()) {
+    std::pair<InstructionCost, MVT> LT = getTypeLegalizationCost(ValTy);
+    if (LT.first.isValid() && LT.second.isFixedLengthVector())
+      return LT.first * 4;
+  }
 
   if (isa<FixedVectorType>(ValTy) && !ST->useRVVForFixedLengthVectors())
     return BaseT::getCmpSelInstrCost(Opcode, ValTy, CondTy, VecPred, CostKind,
@@ -1985,15 +2200,23 @@ InstructionCost RISCVTTIImpl::getVectorInstrCost(unsigned Opcode, Type *Val,
   // registers, and V is normally not enabled. Skip the RVV cost analysis,
   // which asserts in getMinRVVVectorSizeInBits(). Mirrors upstream's guard for
   // the P extension (dfdc69b4c27d, 4540415f19d9).
-  if (ST->hasPULPExtV2() && isa<FixedVectorType>(Val))
-    return 1;
-
   if (Opcode != Instruction::ExtractElement &&
       Opcode != Instruction::InsertElement)
     return BaseT::getVectorInstrCost(Opcode, Val, CostKind, Index, Op0, Op1);
 
   // Legalize the type.
   std::pair<InstructionCost, MVT> LT = getTypeLegalizationCost(Val);
+
+  // A lane of a packed register: pv.extract(u) / pv.insert for a constant
+  // index; a variable index is pv.shuffle for an extract and three
+  // instructions for an insert. Types the legalizer scalarizes (e.g.
+  // <2 x i32>) take the generic path below: their lanes are plain registers.
+  if (ST->hasPULPExtV2() && isa<FixedVectorType>(Val) &&
+      LT.second.isVector()) {
+    if (Index == -1U && Opcode == Instruction::InsertElement)
+      return 3;
+    return 1;
+  }
 
   // This type is legalized to a scalar type.
   if (!LT.second.isVector()) {
@@ -2306,12 +2529,23 @@ InstructionCost RISCVTTIImpl::getPointersChainCost(
   return Cost;
 }
 
+static constexpr unsigned PULPVectorFullUnrollMax = 4;
+
 void RISCVTTIImpl::getUnrollingPreferences(Loop *L, ScalarEvolution &SE,
                                            TTI::UnrollingPreferences &UP,
                                            OptimizationRemarkEmitter *ORE) {
   // TODO: More tuning on benchmarks and metrics with changes as needed
   //       would apply to all settings below to enable performance.
 
+  // PULP: a loop the vectorizers produced runs as a hardware loop, which has
+  // no per-iteration overhead, so fully unrolling it buys nothing but size
+  // (a 64-element add of shorts became 32 copies of the body, 175
+  // instructions against GAP9 GCC's 34 at the same cycle count on GVSoC).
+  // Keep full unrolling for vector loops of at most PULPVectorFullUnrollMax
+  // iterations, where the copies are not larger than the loop setup.
+  if (hasPULPPackedSIMDOnly() &&
+      getBooleanLoopAttribute(L, "llvm.loop.isvectorized"))
+    UP.FullUnrollMaxCount = PULPVectorFullUnrollMax;
 
   if (ST->enableDefaultUnroll())
     return BasicTTIImplBase::getUnrollingPreferences(L, SE, UP, ORE);

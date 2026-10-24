@@ -55,6 +55,32 @@ class RISCVTTIImpl : public BasicTTIImplBase<RISCVTTIImpl> {
   /// type.
   InstructionCost getConstantPoolLoadCost(Type *Ty,
                                           TTI::TargetCostKind CostKind);
+
+  /// PULP Xpulpv2 packed SIMD is the vector unit: the packed types v2i16 and
+  /// v4i8 are legal and live in GPRs (RISCVISelLowering.cpp), and RVV is
+  /// absent. The vectorizers then target one 32-bit GPR per vector, the way
+  /// LoongArch, WebAssembly and ARM describe their vector units to them
+  /// (LoongArchTargetTransformInfo.cpp:22-52, WebAssemblyTargetTransformInfo
+  /// .cpp:26-43, ARMTargetTransformInfo.h:150-183).
+  bool hasPULPPackedSIMDOnly() const {
+    return ST->hasPULPExtV2() && !ST->hasVInstructions();
+  }
+
+  /// Shuffle cost for a fixed vector when the packed types live in GPRs.
+  InstructionCost getPULPShuffleCost(TTI::ShuffleKind Kind,
+                                     FixedVectorType *Tp, ArrayRef<int> Mask,
+                                     TTI::TargetCostKind CostKind, int Index,
+                                     VectorType *SubTp,
+                                     ArrayRef<const Value *> Args,
+                                     const Instruction *CxtI);
+
+  /// Cost of an operation the back end unrolls lane by lane on a packed type:
+  /// extract every lane of each vector operand, one scalar operation per
+  /// lane, pack the results.
+  InstructionCost getPULPScalarizedOpCost(FixedVectorType *Ty,
+                                          unsigned NumVectorOperands,
+                                          InstructionCost ScalarOpCost,
+                                          TTI::TargetCostKind CostKind);
 public:
   explicit RISCVTTIImpl(const RISCVTargetMachine *TM, const Function &F)
       : BaseT(TM, F.getDataLayout()), ST(TM->getSubtargetImpl(F)),
@@ -136,6 +162,9 @@ public:
                              TTI::PeelingPreferences &PP);
 
   unsigned getMinVectorRegisterBitWidth() const {
+    // PULP packed vectors are exactly one 32-bit GPR (v2i16, v4i8).
+    if (hasPULPPackedSIMDOnly())
+      return 32;
     return ST->useRVVForFixedLengthVectors() ? 16 : 0;
   }
 
@@ -365,7 +394,14 @@ public:
     return VF.isScalar() ? 1 : ST->getMaxInterleaveFactor();
   }
 
-  bool enableInterleavedAccessVectorization() { return true; }
+  bool enableInterleavedAccessVectorization() {
+    // PULP packed vectors have no segment loads/stores: an interleave group
+    // becomes a wide load plus strided shuffles of vectors wider than one
+    // GPR, which the back end can only take apart lane by lane. Let the loop
+    // vectorizer price such accesses as scalarized instead, like targets
+    // without interleaved access support (the TTI default is false).
+    return !hasPULPPackedSIMDOnly();
+  }
 
   enum RISCVRegisterClass { GPRRC, FPRRC, VRRC };
   unsigned getNumberOfRegisters(unsigned ClassID) const {
@@ -392,8 +428,13 @@ public:
                                                      ScalarEvolution *SE) const;
 
   unsigned getRegisterClassForType(bool Vector, Type *Ty = nullptr) const {
+    // PULP packed vectors are held in GPRs, so vector values compete with
+    // scalar ones for the same 31 registers in the vectorizers' register
+    // pressure estimate, and the vectorizers' "any vector registers?" gate
+    // sees 31 instead of 0.
     if (Vector)
-      return RISCVRegisterClass::VRRC;
+      return hasPULPPackedSIMDOnly() ? RISCVRegisterClass::GPRRC
+                                     : RISCVRegisterClass::VRRC;
     if (!Ty)
       return RISCVRegisterClass::GPRRC;
 
