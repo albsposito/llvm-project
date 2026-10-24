@@ -18,7 +18,7 @@ define void @mem(ptr %p, ptr %q) {
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %b = load <4 x i8>, ptr %q, align 4
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: store <2 x i16> %a, ptr %q, align 4
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: store <4 x i8> %b, ptr %p, align 4
-; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %c = load <2 x i16>, ptr %p, align 2
+; THRU-NEXT:  Cost Model: Found an estimated cost of 4 for instruction: %c = load <2 x i16>, ptr %p, align 2
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 4 for instruction: store <2 x i16> <i16 1, i16 2>, ptr %q, align 4
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 0 for instruction: ret void
 ;
@@ -44,7 +44,7 @@ define void @arith(<2 x i16> %a, <2 x i16> %b, <4 x i8> %c, <4 x i8> %d) {
 ; THRU-LABEL: 'arith'
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %1 = add <2 x i16> %a, %b
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %2 = sub <4 x i8> %c, %d
-; THRU-NEXT:  Cost Model: Found an estimated cost of 5 for instruction: %3 = mul <2 x i16> %a, %b
+; THRU-NEXT:  Cost Model: Found an estimated cost of 7 for instruction: %3 = mul <2 x i16> %a, %b
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %4 = and <4 x i8> %c, %d
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %5 = shl <2 x i16> %a, %b
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %6 = call <2 x i16> @llvm.smax.v2i16(<2 x i16> %a, <2 x i16> %b)
@@ -75,11 +75,11 @@ define void @misc(<2 x i16> %a, <2 x i16> %b, <4 x i8> %c, i16 %s) {
 ; THRU-LABEL: 'misc'
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %e = extractelement <2 x i16> %a, i32 1
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %i = insertelement <2 x i16> %a, i16 %s, i32 0
-; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %sh = shufflevector <2 x i16> %a, <2 x i16> %b, <2 x i32> <i32 1, i32 2>
+; THRU-NEXT:  Cost Model: Found an estimated cost of 2 for instruction: %sh = shufflevector <2 x i16> %a, <2 x i16> %b, <2 x i32> <i32 1, i32 2>
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %sp = shufflevector <2 x i16> %i, <2 x i16> poison, <2 x i32> zeroinitializer
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %cmp = icmp slt <2 x i16> %a, %b
-; THRU-NEXT:  Cost Model: Found an estimated cost of 3 for instruction: %sel = select <2 x i1> %cmp, <2 x i16> %a, <2 x i16> %b
-; THRU-NEXT:  Cost Model: Found an estimated cost of 3 for instruction: %sx = sext <4 x i8> %c to <4 x i16>
+; THRU-NEXT:  Cost Model: Found an estimated cost of 4 for instruction: %sel = select <2 x i1> %cmp, <2 x i16> %a, <2 x i16> %b
+; THRU-NEXT:  Cost Model: Found an estimated cost of 10 for instruction: %sx = sext <4 x i8> %c to <4 x i16>
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 0 for instruction: %tr = trunc <2 x i16> %a to <2 x i8>
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %bc = bitcast <2 x i16> %a to i32
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 3 for instruction: %r = call i16 @llvm.vector.reduce.add.v2i16(<2 x i16> %a)
@@ -88,7 +88,7 @@ define void @misc(<2 x i16> %a, <2 x i16> %b, <4 x i8> %c, i16 %s) {
 ; SIZE-LABEL: 'misc'
 ; SIZE-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %e = extractelement <2 x i16> %a, i32 1
 ; SIZE-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %i = insertelement <2 x i16> %a, i16 %s, i32 0
-; SIZE-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %sh = shufflevector <2 x i16> %a, <2 x i16> %b, <2 x i32> <i32 1, i32 2>
+; SIZE-NEXT:  Cost Model: Found an estimated cost of 2 for instruction: %sh = shufflevector <2 x i16> %a, <2 x i16> %b, <2 x i32> <i32 1, i32 2>
 ; SIZE-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %sp = shufflevector <2 x i16> %i, <2 x i16> poison, <2 x i32> zeroinitializer
 ; SIZE-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %cmp = icmp slt <2 x i16> %a, %b
 ; SIZE-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %sel = select <2 x i1> %cmp, <2 x i16> %a, <2 x i16> %b
