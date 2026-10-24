@@ -863,6 +863,22 @@ public:
 
   bool isVScaleKnownToBeAPowerOfTwo() const override;
 
+  // GAP9 v2f16/v2bf16: fneg and fabs are one vfsgnjn/vfsgnjx, cheaper than
+  // the integer lui + xor/and the DAG combiner would use instead (and an fneg
+  // kept as an FP node folds into vfmre for a*b - c).
+  bool isFNegFree(EVT VT) const override;
+  bool isFAbsFree(EVT VT) const override;
+
+  // GAP9 packed half precision (Xpulpfvec, task 20/F060): v2f16 with Zhinx,
+  // v2bf16 with Xpulpf16alt, both held in GPRAV2.
+  SmallVector<MVT, 2> getPULPFPVecVTs() const;
+  bool isPULPFPVecVT(MVT VT) const;
+  SDValue lowerPULPFPVecBUILD_VECTOR(SDValue Op, SelectionDAG &DAG) const;
+  SDValue lowerPULPFPVecINSERT_VECTOR_ELT(SDValue Op, SelectionDAG &DAG) const;
+  SDValue lowerPULPFPVecVSELECT(SDValue Op, SelectionDAG &DAG) const;
+  SDValue lowerPULPFPVecEXTRACT_VECTOR_ELT(SDValue Op,
+                                           SelectionDAG &DAG) const;
+
   // PULP: while getIndexedAddressParts works for THead only, this
   // is meant to do the same for Xpulp
   bool getIndexedAddressPartsPulp(const SDNode *Op, SDValue &Base,
