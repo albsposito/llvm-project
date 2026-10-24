@@ -23384,6 +23384,33 @@ Value *CodeGenFunction::EmitRISCVBuiltinExpr(unsigned BuiltinID,
     return Builder.CreateBitCast(Builder.CreateTrunc(Abs, Int16Ty),
                                  ConvertType(E->getType()));
   }
+  // GAP9 packed half <-> packed short conversions (task 20/F049): GCC's
+  // vfcvt.x.h, vfcvt.xu.h, vfcvt.h.x, vfcvt.h.xu, per lane, rounding with
+  // frm. Generic IR, so they work before native vfcvt selection exists:
+  //  - to int: llvm.rint (frm; the default environment is round to nearest
+  //    even), then the saturating llvm.fpto[su]i.sat, whose NaN result (0) is
+  //    replaced by the instruction's (32767 / 65535).
+  //  - to half: sitofp / uitofp of the 16-bit lanes.
+  case RISCV::BI__builtin_pulp_v2hftov2hi:
+  case RISCV::BI__builtin_pulp_v2hftov2hi_u: {
+    bool IsSigned = BuiltinID == RISCV::BI__builtin_pulp_v2hftov2hi;
+    Value *X = EmitScalarExpr(E->getArg(0));
+    llvm::Type *ResTy = ConvertType(E->getType());
+    Value *R = Builder.CreateUnaryIntrinsic(Intrinsic::rint, X);
+    Value *Sat = Builder.CreateIntrinsic(
+        IsSigned ? Intrinsic::fptosi_sat : Intrinsic::fptoui_sat,
+        {ResTy, X->getType()}, {R});
+    Value *IsNaN = Builder.CreateFCmpUNO(X, X);
+    Value *NaNRes = llvm::ConstantInt::get(
+        ResTy, IsSigned ? APInt::getSignedMaxValue(16) : APInt::getMaxValue(16));
+    return Builder.CreateSelect(IsNaN, NaNRes, Sat);
+  }
+  case RISCV::BI__builtin_pulp_v2hitov2hf:
+    return Builder.CreateSIToFP(EmitScalarExpr(E->getArg(0)),
+                                ConvertType(E->getType()));
+  case RISCV::BI__builtin_pulp_v2hitov2hf_u:
+    return Builder.CreateUIToFP(EmitScalarExpr(E->getArg(0)),
+                                ConvertType(E->getType()));
   default:
     break;
   }
