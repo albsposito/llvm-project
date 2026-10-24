@@ -396,6 +396,13 @@ bool RISCVTargetInfo::handleTargetFeatures(std::vector<std::string> &Features,
   if (ISAInfo->hasExtension("xpulpf16alt"))
     HasFullBFloat16 = true;
 
+  // PULP: match GAP9 GCC (newlib), which defines [u]int32_t as [unsigned]
+  // long (__INT32_TYPE__ long int). Only the stdint.h typedefs change; long
+  // and int keep their 32-bit size and alignment (owner decision B65).
+  // "xgap9" parses as extension "xgap", version 9.0.
+  if (ISAInfo->hasExtension("xgap") && getLongWidth() == 32)
+    Int32Type = SignedLong;
+
   FastScalarUnalignedAccess =
       llvm::is_contained(Features, "+unaligned-scalar-mem");
 

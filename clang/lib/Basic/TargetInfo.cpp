@@ -132,6 +132,7 @@ TargetInfo::TargetInfo(const llvm::Triple &T) : Triple(T) {
   Char16Type = UnsignedShort;
   Char32Type = UnsignedInt;
   Int64Type = SignedLongLong;
+  Int32Type = SignedInt;
   Int16Type = SignedShort;
   SigAtomicType = SignedInt;
   ProcessIDType = SignedInt;
