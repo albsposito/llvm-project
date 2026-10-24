@@ -810,6 +810,10 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
     // Stores stay unindexed for the same hardware-loop reason as f32.
     if (Subtarget.hasVendorXpulpf16alt())
       setIndexedLoadAction(ISD::POST_INC, MVT::bf16, Legal);
+    // float16 with Zhinx lives in a GPR as well (GPRF16): p.lhu with
+    // post-increment, as GAP9 GCC. Stores stay unindexed, as for f32/bf16.
+    if (Subtarget.hasStdExtZhinxmin())
+      setIndexedLoadAction(ISD::POST_INC, MVT::f16, Legal);
   }
 
   setBooleanContents(ZeroOrOneBooleanContent);
@@ -22423,9 +22427,11 @@ bool RISCVTargetLowering::getIndexedAddressPartsPulp(
   // Xpulp supports i8, i16, and i32 post-increments, plus f32 loads when Zfinx
   // keeps floats in GPRs (selected onto the same p.lw instructions; f32 stores
   // are rejected earlier because their indexed store action is not Legal), and
-  // bf16 loads with Xpulpf16alt (p.lhu, likewise loads only).
+  // bf16 loads with Xpulpf16alt and f16 loads with Zhinx (p.lhu, likewise
+  // loads only).
   if (!(VT == MVT::i8 || VT == MVT::i16 || VT == MVT::i32 ||
         (VT == MVT::f32 && Subtarget.hasStdExtZfinx()) ||
+        (VT == MVT::f16 && Subtarget.hasStdExtZhinxmin()) ||
         (VT == MVT::bf16 && Subtarget.hasVendorXpulpf16alt())))
     return false;
 
