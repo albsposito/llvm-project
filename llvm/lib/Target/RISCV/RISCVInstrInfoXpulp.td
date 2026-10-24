@@ -1657,6 +1657,16 @@ def : Pat<(dotsp_sc_b GPRAV4:$rs1, (sext_inreg (i32 GPR:$rs2), i8)),
 def : Pat<(dotsp_sc_b GPRAV4:$rs1, simm6:$sci),
           (PV_DOTSP_SCI_B GPRAV4:$rs1, simm6:$sci)>;
 
+// vector.reduce.add on a packed register (VECREDUCE_ADD is Legal for v2i16 and
+// v4i8 in RISCVISelLowering.cpp). A dot product with a splat of 1 sums the
+// sign-extended lanes in 32 bits; its low 16 (8) bits are the wrapped lane
+// sum, and VECREDUCE_ADD leaves the bits above the element width unspecified
+// (20/F054, B157 C1).
+def : Pat<(i32 (vecreduce_add (v2i16 GPRAV2:$rs1))),
+          (PV_DOTSP_SCI_H GPRAV2:$rs1, 1)>;
+def : Pat<(i32 (vecreduce_add (v4i8 GPRAV4:$rs1))),
+          (PV_DOTSP_SCI_B GPRAV4:$rs1, 1)>;
+
 def : Pat<(add (i32 GPR:$rd), (dotup_h GPRAV2:$rs1, GPRAV2:$rs2)),
           (PV_SDOTUP_H (i32 GPR:$rd), GPRAV2:$rs1, GPRAV2:$rs2)>;
 
