@@ -2381,6 +2381,12 @@ bool RISCVTargetLowering::isFPImmLegal(const APFloat &Imm, EVT VT,
 // TODO: This is very conservative.
 bool RISCVTargetLowering::isExtractSubvectorCheap(EVT ResVT, EVT SrcVT,
                                                   unsigned Index) const {
+  // The answer below is in terms of RVV slides and VLEN. Without V (PULP
+  // packed v2i16/v4i8 vectors live in GPRs) there is no cheap extract
+  // (20/F054, B157 C2; as upstream 5e4a21a1b946 does for the P extension).
+  if (!Subtarget.hasVInstructions())
+    return false;
+
   if (!isOperationLegalOrCustom(ISD::EXTRACT_SUBVECTOR, ResVT))
     return false;
 
@@ -5954,8 +5960,11 @@ static SDValue lowerVECTOR_SHUFFLE(SDValue Op, SelectionDAG &DAG,
 }
 
 bool RISCVTargetLowering::isShuffleMaskLegal(ArrayRef<int> M, EVT VT) const {
-  // Only support legal VTs for other shuffles for now.
-  if (!isTypeLegal(VT))
+  // Only support legal VTs for other shuffles for now. The checks below are
+  // RVV ones (isInterleaveShuffle reads ELEN); PULP packed v2i16/v4i8 vectors
+  // are legal without V and their shuffles are expanded (20/F054, B157 C3; as
+  // upstream 42b1beb3f0f6 does for the P extension).
+  if (!isTypeLegal(VT) || !Subtarget.hasVInstructions())
     return false;
 
   // Support splats for any type. These should type legalize well.
