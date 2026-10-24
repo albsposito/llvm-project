@@ -412,6 +412,22 @@ auto getInductionUpdateParts(const MachineInstr *Update)
     Result.IndDef = 2;
     Result.Bump = 3;
     break;
+  case RISCV::P_SW_ri_PostIncrement:
+  case RISCV::P_SW_rr_PostIncrement:
+  case RISCV::P_SH_ri_PostIncrement:
+  case RISCV::P_SH_rr_PostIncrement:
+  case RISCV::P_SB_ri_PostIncrement:
+  case RISCV::P_SB_rr_PostIncrement:
+    // A post-increment store has no value result, only the written-back
+    // address (same operand order as CORE-V's CV_SW_ri_inc,
+    // RISCVInstrInfoXCV.td, class CVStore_ri_inc):
+    // %Rnext:gpr = P_SW_ri_PostIncrement %value:gpr, %R:gpr(tied-def 0), 4
+    //      ^                                           ^               ^
+    // 0: IndUpdate                                 2: IndDef        3: Bump
+    Result.IndUpdate = 0;
+    Result.IndDef = 2;
+    Result.Bump = 3;
+    break;
   }
 
   return Result;
@@ -1350,6 +1366,14 @@ bool PULPHardwareLoops::containsInvalidInstruction(MachineLoop *L) const {
 /// removed.
 bool PULPHardwareLoops::isDead(
     const MachineInstr *MI, SmallVectorImpl<MachineInstr *> &DeadPhis) const {
+  // The induction update can be a post-increment store (or a volatile
+  // post-increment load): its written-back address may become unused, but
+  // the memory access itself must stay. HexagonHardwareLoops only ever passes
+  // an add here. Use the side-effect test of upstream's dead-code
+  // elimination (MachineInstr::isDead -> wouldBeTriviallyDead).
+  if (!MI->wouldBeTriviallyDead())
+    return false;
+
   // Examine each operand.
   for (unsigned i = 0, e = MI->getNumOperands(); i != e; ++i) {
     const MachineOperand &MO = MI->getOperand(i);
