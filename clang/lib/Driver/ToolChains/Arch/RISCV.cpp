@@ -148,7 +148,10 @@ void riscv::getRISCVTargetFeatures(const Driver &D, const llvm::Triple &Triple,
   // If -mstrict-align, -mno-strict-align, -mscalar-strict-align, or
   // -mno-scalar-strict-align is passed, use it. Otherwise, the
   // unaligned-scalar-mem is enabled if the CPU supports it or the target is
-  // Android.
+  // Android, or -march has the GAP9 extension (xgap9): GAP9 does single
+  // misaligned lw/sw/lh/sh correctly on the FC and the cluster (B158). This is
+  // done here, not as a feature xgap9 implies, so that -mstrict-align turns
+  // off unaligned-scalar-mem without also turning off xgap9 in the back end.
   if (const Arg *A = Args.getLastArg(
           options::OPT_mno_strict_align, options::OPT_mscalar_strict_align,
           options::OPT_mstrict_align, options::OPT_mno_scalar_strict_align)) {
@@ -158,7 +161,8 @@ void riscv::getRISCVTargetFeatures(const Driver &D, const llvm::Triple &Triple,
     } else {
       Features.push_back("-unaligned-scalar-mem");
     }
-  } else if (CPUFastScalarUnaligned || Triple.isAndroid()) {
+  } else if (CPUFastScalarUnaligned || Triple.isAndroid() ||
+             llvm::is_contained(Features, "+xgap")) {
     Features.push_back("+unaligned-scalar-mem");
   }
 
