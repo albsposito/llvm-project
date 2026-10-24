@@ -394,7 +394,10 @@ bool llvm::CC_RISCV(unsigned ValNo, MVT ValVT, MVT LocVT,
     }
   }
 
-  if ((ValVT == MVT::f16 && Subtarget.hasStdExtZhinxmin())) {
+  // GAP9 Xpulpf16alt: a bfloat16 (float16alt) goes in a GPR like a Zhinx
+  // f16, as GAP9 GCC passes it (a0-a7, then 4-byte stack slots).
+  if ((ValVT == MVT::f16 && Subtarget.hasStdExtZhinxmin()) ||
+      (ValVT == MVT::bf16 && Subtarget.hasVendorXpulpf16alt())) {
     if (MCRegister Reg = State.AllocateReg(getArgGPR16s(ABI))) {
       State.addLoc(CCValAssign::getReg(ValNo, ValVT, Reg, LocVT, LocInfo));
       return false;
@@ -656,7 +659,8 @@ bool llvm::CC_RISCV_FastCC(unsigned ValNo, MVT ValVT, MVT LocVT,
   MVT XLenVT = Subtarget.getXLenVT();
 
   // Check if there is an available GPRF16 before hitting the stack.
-  if ((LocVT == MVT::f16 && Subtarget.hasStdExtZhinxmin())) {
+  if ((LocVT == MVT::f16 && Subtarget.hasStdExtZhinxmin()) ||
+      (LocVT == MVT::bf16 && Subtarget.hasVendorXpulpf16alt())) {
     if (MCRegister Reg = State.AllocateReg(getFastCCArgGPRF16s(ABI))) {
       State.addLoc(CCValAssign::getReg(ValNo, ValVT, Reg, LocVT, LocInfo));
       return false;

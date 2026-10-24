@@ -894,9 +894,34 @@ bool RISCVDAGToDAGISel::tryPulpIndexedLoad(SDNode *Node) {
       if (simm12) Opcode = RISCV::P_LW_ri_PostIncrement;
       else        Opcode = RISCV::P_LW_rr_PostIncrement;
       break;
+    case MVT::bf16:
+      // Xpulpf16alt keeps bf16 in the low half of a GPR (GPRBF16); GAP9 GCC
+      // loads float16alt with p.lhu. A bf16 extending load is expanded
+      // before post-increment loads are formed.
+      if (!Subtarget->hasVendorXpulpf16alt() ||
+          Load->getExtensionType() != ISD::NON_EXTLOAD)
+        return false;
+      if (simm12) Opcode = RISCV::P_LHU_ri_PostIncrement;
+      else        Opcode = RISCV::P_LHU_rr_PostIncrement;
+      break;
   }
 
   if (!Opcode) return false;
+
+  if (Load->getMemoryVT() == MVT::bf16) {
+    // As for f32 below, but through the sub_16 sub-register, the way the
+    // Zhinx (f16 (riscv_fmv_h_x GPR)) pattern does (RISCVInstrInfoZfh.td).
+    MachineSDNode *LH = CurDAG->getMachineNode(
+        Opcode, DL, MVT::i32, MVT::i32, Chain.getSimpleValueType(), Base,
+        Offset, Chain);
+    SDValue Val = CurDAG->getTargetExtractSubreg(RISCV::sub_16, DL, MVT::bf16,
+                                                 SDValue(LH, 0));
+    ReplaceUses(SDValue(Node, 0), Val);
+    ReplaceUses(SDValue(Node, 1), SDValue(LH, 1));
+    ReplaceUses(SDValue(Node, 2), SDValue(LH, 2));
+    CurDAG->RemoveDeadNode(Node);
+    return true;
+  }
 
   if (Load->getMemoryVT() == MVT::f32) {
     // p.lw defines a GPR; hand the loaded value to its users as f32 in
@@ -1044,8 +1069,10 @@ void RISCVDAGToDAGISel::Select(SDNode *Node) {
     default:
       llvm_unreachable("Unexpected size");
     case MVT::bf16:
-      assert(Subtarget->hasStdExtZfbfmin());
-      Opc = RISCV::FMV_H_X;
+      // Xpulpf16alt keeps bf16 in a GPR (GPRBF16), like f16 with Zhinx.
+      assert(Subtarget->hasStdExtZfbfmin() ||
+             Subtarget->hasVendorXpulpf16alt());
+      Opc = Subtarget->hasStdExtZfbfmin() ? RISCV::FMV_H_X : RISCV::COPY;
       break;
     case MVT::f16:
       Opc = Subtarget->hasStdExtZhinxmin() ? RISCV::COPY : RISCV::FMV_H_X;
@@ -1065,7 +1092,8 @@ void RISCVDAGToDAGISel::Select(SDNode *Node) {
     }
 
     SDNode *Res;
-    if (VT.SimpleTy == MVT::f16 && Opc == RISCV::COPY) {
+    if ((VT.SimpleTy == MVT::f16 || VT.SimpleTy == MVT::bf16) &&
+        Opc == RISCV::COPY) {
       Res =
           CurDAG->getTargetExtractSubreg(RISCV::sub_16, DL, VT, Imm).getNode();
     } else if (VT.SimpleTy == MVT::f32 && Opc == RISCV::COPY) {
