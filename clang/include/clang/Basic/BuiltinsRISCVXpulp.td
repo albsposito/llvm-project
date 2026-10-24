@@ -356,3 +356,23 @@ def pulp_f16altmin2 : PULPBuiltin<"_Vector<2, __bf16>(_Vector<2, __bf16>, _Vecto
 def pulp_v2hftov2ohf : PULPBuiltin<"_Vector<2, __bf16>(_Vector<2, _Float16>)", "xpulpfvec,zhinx,xpulpf16alt">;
 def pulp_v2ohftov2hf : PULPBuiltin<"_Vector<2, _Float16>(_Vector<2, __bf16>)", "xpulpfvec,zhinx,xpulpf16alt">;
 } // Attributes = [NoThrow, Const]
+
+//===----------------------------------------------------------------------===//
+// GAP9 packed half <-> packed short conversions (task 20/F049, backlog B149).
+// Prototypes are GAP9 GCC 7.1.1's exactly (from its diagnostics): all four
+// use the signed vectors, also the _u forms (v2s = 2 x short, v2h = 2 x
+// _Float16, lane 0 in bits 15:0). GCC emits one instruction for each:
+//  - v2hftov2hi / v2hftov2hi_u: vfcvt.x.h / vfcvt.xu.h, per lane, rounding
+//    with the dynamic rounding mode (frm), saturating to [-32768, 32767] /
+//    [0, 65535], NaN gives 32767 / 65535
+//  - v2hitov2hf / v2hitov2hf_u: vfcvt.h.x / vfcvt.h.xu, per lane, the 16-bit
+//    lane read as signed / unsigned, rounding with frm
+// Lowered in CGBuiltin.cpp (EmitRISCVBuiltinExpr) through generic IR
+// (llvm.rint + llvm.fpto[su]i.sat + a NaN select, [su]itofp).
+//===----------------------------------------------------------------------===//
+let Attributes = [NoThrow, Const] in {
+def pulp_v2hftov2hi : PULPBuiltin<"_Vector<2, short>(_Vector<2, _Float16>)", "xpulpfvec,zhinx">;
+def pulp_v2hftov2hi_u : PULPBuiltin<"_Vector<2, short>(_Vector<2, _Float16>)", "xpulpfvec,zhinx">;
+def pulp_v2hitov2hf : PULPBuiltin<"_Vector<2, _Float16>(_Vector<2, short>)", "xpulpfvec,zhinx">;
+def pulp_v2hitov2hf_u : PULPBuiltin<"_Vector<2, _Float16>(_Vector<2, short>)", "xpulpfvec,zhinx">;
+} // Attributes = [NoThrow, Const]
