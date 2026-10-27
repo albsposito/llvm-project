@@ -1950,6 +1950,35 @@ defm : DotproductBuiltin<"s",  "S">;
 defm : DotproductBuiltin<"u",  "U">;
 defm : DotproductBuiltin<"us", "US">;
 
+// Dot products built by combinePULPVecReduceAdd (RISCVISelLowering.cpp,
+// B156 list B, 20/F057) and by the builtins: an accumulator added to a dot
+// product is the accumulating pv.sdot* form, and a scalar operand that is a
+// small constant is the .sci form (uimm6 for pv.dotup, simm6 for pv.dotsp
+// and pv.dotusp, whose scalar operand is signed).
+multiclass DotproductAccSci<string intrin, string instr, Operand sci> {
+  foreach n = ["2", "4"] in {
+    defvar sfx = !if(!eq(n, "2"), "_H", "_B");
+    defvar VR = !if(!eq(n, "2"), GPRAV2, GPRAV4);
+    defvar dotp = !cast<Intrinsic>("int_riscv_pulp_dot" # intrin # "p" # n);
+    defvar dotsc = !cast<Intrinsic>("int_riscv_pulp_dot" # intrin # "psc" # n);
+    def : Pat<(add (i32 GPR:$rd), (dotp VR:$rs1, VR:$rs2)),
+              (!cast<RVInst>("PV_SDOT" # instr # "P" # sfx)
+                   (i32 GPR:$rd), VR:$rs1, VR:$rs2)>;
+    def : Pat<(add (i32 GPR:$rd), (dotsc VR:$rs1, (i32 GPR:$rs2))),
+              (!cast<RVInst>("PV_SDOT" # instr # "P_SC" # sfx)
+                   (i32 GPR:$rd), VR:$rs1, (i32 GPR:$rs2))>;
+    def : Pat<(dotsc VR:$rs1, sci:$imm),
+              (!cast<RVInst>("PV_DOT" # instr # "P_SCI" # sfx) VR:$rs1, sci:$imm)>;
+    def : Pat<(add (i32 GPR:$rd), (dotsc VR:$rs1, sci:$imm)),
+              (!cast<RVInst>("PV_SDOT" # instr # "P_SCI" # sfx)
+                   (i32 GPR:$rd), VR:$rs1, sci:$imm)>;
+  }
+}
+
+defm : DotproductAccSci<"s",  "S",  simm6>;
+defm : DotproductAccSci<"u",  "U",  uimm6>;
+defm : DotproductAccSci<"us", "US", simm6>;
+
 def : PatGprGpr<int_riscv_pulp_muls, P_MULS>;
 def : PatGprGpr<int_riscv_pulp_mulu, P_MULU>;
 def : PatGprGpr<int_riscv_pulp_mulhhs, P_MULHHS>;
