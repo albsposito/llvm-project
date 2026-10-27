@@ -5,8 +5,11 @@
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfalthalf : SubtargetFeature<
-  "xfalthalf", "HasExtXfalthalf", "true", "'Xfalthalf' (alternate half-precision floats)">;
+def FeatureExtXfalthalf : RISCVExtension<
+  0, 1, "alternate half-precision floats"> {
+  let Name = "xfalthalf";
+  let Desc = "'Xfalthalf' (alternate half-precision floats)";
+}
 def HasExtXfalthalf : Predicate<
   "Subtarget->hasExtXfalthalf()">, AssemblerPredicate<(all_of FeatureExtXfalthalf), "'Xfalthalf' (alternate half-precision floats)">;
 let Predicates = [HasExtXfalthalf] in {
@@ -35,12 +38,42 @@ def FCVT_D_AH : RVInstRFrm<0b0100001, RISCVOpcode<"FCVT_D_AH", 0b1010011>,
 }
 
 // Pseudo instructions
-// NOTE: the fp16alt computational/compare/convert mnemonics used to be
-// (incorrectly) aliased to the plain fp16 instructions here; they are now
-// real instructions with the proper funct3/rm encodings, see
-// RISCVInstrInfoXsmallfloat.td.
 def : InstAlias<"flah $rd, ${imm12}(${rs1})",   (FLH FPR16:$rd, GPR:$rs1, simm12:$imm12), 0>;
 def : InstAlias<"fsah $rs2, ${imm12}(${rs1})",   (FSH FPR16:$rs2, GPR:$rs1, simm12:$imm12), 0>;
+def : InstAlias<"fmadd.ah $rd, $rs1, $rs2, $rs3, $rm",   (FMADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, frmarg:$rm), 0>;
+def : InstAlias<"fmadd.ah $rd, $rs1, $rs2, $rs3",   (FMADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, 0b111), 0>;
+def : InstAlias<"fmsub.ah $rd, $rs1, $rs2, $rs3, $rm",   (FMSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, frmarg:$rm), 0>;
+def : InstAlias<"fmsub.ah $rd, $rs1, $rs2, $rs3",   (FMSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, 0b111), 0>;
+def : InstAlias<"fnmsub.ah $rd, $rs1, $rs2, $rs3, $rm",   (FNMSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, frmarg:$rm), 0>;
+def : InstAlias<"fnmsub.ah $rd, $rs1, $rs2, $rs3",   (FNMSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, 0b111), 0>;
+def : InstAlias<"fnmadd.ah $rd, $rs1, $rs2, $rs3, $rm",   (FNMADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, frmarg:$rm), 0>;
+def : InstAlias<"fnmadd.ah $rd, $rs1, $rs2, $rs3",   (FNMADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, FPR16:$rs3, 0b111), 0>;
+def : InstAlias<"fadd.ah $rd, $rs1, $rs2, $rm",   (FADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, frmarg:$rm), 0>;
+def : InstAlias<"fadd.ah $rd, $rs1, $rs2",   (FADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, 0b111), 0>;
+def : InstAlias<"fsub.ah $rd, $rs1, $rs2, $rm",   (FSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, frmarg:$rm), 0>;
+def : InstAlias<"fsub.ah $rd, $rs1, $rs2",   (FSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, 0b111), 0>;
+def : InstAlias<"fmul.ah $rd, $rs1, $rs2, $rm",   (FMUL_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, frmarg:$rm), 0>;
+def : InstAlias<"fmul.ah $rd, $rs1, $rs2",   (FMUL_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, 0b111), 0>;
+def : InstAlias<"fdiv.ah $rd, $rs1, $rs2, $rm",   (FDIV_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, frmarg:$rm), 0>;
+def : InstAlias<"fdiv.ah $rd, $rs1, $rs2",   (FDIV_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2, 0b111), 0>;
+def : InstAlias<"fsqrt.ah $rd, $rs1, $rm",   (FSQRT_H FPR16:$rd, FPR16:$rs1, frmarg:$rm), 0>;
+def : InstAlias<"fsqrt.ah $rd, $rs1",   (FSQRT_H FPR16:$rd, FPR16:$rs1, 0b111), 0>;
+def : InstAlias<"fsgnj.ah $rd, $rs1, $rs2",   (FSGNJ_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"fsgnjn.ah $rd, $rs1, $rs2",   (FSGNJN_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"fsgnjx.ah $rd, $rs1, $rs2",   (FSGNJX_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"fmin.ah $rd, $rs1, $rs2",   (FMIN_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"fmax.ah $rd, $rs1, $rs2",   (FMAX_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"feq.ah $rd, $rs1, $rs2",   (FEQ_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"flt.ah $rd, $rs1, $rs2",   (FLT_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"fle.ah $rd, $rs1, $rs2",   (FLE_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"fcvt.w.ah $rd, $rs1, $rm",   (FCVT_W_H GPR:$rd, FPR16:$rs1, frmarg:$rm), 0>;
+def : InstAlias<"fcvt.w.ah $rd, $rs1",   (FCVT_W_H GPR:$rd, FPR16:$rs1, 0b111), 0>;
+def : InstAlias<"fcvt.wu.ah $rd, $rs1, $rm",   (FCVT_WU_H GPR:$rd, FPR16:$rs1, frmarg:$rm), 0>;
+def : InstAlias<"fcvt.wu.ah $rd, $rs1",   (FCVT_WU_H GPR:$rd, FPR16:$rs1, 0b111), 0>;
+def : InstAlias<"fcvt.ah.w $rd, $rs1, $rm",   (FCVT_H_W FPR16:$rd, GPR:$rs1, frmarg:$rm), 0>;
+def : InstAlias<"fcvt.ah.w $rd, $rs1",   (FCVT_H_W FPR16:$rd, GPR:$rs1, 0b111), 0>;
+def : InstAlias<"fcvt.ah.wu $rd, $rs1, $rm",   (FCVT_H_WU FPR16:$rd, GPR:$rs1, frmarg:$rm), 0>;
+def : InstAlias<"fcvt.ah.wu $rd, $rs1",   (FCVT_H_WU FPR16:$rd, GPR:$rs1, 0b111), 0>;
 def : InstAlias<"fmv.x.ah $rd, $rs1",   (FMV_X_H GPR:$rd, FPR16:$rs1), 0>;
 def : InstAlias<"fclass.ah $rd, $rs1",   (FCLASS_H GPR:$rd, FPR16:$rs1), 0>;
 def : InstAlias<"fmv.ah.x $rd, $rs1",   (FMV_H_X FPR16:$rd, GPR:$rs1), 0>;
@@ -68,8 +101,11 @@ def : InstAlias<"fcvt.h.ah $rd, $rs1",   (FCVT_H_H FPR16:$rd, FPR16:$rs1, 0b111)
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfquarter : SubtargetFeature<
-  "xfquarter", "HasExtXfquarter", "true", "'Xfquarter' (quarter-precision floats)">;
+def FeatureExtXfquarter : RISCVExtension<
+  0, 1, "quarter-precision floats"> {
+  let Name = "xfquarter";
+  let Desc = "'Xfquarter' (quarter-precision floats)";
+}
 def HasExtXfquarter : Predicate<
   "Subtarget->hasExtXfquarter()">, AssemblerPredicate<(all_of FeatureExtXfquarter), "'Xfquarter' (quarter-precision floats)">;
 let Predicates = [HasExtXfquarter] in {
@@ -253,8 +289,11 @@ def : InstAlias<"fcvt.b.ah $rd, $rs1",   (FCVT_B_H FPR16:$rd, FPR16:$rs1, 0b111)
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfaltquarter : SubtargetFeature<
-  "xfaltquarter", "HasExtXfaltquarter", "true", "'Xfaltquarter' (alternate quarter-precision floats)">;
+def FeatureExtXfaltquarter : RISCVExtension<
+  0, 1, "alternate quarter-precision floats"> {
+  let Name = "xfaltquarter";
+  let Desc = "'Xfaltquarter' (alternate quarter-precision floats)";
+}
 def HasExtXfaltquarter : Predicate<
   "Subtarget->hasExtXfaltquarter()">, AssemblerPredicate<(all_of FeatureExtXfaltquarter), "'Xfaltquarter' (alternate quarter-precision floats)">;
 let Predicates = [HasExtXfaltquarter] in {
@@ -338,8 +377,11 @@ def : InstAlias<"fcvt.ab.ab $rd, $rs1",   (FCVT_B_B FPR16:$rd, FPR16:$rs1), 0>;
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfvecsingle : SubtargetFeature<
-  "xfvecsingle", "HasExtXfvecsingle", "true", "'Xfvecsingle' (vectorial single-precision floats - requires FLEN >= 64)">;
+def FeatureExtXfvecsingle : RISCVExtension<
+  0, 1, "vectorial single-precision floats - requires FLEN >= 64"> {
+  let Name = "xfvecsingle";
+  let Desc = "'Xfvecsingle' (vectorial single-precision floats - requires FLEN >= 64)";
+}
 def HasExtXfvecsingle : Predicate<
   "Subtarget->hasExtXfvecsingle()">, AssemblerPredicate<(all_of FeatureExtXfvecsingle), "'Xfvecsingle' (vectorial single-precision floats - requires FLEN >= 64)">;
 let Predicates = [HasExtXfvecsingle] in {
@@ -536,92 +578,92 @@ def : InstAlias<"vfcvtu.ah.h $rd, $rs1",   (VFCVTU_H_H FPR16:$rd, FPR16:$rs1), 0
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfvechalf : SubtargetFeature<
-  "xfvechalf", "HasExtXfvechalf", "true", "'Xfvechalf' (vectorial half-precision floats - requires FLEN >= 32)">;
+def FeatureExtXfvechalf : RISCVExtension<
+  0, 1, "vectorial half-precision floats - requires FLEN >= 32"> {
+  let Name = "xfvechalf";
+  let Desc = "'Xfvechalf' (vectorial half-precision floats - requires FLEN >= 32)";
+}
 def HasExtXfvechalf : Predicate<
   "Subtarget->hasExtXfvechalf()">, AssemblerPredicate<(all_of FeatureExtXfvechalf), "'Xfvechalf' (vectorial half-precision floats - requires FLEN >= 32)">;
 let Predicates = [HasExtXfvechalf] in {
 
 // Instructions
-// NOTE: operands use PulpV2F (GPRs) since GAP9-style cores keep floats in
-// the integer register file (Zfinx/Zhinx style).
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFADD_H : RVInstRVf<0b10, 0b00001, 0b0, VFMT_FP16, RISCVOpcode<"VFADD_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfadd.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfadd.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFADD_R_H : RVInstRVf<0b10, 0b00001, 0b1, VFMT_FP16, RISCVOpcode<"VFADD_R_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfadd.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfadd.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSUB_H : RVInstRVf<0b10, 0b00010, 0b0, VFMT_FP16, RISCVOpcode<"VFSUB_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsub.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsub.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSUB_R_H : RVInstRVf<0b10, 0b00010, 0b1, VFMT_FP16, RISCVOpcode<"VFSUB_R_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsub.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsub.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMUL_H : RVInstRVf<0b10, 0b00011, 0b0, VFMT_FP16, RISCVOpcode<"VFMUL_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmul.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmul.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMUL_R_H : RVInstRVf<0b10, 0b00011, 0b1, VFMT_FP16, RISCVOpcode<"VFMUL_R_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmul.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmul.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFDIV_H : RVInstRVf<0b10, 0b00100, 0b0, VFMT_FP16, RISCVOpcode<"VFDIV_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfdiv.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfdiv.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFDIV_R_H : RVInstRVf<0b10, 0b00100, 0b1, VFMT_FP16, RISCVOpcode<"VFDIV_R_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfdiv.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfdiv.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMIN_H : RVInstRVf<0b10, 0b00101, 0b0, VFMT_FP16, RISCVOpcode<"VFMIN_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmin.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmin.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMIN_R_H : RVInstRVf<0b10, 0b00101, 0b1, VFMT_FP16, RISCVOpcode<"VFMIN_R_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmin.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmin.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMAX_H : RVInstRVf<0b10, 0b00110, 0b0, VFMT_FP16, RISCVOpcode<"VFMAX_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmax.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmax.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMAX_R_H : RVInstRVf<0b10, 0b00110, 0b1, VFMT_FP16, RISCVOpcode<"VFMAX_R_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmax.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmax.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSQRT_H : RVInstRVf<0b10, 0b00111, 0b0, VFMT_FP16, RISCVOpcode<"VFSQRT_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1), "vfsqrt.h", "$rd, $rs1">, Sched<[]> {
+             (outs FPR16:$rd), (ins FPR16:$rs1), "vfsqrt.h", "$rd, $rs1">, Sched<[]> {
     let rs2 = 0b00000;
   }
-// vfmac/vfmre accumulate into rd, so the destination is a tied operand.
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMAC_H : RVInstRVf<0b10, 0b01000, 0b0, VFMT_FP16, RISCVOpcode<"VFMAC_H", 0b0110011>,
-             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmac.h", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmac.h", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMAC_R_H : RVInstRVf<0b10, 0b01000, 0b1, VFMT_FP16, RISCVOpcode<"VFMAC_R_H", 0b0110011>,
-             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmac.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmac.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMRE_H : RVInstRVf<0b10, 0b01001, 0b0, VFMT_FP16, RISCVOpcode<"VFMRE_H", 0b0110011>,
-             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmre.h", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmre.h", "$rd, $rs1, $rs2">, Sched<[]>;
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFMRE_R_H : RVInstRVf<0b10, 0b01001, 0b1, VFMT_FP16, RISCVOpcode<"VFMRE_R_H", 0b0110011>,
-             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmre.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfmre.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFCLASS_H : RVInstRVf<0b10, 0b01100, 0b0, VFMT_FP16, RISCVOpcode<"VFCLASS_H", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1), "vfclass.h", "$rd, $rs1">, Sched<[]> {
+             (outs GPR:$rd), (ins FPR16:$rs1), "vfclass.h", "$rd, $rs1">, Sched<[]> {
     let rs2 = 0b00001;
   }
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJ_H : RVInstRVf<0b10, 0b01101, 0b0, VFMT_FP16, RISCVOpcode<"VFSGNJ_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnj.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnj.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJ_R_H : RVInstRVf<0b10, 0b01101, 0b1, VFMT_FP16, RISCVOpcode<"VFSGNJ_R_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnj.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnj.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJN_H : RVInstRVf<0b10, 0b01110, 0b0, VFMT_FP16, RISCVOpcode<"VFSGNJN_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjn.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnjn.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJN_R_H : RVInstRVf<0b10, 0b01110, 0b1, VFMT_FP16, RISCVOpcode<"VFSGNJN_R_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjn.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnjn.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJX_H : RVInstRVf<0b10, 0b01111, 0b0, VFMT_FP16, RISCVOpcode<"VFSGNJX_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjx.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnjx.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFSGNJX_R_H : RVInstRVf<0b10, 0b01111, 0b1, VFMT_FP16, RISCVOpcode<"VFSGNJX_R_H", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjx.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
+             (outs FPR16:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfsgnjx.r.h", "$rd, $rs1, $rs2">, Sched<[]>;
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
 def VFEQ_H : RVInstRVf<0b10, 0b10000, 0b0, VFMT_FP16, RISCVOpcode<"VFEQ_H", 0b0110011>,
              (outs GPR:$rd), (ins FPR16:$rs1, FPR16:$rs2), "vfeq.h", "$rd, $rs1, $rs2">, Sched<[]>;
@@ -743,158 +785,72 @@ def VFCVTU_H_S : RVInstRVf<0b10, 0b01100, 0b1, VFMT_FP16, RISCVOpcode<"VFCVTU_H_
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfvecalthalf : SubtargetFeature<
-  "xfvecalthalf", "HasExtXfvecalthalf", "true", "'Xfvecalthalf' (vectorial alternate half-precision floats - requires FLEN >= 32)">;
+def FeatureExtXfvecalthalf : RISCVExtension<
+  0, 1, "vectorial alternate half-precision floats - requires FLEN >= 32"> {
+  let Name = "xfvecalthalf";
+  let Desc = "'Xfvecalthalf' (vectorial alternate half-precision floats - requires FLEN >= 32)";
+}
 def HasExtXfvecalthalf : Predicate<
   "Subtarget->hasExtXfvecalthalf()">, AssemblerPredicate<(all_of FeatureExtXfvecalthalf), "'Xfvecalthalf' (vectorial alternate half-precision floats - requires FLEN >= 32)">;
 let Predicates = [HasExtXfvecalthalf] in {
 
 // Instructions
-// Encodings verified against GAP9 GCC: alt-half uses vfmt = 0b01.
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFADD_AH : RVInstRVf<0b10, 0b00001, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFADD_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfadd.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFADD_R_AH : RVInstRVf<0b10, 0b00001, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFADD_R_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfadd.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFSUB_AH : RVInstRVf<0b10, 0b00010, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFSUB_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsub.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFSUB_R_AH : RVInstRVf<0b10, 0b00010, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFSUB_R_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsub.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFMUL_AH : RVInstRVf<0b10, 0b00011, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFMUL_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmul.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFMUL_R_AH : RVInstRVf<0b10, 0b00011, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFMUL_R_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmul.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFDIV_AH : RVInstRVf<0b10, 0b00100, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFDIV_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfdiv.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFDIV_R_AH : RVInstRVf<0b10, 0b00100, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFDIV_R_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfdiv.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFMIN_AH : RVInstRVf<0b10, 0b00101, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFMIN_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmin.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFMIN_R_AH : RVInstRVf<0b10, 0b00101, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFMIN_R_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmin.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFMAX_AH : RVInstRVf<0b10, 0b00110, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFMAX_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmax.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFMAX_R_AH : RVInstRVf<0b10, 0b00110, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFMAX_R_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfmax.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFSQRT_AH : RVInstRVf<0b10, 0b00111, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFSQRT_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1), "vfsqrt.ah", "$rd, $rs1">, Sched<[]> {
-    let rs2 = 0b00000;
-  }
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
-def VFMAC_AH : RVInstRVf<0b10, 0b01000, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFMAC_AH", 0b0110011>,
-             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmac.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
-def VFMAC_R_AH : RVInstRVf<0b10, 0b01000, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFMAC_R_AH", 0b0110011>,
-             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmac.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
-def VFMRE_AH : RVInstRVf<0b10, 0b01001, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFMRE_AH", 0b0110011>,
-             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmre.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0, Constraints = "$rd = $rd_wb" in
-def VFMRE_R_AH : RVInstRVf<0b10, 0b01001, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFMRE_R_AH", 0b0110011>,
-             (outs PulpV2F:$rd_wb), (ins PulpV2F:$rd, PulpV2F:$rs1, PulpV2F:$rs2), "vfmre.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFSGNJ_AH : RVInstRVf<0b10, 0b01101, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFSGNJ_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnj.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFSGNJ_R_AH : RVInstRVf<0b10, 0b01101, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFSGNJ_R_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnj.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFSGNJN_AH : RVInstRVf<0b10, 0b01110, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFSGNJN_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjn.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFSGNJN_R_AH : RVInstRVf<0b10, 0b01110, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFSGNJN_R_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjn.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFSGNJX_AH : RVInstRVf<0b10, 0b01111, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFSGNJX_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjx.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFSGNJX_R_AH : RVInstRVf<0b10, 0b01111, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFSGNJX_R_AH", 0b0110011>,
-             (outs PulpV2F:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfsgnjx.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
 
-// Compare, classify, integer-convert and pack instructions, encodings
-// validated against GAP GCC binutils (vfmt = 0b01 selects the alt format;
-// GAP9 does not implement vfmv.*.ah, vfcvt[u].{s.ah,ah.s} or the
-// vfcpk{b,c,d}.ah.* variants).
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFCLASS_AH : RVInstRVf<0b10, 0b01100, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFCLASS_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1), "vfclass.ah", "$rd, $rs1">, Sched<[]> {
-    let rs2 = 0b00001;
-  }
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFEQ_AH : RVInstRVf<0b10, 0b10000, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFEQ_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfeq.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFEQ_R_AH : RVInstRVf<0b10, 0b10000, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFEQ_R_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfeq.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFNE_AH : RVInstRVf<0b10, 0b10001, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFNE_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfne.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFNE_R_AH : RVInstRVf<0b10, 0b10001, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFNE_R_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfne.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFLT_AH : RVInstRVf<0b10, 0b10010, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFLT_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vflt.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFLT_R_AH : RVInstRVf<0b10, 0b10010, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFLT_R_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vflt.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFGE_AH : RVInstRVf<0b10, 0b10011, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFGE_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfge.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFGE_R_AH : RVInstRVf<0b10, 0b10011, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFGE_R_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfge.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFLE_AH : RVInstRVf<0b10, 0b10100, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFLE_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfle.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFLE_R_AH : RVInstRVf<0b10, 0b10100, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFLE_R_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfle.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFGT_AH : RVInstRVf<0b10, 0b10101, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFGT_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfgt.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFGT_R_AH : RVInstRVf<0b10, 0b10101, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFGT_R_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1, PulpV2F:$rs2), "vfgt.r.ah", "$rd, $rs1, $rs2">, Sched<[]>;
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFCVT_X_AH : RVInstRVf<0b10, 0b01100, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFCVT_X_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1), "vfcvt.x.ah", "$rd, $rs1">, Sched<[]> {
-    let rs2 = 0b00010;
-  }
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFCVT_XU_AH : RVInstRVf<0b10, 0b01100, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFCVT_XU_AH", 0b0110011>,
-             (outs GPR:$rd), (ins PulpV2F:$rs1), "vfcvt.xu.ah", "$rd, $rs1">, Sched<[]> {
-    let rs2 = 0b00010;
-  }
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFCVT_AH_X : RVInstRVf<0b10, 0b01100, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFCVT_AH_X", 0b0110011>,
-             (outs PulpV2F:$rd), (ins GPR:$rs1), "vfcvt.ah.x", "$rd, $rs1">, Sched<[]> {
-    let rs2 = 0b00011;
-  }
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFCVT_AH_XU : RVInstRVf<0b10, 0b01100, 0b1, VFMT_FP16ALT, RISCVOpcode<"VFCVT_AH_XU", 0b0110011>,
-             (outs PulpV2F:$rd), (ins GPR:$rs1), "vfcvt.ah.xu", "$rd, $rs1">, Sched<[]> {
-    let rs2 = 0b00011;
-  }
-let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def VFCPKA_AH_S : RVInstRVf<0b10, 0b11000, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFCPKA_AH_S", 0b0110011>,
-             (outs PulpV2F:$rd), (ins FPR32INX:$rs1, FPR32INX:$rs2), "vfcpka.ah.s", "$rd, $rs1, $rs2">, Sched<[]>;
-
-// NOTE: the previous vfmv/vfcvt/vfcpk/compare .ah aliases mapped to the .h
-// encodings (vfmt=0b10), which is wrong; they were removed until their real
-// encodings are validated against hardware/GCC.
+// Pseudo instructions
+def : InstAlias<"vfadd.ah $rd, $rs1, $rs2",   (VFADD_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfadd.r.ah $rd, $rs1, $rs2",   (VFADD_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfsub.ah $rd, $rs1, $rs2",   (VFSUB_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfsub.r.ah $rd, $rs1, $rs2",   (VFSUB_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfmul.ah $rd, $rs1, $rs2",   (VFMUL_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfmul.r.ah $rd, $rs1, $rs2",   (VFMUL_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfdiv.ah $rd, $rs1, $rs2",   (VFDIV_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfdiv.r.ah $rd, $rs1, $rs2",   (VFDIV_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfmin.ah $rd, $rs1, $rs2",   (VFMIN_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfmin.r.ah $rd, $rs1, $rs2",   (VFMIN_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfmax.ah $rd, $rs1, $rs2",   (VFMAX_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfmax.r.ah $rd, $rs1, $rs2",   (VFMAX_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfsqrt.ah $rd, $rs1",   (VFSQRT_H FPR16:$rd, FPR16:$rs1), 0>;
+def : InstAlias<"vfmac.ah $rd, $rs1, $rs2",   (VFMAC_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfmac.r.ah $rd, $rs1, $rs2",   (VFMAC_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfmre.ah $rd, $rs1, $rs2",   (VFMRE_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfmre.r.ah $rd, $rs1, $rs2",   (VFMRE_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfclass.ah $rd, $rs1",   (VFCLASS_H GPR:$rd, FPR16:$rs1), 0>;
+def : InstAlias<"vfsgnj.ah $rd, $rs1, $rs2",   (VFSGNJ_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfsgnj.r.ah $rd, $rs1, $rs2",   (VFSGNJ_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfsgnjn.ah $rd, $rs1, $rs2",   (VFSGNJN_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfsgnjn.r.ah $rd, $rs1, $rs2",   (VFSGNJN_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfsgnjx.ah $rd, $rs1, $rs2",   (VFSGNJX_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfsgnjx.r.ah $rd, $rs1, $rs2",   (VFSGNJX_R_H FPR16:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfeq.ah $rd, $rs1, $rs2",   (VFEQ_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfeq.r.ah $rd, $rs1, $rs2",   (VFEQ_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfne.ah $rd, $rs1, $rs2",   (VFNE_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfne.r.ah $rd, $rs1, $rs2",   (VFNE_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vflt.ah $rd, $rs1, $rs2",   (VFLT_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vflt.r.ah $rd, $rs1, $rs2",   (VFLT_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfge.ah $rd, $rs1, $rs2",   (VFGE_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfge.r.ah $rd, $rs1, $rs2",   (VFGE_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfle.ah $rd, $rs1, $rs2",   (VFLE_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfle.r.ah $rd, $rs1, $rs2",   (VFLE_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfgt.ah $rd, $rs1, $rs2",   (VFGT_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfgt.r.ah $rd, $rs1, $rs2",   (VFGT_R_H GPR:$rd, FPR16:$rs1, FPR16:$rs2), 0>;
+def : InstAlias<"vfmv.x.ah $rd, $rs1",   (VFMV_X_H GPR:$rd, FPR16:$rs1), 0>;
+def : InstAlias<"vfmv.ah.x $rd, $rs1",   (VFMV_H_X FPR16:$rd, GPR:$rs1), 0>;
+def : InstAlias<"vfcvt.x.ah $rd, $rs1",   (VFCVT_X_H GPR:$rd, FPR16:$rs1), 0>;
+def : InstAlias<"vfcvt.xu.ah $rd, $rs1",   (VFCVT_XU_H GPR:$rd, FPR16:$rs1), 0>;
+def : InstAlias<"vfcvt.ah.x $rd, $rs1",   (VFCVT_H_X FPR16:$rd, GPR:$rs1), 0>;
+def : InstAlias<"vfcvt.ah.xu $rd, $rs1",   (VFCVT_H_XU FPR16:$rd, GPR:$rs1), 0>;
+def : InstAlias<"vfcpka.ah.s $rd, $rs1, $rs2",   (VFCPKA_H_S FPR16:$rd, FPR32:$rs1, FPR32:$rs2), 0>;
+def : InstAlias<"vfcpkb.ah.s $rd, $rs1, $rs2",   (VFCPKB_H_S FPR16:$rd, FPR32:$rs1, FPR32:$rs2), 0>;
+def : InstAlias<"vfcpkc.ah.s $rd, $rs1, $rs2",   (VFCPKC_H_S FPR16:$rd, FPR32:$rs1, FPR32:$rs2), 0>;
+def : InstAlias<"vfcpkd.ah.s $rd, $rs1, $rs2",   (VFCPKD_H_S FPR16:$rd, FPR32:$rs1, FPR32:$rs2), 0>;
+def : InstAlias<"vfcpka.ah.d $rd, $rs1, $rs2",   (VFCPKA_H_D FPR16:$rd, FPR64:$rs1, FPR64:$rs2), 0>;
+def : InstAlias<"vfcpkb.ah.d $rd, $rs1, $rs2",   (VFCPKB_H_D FPR16:$rd, FPR64:$rs1, FPR64:$rs2), 0>;
+def : InstAlias<"vfcpkc.ah.d $rd, $rs1, $rs2",   (VFCPKC_H_D FPR16:$rd, FPR64:$rs1, FPR64:$rs2), 0>;
+def : InstAlias<"vfcpkd.ah.d $rd, $rs1, $rs2",   (VFCPKD_H_D FPR16:$rd, FPR64:$rs1, FPR64:$rs2), 0>;
+def : InstAlias<"vfcvt.s.ah $rd, $rs1",   (VFCVT_S_H FPR32:$rd, FPR16:$rs1), 0>;
+def : InstAlias<"vfcvtu.s.ah $rd, $rs1",   (VFCVTU_S_H FPR32:$rd, FPR16:$rs1), 0>;
+def : InstAlias<"vfcvt.ah.s $rd, $rs1",   (VFCVT_H_S FPR16:$rd, FPR32:$rs1), 0>;
+def : InstAlias<"vfcvtu.ah.s $rd, $rs1",   (VFCVTU_H_S FPR16:$rd, FPR32:$rs1), 0>;
 } // let Predicates = [HasExtXfvecalthalf]
 
 
@@ -904,8 +860,11 @@ def VFCPKA_AH_S : RVInstRVf<0b10, 0b11000, 0b0, VFMT_FP16ALT, RISCVOpcode<"VFCPK
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfvecquarter : SubtargetFeature<
-  "xfvecquarter", "HasExtXfvecquarter", "true", "'Xfvecquarter' (vectorial quarter-precision floats - requires FLEN >= 16)">;
+def FeatureExtXfvecquarter : RISCVExtension<
+  0, 1, "vectorial quarter-precision floats - requires FLEN >= 16"> {
+  let Name = "xfvecquarter";
+  let Desc = "'Xfvecquarter' (vectorial quarter-precision floats - requires FLEN >= 16)";
+}
 def HasExtXfvecquarter : Predicate<
   "Subtarget->hasExtXfvecquarter()">, AssemblerPredicate<(all_of FeatureExtXfvecquarter), "'Xfvecquarter' (vectorial quarter-precision floats - requires FLEN >= 16)">;
 let Predicates = [HasExtXfvecquarter] in {
@@ -1146,8 +1105,11 @@ def : InstAlias<"vfcvtu.b.ab $rd, $rs1",   (VFCVTU_B_B FPR16:$rd, FPR16:$rs1), 0
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfvecaltquarter : SubtargetFeature<
-  "xfvecaltquarter", "HasExtXfvecaltquarter", "true", "'Xfvecaltquarter' (vectorial alternative quarter-precision floats - requires FLEN >= 16)">;
+def FeatureExtXfvecaltquarter : RISCVExtension<
+  0, 1, "vectorial alternative quarter-precision floats - requires FLEN >= 16"> {
+  let Name = "xfvecaltquarter";
+  let Desc = "'Xfvecaltquarter' (vectorial alternative quarter-precision floats - requires FLEN >= 16)";
+}
 def HasExtXfvecaltquarter : Predicate<
   "Subtarget->hasExtXfvecaltquarter()">, AssemblerPredicate<(all_of FeatureExtXfvecaltquarter), "'Xfvecaltquarter' (vectorial alternative quarter-precision floats - requires FLEN >= 16)">;
 let Predicates = [HasExtXfvecaltquarter] in {
@@ -1226,8 +1188,11 @@ def : InstAlias<"vfcvtu.ab.ah $rd, $rs1",   (VFCVTU_B_H FPR16:$rd, FPR16:$rs1), 
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfauxhalf : SubtargetFeature<
-  "xfauxhalf", "HasExtXfauxhalf", "true", "'Xfauxhalf' (half-precision auxiliary operations - requires Xfhalf extension)">;
+def FeatureExtXfauxhalf : RISCVExtension<
+  0, 1, "half-precision auxiliary operations - requires Xfhalf extension"> {
+  let Name = "xfauxhalf";
+  let Desc = "'Xfauxhalf' (half-precision auxiliary operations - requires Xfhalf extension)";
+}
 def HasExtXfauxhalf : Predicate<
   "Subtarget->hasExtXfauxhalf()">, AssemblerPredicate<(all_of FeatureExtXfauxhalf), "'Xfauxhalf' (half-precision auxiliary operations - requires Xfhalf extension)">;
 let Predicates = [HasExtXfauxhalf] in {
@@ -1252,8 +1217,11 @@ def      : InstAlias<"fmacex.s.h $rd, $rs1, $rs2", (FMACEX_S_H FPR32:$rd, FPR32:
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfauxalthalf : SubtargetFeature<
-  "xfauxalthalf", "HasExtXfauxalthalf", "true", "'Xfauxalthalf' (alternate half-precision auxiliary operations - requires Xfalthalf extension)">;
+def FeatureExtXfauxalthalf : RISCVExtension<
+  0, 1, "alternate half-precision auxiliary operations - requires Xfalthalf extension"> {
+  let Name = "xfauxalthalf";
+  let Desc = "'Xfauxalthalf' (alternate half-precision auxiliary operations - requires Xfalthalf extension)";
+}
 def HasExtXfauxalthalf : Predicate<
   "Subtarget->hasExtXfauxalthalf()">, AssemblerPredicate<(all_of FeatureExtXfauxalthalf), "'Xfauxalthalf' (alternate half-precision auxiliary operations - requires Xfalthalf extension)">;
 let Predicates = [HasExtXfauxalthalf] in {
@@ -1274,8 +1242,11 @@ def : InstAlias<"fmacex.s.ah $rd, $rs1, $rs2",   (FMACEX_S_H FPR32:$rd, FPR32:$r
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfauxquarter : SubtargetFeature<
-  "xfauxquarter", "HasExtXfauxquarter", "true", "'Xfauxquarter' (quarter-precision auxiliary operations - requires Xfquarter extension)">;
+def FeatureExtXfauxquarter : RISCVExtension<
+  0, 1, "quarter-precision auxiliary operations - requires Xfquarter extension"> {
+  let Name = "xfauxquarter";
+  let Desc = "'Xfauxquarter' (quarter-precision auxiliary operations - requires Xfquarter extension)";
+}
 def HasExtXfauxquarter : Predicate<
   "Subtarget->hasExtXfauxquarter()">, AssemblerPredicate<(all_of FeatureExtXfauxquarter), "'Xfauxquarter' (quarter-precision auxiliary operations - requires Xfquarter extension)">;
 let Predicates = [HasExtXfauxquarter] in {
@@ -1300,8 +1271,11 @@ def      : InstAlias<"fmacex.s.b $rd, $rs1, $rs2", (FMACEX_S_B FPR32:$rd, FPR32:
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfauxaltquarter : SubtargetFeature<
-  "xfauxaltquarter", "HasExtXfauxaltquarter", "true", "'Xfauxaltquarter' (alternate quarter-precision auxiliary operations - requires Xfaltquarter extension)">;
+def FeatureExtXfauxaltquarter : RISCVExtension<
+  0, 1, "alternate quarter-precision auxiliary operations - requires Xfaltquarter extension"> {
+  let Name = "xfauxaltquarter";
+  let Desc = "'Xfauxaltquarter' (alternate quarter-precision auxiliary operations - requires Xfaltquarter extension)";
+}
 def HasExtXfauxaltquarter : Predicate<
   "Subtarget->hasExtXfauxaltquarter()">, AssemblerPredicate<(all_of FeatureExtXfauxaltquarter), "'Xfauxaltquarter' (alternate quarter-precision auxiliary operations - requires Xfaltquarter extension)">;
 let Predicates = [HasExtXfauxaltquarter] in {
@@ -1322,8 +1296,11 @@ def : InstAlias<"fmacex.s.ab $rd, $rs1, $rs2",   (FMACEX_S_B FPR32:$rd, FPR32:$r
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfauxvecsingle : SubtargetFeature<
-  "xfauxvecsingle", "HasExtXfauxvecsingle", "true", "'Xfauxvecsingle' (vectorial single-precision auxiliary operations - requires Xfvecsingle extension)">;
+def FeatureExtXfauxvecsingle : RISCVExtension<
+  0, 1, "vectorial single-precision auxiliary operations - requires Xfvecsingle extension"> {
+  let Name = "xfauxvecsingle";
+  let Desc = "'Xfauxvecsingle' (vectorial single-precision auxiliary operations - requires Xfvecsingle extension)";
+}
 def HasExtXfauxvecsingle : Predicate<
   "Subtarget->hasExtXfauxvecsingle()">, AssemblerPredicate<(all_of FeatureExtXfauxvecsingle), "'Xfauxvecsingle' (vectorial single-precision auxiliary operations - requires Xfvecsingle extension)">;
 let Predicates = [HasExtXfauxvecsingle] in {
@@ -1350,8 +1327,11 @@ def VFNSUM_S : RVInstRVf<0b10, 0b10111, 0b0, VFMT_FP32, RISCVOpcode<"VFNSUM_S", 
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfauxvechalf : SubtargetFeature<
-  "xfauxvechalf", "HasExtXfauxvechalf", "true", "'Xfauxvechalf' (vectorial half-precision auxiliary operations - requires Xfvechalf extension)">;
+def FeatureExtXfauxvechalf : RISCVExtension<
+  0, 1, "vectorial half-precision auxiliary operations - requires Xfvechalf extension"> {
+  let Name = "xfauxvechalf";
+  let Desc = "'Xfauxvechalf' (vectorial half-precision auxiliary operations - requires Xfvechalf extension)";
+}
 def HasExtXfauxvechalf : Predicate<
   "Subtarget->hasExtXfauxvechalf()">, AssemblerPredicate<(all_of FeatureExtXfauxvechalf), "'Xfauxvechalf' (vectorial half-precision auxiliary operations - requires Xfvechalf extension)">;
 let Predicates = [HasExtXfauxvechalf] in {
@@ -1378,8 +1358,11 @@ def VFNSUM_H : RVInstRVf<0b10, 0b10111, 0b0, VFMT_FP16, RISCVOpcode<"VFNSUM_H", 
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfauxvecalthalf : SubtargetFeature<
-  "xfauxvecalthalf", "HasExtXfauxvecalthalf", "true", "'Xfauxvecalthalf' (- vectorial alternate half-precision auxiliary operations - requires Xfvecalthalf extension)">;
+def FeatureExtXfauxvecalthalf : RISCVExtension<
+  0, 1, "- vectorial alternate half-precision auxiliary operations - requires Xfvecalthalf extension"> {
+  let Name = "xfauxvecalthalf";
+  let Desc = "'Xfauxvecalthalf' (- vectorial alternate half-precision auxiliary operations - requires Xfvecalthalf extension)";
+}
 def HasExtXfauxvecalthalf : Predicate<
   "Subtarget->hasExtXfauxvecalthalf()">, AssemblerPredicate<(all_of FeatureExtXfauxvecalthalf), "'Xfauxvecalthalf' (- vectorial alternate half-precision auxiliary operations - requires Xfvecalthalf extension)">;
 let Predicates = [HasExtXfauxvecalthalf] in {
@@ -1398,8 +1381,11 @@ def : InstAlias<"vfnsum.ah $rd, $rs1",   (VFNSUM_H FPR16:$rd, FPR16:$rs1), 0>;
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfauxvecquarter : SubtargetFeature<
-  "xfauxvecquarter", "HasExtXfauxvecquarter", "true", "'Xfauxvecquarter' (vectorial quarter-precision auxiliary operations - requires Xfvecquarter extension)">;
+def FeatureExtXfauxvecquarter : RISCVExtension<
+  0, 1, "vectorial quarter-precision auxiliary operations - requires Xfvecquarter extension"> {
+  let Name = "xfauxvecquarter";
+  let Desc = "'Xfauxvecquarter' (vectorial quarter-precision auxiliary operations - requires Xfvecquarter extension)";
+}
 def HasExtXfauxvecquarter : Predicate<
   "Subtarget->hasExtXfauxvecquarter()">, AssemblerPredicate<(all_of FeatureExtXfauxvecquarter), "'Xfauxvecquarter' (vectorial quarter-precision auxiliary operations - requires Xfvecquarter extension)">;
 let Predicates = [HasExtXfauxvecquarter] in {
@@ -1426,8 +1412,11 @@ def VFNSUM_B : RVInstRVf<0b10, 0b10111, 0b0, VFMT_FP8, RISCVOpcode<"VFNSUM_B", 0
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfauxvecaltquarter : SubtargetFeature<
-  "xfauxvecaltquarter", "HasExtXfauxvecaltquarter", "true", "'Xfauxvecaltquarter' (- vectorial alternate quarter-precision auxiliary operations - requires Xfvecaltquarter extension)">;
+def FeatureExtXfauxvecaltquarter : RISCVExtension<
+  0, 1, "- vectorial alternate quarter-precision auxiliary operations - requires Xfvecaltquarter extension"> {
+  let Name = "xfauxvecaltquarter";
+  let Desc = "'Xfauxvecaltquarter' (- vectorial alternate quarter-precision auxiliary operations - requires Xfvecaltquarter extension)";
+}
 def HasExtXfauxvecaltquarter : Predicate<
   "Subtarget->hasExtXfauxvecaltquarter()">, AssemblerPredicate<(all_of FeatureExtXfauxvecaltquarter), "'Xfauxvecaltquarter' (- vectorial alternate quarter-precision auxiliary operations - requires Xfvecaltquarter extension)">;
 let Predicates = [HasExtXfauxvecaltquarter] in {
@@ -1446,8 +1435,11 @@ def : InstAlias<"vfnsum.ab $rd, $rs1",   (VFNSUM_B FPR16:$rd, FPR16:$rs1), 0>;
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfexpauxvechalf : SubtargetFeature<
-  "xfexpauxvechalf", "HasExtXfexpauxvechalf", "true", "'Xfexpauxvechalf' (vectorial half-precision expanding auxiliary operations - requires Xfvechalf extension)">;
+def FeatureExtXfexpauxvechalf : RISCVExtension<
+  0, 1, "vectorial half-precision expanding auxiliary operations - requires Xfvechalf extension"> {
+  let Name = "xfexpauxvechalf";
+  let Desc = "'Xfexpauxvechalf' (vectorial half-precision expanding auxiliary operations - requires Xfvechalf extension)";
+}
 def HasExtXfexpauxvechalf : Predicate<
   "Subtarget->hasExtXfexpauxvechalf()">, AssemblerPredicate<(all_of FeatureExtXfexpauxvechalf), "'Xfexpauxvechalf' (vectorial half-precision expanding auxiliary operations - requires Xfvechalf extension)">;
 let Predicates = [HasExtXfexpauxvechalf] in {
@@ -1486,8 +1478,11 @@ def VFNDOTPEX_S_R_H : RVInstRVf<0b10, 0b11101, 0b1, VFMT_FP32, RISCVOpcode<"VFND
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfexpauxvecalthalf : SubtargetFeature<
-  "xfexpauxvecalthalf", "HasExtXfexpauxvecalthalf", "true", "'Xfexpauxvecalthalf' (vectorial alternate half-precision expanding auxiliary operations)">;
+def FeatureExtXfexpauxvecalthalf : RISCVExtension<
+  0, 1, "vectorial alternate half-precision expanding auxiliary operations"> {
+  let Name = "xfexpauxvecalthalf";
+  let Desc = "'Xfexpauxvecalthalf' (vectorial alternate half-precision expanding auxiliary operations)";
+}
 def HasExtXfexpauxvecalthalf : Predicate<
   "Subtarget->hasExtXfexpauxvecalthalf()">, AssemblerPredicate<(all_of FeatureExtXfexpauxvecalthalf), "'Xfexpauxvecalthalf' (vectorial alternate half-precision expanding auxiliary operations)">;
 let Predicates = [HasExtXfexpauxvecalthalf] in {
@@ -1510,8 +1505,11 @@ def : InstAlias<"vfndotpex.s.r.ah $rd, $rs1, $rs2",   (VFNDOTPEX_S_R_H FPR32:$rd
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfexpauxvecquarter : SubtargetFeature<
-  "xfexpauxvecquarter", "HasExtXfexpauxvecquarter", "true", "'Xfexpauxvecquarter' (vectorial quarter-precision expanding auxiliary operations)">;
+def FeatureExtXfexpauxvecquarter : RISCVExtension<
+  0, 1, "vectorial quarter-precision expanding auxiliary operations"> {
+  let Name = "xfexpauxvecquarter";
+  let Desc = "'Xfexpauxvecquarter' (vectorial quarter-precision expanding auxiliary operations)";
+}
 def HasExtXfexpauxvecquarter : Predicate<
   "Subtarget->hasExtXfexpauxvecquarter()">, AssemblerPredicate<(all_of FeatureExtXfexpauxvecquarter), "'Xfexpauxvecquarter' (vectorial quarter-precision expanding auxiliary operations)">;
 let Predicates = [HasExtXfexpauxvecquarter] in {
@@ -1556,8 +1554,11 @@ def : InstAlias<"vfndotpex.ah.r.b $rd, $rs1, $rs2",   (VFNDOTPEX_H_R_B FPR16:$rd
 //===----------------------------------------------------------------------===//
 
 // Subtarget definitions
-def FeatureExtXfexpauxvecaltquarter : SubtargetFeature<
-  "xfexpauxvecaltquarter", "HasExtXfexpauxvecaltquarter", "true", "'Xfexpauxvecaltquarter' (vectorial alternate quarter-precision expanding auxiliary operations)">;
+def FeatureExtXfexpauxvecaltquarter : RISCVExtension<
+  0, 1, "vectorial alternate quarter-precision expanding auxiliary operations"> {
+  let Name = "xfexpauxvecaltquarter";
+  let Desc = "'Xfexpauxvecaltquarter' (vectorial alternate quarter-precision expanding auxiliary operations)";
+}
 def HasExtXfexpauxvecaltquarter : Predicate<
   "Subtarget->hasExtXfexpauxvecaltquarter()">, AssemblerPredicate<(all_of FeatureExtXfexpauxvecaltquarter), "'Xfexpauxvecaltquarter' (vectorial alternate quarter-precision expanding auxiliary operations)">;
 let Predicates = [HasExtXfexpauxvecaltquarter] in {

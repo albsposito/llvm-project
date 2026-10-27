@@ -16,7 +16,7 @@
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Basic/TargetOptions.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/Support/RISCVISAInfo.h"
+#include "llvm/TargetParser/RISCVISAInfo.h"
 #include "llvm/TargetParser/Triple.h"
 #include <optional>
 
@@ -33,7 +33,7 @@ protected:
   std::unique_ptr<llvm::RISCVISAInfo> ISAInfo;
 
 private:
-  bool FastUnalignedAccess;
+  bool FastScalarUnalignedAccess;
   bool HasExperimental = false;
 
 public:
@@ -103,16 +103,34 @@ public:
                  const std::vector<std::string> &FeaturesVec) const override;
 
   std::optional<std::pair<unsigned, unsigned>>
-  getVScaleRange(const LangOptions &LangOpts) const override;
+  getVScaleRange(const LangOptions &LangOpts,
+                 bool IsArmStreamingFunction) const override;
 
   bool hasFeature(StringRef Feature) const override;
 
   bool handleTargetFeatures(std::vector<std::string> &Features,
                             DiagnosticsEngine &Diags) override;
 
+  // PULP: GAP9 GCC (newlib) defines [u]int32_t and [u]int_least32_t as
+  // [unsigned] long but [u]int_fast32_t as [unsigned] int. Int32Type is set
+  // to SignedLong for xgap9 in handleTargetFeatures; least follows it and fast
+  // keeps the default type. Same mechanism as AVR's [u]int16_t (AVR.h).
+  IntType getLeastIntTypeByWidth(unsigned BitWidth,
+                                 bool IsSigned) const override {
+    return BitWidth == 32 ? (IsSigned ? getInt32Type() : getUInt32Type())
+                          : TargetInfo::getLeastIntTypeByWidth(BitWidth,
+                                                               IsSigned);
+  }
+  IntType getFastIntTypeByWidth(unsigned BitWidth,
+                                bool IsSigned) const override {
+    return TargetInfo::getLeastIntTypeByWidth(BitWidth, IsSigned);
+  }
+
   bool hasBitIntType() const override { return true; }
 
   bool hasBFloat16Type() const override { return true; }
+
+  CallingConvCheckResult checkCallingConvention(CallingConv CC) const override;
 
   bool useFP16ConversionIntrinsics() const override {
     return false;
@@ -124,6 +142,50 @@ public:
   void fillValidTuneCPUList(SmallVectorImpl<StringRef> &Values) const override;
   bool supportsTargetAttributeTune() const override { return true; }
   ParsedTargetAttr parseTargetAttr(StringRef Str) const override;
+  uint64_t getFMVPriority(ArrayRef<StringRef> Features) const override;
+
+  std::pair<unsigned, unsigned> hardwareInterferenceSizes() const override {
+    return std::make_pair(32, 32);
+  }
+
+  bool supportsCpuSupports() const override { return getTriple().isOSLinux(); }
+  bool supportsCpuIs() const override { return getTriple().isOSLinux(); }
+  bool supportsCpuInit() const override { return getTriple().isOSLinux(); }
+  bool validateCpuSupports(StringRef Feature) const override;
+  bool validateCpuIs(StringRef CPUName) const override;
+  bool isValidFeatureName(StringRef Name) const override;
+
+  bool validateGlobalRegisterVariable(StringRef RegName, unsigned RegSize,
+                                      bool &HasSizeMismatch) const override;
+
+  bool checkCFProtectionBranchSupported(DiagnosticsEngine &) const override {
+    // Always generate Zicfilp lpad insns
+    // Non-zicfilp CPUs would read them as NOP
+    return true;
+  }
+
+  bool
+  checkCFProtectionReturnSupported(DiagnosticsEngine &Diags) const override {
+    if (ISAInfo->hasExtension("zicfiss"))
+      return true;
+    return TargetInfo::checkCFProtectionReturnSupported(Diags);
+  }
+
+  CFBranchLabelSchemeKind getDefaultCFBranchLabelScheme() const override {
+    return CFBranchLabelSchemeKind::FuncSig;
+  }
+
+  bool
+  checkCFBranchLabelSchemeSupported(const CFBranchLabelSchemeKind Scheme,
+                                    DiagnosticsEngine &Diags) const override {
+    switch (Scheme) {
+    case CFBranchLabelSchemeKind::Default:
+    case CFBranchLabelSchemeKind::Unlabeled:
+    case CFBranchLabelSchemeKind::FuncSig:
+      return true;
+    }
+    return TargetInfo::checkCFBranchLabelSchemeSupported(Scheme, Diags);
+  }
 };
 class LLVM_LIBRARY_VISIBILITY RISCV32TargetInfo : public RISCVTargetInfo {
 public:

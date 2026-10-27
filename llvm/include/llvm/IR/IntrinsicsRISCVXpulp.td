@@ -214,6 +214,30 @@ let TargetPrefix = "riscv" in {
                              [IntrNoMem, ImmArg<ArgIndex<1>>, ImmArg<ArgIndex<2>>]>;
   defm clipu_r : PulpBinary32;
 
+  // Task 20/F043: GAP9 GCC accepts an immediate of the mul/mac N/RN and
+  // clip/clipu builtins that becomes constant only after optimisation (a
+  // local variable, a parameter of an inlined function). Clang emits these
+  // variants, with the same operands but no ImmArg, when such an argument is
+  // not an integer constant expression. Instruction selection
+  // (RISCVISelLowering) turns them into the intrinsics above once the operand
+  // is a valid constant, and reports an error otherwise, as GCC does. They
+  // have no ClangBuiltin: clang/lib/CodeGen/CGBuiltin.cpp picks them.
+  multiclass PulpDeferredImm<list<LLVMType> param_types> {
+    def int_riscv_pulp_ #NAME #_deferred
+        : Intrinsic<[llvm_i32_ty], param_types, [IntrNoMem]>;
+  }
+  foreach op = ["s", "u", "hhs", "hhu"] in {
+    defm mul #op #N : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty]>;
+    defm mul #op #RN : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty,
+                                        llvm_i32_ty]>;
+    defm mac #op #N : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty,
+                                       llvm_i32_ty]>;
+    defm mac #op #RN : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty,
+                                        llvm_i32_ty, llvm_i32_ty]>;
+  }
+  defm clip : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty]>;
+  defm clipu : PulpDeferredImm<[llvm_i32_ty, llvm_i32_ty, llvm_i32_ty]>;
+
   // PULP Memory Intrinsics
 
   multiclass PulpReadMemIntrinsic
@@ -273,6 +297,7 @@ let TargetPrefix = "riscv" in {
 
   defm CoreId : PulpIntrinsic<[llvm_i32_ty], [], [IntrNoMem]>;
   defm CoreCount : PulpIntrinsic<[llvm_i32_ty], [], [IntrNoMem]>;
+  defm CoreCount_m1 : PulpIntrinsic<[llvm_i32_ty], [], [IntrNoMem]>;
   defm ClusterId : PulpIntrinsic<[llvm_i32_ty], [], [IntrNoMem]>;
   defm IsFc : PulpIntrinsic<[llvm_i32_ty], [], [IntrNoMem]>;
   defm HasFc : PulpIntrinsic<[llvm_i32_ty], [], [IntrNoMem]>;
@@ -284,9 +309,107 @@ let TargetPrefix = "riscv" in {
                 [llvm_ptr_ty, llvm_i32_ty],
                 [IntrHasSideEffects]>;
 
+  // GAP9 PMSIS builtins (task 20/F016).
+  // p.elw that GAP9 GCC treats as a full memory barrier: no memory attribute,
+  // so it may read and write any memory, plus side effects, so it is never
+  // removed, merged, hoisted or reordered across other memory operations.
+  def int_riscv_pulp_event_unit_read_fenced
+    : ClangBuiltin<"__builtin_pulp_event_unit_read_fenced">,
+      Intrinsic<[llvm_i32_ty],
+                [llvm_ptr_ty, llvm_i32_ty],
+                [IntrHasSideEffects]>;
+  // Store of a pointer value (operand 0) at base (operand 1) + offset
+  // (operand 2), modelled like OffsetedWrite (PulpWriteMemIntrinsic above).
+  // The stored pointer escapes, so operand 0 is not NoCapture. The call may
+  // write any memory and is not willreturn, so IR passes never delete it as a
+  // dead store, and the selected store has no memory operand, so machine
+  // passes keep it and keep it ordered with every other memory access.
+  def int_riscv_pulp_OffsetedWritePtr
+    : ClangBuiltin<"__builtin_pulp_OffsetedWritePtr">,
+      Intrinsic<[],
+                [llvm_ptr_ty, llvm_ptr_ty, llvm_i32_ty],
+                [IntrWriteMem, WriteOnly<ArgIndex<1>>, NoCapture<ArgIndex<1>>]>;
+
+  // GAP9 fractional-multiply aliases, 64-bit high multiplies and truncations
+  // (task 20/F037). mulf*/macf* are the mul*/mac* operations under GAP9 GCC's
+  // second name and select the same instructions (RISCVInstrInfoXpulp.td).
+  defm mulfs : PulpBinary32;
+  defm mulfu : PulpBinary32;
+  defm macfs : PulpTernary32;
+  defm macfu : PulpTernary32;
+  defm fs : mul_mac_N_RN; // mulfsN, mulfsRN, macfsN, macfsRN
+  defm fu : mul_mac_N_RN; // mulfuN, mulfuRN, macfuN, macfuRN
+  defm mul64hs : PulpBinary32;
+  defm mul64hu : PulpBinary32;
+  defm mul64hus : PulpBinary32;
+  // (short)x and (char)x: the result types match the builtins' C return types
+  // (clang only bitcasts), and the RISC-V lowering turns them into a plain
+  // truncate during type legalization.
+  defm trunch : PulpIntrinsic<[llvm_i16_ty], [llvm_i32_ty], [IntrNoMem]>;
+  defm truncb : PulpIntrinsic<[llvm_i8_ty], [llvm_i32_ty], [IntrNoMem]>;
+
   def int_riscv_pulp_bitinsert
     : ClangBuiltin<"__builtin_bitinsert">, // NOTE: GCC has no pulp here
       Intrinsic<[llvm_i32_ty],
                 [llvm_i32_ty, llvm_i32_ty, llvm_i32_ty, llvm_i32_ty],
                 [IntrNoMem]>;
+
+  // GAP9 complex / divide-by-N builtins (task 20/F038). Selected only with
+  // the GAP9 extension (xgap9), see RISCVInstrInfoXpulp.td.
+  defm add2div2 : PulpBinaryV2;
+  defm add2div4 : PulpBinaryV2;
+  defm sub2div2 : PulpBinaryV2;
+  defm sub2div4 : PulpBinaryV2;
+  defm sub2rotmj : PulpBinaryV2;
+  defm cplx_conj : PulpUnaryV2;
+  defm cplxmuls2 : PulpBinaryV2;
+  defm cplxmuls2div2 : PulpBinaryV2;
+  defm cplxmuls2div4 : PulpBinaryV2;
+  defm cplxmuls2div8 : PulpBinaryV2;
+
+  // GAP9 f32 scalar builtins (task 20/F036). Lowered in
+  // RISCVTargetLowering::LowerINTRINSIC_WO_CHAIN to the generic nodes for
+  // fmax.s/fmin.s/fabs.s/fsqrt.s and to RISCVISD::FCVT_X (saturating
+  // fcvt.w.s) with a fixed rounding mode.
+  defm f32max : PulpIntrinsic<[llvm_float_ty], [llvm_float_ty, llvm_float_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
+  defm f32min : PulpIntrinsic<[llvm_float_ty], [llvm_float_ty, llvm_float_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
+  defm f32abs : PulpIntrinsic<[llvm_float_ty], [llvm_float_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
+  defm f32sqrt : PulpIntrinsic<[llvm_float_ty], [llvm_float_ty],
+                               [IntrNoMem, IntrSpeculatable]>;
+  defm rintsf2 : PulpIntrinsic<[llvm_i32_ty], [llvm_float_ty],
+                               [IntrNoMem, IntrSpeculatable]>;
+  defm rdownsf2 : PulpIntrinsic<[llvm_i32_ty], [llvm_float_ty],
+                                [IntrNoMem, IntrSpeculatable]>;
+  defm rupsf2 : PulpIntrinsic<[llvm_i32_ty], [llvm_float_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
+  // GAP9 half-precision builtins (task 20/F042). float16 scalars are half.
+  // bfloat16 scalars (float16alt) are passed as their 16 bits (i16) and the
+  // packed pairs (v2h, v2ah) as their 32 bits (i32, lane 0 in bits 15:0);
+  // clang's builtin call bitcasts the C types. Until the backend has
+  // bfloat16 and packed half-precision instructions, a bfloat or vector
+  // value in the IR can be kept as f32 between blocks and rounded back
+  // through the libcall __truncsfbf2 (missing from GAP9's libgcc) or fail to
+  // select; integer types keep the builtins free of both. Lowered in
+  // RISCVISelLowering.cpp (lowerPULPFP16Intrinsic).
+  defm f16max : PulpIntrinsic<[llvm_half_ty], [llvm_half_ty, llvm_half_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
+  defm f16min : PulpIntrinsic<[llvm_half_ty], [llvm_half_ty, llvm_half_ty],
+                              [IntrNoMem, IntrSpeculatable]>;
+  defm f16sqrt : PulpIntrinsic<[llvm_half_ty], [llvm_half_ty],
+                               [IntrNoMem, IntrSpeculatable]>;
+  defm f16altmax : PulpIntrinsic<[llvm_i16_ty], [llvm_i16_ty, llvm_i16_ty],
+                                 [IntrNoMem, IntrSpeculatable]>;
+  defm f16altmin : PulpIntrinsic<[llvm_i16_ty], [llvm_i16_ty, llvm_i16_ty],
+                                 [IntrNoMem, IntrSpeculatable]>;
+  defm f16altsqrt : PulpIntrinsic<[llvm_i16_ty], [llvm_i16_ty],
+                                  [IntrNoMem, IntrSpeculatable]>;
+  defm f16max2 : PulpBinary32;
+  defm f16min2 : PulpBinary32;
+  defm f16altmax2 : PulpBinary32;
+  defm f16altmin2 : PulpBinary32;
+  defm v2hftov2ohf : PulpUnary32;
+  defm v2ohftov2hf : PulpUnary32;
 }

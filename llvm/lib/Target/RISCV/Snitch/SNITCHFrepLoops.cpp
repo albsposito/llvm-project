@@ -15,8 +15,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "../RISCVInstrInfo.h"
+#include "../RISCVMachineFunctionInfo.h"
 #include "../RISCVRegisterInfo.h"
 #include "../RISCVSubtarget.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/ADT/StringRef.h"
@@ -86,8 +89,8 @@ public:
   StringRef getPassName() const override { return SNITCH_FREP_LOOPS_NAME; }
 
   void getAnalysisUsage(AnalysisUsage &AU) const override {
-    AU.addRequired<MachineDominatorTree>();
-    AU.addRequired<MachineLoopInfo>();
+    AU.addRequired<MachineDominatorTreeWrapperPass>();
+    AU.addRequired<MachineLoopInfoWrapperPass>();
     MachineFunctionPass::getAnalysisUsage(AU);
   }
 
@@ -140,15 +143,21 @@ private:
   /// If so, then perform the conversion and return true.
   bool convertToHardwareLoop(MachineLoop *L);
 
-  /// Return number of freppable instructions of loop is freppable, zero
-  /// if not
+  /// Return the number of instructions the frep repeats (its N) if the loop
+  /// can become an frep loop, zero if not. OldInsts is the loop control
+  /// found by getLoopTripCount (induction update, trip count values).
   unsigned
   containsInvalidInstruction(MachineLoop *L, Register *IV, Register *ICV,
+                             ArrayRef<MachineInstr *> OldInsts,
                              SmallVectorImpl<MachineInstr *> &FPPhis) const;
 
   /// Return true if the instruction is not valid within a hardware
   /// loop.
   bool isInvalidLoopOperation(const MachineInstr *MI) const;
+
+  /// Return true if PHI elimination / register allocation may have to turn
+  /// the loop-carried PHI into a copy inside the loop body.
+  bool phiMayNeedCopy(MachineLoop *L, const MachineInstr &Phi) const;
 
   /// Scan the loop body and search for a branch instruction that
   /// leads to the induction variable and trip count
@@ -313,9 +322,9 @@ bool SNITCHFrepLoops::runOnMachineFunction(MachineFunction &MF) {
 
   bool Changed = false;
 
-  MLI = &getAnalysis<MachineLoopInfo>();
+  MLI = &getAnalysis<MachineLoopInfoWrapperPass>().getLI();
   MRI = &MF.getRegInfo();
-  MDT = &getAnalysis<MachineDominatorTree>();
+  MDT = &getAnalysis<MachineDominatorTreeWrapperPass>().getDomTree();
   const RISCVSubtarget &HST = MF.getSubtarget<RISCVSubtarget>();
   TII = HST.getInstrInfo();
   TRI = HST.getRegisterInfo();
@@ -390,7 +399,8 @@ bool SNITCHFrepLoops::convertToHardwareLoop(MachineLoop *L) {
   // Does the loop contain any invalid instructions?
   LLVM_DEBUG(dbgs() << ">>>>> in containsInvalidInstruction()\n");
   SmallVector<MachineInstr *, 2> FPPhis;
-  unsigned nFlops = containsInvalidInstruction(L, IndReg, IncReg, FPPhis);
+  unsigned nFlops =
+      containsInvalidInstruction(L, IndReg, IncReg, OldInsts, FPPhis);
   if (nFlops == 0) {
     return changed;
   }
@@ -513,6 +523,9 @@ bool SNITCHFrepLoops::convertToHardwareLoop(MachineLoop *L) {
                       .addImm(0)
                       .addImm(0);
     KnownHardwareLoops.insert(hwloop.getInstr());
+    // Tell RISCVInstrInfo::isSchedulingBoundary this function has an frep.
+    TopBlock->getParent()->getInfo<RISCVMachineFunctionInfo>()->noteFrepBody(
+        nFlops);
   } else {
     assert(TripCount->isImm() &&
            "Expecting immediate value for trip count if not register");
@@ -529,6 +542,9 @@ bool SNITCHFrepLoops::convertToHardwareLoop(MachineLoop *L) {
                       .addImm(0)
                       .addImm(0);
     KnownHardwareLoops.insert(hwloop.getInstr());
+    // Tell RISCVInstrInfo::isSchedulingBoundary this function has an frep.
+    TopBlock->getParent()->getInfo<RISCVMachineFunctionInfo>()->noteFrepBody(
+        nFlops);
   }
   delete TripCount;
 
@@ -727,10 +743,22 @@ bool SNITCHFrepLoops::convertToHardwareLoop(MachineLoop *L) {
   return true;
 }
 
-/// Return true if the loop contains an instruction that inhibits
-/// the use of the hardware loop instruction.
+/// Return the number of instructions the frep will repeat, or zero if the
+/// loop cannot become an frep loop.
+///
+/// frep.o hands the next N floating-point instructions to the Snitch FPU
+/// sequencer, which repeats them; every other instruction (integer code, FP
+/// instructions with an integer operand, FP format conversions) runs only
+/// once, on the integer core, and is not counted in N (GVSoC snitch_fast
+/// sequencer.cpp and the 'nseq' ISA tags). So the loop body may contain only
+/// instructions RISCVInstrInfo::isFrepSequenced accepts, plus the loop
+/// control this pass removes: PHIs, the induction update and trip count
+/// values (OldInsts), the exit branch and the loop's own unconditional
+/// branches. Anything else would run once instead of once per iteration,
+/// so the loop is left alone. N counts the sequenced instructions only.
 unsigned SNITCHFrepLoops::containsInvalidInstruction(
     MachineLoop *L, Register *IV, Register *ICV,
+    ArrayRef<MachineInstr *> OldInsts,
     SmallVectorImpl<MachineInstr *> &FPPhis) const {
   MachineBasicBlock *Header = L->getHeader();
   MachineBasicBlock *Latch = L->getLoopLatch();
@@ -739,6 +767,21 @@ unsigned SNITCHFrepLoops::containsInvalidInstruction(
   unsigned Flops = 0;
   // TODO: do not check header block, it will be removed later anyway
 
+  // The induction variable may be used only by the loop control that the
+  // frep replaces: its PHI, its update and the exit branch. Any other user
+  // (address arithmetic, a use after the loop) needs the per-iteration
+  // value, which no longer exists once the loop is an frep.
+  const MachineInstr *IVPhi = MRI->getVRegDef(*IV);
+  for (Register R : {*IV, *ICV})
+    for (const MachineInstr &UseMI : MRI->use_nodbg_instructions(R))
+      if (&UseMI != IVPhi && &UseMI != FL->condTerm &&
+          !is_contained(OldInsts, &UseMI)) {
+        LLVM_DEBUG(dbgs() << "Cannot convert to frep: induction variable "
+                             "used by";
+                   UseMI.dump());
+        return 0;
+      }
+
   for (MachineBasicBlock *MBB : L->getBlocks()) {
     for (MachineBasicBlock::iterator MII = MBB->begin(), E = MBB->end();
          MII != E; ++MII) {
@@ -746,6 +789,17 @@ unsigned SNITCHFrepLoops::containsInvalidInstruction(
       LLVM_DEBUG(dbgs() << "Checking"; MI->dump());
 
       if (MI->getOpcode() == TargetOpcode::PHI) {
+        // A loop-carried value that stays live after its next value is
+        // defined (a swap or rotation, a value used after its update) becomes
+        // a copy (fmv.d = fsgnj.d, or mv) in the body after this pass. The
+        // sequencer repeats an FP copy, so it would have to be in N; an
+        // integer copy would run only once. Neither can be counted here, so
+        // such a loop is left alone. The induction variable is loop control.
+        if (MI != IVPhi && phiMayNeedCopy(L, *MI)) {
+          LLVM_DEBUG(dbgs() << "Cannot convert to frep: PHI needs a copy:";
+                     MI->dump());
+          return 0;
+        }
         LLVM_DEBUG(dbgs() << "  ignoring PHI node\n");
         // Add to list of FP PHIs that need fixing-up
         if (MRI->getRegClass(MI->getOperand(0).getReg()) ==
@@ -758,8 +812,13 @@ unsigned SNITCHFrepLoops::containsInvalidInstruction(
       }
 
       if (MI->getOpcode() == TargetOpcode::COPY) {
-        LLVM_DEBUG(dbgs() << "  ignoring COPY\n");
-        continue;
+        // Whether a copy survives register allocation is not known here. If
+        // it does, an FP copy becomes fmv.d (fsgnj.d), which the sequencer
+        // repeats and N would have to count, and an integer copy runs only
+        // once. Neither can be counted reliably, so the loop is left alone.
+        LLVM_DEBUG(dbgs() << "Cannot convert to frep due to COPY:";
+                   MI->dump());
+        return 0;
       }
 
       if (MI->isUnconditionalBranch()) {
@@ -800,16 +859,13 @@ unsigned SNITCHFrepLoops::containsInvalidInstruction(
       if (skip)
         continue;
 
-      // skip if contains induction variable IV
-      skip = false;
-      for (auto MO : MI->operands())
-        if (MO.isReg() && (MO.getReg() == *IV)) {
-          LLVM_DEBUG(dbgs() << "  skipped due to inudction register usage\n");
-          skip = true;
-          break;
-        }
-      if (skip)
+      // Loop control the frep replaces (induction update, trip count
+      // values); checked above to have no other users of the induction
+      // variable.
+      if (is_contained(OldInsts, MI)) {
+        LLVM_DEBUG(dbgs() << "  skipped: loop control\n");
         continue;
+      }
 
       if (isInvalidLoopOperation(MI)) {
         LLVM_DEBUG(dbgs() << "Cannot convert to hw_loop due to:"; MI->dump());
@@ -821,17 +877,82 @@ unsigned SNITCHFrepLoops::containsInvalidInstruction(
   return Flops;
 }
 
-/// Return true if the operation is invalid within hardware loop.
+/// Return true if the loop-carried PHI may need a copy inside the loop once
+/// PHIs are eliminated. The PHI result R and its back-edge value V can share
+/// one register (so no copy is needed) only if R is dead once V is defined:
+/// V must be defined by a non-PHI instruction D in the loop (or be R itself),
+/// and every use of R must come before or at D in the iteration, including
+/// the path out of the loop. Otherwise (a swap or rotation of loop-carried
+/// values, a loop-invariant back-edge value, R used after D or after the
+/// loop when the loop exits after D) the register allocator has to insert a
+/// copy in the body. Plain accumulators (R used only by D) need none.
+bool SNITCHFrepLoops::phiMayNeedCopy(MachineLoop *L,
+                                     const MachineInstr &Phi) const {
+  Register R = Phi.getOperand(0).getReg();
+  const MachineBasicBlock *PhiBB = Phi.getParent();
+  if (PhiBB != L->getHeader())
+    return true;
+  SmallVector<MachineBasicBlock *, 2> Exiting;
+  L->getExitingBlocks(Exiting);
+  for (unsigned i = 1, n = Phi.getNumOperands(); i < n; i += 2) {
+    if (!L->contains(Phi.getOperand(i + 1).getMBB()))
+      continue; // value from outside the loop
+    Register V = Phi.getOperand(i).getReg();
+    if (V == R)
+      continue; // unchanged value
+    if (!V.isVirtual())
+      return true;
+    const MachineInstr *D = MRI->getVRegDef(V);
+    if (!D || D->isPHI() || !L->contains(D))
+      return true;
+    // Two PHIs of this loop carrying the same value need two registers: one
+    // gets a copy. (A PHI outside the loop, e.g. in an outer loop, reads V
+    // after the loop and needs no copy inside it.)
+    for (const MachineInstr &VUse : MRI->use_nodbg_instructions(V))
+      if (VUse.isPHI() && &VUse != &Phi && VUse.getParent() == PhiBB)
+        return true;
+    const MachineBasicBlock *DB = D->getParent();
+    for (const MachineInstr &UseMI : MRI->use_nodbg_instructions(R)) {
+      if (&UseMI == D)
+        continue;
+      if (UseMI.isPHI())
+        return true; // R feeds another PHI: a rotation, or a use after exit
+      const MachineBasicBlock *UB = UseMI.getParent();
+      if (!L->contains(UB)) {
+        // R is live out of the loop: it must not be live after D on the way
+        // out, so every exit must be taken before D is reached.
+        for (const MachineBasicBlock *EB : Exiting)
+          if (!MDT->properlyDominates(EB, DB))
+            return true;
+        continue;
+      }
+      if (UB == DB) {
+        // UseMI must come before D in the block.
+        bool Before = false;
+        for (const MachineInstr &I : *DB) {
+          if (&I == &UseMI) {
+            Before = true;
+            break;
+          }
+          if (&I == D)
+            break;
+        }
+        if (!Before)
+          return true;
+        continue;
+      }
+      if (!MDT->properlyDominates(UB, DB))
+        return true;
+    }
+  }
+  return false;
+}
+
+/// Return true if MI cannot be in an frep body: the sequencer would not
+/// repeat it (see RISCVInstrInfo::isFrepSequenced, which also decides which
+/// instructions after an frep the schedulers must leave in place).
 bool SNITCHFrepLoops::isInvalidLoopOperation(const MachineInstr *MI) const {
-  // If all virtual register operands are FPR, this instruction is valid for
-  // frep
-  bool validInstr = true;
-  for (auto MO : MI->operands())
-    if (MO.isReg() && MO.getReg().isVirtual())
-      if (MRI->getRegClass(MO.getReg()) != &RISCV::FPR64RegClass ||
-          MRI->getRegClass(MO.getReg()) != &RISCV::FPR32RegClass)
-        validInstr = false;
-  return validInstr;
+  return !RISCVInstrInfo::isFrepSequenced(*MI);
 }
 
 const MachineInstr *SNITCHFrepLoops::findBranchInstruction(MachineLoop *L) {
@@ -1326,9 +1447,11 @@ SNITCHFrepLoops::Comparison::Kind SNITCHFrepLoops::getComparisonKindFromCC(
   default:
     break;
   case RISCVCC::COND_EQ:
+  case RISCVCC::COND_P_BEQIMM:
     Cmp = Comparison::EQ;
     break;
   case RISCVCC::COND_NE:
+  case RISCVCC::COND_P_BNEIMM:
     Cmp = Comparison::NE;
     break;
   case RISCVCC::COND_LT:
@@ -1636,8 +1759,8 @@ bool SNITCHFrepLoops::isMarkedForInference(MachineLoop *L) {
 
 INITIALIZE_PASS_BEGIN(SNITCHFrepLoops, DEBUG_TYPE, SNITCH_FREP_LOOPS_NAME,
                       false, false)
-INITIALIZE_PASS_DEPENDENCY(MachineDominatorTree)
-INITIALIZE_PASS_DEPENDENCY(MachineLoopInfo)
+INITIALIZE_PASS_DEPENDENCY(MachineDominatorTreeWrapperPass)
+INITIALIZE_PASS_DEPENDENCY(MachineLoopInfoWrapperPass)
 INITIALIZE_PASS_END(SNITCHFrepLoops, DEBUG_TYPE, SNITCH_FREP_LOOPS_NAME, false,
                     false)
 

@@ -61,17 +61,25 @@ let TargetPrefix = "riscv" in {
   // The `Throws` attribute ensures that the push/pop don't get removed from loops
   // by the LICM pass
   // TODO: Is there another way to do this?
+  // Every push/pop advances the hidden state of its data stream (and the stream
+  // itself reads/writes memory at the configured addresses), so no call may be
+  // hoisted, sunk, merged, CSE'd or deleted. They therefore must not carry
+  // IntrReadMem/IntrWriteMem: since LLVM 20 TableGen emits memory(read) /
+  // memory(write) for those even together with IntrHasSideEffects (upstream
+  // e5c7cde5c812), and IR passes only look at the memory attribute. Leaving the
+  // memory effects unknown matches how upstream declares its stream (channel)
+  // intrinsics int_xcore_in/int_xcore_out in IntrinsicsXCore.td.
   def int_riscv_ssr_push
       : ClangBuiltin<"__builtin_ssr_push">,
         Intrinsic<[],
                   [llvm_i32_ty, llvm_double_ty],
-                  [IntrWriteMem, IntrHasSideEffects, Throws, ImmArg<ArgIndex<0>>]>,
+                  [IntrHasSideEffects, Throws, ImmArg<ArgIndex<0>>]>,
         RISCVSSRIntrinsic;
   def int_riscv_ssr_pop
       : ClangBuiltin<"__builtin_ssr_pop">,
         Intrinsic<[llvm_double_ty],
                   [llvm_i32_ty],
-                  [IntrReadMem, IntrHasSideEffects, Throws, ImmArg<ArgIndex<0>>]>,
+                  [IntrHasSideEffects, Throws, ImmArg<ArgIndex<0>>]>,
         RISCVSSRIntrinsic;
 
   def int_riscv_ssr_enable

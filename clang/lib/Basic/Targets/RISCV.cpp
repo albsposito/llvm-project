@@ -44,7 +44,7 @@ ArrayRef<const char *> RISCVTargetInfo::getGCCRegNames() const {
       "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31",
 
       // CSRs
-      "fflags", "frm", "vtype", "vl", "vxsat", "vxrm"
+      "fflags", "frm", "vtype", "vl", "vxsat", "vxrm", "sf.vcix_state"
     };
   // clang-format on
   return llvm::ArrayRef(GCCRegNames);
@@ -96,12 +96,25 @@ bool RISCVTargetInfo::validateAsmConstraint(
     // An address that is held in a general-purpose register.
     Info.setAllowsMemory();
     return true;
-  case 'S': // A symbolic address
+  case 's':
+  case 'S': // A symbol or label reference with a constant offset
+    Info.setAllowsRegister();
+    return true;
+  case 'c':
+    // A RVC register - GPR or FPR
+    if (Name[1] == 'r' || Name[1] == 'R' || Name[1] == 'f') {
+      Info.setAllowsRegister();
+      Name += 1;
+      return true;
+    }
+    return false;
+  case 'R':
+    // An even-odd GPR pair
     Info.setAllowsRegister();
     return true;
   case 'v':
     // A vector register.
-    if (Name[1] == 'r' || Name[1] == 'm') {
+    if (Name[1] == 'r' || Name[1] == 'd' || Name[1] == 'm') {
       Info.setAllowsRegister();
       Name += 1;
       return true;
@@ -113,6 +126,8 @@ bool RISCVTargetInfo::validateAsmConstraint(
 std::string RISCVTargetInfo::convertConstraint(const char *&Constraint) const {
   std::string R;
   switch (*Constraint) {
+  // c* and v* are two-letter constraints on RISC-V.
+  case 'c':
   case 'v':
     R = std::string("^") + std::string(Constraint, 2);
     Constraint += 1;
@@ -145,6 +160,8 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
     Builder.defineMacro("__riscv_cmodel_medlow");
   else if (CodeModel == "medium")
     Builder.defineMacro("__riscv_cmodel_medany");
+  else if (CodeModel == "large")
+    Builder.defineMacro("__riscv_cmodel_large");
 
   StringRef ABIName = getABI();
   if (ABIName == "ilp32f" || ABIName == "lp64f")
@@ -167,7 +184,41 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
                         Twine(getVersionValue(ExtInfo.Major, ExtInfo.Minor)));
   }
 
-  if (ISAInfo->hasExtension("m") || ISAInfo->hasExtension("zmmul"))
+  // PULP: the GAP/PULP GCC toolchain predefines these whenever it targets a
+  // PULP core (-march=...xgap8/xgap9/xgap10). SDK headers test them to pick
+  // the PULP builtins over portable C. Limited to Xpulpv so that plain RISC-V
+  // keeps upstream's macro set (upstream clang defines neither __riscv__ nor
+  // _riscv).
+  if (ISAInfo->hasExtension("xpulpv")) {
+    Builder.defineMacro("__pulp__");
+    Builder.defineMacro("__pulp");
+    Builder.defineMacro("_pulp");
+    Builder.defineMacro("__riscv__");
+    Builder.defineMacro("_riscv");
+  }
+  // GAP9 GCC defines the chip macro for -march=...xgap9 (and -mchip=gap9).
+  // "xgap9" parses as extension "xgap", version 9.0 (see RISCVFeatures.td).
+  if (ISAInfo->hasExtension("xgap"))
+    Builder.defineMacro("__gap9__");
+  // GAP9 GCC predeclares the half-precision type names float16 (IEEE
+  // binary16) and float16alt (bfloat16) in every translation unit; the SDK
+  // uses them as plain type names and builds v2h/v2ah on them (autotiler
+  // Emulation/Gap.h, on its __gap9__ path). Map them onto the standard clang
+  // types that have the same layout: _Float16 (native through Zhinx) and
+  // __bf16 (see HasFullBFloat16 below). A macro, not a predeclared typedef:
+  // the target can only add macros here, and the SDK never uses the names as
+  // identifiers or tests them with #ifdef. Only in the PULP half-precision
+  // configuration (the GAP9 extensions xpulpf16alt/xpulpfvec, implied by
+  // xgap9), so that plain Zhinx users do not see a macro named float16.
+  if (ISAInfo->hasExtension("xpulpf16alt") ||
+      ISAInfo->hasExtension("xpulpfvec")) {
+    if (ISAInfo->hasExtension("zhinx"))
+      Builder.defineMacro("float16", "_Float16");
+    if (ISAInfo->hasExtension("xpulpf16alt"))
+      Builder.defineMacro("float16alt", "__bf16");
+  }
+
+  if (ISAInfo->hasExtension("zmmul"))
     Builder.defineMacro("__riscv_mul");
 
   if (ISAInfo->hasExtension("m")) {
@@ -202,18 +253,18 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
   if (ISAInfo->hasExtension("c"))
     Builder.defineMacro("__riscv_compressed");
 
-  if (ISAInfo->hasExtension("zve32x")) {
+  if (ISAInfo->hasExtension("zve32x"))
     Builder.defineMacro("__riscv_vector");
-    // Currently we support the v0.12 RISC-V V intrinsics.
-    Builder.defineMacro("__riscv_v_intrinsic", Twine(getVersionValue(0, 12)));
-  }
 
-  auto VScale = getVScaleRange(Opts);
+  // Currently we support the v1.0 RISC-V V intrinsics.
+  Builder.defineMacro("__riscv_v_intrinsic", Twine(getVersionValue(1, 0)));
+
+  auto VScale = getVScaleRange(Opts, false);
   if (VScale && VScale->first && VScale->first == VScale->second)
     Builder.defineMacro("__riscv_v_fixed_vlen",
                         Twine(VScale->first * llvm::RISCV::RVVBitsPerBlock));
 
-  if (FastUnalignedAccess)
+  if (FastScalarUnalignedAccess)
     Builder.defineMacro("__riscv_misaligned_fast");
   else
     Builder.defineMacro("__riscv_misaligned_avoid");
@@ -236,7 +287,7 @@ static constexpr Builtin::Info BuiltinInfo[] = {
   {#ID, TYPE, ATTRS, nullptr, HeaderDesc::NO_HEADER, ALL_LANGUAGES},
 #define TARGET_BUILTIN(ID, TYPE, ATTRS, FEATURE)                               \
   {#ID, TYPE, ATTRS, FEATURE, HeaderDesc::NO_HEADER, ALL_LANGUAGES},
-#include "clang/Basic/BuiltinsRISCV.def"
+#include "clang/Basic/BuiltinsRISCV.inc"
 };
 
 ArrayRef<Builtin::Info> RISCVTargetInfo::getTargetBuiltins() const {
@@ -257,25 +308,6 @@ bool RISCVTargetInfo::initFeatureMap(
     Features["32bit"] = true;
   }
 
-  // If a target attribute specified a full arch string, override all the ISA
-  // extension target features.
-  const auto I = llvm::find(FeaturesVec, "__RISCV_TargetAttrNeedOverride");
-  if (I != FeaturesVec.end()) {
-    std::vector<std::string> OverrideFeatures(std::next(I), FeaturesVec.end());
-
-    // Add back any non ISA extension features, e.g. +relax.
-    auto IsNonISAExtFeature = [](StringRef Feature) {
-      assert(Feature.size() > 1 && (Feature[0] == '+' || Feature[0] == '-'));
-      StringRef Ext = Feature.substr(1); // drop the +/-
-      return !llvm::RISCVISAInfo::isSupportedExtensionFeature(Ext);
-    };
-    llvm::copy_if(llvm::make_range(FeaturesVec.begin(), I),
-                  std::back_inserter(OverrideFeatures), IsNonISAExtFeature);
-
-    return TargetInfo::initFeatureMap(Features, Diags, CPU, OverrideFeatures);
-  }
-
-  // Otherwise, parse the features and add any implied extensions.
   std::vector<std::string> AllFeatures = FeaturesVec;
   auto ParseResult = llvm::RISCVISAInfo::parseFeatures(XLen, FeaturesVec);
   if (!ParseResult) {
@@ -294,7 +326,8 @@ bool RISCVTargetInfo::initFeatureMap(
 }
 
 std::optional<std::pair<unsigned, unsigned>>
-RISCVTargetInfo::getVScaleRange(const LangOptions &LangOpts) const {
+RISCVTargetInfo::getVScaleRange(const LangOptions &LangOpts,
+                                bool IsArmStreamingFunction) const {
   // RISCV::RVVBitsPerBlock is 64.
   unsigned VScaleMin = ISAInfo->getMinVLen() / llvm::RISCV::RVVBitsPerBlock;
 
@@ -355,12 +388,23 @@ bool RISCVTargetInfo::handleTargetFeatures(std::vector<std::string> &Features,
   if (ISAInfo->hasExtension("zfh") || ISAInfo->hasExtension("zhinx"))
     HasLegalHalfType = true;
 
-  // The PULP Xfalthalf extension provides native scalar bf16 arithmetic, so
-  // __bf16 does not need to be evaluated with float excess precision.
-  if (ISAInfo->hasExtension("xfalthalf"))
+  // PULP: GAP9 float16alt (bfloat16) arithmetic rounds to bfloat16 after
+  // every operation (GCC emits one fadd.ah/fmul.ah per C operator). Without
+  // this, clang keeps __bf16 intermediates in float (excess precision) and
+  // rounds once per expression, which gives different results. Same switch
+  // as X86 (avx10.2) and ARM (bf16) use for targets with bfloat16 arithmetic.
+  if (ISAInfo->hasExtension("xpulpf16alt"))
     HasFullBFloat16 = true;
 
-  FastUnalignedAccess = llvm::is_contained(Features, "+fast-unaligned-access");
+  // PULP: match GAP9 GCC (newlib), which defines [u]int32_t as [unsigned]
+  // long (__INT32_TYPE__ long int). Only the stdint.h typedefs change; long
+  // and int keep their 32-bit size and alignment (owner decision B65).
+  // "xgap9" parses as extension "xgap", version 9.0.
+  if (ISAInfo->hasExtension("xgap") && getLongWidth() == 32)
+    Int32Type = SignedLong;
+
+  FastScalarUnalignedAccess =
+      llvm::is_contained(Features, "+unaligned-scalar-mem");
 
   if (llvm::is_contained(Features, "+experimental"))
     HasExperimental = true;
@@ -395,17 +439,29 @@ void RISCVTargetInfo::fillValidTuneCPUList(
   llvm::RISCV::fillValidTuneCPUArchList(Values, Is64Bit);
 }
 
+static void populateNegativeRISCVFeatures(std::vector<std::string> &Features) {
+  auto RII = llvm::RISCVISAInfo::parseArchString(
+      "rv64i", /* EnableExperimentalExtension */ true);
+
+  if (llvm::errorToBool(RII.takeError()))
+    llvm_unreachable("unsupport rv64i");
+
+  std::vector<std::string> FeatStrings =
+      (*RII)->toFeatures(/* AddAllExtensions */ true);
+  Features.insert(Features.end(), FeatStrings.begin(), FeatStrings.end());
+}
+
 static void handleFullArchString(StringRef FullArchStr,
                                  std::vector<std::string> &Features) {
-  Features.push_back("__RISCV_TargetAttrNeedOverride");
   auto RII = llvm::RISCVISAInfo::parseArchString(
       FullArchStr, /* EnableExperimentalExtension */ true);
   if (llvm::errorToBool(RII.takeError())) {
     // Forward the invalid FullArchStr.
-    Features.push_back("+" + FullArchStr.str());
+    Features.push_back(FullArchStr.str());
   } else {
     // Append a full list of features, including any negative extensions so that
     // we override the CPU's features.
+    populateNegativeRISCVFeatures(Features);
     std::vector<std::string> FeatStrings =
         (*RII)->toFeatures(/* AddAllExtensions */ true);
     Features.insert(Features.end(), FeatStrings.begin(), FeatStrings.end());
@@ -420,6 +476,24 @@ ParsedTargetAttr RISCVTargetInfo::parseTargetAttr(StringRef Features) const {
   Features.split(AttrFeatures, ";");
   bool FoundArch = false;
 
+  auto handleArchExtension = [](StringRef AttrString,
+                                std::vector<std::string> &Features) {
+    SmallVector<StringRef, 1> Exts;
+    AttrString.split(Exts, ",");
+    for (auto Ext : Exts) {
+      if (Ext.empty())
+        continue;
+
+      StringRef ExtName = Ext.substr(1);
+      std::string TargetFeature =
+          llvm::RISCVISAInfo::getTargetFeatureForExtension(ExtName);
+      if (!TargetFeature.empty())
+        Features.push_back(Ext.front() + TargetFeature);
+      else
+        Features.push_back(Ext.str());
+    }
+  };
+
   for (auto &Feature : AttrFeatures) {
     Feature = Feature.trim();
     StringRef AttrString = Feature.split("=").second.trim();
@@ -433,20 +507,7 @@ ParsedTargetAttr RISCVTargetInfo::parseTargetAttr(StringRef Features) const {
 
       if (AttrString.starts_with("+")) {
         // EXTENSION like arch=+v,+zbb
-        SmallVector<StringRef, 1> Exts;
-        AttrString.split(Exts, ",");
-        for (auto Ext : Exts) {
-          if (Ext.empty())
-            continue;
-
-          StringRef ExtName = Ext.substr(1);
-          std::string TargetFeature =
-              llvm::RISCVISAInfo::getTargetFeatureForExtension(ExtName);
-          if (!TargetFeature.empty())
-            Ret.Features.push_back(Ext.front() + TargetFeature);
-          else
-            Ret.Features.push_back(Ext.str());
-        }
+        handleArchExtension(AttrString, Ret.Features);
       } else {
         // full-arch-string like arch=rv64gcv
         handleFullArchString(AttrString, Ret.Features);
@@ -470,7 +531,73 @@ ParsedTargetAttr RISCVTargetInfo::parseTargetAttr(StringRef Features) const {
         Ret.Duplicate = "tune=";
 
       Ret.Tune = AttrString;
+    } else if (Feature.starts_with("priority")) {
+      // Skip because it only use for FMV.
+    } else if (Feature.starts_with("+")) {
+      // Handle target_version/target_clones attribute strings
+      // that are already delimited by ','
+      handleArchExtension(Feature, Ret.Features);
     }
   }
   return Ret;
+}
+
+uint64_t RISCVTargetInfo::getFMVPriority(ArrayRef<StringRef> Features) const {
+  // Priority is explicitly specified on RISC-V unlike on other targets, where
+  // it is derived by all the features of a specific version. Therefore if a
+  // feature contains the priority string, then return it immediately.
+  for (StringRef Feature : Features) {
+    auto [LHS, RHS] = Feature.rsplit(';');
+    if (LHS.consume_front("priority="))
+      Feature = LHS;
+    else if (RHS.consume_front("priority="))
+      Feature = RHS;
+    else
+      continue;
+    uint64_t Priority;
+    if (!Feature.getAsInteger(0, Priority))
+      return Priority;
+  }
+  // Default Priority is zero.
+  return 0;
+}
+
+TargetInfo::CallingConvCheckResult
+RISCVTargetInfo::checkCallingConvention(CallingConv CC) const {
+  switch (CC) {
+  default:
+    return CCCR_Warning;
+  case CC_C:
+  case CC_RISCVVectorCall:
+    return CCCR_OK;
+  }
+}
+
+bool RISCVTargetInfo::validateCpuSupports(StringRef Feature) const {
+  // Only allow extensions we have a known bit position for in the
+  // __riscv_feature_bits structure.
+  return -1 != llvm::RISCVISAInfo::getRISCVFeaturesBitsInfo(Feature).second;
+}
+
+bool RISCVTargetInfo::isValidFeatureName(StringRef Name) const {
+  return llvm::RISCVISAInfo::isSupportedExtensionFeature(Name);
+}
+
+bool RISCVTargetInfo::validateGlobalRegisterVariable(
+    StringRef RegName, unsigned RegSize, bool &HasSizeMismatch) const {
+  if (RegName == "ra" || RegName == "sp" || RegName == "gp" ||
+      RegName == "tp" || RegName.starts_with("x") || RegName.starts_with("a") ||
+      RegName.starts_with("s") || RegName.starts_with("t")) {
+    unsigned XLen = getTriple().isArch64Bit() ? 64 : 32;
+    HasSizeMismatch = RegSize != XLen;
+    return true;
+  }
+  return false;
+}
+
+bool RISCVTargetInfo::validateCpuIs(StringRef CPUName) const {
+  assert(getTriple().isOSLinux() &&
+         "__builtin_cpu_is() is only supported for Linux.");
+
+  return llvm::RISCV::hasValidCPUModel(CPUName);
 }
