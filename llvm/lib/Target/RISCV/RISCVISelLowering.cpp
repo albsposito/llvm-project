@@ -773,6 +773,8 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
     setTruncStoreAction(MVT::v2i16, MVT::v2i8, Expand);
 
     setTargetDAGCombine(ISD::BR);
+    // Dot products and sums (combinePULPVecReduceAdd).
+    setTargetDAGCombine(ISD::VECREDUCE_ADD);
 
     setBooleanVectorContents(ZeroOrNegativeOneBooleanContent);
   }
@@ -18271,6 +18273,235 @@ static SDValue combineScalarCTPOPToVCPOP(SDNode *N, SelectionDAG &DAG,
   return DAG.getZExtOrTrunc(Pop, DL, VT);
 }
 
+// PULP dot products (backlog B156 list B, 20/F057). The loop vectorizer's
+// in-loop add reductions (RISCVTTIImpl::preferInLoopReduction) give
+//   vecreduce_add(mul(ext(A), ext(B)))   dot product
+//   vecreduce_add(ext(A))                sum
+// with A, B vectors of i16 or i8 and an i32 (or narrower) result. Before type
+// legalization splits the illegal <N x i32> types into per-lane code, turn
+// them into the GAP9 dot-product instructions, one per packed register
+// (v2i16 / v4i8), as AArch64 does with UDOT/SDOT (performVecReduceAddCombine
+// in AArch64ISelLowering.cpp) and Arm MVE with VMLAV/VADDV
+// (PerformVECREDUCE_ADDCombine in ARMISelLowering.cpp). The nodes built are
+// the PULP dot-product intrinsics, which the Xpulp patterns select, also in
+// their accumulating (pv.sdot*) and scalar (.sc / .sci) forms.
+//
+// Exactness: a dot product computes the exact sum of the lane products (each
+// lane sign- or zero-extended as the instruction says) modulo 2^32. The IR
+// computes the same products and sum modulo 2^E, E <= 32 the element width of
+// the reduction, after sign- or zero-extending each lane, which keeps each
+// lane's value modulo 2^E. So the low E bits agree for any E <= 32, with any
+// mix of signed and unsigned operands, provided each operand is handed to the
+// instruction with its own signedness: signed x signed is pv.dotsp, unsigned x
+// unsigned pv.dotup, unsigned x signed pv.dotusp (vector operand first).
+namespace {
+struct PULPDotOperand {
+  SDValue Src; // vector of i8 or i16
+  bool Signed;
+};
+} // namespace
+
+static bool matchPULPDotExtend(SDValue X, PULPDotOperand &Op) {
+  unsigned Opc = X.getOpcode();
+  if (Opc != ISD::SIGN_EXTEND && Opc != ISD::ZERO_EXTEND)
+    return false;
+  EVT SrcVT = X.getOperand(0).getValueType();
+  unsigned Bits = SrcVT.getScalarSizeInBits();
+  if (!SrcVT.isFixedLengthVector() || (Bits != 8 && Bits != 16))
+    return false;
+  Op = {X.getOperand(0), Opc == ISD::SIGN_EXTEND};
+  return true;
+}
+
+// Split a vector of i16 (i8) lanes into v2i16 (v4i8) registers; an operand of
+// narrower lanes is first extended to the lane width with its own signedness.
+static void splitPULPDotOperand(PULPDotOperand Op, unsigned LaneBits,
+                                SmallVectorImpl<SDValue> &Regs,
+                                SelectionDAG &DAG, const SDLoc &DL) {
+  SDValue V = Op.Src;
+  EVT VT = V.getValueType();
+  MVT LaneVT = MVT::getIntegerVT(LaneBits);
+  if (VT.getScalarSizeInBits() != LaneBits) {
+    VT = VT.changeVectorElementType(LaneVT);
+    V = DAG.getNode(Op.Signed ? ISD::SIGN_EXTEND : ISD::ZERO_EXTEND, DL, VT, V);
+  }
+  unsigned Lanes = 32 / LaneBits;
+  MVT RegVT = MVT::getVectorVT(LaneVT, Lanes);
+  if (VT == RegVT) {
+    Regs.push_back(V);
+    return;
+  }
+  for (unsigned I = 0, E = VT.getVectorNumElements(); I < E; I += Lanes)
+    Regs.push_back(DAG.getNode(ISD::EXTRACT_SUBVECTOR, DL, RegVT, V,
+                               DAG.getVectorIdxConstant(I, DL)));
+}
+
+// The dot-product intrinsic for a vector operand of LaneBits lanes and a
+// second operand (vector, or a scalar for the .sc form) of the given
+// signedness. Returns 0 for signed vector x unsigned scalar, which has no
+// instruction.
+static unsigned getPULPDotIntrinsic(bool ASigned, bool BSigned, bool Scalar,
+                                    unsigned LaneBits) {
+  bool H = LaneBits == 16;
+  if (ASigned && BSigned)
+    return Scalar ? (H ? Intrinsic::riscv_pulp_dotspsc2
+                       : Intrinsic::riscv_pulp_dotspsc4)
+                  : (H ? Intrinsic::riscv_pulp_dotsp2
+                       : Intrinsic::riscv_pulp_dotsp4);
+  if (!ASigned && !BSigned)
+    return Scalar ? (H ? Intrinsic::riscv_pulp_dotupsc2
+                       : Intrinsic::riscv_pulp_dotupsc4)
+                  : (H ? Intrinsic::riscv_pulp_dotup2
+                       : Intrinsic::riscv_pulp_dotup4);
+  if (!ASigned && BSigned)
+    return Scalar ? (H ? Intrinsic::riscv_pulp_dotuspsc2
+                       : Intrinsic::riscv_pulp_dotuspsc4)
+                  : (H ? Intrinsic::riscv_pulp_dotusp2
+                       : Intrinsic::riscv_pulp_dotusp4);
+  return 0;
+}
+
+// Sum of IntID(ARegs[i], B[i]) over the registers (B: one scalar for all).
+static SDValue buildPULPDotSum(unsigned IntID, ArrayRef<SDValue> ARegs,
+                               ArrayRef<SDValue> BRegs, SDValue BScalar,
+                               SelectionDAG &DAG, const SDLoc &DL) {
+  SDValue Sum;
+  SDValue ID = DAG.getTargetConstant(IntID, DL, MVT::i32);
+  for (unsigned I = 0, E = ARegs.size(); I != E; ++I) {
+    SDValue Dot = DAG.getNode(ISD::INTRINSIC_WO_CHAIN, DL, MVT::i32, ID,
+                              ARegs[I], BScalar ? BScalar : BRegs[I]);
+    Sum = Sum ? DAG.getNode(ISD::ADD, DL, MVT::i32, Sum, Dot) : Dot;
+  }
+  return Sum;
+}
+
+static SDValue combinePULPVecReduceAdd(SDNode *N, SelectionDAG &DAG,
+                                       const RISCVSubtarget &Subtarget) {
+  if (!Subtarget.hasPULPExtV2() || Subtarget.hasVInstructions() ||
+      Subtarget.is64Bit())
+    return SDValue();
+  SDValue V = N->getOperand(0);
+  EVT VT = V.getValueType();
+  EVT RT = N->getValueType(0);
+  if (!VT.isFixedLengthVector() || !VT.isInteger() || !RT.isScalarInteger() ||
+      VT.getScalarSizeInBits() > 32 || RT.getSizeInBits() > 32)
+    return SDValue();
+  SDLoc DL(N);
+  unsigned NumElts = VT.getVectorNumElements();
+  auto LanesFit = [&](unsigned LaneBits) {
+    return NumElts % (32 / LaneBits) == 0;
+  };
+  auto Finish = [&](SDValue Res) { return DAG.getZExtOrTrunc(Res, DL, RT); };
+
+  // An extension around the multiply is looked through only when it keeps
+  // every product unchanged: X has M-bit lanes and the products of an a-bit
+  // and a b-bit operand need M >= a+b bits as signed numbers (one more if both
+  // operands are unsigned), or M >= a+b bits as unsigned numbers (only when
+  // both are unsigned).
+  SDValue X = V;
+  unsigned OuterExt = 0;
+  if ((V.getOpcode() == ISD::SIGN_EXTEND || V.getOpcode() == ISD::ZERO_EXTEND) &&
+      V.getOperand(0).getOpcode() == ISD::MUL) {
+    OuterExt = V.getOpcode();
+    X = V.getOperand(0);
+  }
+  unsigned M = X.getValueType().getScalarSizeInBits();
+
+  PULPDotOperand A, B;
+  if (X.getOpcode() == ISD::MUL) {
+    SDValue M0 = X.getOperand(0), M1 = X.getOperand(1);
+    if (matchPULPDotExtend(M0, A) && matchPULPDotExtend(M1, B)) {
+      unsigned ABits = A.Src.getValueType().getScalarSizeInBits();
+      unsigned BBits = B.Src.getValueType().getScalarSizeInBits();
+      unsigned LaneBits = std::max(ABits, BBits);
+      if (!LanesFit(LaneBits))
+        return SDValue();
+      if (OuterExt == ISD::SIGN_EXTEND &&
+          M < ABits + BBits + (!A.Signed && !B.Signed))
+        return SDValue();
+      if (OuterExt == ISD::ZERO_EXTEND &&
+          (A.Signed || B.Signed || M < ABits + BBits))
+        return SDValue();
+      // pv.dotusp takes the unsigned operand first.
+      if (A.Signed && !B.Signed)
+        std::swap(A, B);
+      SmallVector<SDValue, 4> ARegs, BRegs;
+      splitPULPDotOperand(A, LaneBits, ARegs, DAG, DL);
+      splitPULPDotOperand(B, LaneBits, BRegs, DAG, DL);
+      unsigned ID = getPULPDotIntrinsic(A.Signed, B.Signed, false, LaneBits);
+      return Finish(buildPULPDotSum(ID, ARegs, BRegs, SDValue(), DAG, DL));
+    }
+    if (OuterExt)
+      return SDValue();
+    // ext(A) * splat(c): the .sc / .sci forms. The instruction reads the low
+    // LaneBits bits of the scalar, sign-extended for pv.dotsp/pv.dotusp and
+    // zero-extended for pv.dotup, so c must have that value as an M-bit
+    // number.
+    if (!matchPULPDotExtend(M0, A))
+      std::swap(M0, M1);
+    if (matchPULPDotExtend(M0, A)) {
+      SDValue C = DAG.getSplatValue(M1);
+      unsigned LaneBits = A.Src.getValueType().getScalarSizeInBits();
+      if (!C || !LanesFit(LaneBits))
+        return SDValue();
+      bool CSigned;
+      if (DAG.ComputeNumSignBits(C) >= C.getScalarValueSizeInBits() - LaneBits + 1)
+        CSigned = true;
+      else if (DAG.computeKnownBits(C).countMinLeadingZeros() >=
+               C.getScalarValueSizeInBits() - LaneBits)
+        CSigned = false;
+      else
+        return SDValue();
+      unsigned ID = getPULPDotIntrinsic(A.Signed, CSigned, true, LaneBits);
+      if (!ID)
+        return SDValue();
+      SmallVector<SDValue, 4> ARegs;
+      splitPULPDotOperand(A, LaneBits, ARegs, DAG, DL);
+      return Finish(buildPULPDotSum(ID, ARegs, {},
+                                    DAG.getAnyExtOrTrunc(C, DL, MVT::i32), DAG,
+                                    DL));
+    }
+  }
+
+  // vecreduce_add(ext(A)): a sum, as a dot product with a splat of 1
+  // (pv.dotsp.sci / pv.dotup.sci). This also covers the sums of absolute
+  // differences, which the DAG combiner has turned into zext(abdu/abds(a, b))
+  // by now (the lanes of abd are the exact |a - b| as unsigned numbers).
+  if (matchPULPDotExtend(V, A)) {
+    unsigned LaneBits = A.Src.getValueType().getScalarSizeInBits();
+    if (!LanesFit(LaneBits))
+      return SDValue();
+    SmallVector<SDValue, 4> ARegs;
+    splitPULPDotOperand(A, LaneBits, ARegs, DAG, DL);
+    unsigned ID = getPULPDotIntrinsic(A.Signed, A.Signed, true, LaneBits);
+    return Finish(buildPULPDotSum(ID, ARegs, {},
+                                  DAG.getConstant(1, DL, MVT::i32), DAG, DL));
+  }
+
+  // Narrow reductions, whose result has the lanes' own width (only its low
+  // bits are defined): mul(A, B) of i16 / i8 lanes is any dot product, any
+  // other value of one packed register a dot product with 1.
+  unsigned EBits = VT.getScalarSizeInBits();
+  if ((EBits != 8 && EBits != 16) || !LanesFit(EBits))
+    return SDValue();
+  SmallVector<SDValue, 4> ARegs, BRegs;
+  if (V.getOpcode() == ISD::MUL) {
+    splitPULPDotOperand({V.getOperand(0), true}, EBits, ARegs, DAG, DL);
+    splitPULPDotOperand({V.getOperand(1), true}, EBits, BRegs, DAG, DL);
+    unsigned ID = getPULPDotIntrinsic(true, true, false, EBits);
+    return Finish(buildPULPDotSum(ID, ARegs, BRegs, SDValue(), DAG, DL));
+  }
+  // A plain narrow sum of one register is the same instruction either way; a
+  // wider one is better left to the generic split, which adds the registers
+  // lane-wise (pv.add) and reduces once (20/F054's VECREDUCE_ADD pattern).
+  if (NumElts != 32 / EBits)
+    return SDValue();
+  splitPULPDotOperand({V, true}, EBits, ARegs, DAG, DL);
+  unsigned ID = getPULPDotIntrinsic(true, true, true, EBits);
+  return Finish(buildPULPDotSum(ID, ARegs, {}, DAG.getConstant(1, DL, MVT::i32),
+                                DAG, DL));
+}
+
 SDValue RISCVTargetLowering::PerformDAGCombine(SDNode *N,
                                                DAGCombinerInfo &DCI) const {
   SelectionDAG &DAG = DCI.DAG;
@@ -18293,6 +18524,11 @@ SDValue RISCVTargetLowering::PerformDAGCombine(SDNode *N,
 
   switch (N->getOpcode()) {
   default:
+    break;
+  case ISD::VECREDUCE_ADD:
+    if (DCI.isBeforeLegalize())
+      if (SDValue V = combinePULPVecReduceAdd(N, DAG, Subtarget))
+        return V;
     break;
   case RISCVISD::SplitF64: {
     SDValue Op0 = N->getOperand(0);

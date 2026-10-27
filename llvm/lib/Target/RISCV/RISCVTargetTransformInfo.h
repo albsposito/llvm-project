@@ -66,6 +66,13 @@ class RISCVTTIImpl : public BasicTTIImplBase<RISCVTTIImpl> {
     return ST->hasPULPExtV2() && !ST->hasVInstructions();
   }
 
+  /// Number of PULP packed registers (v2i16 / v4i8) a reduction over ValTy
+  /// occupies, when every register is reduced by one dot-product instruction
+  /// (pv.dotsp/pv.dotup/pv.dotusp .h/.b and their .sc/.sci and accumulating
+  /// forms) into a result of ResTy; std::nullopt when it does not map.
+  std::optional<unsigned> getPULPDotProductRegs(Type *ResTy,
+                                                VectorType *ValTy) const;
+
   /// Shuffle cost for a fixed vector when the packed types live in GPRs.
   InstructionCost getPULPShuffleCost(TTI::ShuffleKind Kind,
                                      FixedVectorType *Tp, ArrayRef<int> Mask,
@@ -220,6 +227,13 @@ public:
                                            Type *ResTy, VectorType *ValTy,
                                            FastMathFlags FMF,
                                            TTI::TargetCostKind CostKind);
+
+  InstructionCost getMulAccReductionCost(bool IsUnsigned, Type *ResTy,
+                                         VectorType *ValTy,
+                                         TTI::TargetCostKind CostKind);
+
+  bool preferInLoopReduction(unsigned Opcode, Type *Ty,
+                             TTI::ReductionFlags Flags) const;
 
   InstructionCost
   getMemoryOpCost(unsigned Opcode, Type *Src, MaybeAlign Alignment,

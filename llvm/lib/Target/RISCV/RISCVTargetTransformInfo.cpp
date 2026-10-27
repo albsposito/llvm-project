@@ -1752,6 +1752,13 @@ RISCVTTIImpl::getArithmeticReductionCost(unsigned Opcode, VectorType *Ty,
   if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(Ty) &&
       Ty->getElementType()->isIntegerTy(1))
     return InstructionCost::getInvalid();
+  if (hasPULPPackedSIMDOnly() && Opcode == Instruction::Add &&
+      isa<FixedVectorType>(Ty)) {
+    // A narrow sum of i16 / i8 lanes: one pv.dotsp.sci with 1 per register.
+    if (std::optional<unsigned> Regs =
+            getPULPDotProductRegs(Ty->getElementType(), Ty))
+      return *Regs;
+  }
   if (isa<FixedVectorType>(Ty) && !ST->useRVVForFixedLengthVectors())
     return BaseT::getArithmeticReductionCost(Opcode, Ty, FMF, CostKind);
 
@@ -1867,9 +1874,54 @@ RISCVTTIImpl::getArithmeticReductionCost(unsigned Opcode, VectorType *Ty,
   return SplitCost + getRISCVInstructionCost(Opcodes, LT.second, CostKind);
 }
 
+// PULP dot products (B156 list B, 20/F057). A reduction of N lanes of i16 (i8)
+// is N/2 (N/4) packed registers, and each one is reduced, extended and added
+// to the scalar accumulator by one pv.sdotsp/pv.sdotup/pv.sdotusp (.h/.b),
+// or by its .sci form with 1 for a plain sum (RISCVISelLowering.cpp,
+// combinePULPVecReduceAdd). The result is exact modulo 2^32, so any
+// accumulator of at most 32 bits works.
+std::optional<unsigned>
+RISCVTTIImpl::getPULPDotProductRegs(Type *ResTy, VectorType *ValTy) const {
+  auto *FVT = dyn_cast<FixedVectorType>(ValTy);
+  if (!hasPULPPackedSIMDOnly() || !FVT || !ResTy->isIntegerTy() ||
+      ResTy->getIntegerBitWidth() > 32)
+    return std::nullopt;
+  unsigned EltBits = FVT->getScalarSizeInBits();
+  if (!FVT->getElementType()->isIntegerTy() || (EltBits != 8 && EltBits != 16))
+    return std::nullopt;
+  unsigned Lanes = 32 / EltBits;
+  if (FVT->getNumElements() % Lanes)
+    return std::nullopt;
+  return FVT->getNumElements() / Lanes;
+}
+
+// Following Arm MVE, whose VMLADAVA/VADDVA are the same kind of instruction
+// (ARMTargetTransformInfo.cpp, getMulAccReductionCost and preferInLoopReduction):
+// in-loop add reductions keep the accumulator a scalar, which is the operand
+// the accumulating dot products update.
+bool RISCVTTIImpl::preferInLoopReduction(unsigned Opcode, Type *Ty,
+                                         TTI::ReductionFlags Flags) const {
+  if (!hasPULPPackedSIMDOnly())
+    return false;
+  return Opcode == Instruction::Add && Ty->isIntegerTy() &&
+         Ty->getScalarSizeInBits() <= 32;
+}
+
+InstructionCost
+RISCVTTIImpl::getMulAccReductionCost(bool IsUnsigned, Type *ResTy,
+                                     VectorType *ValTy,
+                                     TTI::TargetCostKind CostKind) {
+  if (std::optional<unsigned> Regs = getPULPDotProductRegs(ResTy, ValTy))
+    return *Regs;
+  return BaseT::getMulAccReductionCost(IsUnsigned, ResTy, ValTy, CostKind);
+}
+
 InstructionCost RISCVTTIImpl::getExtendedReductionCost(
     unsigned Opcode, bool IsUnsigned, Type *ResTy, VectorType *ValTy,
     FastMathFlags FMF, TTI::TargetCostKind CostKind) {
+  if (Opcode == Instruction::Add)
+    if (std::optional<unsigned> Regs = getPULPDotProductRegs(ResTy, ValTy))
+      return *Regs;
   if (isa<FixedVectorType>(ValTy) && !ST->useRVVForFixedLengthVectors())
     return BaseT::getExtendedReductionCost(Opcode, IsUnsigned, ResTy, ValTy,
                                            FMF, CostKind);
@@ -2838,6 +2890,27 @@ bool RISCVTTIImpl::canSplatOperand(Instruction *I, int Operand) const {
 bool RISCVTTIImpl::isProfitableToSinkOperands(
     Instruction *I, SmallVectorImpl<Use *> &Ops) const {
   using namespace llvm::PatternMatch;
+
+  // PULP dot products by a scalar (pv.dotsp.sc/.sci and friends, B156 list B,
+  // 20/F057): the vectorizer builds the splat of the scalar in the preheader,
+  // and in the loop the instruction selector then only sees one register per
+  // lane. Sinking the splat next to the multiply that feeds the reduction
+  // lets combinePULPVecReduceAdd see the scalar, as the RVV code below does
+  // for the .vx forms.
+  if (hasPULPPackedSIMDOnly() && I->getOpcode() == Instruction::Mul &&
+      isa<FixedVectorType>(I->getType()) && I->hasOneUse() &&
+      match(I->user_back(), m_Intrinsic<Intrinsic::vector_reduce_add>())) {
+    for (Use &U : I->operands()) {
+      auto *Op = dyn_cast<Instruction>(U.get());
+      if (!Op || !Op->hasOneUse() ||
+          !match(Op, m_Shuffle(m_InsertElt(m_Undef(), m_Value(), m_ZeroInt()),
+                               m_Undef(), m_ZeroMask())))
+        continue;
+      Ops.push_back(&Op->getOperandUse(0));
+      Ops.push_back(&U);
+    }
+    return !Ops.empty();
+  }
 
   if (!I->getType()->isVectorTy() || !ST->hasVInstructions())
     return false;
