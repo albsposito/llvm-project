@@ -10,6 +10,7 @@
 #include "MCTargetDesc/RISCVMatInt.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Analysis/TargetTransformInfo.h"
+#include "llvm/Analysis/ValueTracking.h"
 #include "llvm/CodeGen/BasicTTIImpl.h"
 #include "llvm/CodeGen/CostTable.h"
 #include "llvm/CodeGen/TargetLowering.h"
@@ -1108,6 +1109,11 @@ RISCVTTIImpl::getIntrinsicInstrCost(const IntrinsicCostAttributes &ICA,
   // the parameter types).
   if (isPULPBoolVector(CostKind, RetTy, ICA.getInst()))
     return InstructionCost::getInvalid();
+  // PULP in-loop add reductions (see getPULPDotReductionStep).
+  if (ICA.getInst() && CostKind == TTI::TCK_RecipThroughput)
+    if (std::optional<InstructionCost> C =
+            getPULPReductionStepCost(ICA.getInst(), RetTy))
+      return *C;
   switch (ICA.getID()) {
   case Intrinsic::lrint:
   case Intrinsic::llrint:
@@ -1444,6 +1450,11 @@ InstructionCost RISCVTTIImpl::getCastInstrCost(unsigned Opcode, Type *Dst,
   bool IsVectorType = isa<VectorType>(Dst) && isa<VectorType>(Src);
   if (!IsVectorType)
     return BaseT::getCastInstrCost(Opcode, Dst, Src, CCH, CostKind, I);
+
+  // PULP in-loop add reductions (see getPULPDotReductionStep).
+  if (I && I->getOpcode() == Opcode && CostKind == TTI::TCK_RecipThroughput)
+    if (std::optional<InstructionCost> C = getPULPReductionStepCost(I, Dst))
+      return *C;
 
   // PULP packed integer extends and truncates, as llc lowers them for xgap9:
   // every lane leaves a packed register with one pv.extract(u) (which also
@@ -1906,11 +1917,48 @@ RISCVTTIImpl::getArithmeticReductionCost(unsigned Opcode, VectorType *Ty,
   return SplitCost + getRISCVInstructionCost(Opcodes, LT.second, CostKind);
 }
 
+// Following Arm MVE, whose VMLADAVA/VADDVA are the same kind of instruction
+// (ARMTargetTransformInfo.cpp, preferInLoopReduction): in-loop add reductions
+// keep the accumulator a scalar, which is the operand the accumulating dot
+// products update. Unlike MVE, PULP has no instruction for a reduction of
+// 32-bit lanes, so the steps that do not become dot products are priced by
+// getPULPReductionStepCost. Only 32-bit accumulators: an in-loop i8 / i16
+// reduction of a compare (a count, `c += a[i] == 0`) becomes
+// vector_reduce_add(zext <N x i1>), which InstCombine turns into a bitcast of
+// the mask that ISel cannot lower (it asserts in getTruncStore, as in
+// 20/F055's pulp-flag-reductions.ll), and this hook does not see the step.
+// Narrow accumulators keep the vectorizer's out-of-loop form.
+bool RISCVTTIImpl::preferInLoopReduction(unsigned Opcode, Type *Ty,
+                                         TTI::ReductionFlags Flags) const {
+  if (!hasPULPPackedSIMDOnly())
+    return false;
+  return Opcode == Instruction::Add && Ty->isIntegerTy(32);
+}
+
+// PULP: decline the reduction patterns, so the vectorizer costs each
+// instruction of the reduction step (getPULPReductionStepCost). Whether the
+// pattern is one dot product per register or lane-by-lane code depends on what
+// these hooks are not told (the operands' loads, the scalar's value). An
+// invalid pattern cost makes LoopVectorizationCostModel::getReductionPatternCost
+// use the per-instruction costs; a valid one would bypass them.
+InstructionCost
+RISCVTTIImpl::getMulAccReductionCost(bool IsUnsigned, Type *ResTy,
+                                     VectorType *ValTy,
+                                     TTI::TargetCostKind CostKind) {
+  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(ValTy) &&
+      ResTy->isIntegerTy(32))
+    return InstructionCost::getInvalid();
+  return BaseT::getMulAccReductionCost(IsUnsigned, ResTy, ValTy, CostKind);
+}
+
 InstructionCost RISCVTTIImpl::getExtendedReductionCost(
     unsigned Opcode, bool IsUnsigned, Type *ResTy, VectorType *ValTy,
     FastMathFlags FMF, TTI::TargetCostKind CostKind) {
   // PULP without V: no vector of i1 (see isPULPBoolVector).
   if (isPULPBoolVector(CostKind, {ResTy, ValTy}))
+    return InstructionCost::getInvalid();
+  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(ValTy) &&
+      Opcode == Instruction::Add && ResTy->isIntegerTy(32))
     return InstructionCost::getInvalid();
   if (isa<FixedVectorType>(ValTy) && !ST->useRVVForFixedLengthVectors())
     return BaseT::getExtendedReductionCost(Opcode, IsUnsigned, ResTy, ValTy,
@@ -1972,6 +2020,12 @@ InstructionCost RISCVTTIImpl::getMemoryOpCost(unsigned Opcode, Type *Src,
   // PULP without V: no vector of i1 (see isPULPBoolVector).
   if (isPULPBoolVector(CostKind, Src, I))
     return InstructionCost::getInvalid();
+  // PULP in-loop add reductions (see getPULPDotReductionStep): a loaded value
+  // added into the reduction.
+  if (I && Opcode == Instruction::Load && I->getOpcode() == Opcode &&
+      CostKind == TTI::TCK_RecipThroughput)
+    if (std::optional<InstructionCost> C = getPULPReductionStepCost(I, Src))
+      return *C;
   EVT VT = TLI->getValueType(DL, Src, true);
   // Type legalization can't handle structs
   if (VT == MVT::Other)
@@ -2143,6 +2197,12 @@ InstructionCost RISCVTTIImpl::getCmpSelInstrCost(
        (isPULPVectorizerCost(CostKind) && isPULPMultiLaneVector(ValTy) &&
         (Opcode == Instruction::ICmp || Opcode == Instruction::FCmp))))
     return InstructionCost::getInvalid();
+  // PULP in-loop add reductions (see getPULPDotReductionStep): a select added
+  // into the reduction.
+  if (I && I->getOpcode() == Opcode && Opcode == Instruction::Select &&
+      CostKind == TTI::TCK_RecipThroughput)
+    if (std::optional<InstructionCost> C = getPULPReductionStepCost(I, ValTy))
+      return *C;
 
   if (CostKind != TTI::TCK_RecipThroughput)
     return BaseT::getCmpSelInstrCost(Opcode, ValTy, CondTy, VecPred, CostKind,
@@ -2482,6 +2542,278 @@ InstructionCost RISCVTTIImpl::getVectorInstrCost(unsigned Opcode, Type *Val,
   return BaseCost + SlideCost;
 }
 
+// PULP dot products in the loop vectorizer (B156 list B, 20/F057).
+//
+// An integer add reduction is kept in the loop (preferInLoopReduction), so
+// each vector iteration reduces the value it adds, its "reduction step".
+// combinePULPVecReduceAdd (RISCVISelLowering.cpp) turns some steps into one
+// dot product per packed register. The others have no packed form on 32-bit
+// lanes: the legalizer gives each lane its own GPR, and the loop becomes the
+// scalar loop's work plus a pv.extract per lane of every packed input. The
+// scalar loop does that work with free extends (p.lb/p.lh), fused
+// multiply-adds (p.mac), post-increment addressing and a hardware loop, which
+// the vectorizer's scalar cost does not see (`s += a[i] * k` is priced 5 per
+// element for 2 instructions). With finite costs it picked such loops and ran
+// up to 1.36x slower (sim=legacy, review of 20/F057).
+//
+// Which steps the combine takes depends on the IR (signs, widths, the value of
+// a scalar, how the operands are loaded), which the vectorizer's reduction
+// pattern hooks (getMulAccReductionCost, getExtendedReductionCost) are not
+// given. So on PULP those hooks decline, the vectorizer costs each instruction
+// of the step, and the hooks below, which get the scalar instruction, apply
+// the combine's rules to it: a step the combine takes costs one per dot
+// product and the extends and multiply it absorbs cost nothing; a step on
+// 32-bit lanes that it does not take is invalid at that VF, so the loop stays
+// scalar.
+
+// Whether I is the value an integer add reduction adds (or subtracts) in each
+// iteration: its only user is an add or sub that feeds a phi which takes that
+// add or sub back, as LoopVectorize's in-loop reduction chains are.
+static bool isPULPReductionStepOperand(const Instruction *I) {
+  if (!I->hasOneUse())
+    return false;
+  auto *U = dyn_cast<BinaryOperator>(I->user_back());
+  if (!U || (U->getOpcode() != Instruction::Add &&
+             U->getOpcode() != Instruction::Sub))
+    return false;
+  for (const Value *Op : U->operands())
+    if (auto *Phi = dyn_cast<PHINode>(Op))
+      if (is_contained(Phi->incoming_values(), U))
+        return true;
+  return false;
+}
+
+// Whether V, defined in block BB, is a linear function of an induction phi of
+// BB; *Scale is its step per iteration. Recognizes the forms InstCombine leaves
+// for array indices: the phi, its sign or zero extension, plus or minus a
+// value from outside BB, and a multiply or shift by a constant.
+static bool getPULPIndexStep(const Value *V, const BasicBlock *BB,
+                             int64_t *Scale, unsigned Depth = 0) {
+  auto *I = dyn_cast<Instruction>(V);
+  if (!I || I->getParent() != BB || Depth > 6)
+    return false;
+  auto Outside = [&](const Value *X) {
+    auto *XI = dyn_cast<Instruction>(X);
+    return !XI || XI->getParent() != BB;
+  };
+  const APInt *C;
+  if (auto *Phi = dyn_cast<PHINode>(I)) {
+    for (const Value *In : Phi->incoming_values())
+      if (match(In, m_Add(m_Specific(Phi), m_APInt(C)))) {
+        *Scale = C->getSExtValue();
+        return true;
+      }
+    return false;
+  }
+  if (isa<SExtInst>(I) || isa<ZExtInst>(I))
+    return getPULPIndexStep(I->getOperand(0), BB, Scale, Depth + 1);
+  if (match(I, m_Shl(m_Value(), m_APInt(C))) && C->ult(32) &&
+      getPULPIndexStep(I->getOperand(0), BB, Scale, Depth + 1)) {
+    *Scale <<= C->getZExtValue();
+    return true;
+  }
+  if (match(I, m_Mul(m_Value(), m_APInt(C))) &&
+      getPULPIndexStep(I->getOperand(0), BB, Scale, Depth + 1)) {
+    *Scale *= C->getSExtValue();
+    return true;
+  }
+  unsigned Opc = I->getOpcode();
+  if (Opc == Instruction::Add || Opc == Instruction::Or ||
+      Opc == Instruction::Sub) {
+    if (Outside(I->getOperand(1)))
+      return getPULPIndexStep(I->getOperand(0), BB, Scale, Depth + 1);
+    if (Opc == Instruction::Add && Outside(I->getOperand(0)))
+      return getPULPIndexStep(I->getOperand(1), BB, Scale, Depth + 1);
+  }
+  return false;
+}
+
+// Whether V is a load whose address advances by something other than its own
+// size per iteration (such as b[2 * i]). The vectorizer then loads it lane by
+// lane and packs the lanes, without post-increment addressing, which costs
+// more than the dot product saves (strided16 1.36x slower, sim=legacy).
+// Addresses whose step is not recognized are taken as consecutive.
+static bool isPULPStridedLoad(const Value *V, const DataLayout &DL) {
+  auto *LI = dyn_cast<LoadInst>(V);
+  if (!LI)
+    return false;
+  const BasicBlock *BB = LI->getParent();
+  int64_t Size = DL.getTypeStoreSize(LI->getType()).getFixedValue();
+  const Value *Ptr = LI->getPointerOperand();
+  // A pointer induction: p = phi [p0, ...], [gep p, C].
+  if (auto *Phi = dyn_cast<PHINode>(Ptr)) {
+    if (Phi->getParent() != BB)
+      return false;
+    for (const Value *In : Phi->incoming_values())
+      if (auto *G = dyn_cast<GetElementPtrInst>(In))
+        if (G->getPointerOperand() == Phi && G->getNumIndices() == 1)
+          if (auto *C = dyn_cast<ConstantInt>(G->getOperand(1)))
+            return C->getSExtValue() *
+                       int64_t(DL.getTypeAllocSize(G->getSourceElementType())
+                                   .getFixedValue()) !=
+                   Size;
+    return false;
+  }
+  auto *G = dyn_cast<GetElementPtrInst>(Ptr);
+  if (!G || G->getParent() != BB || G->getNumIndices() == 0)
+    return false;
+  // Only the last index may vary; it steps by elements of the indexed type.
+  for (unsigned I = 1, E = G->getNumOperands() - 1; I < E; ++I)
+    if (auto *XI = dyn_cast<Instruction>(G->getOperand(I)))
+      if (XI->getParent() == BB)
+        return false;
+  int64_t Step;
+  if (!getPULPIndexStep(G->getOperand(G->getNumOperands() - 1), BB, &Step))
+    return false;
+  int64_t Elt =
+      DL.getTypeAllocSize(G->getResultElementType()).getFixedValue();
+  return Step * Elt != Size;
+}
+
+// If the reduction step RedOp (a scalar instruction of the loop), vectorized
+// at VF lanes, is one combinePULPVecReduceAdd turns into dot products, the
+// number of dot-product instructions; std::nullopt otherwise. These are the
+// combine's rules, applied to the scalar IR:
+//   ext(A) * ext(B)  any mix of signs, lanes of the wider source
+//   ext(A) * C       C from outside the loop body, fitting the lane as a
+//                    signed number, or as an unsigned one when A is unsigned
+//                    too (.sc / .sci)
+//   ext(A)           a sum (.sci 1); also ext(mul(ext A, ext B)) when the
+//                    outer extend keeps every product
+//   abs(zext(A) - zext(B))  a sum of absolute differences (the DAG makes it
+//                    zext(abdu(A, B)), a sum)
+// with A, B of i8 / i16 extended in the loop body, not loaded with a stride,
+// and VF filling whole v2i16 / v4i8 registers. Only 32-bit accumulators are
+// in-loop reductions (preferInLoopReduction); a narrower step is left to the
+// normal costs.
+std::optional<unsigned>
+RISCVTTIImpl::getPULPDotReductionStep(const Instruction *RedOp,
+                                      unsigned VF) const {
+  // A step the reduction subtracts is vectorized as vecreduce_add(0 - step),
+  // which the combine does not take (dot16_sub, 1.25x slower lane by lane,
+  // sim=legacy).
+  if (!hasPULPPackedSIMDOnly() || !RedOp->getType()->isIntegerTy() ||
+      !isPULPReductionStepOperand(RedOp) ||
+      RedOp->user_back()->getOpcode() != Instruction::Add)
+    return std::nullopt;
+  unsigned M = RedOp->getType()->getIntegerBitWidth();
+  if (M != 32)
+    return std::nullopt;
+  const BasicBlock *BB = RedOp->getParent();
+  struct ExtOp {
+    unsigned Bits;
+    bool Signed;
+  };
+  auto MatchExt = [&](const Value *V, ExtOp &E) {
+    auto *C = dyn_cast<CastInst>(V);
+    if (!C || (!isa<SExtInst>(C) && !isa<ZExtInst>(C)) ||
+        C->getParent() != BB)
+      return false;
+    unsigned Bits = C->getSrcTy()->getScalarSizeInBits();
+    if ((Bits != 8 && Bits != 16) || isPULPStridedLoad(C->getOperand(0), DL))
+      return false;
+    E = {Bits, isa<SExtInst>(C)};
+    return true;
+  };
+  auto Dots = [&](unsigned LaneBits) -> std::optional<unsigned> {
+    if (VF % (32 / LaneBits))
+      return std::nullopt;
+    return VF * LaneBits / 32;
+  };
+  ExtOp A, B;
+
+  // Extensions: a sum, or an extended product.
+  if (isa<SExtInst>(RedOp) || isa<ZExtInst>(RedOp)) {
+    auto *Mul = dyn_cast<BinaryOperator>(RedOp->getOperand(0));
+    if (Mul && Mul->getOpcode() == Instruction::Mul) {
+      if (Mul->getParent() != BB || !Mul->hasOneUse() ||
+          !MatchExt(Mul->getOperand(0), A) || !MatchExt(Mul->getOperand(1), B))
+        return std::nullopt;
+      unsigned MulBits = Mul->getType()->getIntegerBitWidth();
+      bool BothUnsigned = !A.Signed && !B.Signed;
+      if (isa<SExtInst>(RedOp) ? MulBits < A.Bits + B.Bits + BothUnsigned
+                               : !BothUnsigned || MulBits < A.Bits + B.Bits)
+        return std::nullopt;
+      return Dots(std::max(A.Bits, B.Bits));
+    }
+    if (!MatchExt(RedOp, A))
+      return std::nullopt;
+    return Dots(A.Bits);
+  }
+
+  if (match(RedOp, m_Intrinsic<Intrinsic::abs>(m_Value(), m_Value()))) {
+    auto *Sub = dyn_cast<BinaryOperator>(RedOp->getOperand(0));
+    if (!Sub || Sub->getOpcode() != Instruction::Sub ||
+        Sub->getParent() != BB || !Sub->hasOneUse() ||
+        !MatchExt(Sub->getOperand(0), A) || !MatchExt(Sub->getOperand(1), B) ||
+        A.Signed || B.Signed || A.Bits != B.Bits)
+      return std::nullopt;
+    return Dots(A.Bits);
+  }
+
+  if (RedOp->getOpcode() != Instruction::Mul)
+    return std::nullopt;
+  const Value *X = RedOp->getOperand(0), *Y = RedOp->getOperand(1);
+  bool XExt = MatchExt(X, A), YExt = MatchExt(Y, B);
+  if (XExt && YExt)
+    return Dots(std::max(A.Bits, B.Bits));
+  if (!XExt && !YExt)
+    return std::nullopt;
+  if (YExt) {
+    std::swap(X, Y);
+    A = B;
+  }
+  // ext(A) * Y: Y is the scalar of the .sc form, from outside the loop body.
+  if (auto *YI = dyn_cast<Instruction>(Y); YI && YI->getParent() == BB)
+    return std::nullopt;
+  if (ComputeNumSignBits(Y, DL) >= M - A.Bits + 1 ||
+      (!A.Signed &&
+       computeKnownBits(Y, DL).countMinLeadingZeros() >= M - A.Bits))
+    return Dots(A.Bits);
+  return std::nullopt;
+}
+
+// The cost, in the vectorizer at type VecTy, of the scalar instruction I of
+// an in-loop (32-bit) add reduction on PULP: the dot products for a step the
+// combine takes (getPULPDotReductionStep), 0 for an extend or multiply such a
+// step absorbs, invalid for another step; std::nullopt when none of these
+// applies.
+std::optional<InstructionCost>
+RISCVTTIImpl::getPULPReductionStepCost(const Instruction *I,
+                                       Type *VecTy) const {
+  auto *FVT = dyn_cast_or_null<FixedVectorType>(VecTy);
+  if (!I || !FVT || !hasPULPPackedSIMDOnly())
+    return std::nullopt;
+  unsigned VF = FVT->getNumElements();
+  if (isPULPReductionStepOperand(I)) {
+    if (!FVT->getElementType()->isIntegerTy(32))
+      return std::nullopt;
+    if (std::optional<unsigned> Dots = getPULPDotReductionStep(I, VF))
+      return InstructionCost(*Dots);
+    return InstructionCost::getInvalid();
+  }
+  // An operand the dot products absorb: ext(A) feeding the multiply (or the
+  // multiply inside ext(mul(...))), or that multiply.
+  if (!I->hasOneUse())
+    return std::nullopt;
+  const Instruction *U = I->user_back();
+  auto IsExt = [](const Instruction *X) {
+    return isa<SExtInst>(X) || isa<ZExtInst>(X);
+  };
+  if (IsExt(I) && U->getOpcode() == Instruction::Mul) {
+    if (getPULPDotReductionStep(U, VF))
+      return InstructionCost(0);
+    if (U->hasOneUse() && IsExt(U->user_back()) &&
+        getPULPDotReductionStep(U->user_back(), VF))
+      return InstructionCost(0);
+    return std::nullopt;
+  }
+  if (I->getOpcode() == Instruction::Mul && IsExt(U) &&
+      getPULPDotReductionStep(U, VF))
+    return InstructionCost(0);
+  return std::nullopt;
+}
+
 InstructionCost RISCVTTIImpl::getArithmeticInstrCost(
     unsigned Opcode, Type *Ty, TTI::TargetCostKind CostKind,
     TTI::OperandValueInfo Op1Info, TTI::OperandValueInfo Op2Info,
@@ -2489,6 +2821,12 @@ InstructionCost RISCVTTIImpl::getArithmeticInstrCost(
   // PULP without V: no vector of i1 (see isPULPBoolVector).
   if (isPULPBoolVector(CostKind, Ty, CxtI))
     return InstructionCost::getInvalid();
+
+  // PULP in-loop add reductions (see getPULPDotReductionStep).
+  if (CxtI && CxtI->getOpcode() == Opcode &&
+      CostKind == TTI::TCK_RecipThroughput)
+    if (std::optional<InstructionCost> C = getPULPReductionStepCost(CxtI, Ty))
+      return *C;
 
   // TODO: Handle more cost kinds.
   if (CostKind != TTI::TCK_RecipThroughput)
@@ -2975,6 +3313,27 @@ bool RISCVTTIImpl::canSplatOperand(Instruction *I, int Operand) const {
 bool RISCVTTIImpl::isProfitableToSinkOperands(
     Instruction *I, SmallVectorImpl<Use *> &Ops) const {
   using namespace llvm::PatternMatch;
+
+  // PULP dot products by a scalar (pv.dotsp.sc/.sci and friends, B156 list B,
+  // 20/F057): the vectorizer builds the splat of the scalar in the preheader,
+  // and in the loop the instruction selector then only sees one register per
+  // lane. Sinking the splat next to the multiply that feeds the reduction
+  // lets combinePULPVecReduceAdd see the scalar, as the RVV code below does
+  // for the .vx forms.
+  if (hasPULPPackedSIMDOnly() && I->getOpcode() == Instruction::Mul &&
+      isa<FixedVectorType>(I->getType()) && I->hasOneUse() &&
+      match(I->user_back(), m_Intrinsic<Intrinsic::vector_reduce_add>())) {
+    for (Use &U : I->operands()) {
+      auto *Op = dyn_cast<Instruction>(U.get());
+      if (!Op || !Op->hasOneUse() ||
+          !match(Op, m_Shuffle(m_InsertElt(m_Undef(), m_Value(), m_ZeroInt()),
+                               m_Undef(), m_ZeroMask())))
+        continue;
+      Ops.push_back(&Op->getOperandUse(0));
+      Ops.push_back(&U);
+    }
+    return !Ops.empty();
+  }
 
   if (!I->getType()->isVectorTy() || !ST->hasVInstructions())
     return false;
