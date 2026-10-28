@@ -66,6 +66,10 @@ class RISCVTTIImpl : public BasicTTIImplBase<RISCVTTIImpl> {
     return ST->hasPULPExtV2() && !ST->hasVInstructions();
   }
 
+  /// PULP without V: \p I is a boolean whose widened form (type \p Ty)
+  /// would be carried in a recurrence phi, which the back end cannot reduce.
+  bool isPULPMaskRecurrence(Type *Ty, const Instruction *I) const;
+
   /// Shuffle cost for a fixed vector when the packed types live in GPRs.
   InstructionCost getPULPShuffleCost(TTI::ShuffleKind Kind,
                                      FixedVectorType *Tp, ArrayRef<int> Mask,
