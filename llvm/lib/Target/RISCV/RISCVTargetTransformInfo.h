@@ -66,6 +66,17 @@ class RISCVTTIImpl : public BasicTTIImplBase<RISCVTTIImpl> {
     return ST->hasPULPExtV2() && !ST->hasVInstructions();
   }
 
+  /// The number of dot-product instructions combinePULPVecReduceAdd makes of
+  /// the in-loop reduction step RedOp vectorized at VF lanes, or std::nullopt
+  /// when it does not take it.
+  std::optional<unsigned> getPULPDotReductionStep(const Instruction *RedOp,
+                                                  unsigned VF) const;
+
+  /// The vectorizer's cost of the scalar instruction I of a PULP in-loop add
+  /// reduction at type VecTy, or std::nullopt for the normal cost.
+  std::optional<InstructionCost>
+  getPULPReductionStepCost(const Instruction *I, Type *VecTy) const;
+
   /// Shuffle cost for a fixed vector when the packed types live in GPRs.
   InstructionCost getPULPShuffleCost(TTI::ShuffleKind Kind,
                                      FixedVectorType *Tp, ArrayRef<int> Mask,
@@ -220,6 +231,13 @@ public:
                                            Type *ResTy, VectorType *ValTy,
                                            FastMathFlags FMF,
                                            TTI::TargetCostKind CostKind);
+
+  InstructionCost getMulAccReductionCost(bool IsUnsigned, Type *ResTy,
+                                         VectorType *ValTy,
+                                         TTI::TargetCostKind CostKind);
+
+  bool preferInLoopReduction(unsigned Opcode, Type *Ty,
+                             TTI::ReductionFlags Flags) const;
 
   InstructionCost
   getMemoryOpCost(unsigned Opcode, Type *Src, MaybeAlign Alignment,
