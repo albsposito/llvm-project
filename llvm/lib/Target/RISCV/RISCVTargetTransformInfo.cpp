@@ -1067,6 +1067,9 @@ InstructionCost
 RISCVTTIImpl::getIntrinsicInstrCost(const IntrinsicCostAttributes &ICA,
                                     TTI::TargetCostKind CostKind) {
   auto *RetTy = ICA.getReturnType();
+  // PULP without V: no boolean recurrences (see isPULPMaskRecurrence).
+  if (isPULPMaskRecurrence(RetTy, ICA.getInst()))
+    return InstructionCost::getInvalid();
   switch (ICA.getID()) {
   case Intrinsic::lrint:
   case Intrinsic::llrint:
@@ -1397,6 +1400,9 @@ InstructionCost RISCVTTIImpl::getCastInstrCost(unsigned Opcode, Type *Dst,
                                                TTI::CastContextHint CCH,
                                                TTI::TargetCostKind CostKind,
                                                const Instruction *I) {
+  // PULP without V: no boolean recurrences (see isPULPMaskRecurrence).
+  if (isPULPMaskRecurrence(Dst, I))
+    return InstructionCost::getInvalid();
   bool IsVectorType = isa<VectorType>(Dst) && isa<VectorType>(Src);
   if (!IsVectorType)
     return BaseT::getCastInstrCost(Opcode, Dst, Src, CCH, CostKind, I);
@@ -2011,61 +2017,64 @@ InstructionCost RISCVTTIImpl::getMemoryOpCost(unsigned Opcode, Type *Src,
 
 }
 
-// PULP packed SIMD without V: the back end cannot carry an <N x i1> mask from
-// one basic block to another. A mask in a phi, or the bitcast <N x i1> -> iN
-// that reduces it, is promoted and stored with a vector truncstore, and ISel
-// asserts in SelectionDAG::getTruncStore (int-20 llc too; plain RV32 is
-// fine). The loop vectorizer forms such a phi for an any-of recurrence
-// (`if (a[i] == 0) flag = 1`, `flag &= a[i] != b[i]` on a char or short
-// flag, `flag = c ? flag : 3`), for an i1 recurrence (`_Bool` flags with |=,
-// ^=, &=, +=) and for a mask that is live out of the loop, and it costs
-// neither the phi nor the reduction in the middle block, so the
-// reduction-cost guards never see it. What it does cost is the widened
-// compare, with the scalar compare as context. This returns true when the
-// scalar compare's boolean reaches a phi or leaves its block, directly or
-// through i1 logic operations and any-of selects. A select that only uses the
-// compare to pick between two in-loop values (min/max) does not count, and
-// neither does a zext/sext to a wider integer (a full-width packed vector).
-static bool pulpMaskReachesPHI(const Instruction *Cmp) {
-  SmallVector<const Instruction *, 8> Work{Cmp};
-  SmallPtrSet<const Instruction *, 8> Seen{Cmp};
+// PULP packed SIMD without V: the back end cannot reduce an <N x i1> vector.
+// The reduction (vector.reduce.or/and/xor on <N x i1>, which InstCombine
+// turns into a bitcast <N x i1> -> iN) is legalized through a vector
+// truncstore and ISel asserts in SelectionDAG::getTruncStore (int-20 llc
+// too; plain RV32 is fine). The loop vectorizer forms such a reduction for
+// every boolean recurrence: any-of flags (`if (a[i] == 0) f = 1`,
+// `f = c ? f : 3`), _Bool flags updated with &, |, ^, +, != (`f ^= a[i] & 1`)
+// and conjunctions of these. It never asks the target about the boolean phi
+// itself (VPHeaderPHIRecipe costs a phi with getCFInstrCost(PHI), without a
+// type or an instruction) nor about the reduction in the middle block. What
+// it does cost is every widened value of the loop body, and the arithmetic,
+// cast, compare/select and intrinsic hooks get the scalar instruction as
+// context. So each of those hooks asks this: is the queried type a vector,
+// is the scalar value a boolean (i1), and does that boolean feed a
+// recurrence, i.e. reach a phi that in turn feeds the same chain back? The
+// walk follows every boolean-typed user and the any-of select (a select on
+// the boolean between the phi and a value not computed in the loop body);
+// it stops at anything wider (zext/sext: `acc |= a[i] == 0` on a short is a
+// full-width packed vector, which works). A boolean that is only used after
+// the loop (an LCSSA phi with no user in the chain, lowered as a lane
+// extract) and a select between two in-loop values (min/max) do not count.
+bool RISCVTTIImpl::isPULPMaskRecurrence(Type *Ty, const Instruction *I) const {
+  if (!hasPULPPackedSIMDOnly() || !I || !isa<FixedVectorType>(Ty) ||
+      !I->getType()->isIntegerTy(1))
+    return false;
+  SmallVector<const Instruction *, 8> Work{I};
+  SmallPtrSet<const Instruction *, 8> Seen{I};
   while (!Work.empty()) {
     const Instruction *V = Work.pop_back_val();
     for (const User *U : V->users()) {
       const auto *UI = dyn_cast<Instruction>(U);
       if (!UI)
         continue;
-      if (isa<PHINode>(UI) || UI->getParent() != Cmp->getParent())
-        return true;
-      // Follow the value while it is still a boolean: a zext/sext to i8/i16
-      // (e.g. `acc |= a[i] == 0` on a short) is carried as a full-width packed
-      // vector, which the back end handles.
-      bool Follow = false;
-      if (const auto *Sel = dyn_cast<SelectInst>(UI)) {
-        if (Sel->getCondition() != V) {
-          // A boolean used as a select value: logical and/or of masks.
-          Follow = Sel->getType()->isIntOrIntVectorTy(1);
-        } else {
-          // Any-of shape: select(c, phi, x) or select(c, x, phi) with x not
-          // computed in this block (a loop-invariant value or constant).
-          const Value *T = Sel->getTrueValue(), *F = Sel->getFalseValue();
-          auto InBlock = [&](const Value *X) {
-            const auto *XI = dyn_cast<Instruction>(X);
-            return XI && !isa<PHINode>(XI) &&
-                   XI->getParent() == Sel->getParent();
-          };
-          if ((isa<PHINode>(T) && !InBlock(F)) ||
-              (isa<PHINode>(F) && !InBlock(T)) ||
-              Sel->getType()->isIntOrIntVectorTy(1))
-            Follow = true;
-        }
-      } else if (UI->getType()->isIntOrIntVectorTy(1) &&
-                 (isa<FreezeInst>(UI) || UI->getOpcode() == Instruction::And ||
-                  UI->getOpcode() == Instruction::Or ||
-                  UI->getOpcode() == Instruction::Xor)) {
-        Follow = true;
+      if (const auto *Phi = dyn_cast<PHINode>(UI)) {
+        // A recurrence: the phi feeds the chain that reached it.
+        if (any_of(Phi->users(), [&](const User *PU) {
+              return isa<Instruction>(PU) &&
+                     Seen.contains(cast<Instruction>(PU));
+            }))
+          return true;
+      } else if (const auto *Sel = dyn_cast<SelectInst>(UI);
+                 Sel && Sel->getCondition() == V &&
+                 !Sel->getType()->isIntegerTy(1)) {
+        // Any-of shape: select(c, phi, x) or select(c, x, phi) with x not
+        // computed in the loop body (a loop-invariant value or constant).
+        const Value *T = Sel->getTrueValue(), *F = Sel->getFalseValue();
+        auto InBlock = [&](const Value *X) {
+          const auto *XI = dyn_cast<Instruction>(X);
+          return XI && !isa<PHINode>(XI) &&
+                 XI->getParent() == Sel->getParent();
+        };
+        if (!((isa<PHINode>(T) && !InBlock(F)) ||
+              (isa<PHINode>(F) && !InBlock(T))))
+          continue;
+      } else if (!UI->getType()->isIntegerTy(1)) {
+        continue;
       }
-      if (Follow && Seen.insert(UI).second)
+      if (Seen.insert(UI).second)
         Work.push_back(UI);
     }
   }
@@ -2076,11 +2085,8 @@ InstructionCost RISCVTTIImpl::getCmpSelInstrCost(
     unsigned Opcode, Type *ValTy, Type *CondTy, CmpInst::Predicate VecPred,
     TTI::TargetCostKind CostKind, TTI::OperandValueInfo Op1Info,
     TTI::OperandValueInfo Op2Info, const Instruction *I) {
-  // PULP packed SIMD without V: a vector compare whose mask would be carried
-  // in a phi (any-of flags, i1 (_Bool) flag recurrences,
-  // live-out masks) cannot be lowered; see pulpMaskReachesPHI.
-  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(ValTy) && I &&
-      isa<CmpInst>(I) && pulpMaskReachesPHI(I))
+  // PULP without V: no boolean recurrences (see isPULPMaskRecurrence).
+  if (isPULPMaskRecurrence(ValTy, I))
     return InstructionCost::getInvalid();
 
   if (CostKind != TTI::TCK_RecipThroughput)
@@ -2420,6 +2426,9 @@ InstructionCost RISCVTTIImpl::getArithmeticInstrCost(
     unsigned Opcode, Type *Ty, TTI::TargetCostKind CostKind,
     TTI::OperandValueInfo Op1Info, TTI::OperandValueInfo Op2Info,
     ArrayRef<const Value *> Args, const Instruction *CxtI) {
+  // PULP without V: no boolean recurrences (see isPULPMaskRecurrence).
+  if (isPULPMaskRecurrence(Ty, CxtI))
+    return InstructionCost::getInvalid();
 
   // TODO: Handle more cost kinds.
   if (CostKind != TTI::TCK_RecipThroughput)
