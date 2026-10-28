@@ -2011,10 +2011,78 @@ InstructionCost RISCVTTIImpl::getMemoryOpCost(unsigned Opcode, Type *Src,
 
 }
 
+// PULP packed SIMD without V: the back end cannot carry an <N x i1> mask from
+// one basic block to another. A mask in a phi, or the bitcast <N x i1> -> iN
+// that reduces it, is promoted and stored with a vector truncstore, and ISel
+// asserts in SelectionDAG::getTruncStore (int-20 llc too; plain RV32 is
+// fine). The loop vectorizer forms such a phi for an any-of recurrence
+// (`if (a[i] == 0) flag = 1`, `flag &= a[i] != b[i]` on a char or short
+// flag, `flag = c ? flag : 3`), for an i1 recurrence (`_Bool` flags with |=,
+// ^=, &=, +=) and for a mask that is live out of the loop, and it costs
+// neither the phi nor the reduction in the middle block, so the
+// reduction-cost guards never see it. What it does cost is the widened
+// compare, with the scalar compare as context. This returns true when the
+// scalar compare's boolean reaches a phi or leaves its block, directly or
+// through i1 logic operations and any-of selects. A select that only uses the
+// compare to pick between two in-loop values (min/max) does not count, and
+// neither does a zext/sext to a wider integer (a full-width packed vector).
+static bool pulpMaskReachesPHI(const Instruction *Cmp) {
+  SmallVector<const Instruction *, 8> Work{Cmp};
+  SmallPtrSet<const Instruction *, 8> Seen{Cmp};
+  while (!Work.empty()) {
+    const Instruction *V = Work.pop_back_val();
+    for (const User *U : V->users()) {
+      const auto *UI = dyn_cast<Instruction>(U);
+      if (!UI)
+        continue;
+      if (isa<PHINode>(UI) || UI->getParent() != Cmp->getParent())
+        return true;
+      // Follow the value while it is still a boolean: a zext/sext to i8/i16
+      // (e.g. `acc |= a[i] == 0` on a short) is carried as a full-width packed
+      // vector, which the back end handles.
+      bool Follow = false;
+      if (const auto *Sel = dyn_cast<SelectInst>(UI)) {
+        if (Sel->getCondition() != V) {
+          // A boolean used as a select value: logical and/or of masks.
+          Follow = Sel->getType()->isIntOrIntVectorTy(1);
+        } else {
+          // Any-of shape: select(c, phi, x) or select(c, x, phi) with x not
+          // computed in this block (a loop-invariant value or constant).
+          const Value *T = Sel->getTrueValue(), *F = Sel->getFalseValue();
+          auto InBlock = [&](const Value *X) {
+            const auto *XI = dyn_cast<Instruction>(X);
+            return XI && !isa<PHINode>(XI) &&
+                   XI->getParent() == Sel->getParent();
+          };
+          if ((isa<PHINode>(T) && !InBlock(F)) ||
+              (isa<PHINode>(F) && !InBlock(T)) ||
+              Sel->getType()->isIntOrIntVectorTy(1))
+            Follow = true;
+        }
+      } else if (UI->getType()->isIntOrIntVectorTy(1) &&
+                 (isa<FreezeInst>(UI) || UI->getOpcode() == Instruction::And ||
+                  UI->getOpcode() == Instruction::Or ||
+                  UI->getOpcode() == Instruction::Xor)) {
+        Follow = true;
+      }
+      if (Follow && Seen.insert(UI).second)
+        Work.push_back(UI);
+    }
+  }
+  return false;
+}
+
 InstructionCost RISCVTTIImpl::getCmpSelInstrCost(
     unsigned Opcode, Type *ValTy, Type *CondTy, CmpInst::Predicate VecPred,
     TTI::TargetCostKind CostKind, TTI::OperandValueInfo Op1Info,
     TTI::OperandValueInfo Op2Info, const Instruction *I) {
+  // PULP packed SIMD without V: a vector compare whose mask would be carried
+  // in a phi (any-of flags, i1 (_Bool) flag recurrences,
+  // live-out masks) cannot be lowered; see pulpMaskReachesPHI.
+  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(ValTy) && I &&
+      isa<CmpInst>(I) && pulpMaskReachesPHI(I))
+    return InstructionCost::getInvalid();
+
   if (CostKind != TTI::TCK_RecipThroughput)
     return BaseT::getCmpSelInstrCost(Opcode, ValTy, CondTy, VecPred, CostKind,
                                      Op1Info, Op2Info, I);
