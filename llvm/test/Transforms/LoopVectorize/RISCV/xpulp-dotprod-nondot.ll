@@ -12,8 +12,9 @@
 ; post-increment addressing (1.36x slower): also scalar. Controls: a mixed-sign dot product
 ; and a dot product by a scalar that fits still vectorize. Counts of a compare (cnt32,
 ; cnt16) must not become in-loop reductions of a zext <N x i1>, which InstCombine turns into
-; a mask bitcast that ISel cannot lower (the second RUN line aborted in llc): cnt32 stays
-; scalar, cnt16 keeps the out-of-loop vector form.
+; a mask bitcast that ISel cannot lower (the second RUN line aborted in llc): cnt32 and
+; cnt16 stay scalar (since 20/F055 r5 no <N x i1> vector is costed as valid on PULP
+; without V, so cnt16 lost its out-of-loop vector form there too).
 
 define i32 @d16su(ptr readonly %pa, ptr readonly %pb, i32 %n) {
 ; CHECK-LABEL: @d16su(
@@ -649,50 +650,24 @@ define signext i16 @cnt16(ptr readonly %a, i32 %n) {
 ; CHECK-NEXT:    [[CMP4:%.*]] = icmp sgt i32 [[N:%.*]], 0
 ; CHECK-NEXT:    br i1 [[CMP4]], label [[FOR_BODY_PREHEADER:%.*]], label [[FOR_COND_CLEANUP:%.*]]
 ; CHECK:       for.body.preheader:
-; CHECK-NEXT:    [[MIN_ITERS_CHECK:%.*]] = icmp ult i32 [[N]], 2
-; CHECK-NEXT:    br i1 [[MIN_ITERS_CHECK]], label [[SCALAR_PH:%.*]], label [[VECTOR_PH:%.*]]
-; CHECK:       vector.ph:
-; CHECK-NEXT:    [[N_MOD_VF:%.*]] = urem i32 [[N]], 2
-; CHECK-NEXT:    [[N_VEC:%.*]] = sub i32 [[N]], [[N_MOD_VF]]
-; CHECK-NEXT:    br label [[VECTOR_BODY:%.*]]
-; CHECK:       vector.body:
-; CHECK-NEXT:    [[INDEX:%.*]] = phi i32 [ 0, [[VECTOR_PH]] ], [ [[INDEX_NEXT:%.*]], [[VECTOR_BODY]] ]
-; CHECK-NEXT:    [[VEC_PHI:%.*]] = phi <2 x i16> [ zeroinitializer, [[VECTOR_PH]] ], [ [[TMP5:%.*]], [[VECTOR_BODY]] ]
-; CHECK-NEXT:    [[TMP0:%.*]] = add i32 [[INDEX]], 0
-; CHECK-NEXT:    [[TMP1:%.*]] = getelementptr inbounds nuw i16, ptr [[A:%.*]], i32 [[TMP0]]
-; CHECK-NEXT:    [[TMP2:%.*]] = getelementptr inbounds nuw i16, ptr [[TMP1]], i32 0
-; CHECK-NEXT:    [[WIDE_LOAD:%.*]] = load <2 x i16>, ptr [[TMP2]], align 2
-; CHECK-NEXT:    [[TMP3:%.*]] = icmp sgt <2 x i16> [[WIDE_LOAD]], splat (i16 5)
-; CHECK-NEXT:    [[TMP4:%.*]] = zext <2 x i1> [[TMP3]] to <2 x i16>
-; CHECK-NEXT:    [[TMP5]] = add <2 x i16> [[VEC_PHI]], [[TMP4]]
-; CHECK-NEXT:    [[INDEX_NEXT]] = add nuw i32 [[INDEX]], 2
-; CHECK-NEXT:    [[TMP6:%.*]] = icmp eq i32 [[INDEX_NEXT]], [[N_VEC]]
-; CHECK-NEXT:    br i1 [[TMP6]], label [[MIDDLE_BLOCK:%.*]], label [[VECTOR_BODY]], !llvm.loop [[LOOP6:![0-9]+]]
-; CHECK:       middle.block:
-; CHECK-NEXT:    [[TMP7:%.*]] = call i16 @llvm.vector.reduce.add.v2i16(<2 x i16> [[TMP5]])
-; CHECK-NEXT:    [[CMP_N:%.*]] = icmp eq i32 [[N]], [[N_VEC]]
-; CHECK-NEXT:    br i1 [[CMP_N]], label [[FOR_COND_CLEANUP_LOOPEXIT:%.*]], label [[SCALAR_PH]]
-; CHECK:       scalar.ph:
-; CHECK-NEXT:    [[BC_RESUME_VAL:%.*]] = phi i32 [ [[N_VEC]], [[MIDDLE_BLOCK]] ], [ 0, [[FOR_BODY_PREHEADER]] ]
-; CHECK-NEXT:    [[BC_MERGE_RDX:%.*]] = phi i16 [ [[TMP7]], [[MIDDLE_BLOCK]] ], [ 0, [[FOR_BODY_PREHEADER]] ]
 ; CHECK-NEXT:    br label [[FOR_BODY:%.*]]
 ; CHECK:       for.cond.cleanup.loopexit:
-; CHECK-NEXT:    [[ADD_LCSSA:%.*]] = phi i16 [ [[ADD:%.*]], [[FOR_BODY]] ], [ [[TMP7]], [[MIDDLE_BLOCK]] ]
+; CHECK-NEXT:    [[ADD_LCSSA:%.*]] = phi i16 [ [[ADD:%.*]], [[FOR_BODY]] ]
 ; CHECK-NEXT:    br label [[FOR_COND_CLEANUP]]
 ; CHECK:       for.cond.cleanup:
-; CHECK-NEXT:    [[C_0_LCSSA:%.*]] = phi i16 [ 0, [[ENTRY:%.*]] ], [ [[ADD_LCSSA]], [[FOR_COND_CLEANUP_LOOPEXIT]] ]
+; CHECK-NEXT:    [[C_0_LCSSA:%.*]] = phi i16 [ 0, [[ENTRY:%.*]] ], [ [[ADD_LCSSA]], [[FOR_COND_CLEANUP_LOOPEXIT:%.*]] ]
 ; CHECK-NEXT:    ret i16 [[C_0_LCSSA]]
 ; CHECK:       for.body:
-; CHECK-NEXT:    [[I_06:%.*]] = phi i32 [ [[INC:%.*]], [[FOR_BODY]] ], [ [[BC_RESUME_VAL]], [[SCALAR_PH]] ]
-; CHECK-NEXT:    [[C_05:%.*]] = phi i16 [ [[ADD]], [[FOR_BODY]] ], [ [[BC_MERGE_RDX]], [[SCALAR_PH]] ]
-; CHECK-NEXT:    [[ARRAYIDX:%.*]] = getelementptr inbounds nuw i16, ptr [[A]], i32 [[I_06]]
+; CHECK-NEXT:    [[I_06:%.*]] = phi i32 [ [[INC:%.*]], [[FOR_BODY]] ], [ 0, [[FOR_BODY_PREHEADER]] ]
+; CHECK-NEXT:    [[C_05:%.*]] = phi i16 [ [[ADD]], [[FOR_BODY]] ], [ 0, [[FOR_BODY_PREHEADER]] ]
+; CHECK-NEXT:    [[ARRAYIDX:%.*]] = getelementptr inbounds nuw i16, ptr [[A:%.*]], i32 [[I_06]]
 ; CHECK-NEXT:    [[TMP8:%.*]] = load i16, ptr [[ARRAYIDX]], align 2
 ; CHECK-NEXT:    [[CMP1:%.*]] = icmp sgt i16 [[TMP8]], 5
 ; CHECK-NEXT:    [[CONV2:%.*]] = zext i1 [[CMP1]] to i16
 ; CHECK-NEXT:    [[ADD]] = add i16 [[C_05]], [[CONV2]]
 ; CHECK-NEXT:    [[INC]] = add nuw nsw i32 [[I_06]], 1
 ; CHECK-NEXT:    [[EXITCOND_NOT:%.*]] = icmp eq i32 [[INC]], [[N]]
-; CHECK-NEXT:    br i1 [[EXITCOND_NOT]], label [[FOR_COND_CLEANUP_LOOPEXIT]], label [[FOR_BODY]], !llvm.loop [[LOOP7:![0-9]+]]
+; CHECK-NEXT:    br i1 [[EXITCOND_NOT]], label [[FOR_COND_CLEANUP_LOOPEXIT]], label [[FOR_BODY]]
 ;
 entry:
   %cmp4 = icmp sgt i32 %n, 0
