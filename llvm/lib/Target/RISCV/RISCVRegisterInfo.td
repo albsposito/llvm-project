@@ -445,7 +445,10 @@ def FPR64C : RISCVRegisterClass<[f64], 64, (add
 // other (classes of equal spill size and member count sort by name), so the
 // names must sort between "GPR" and "GPRF32" (formerly PulpV2/PulpV4).
 // Bridge until the classes are replaced by upstream's GPR-held packed types.
-def GPRAV2 : RegisterClass<"RISCV", [v2i16], 32, (add
+// GPRAV2 also holds GAP9's packed half-precision floats (Xpulpfvec, B90
+// decision 6.3): v2f16 ("v2h") and v2bf16 ("v2ah") are two 16-bit lanes in one
+// GPR, like v2i16, and the vf*.h/.ah instructions take them here.
+def GPRAV2 : RegisterClass<"RISCV", [v2i16, v2f16, v2bf16], 32, (add
     (sequence "X%u", 10, 17),
     (sequence "X%u", 5, 7),
     (sequence "X%u", 28, 31),

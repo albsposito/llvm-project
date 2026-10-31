@@ -1504,25 +1504,25 @@ def : Pat<(ushiftRound (machhu (i32 GPR:$rd), (i32 GPR:$rs1), (i32 GPR:$rs2)), u
 
 // Patterns for vectorial ALU operations
 class PatV2V2<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode GPRAV2:$rs1, GPRAV2:$rs2), (Inst GPRAV2:$rs1, GPRAV2:$rs2)>;
+    : Pat<(OpNode (v2i16 GPRAV2:$rs1), (v2i16 GPRAV2:$rs2)), (Inst GPRAV2:$rs1, GPRAV2:$rs2)>;
 
 class PatV4V4<SDPatternOperator OpNode, RVInst Inst>
     : Pat<(OpNode GPRAV4:$rs1, GPRAV4:$rs2), (Inst GPRAV4:$rs1, GPRAV4:$rs2)>;
 
 class PatV2GPR<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode GPRAV2:$rs1, (v2i16 (splat_vector (i32 GPR:$rs2)))), (Inst GPRAV2:$rs1, (i32 GPR:$rs2))>;
+    : Pat<(OpNode (v2i16 GPRAV2:$rs1), (v2i16 (splat_vector (i32 GPR:$rs2)))), (Inst GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
 class PatV4GPR<SDPatternOperator OpNode, RVInst Inst>
     : Pat<(OpNode GPRAV4:$rs1, (v4i8 (splat_vector (i32 GPR:$rs2)))), (Inst GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
 class PatV2Simm6<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode GPRAV2:$rs1, (v2i16 (splat_vector simm6:$imm))), (Inst GPRAV2:$rs1, simm6:$imm)>;
+    : Pat<(OpNode (v2i16 GPRAV2:$rs1), (v2i16 (splat_vector simm6:$imm))), (Inst GPRAV2:$rs1, simm6:$imm)>;
 
 class PatV4Simm6<SDPatternOperator OpNode, RVInst Inst>
     : Pat<(OpNode GPRAV4:$rs1, (v4i8 (splat_vector simm6:$imm))), (Inst GPRAV4:$rs1, simm6:$imm)>;
 
 class PatV2Uimm6<SDPatternOperator OpNode, RVInst Inst>
-    : Pat<(OpNode GPRAV2:$rs1, (v2i16 (splat_vector uimm6:$imm))), (Inst GPRAV2:$rs1, uimm6:$imm)>;
+    : Pat<(OpNode (v2i16 GPRAV2:$rs1), (v2i16 (splat_vector uimm6:$imm))), (Inst GPRAV2:$rs1, uimm6:$imm)>;
 
 class PatV4Uimm6<SDPatternOperator OpNode, RVInst Inst>
     : Pat<(OpNode GPRAV4:$rs1, (v4i8 (splat_vector uimm6:$imm))), (Inst GPRAV4:$rs1, uimm6:$imm)>;
@@ -1579,7 +1579,7 @@ def : Pat<(i32 (vector_extract (v2i16 GPRAV2:$rs1), uimm6:$index)),
           (PV_EXTRACT_H GPRAV2:$rs1, uimm6:$index)>;
 def : Pat<(i32 (vector_extract (v4i8 GPRAV4:$rs1), uimm6:$index)),
           (PV_EXTRACT_B GPRAV4:$rs1, uimm6:$index)>;
-def : Pat<(i32 (sext_inreg (vector_extract GPRAV2:$rs1, uimm6:$index), i16)),
+def : Pat<(i32 (sext_inreg (vector_extract (v2i16 GPRAV2:$rs1), uimm6:$index), i16)),
           (PV_EXTRACT_H GPRAV2:$rs1, uimm6:$index)>;
 def : Pat<(i32 (sext_inreg (vector_extract GPRAV4:$rs1, uimm6:$index), i8)),
           (PV_EXTRACT_B GPRAV4:$rs1, uimm6:$index)>;
@@ -1589,30 +1589,30 @@ def : Pat<(i32 (and (vector_extract (v2i16 GPRAV2:$rs1), uimm6:$index), 65535)),
           (PV_EXTRACTU_H GPRAV2:$rs1, uimm6:$index)>;
 def : Pat<(i32 (and (vector_extract (v4i8 GPRAV4:$rs1), uimm6:$index), 255)),
           (PV_EXTRACTU_B GPRAV4:$rs1, uimm6:$index)>;
-def : Pat<(vector_insert GPRAV2:$rd, (i32 GPR:$rs1), uimm6:$index),
+def : Pat<(vector_insert (v2i16 GPRAV2:$rd), (i32 GPR:$rs1), uimm6:$index),
           (PV_INSERT_H GPRAV2:$rd, (i32 GPR:$rs1), uimm6:$index)>;
 def : Pat<(vector_insert GPRAV4:$rd, (i32 GPR:$rs1), uimm6:$index),
           (PV_INSERT_B GPRAV4:$rd, (i32 GPR:$rs1), uimm6:$index)>;
 
 // insert/extract without immediate index
-def : Pat<(vector_insert GPRAV2:$rd, (i32 GPR:$rs1), (i32 GPR:$index)),
+def : Pat<(vector_insert (v2i16 GPRAV2:$rd), (i32 GPR:$rs1), (i32 GPR:$index)),
           (P_INSERTR_v2 GPRAV2:$rd, (i32 GPR:$rs1),
                      (P_INSERT (ADDI (XLenVT X0), 0b111100000), (i32 GPR:$index), 0, 4))>;
 def : Pat<(vector_insert GPRAV4:$rd, (i32 GPR:$rs1), (i32 GPR:$index)),
           (P_INSERTR_v4 GPRAV4:$rd, (i32 GPR:$rs1),
                      (P_INSERT (ADDI (XLenVT X0), 0b11100000), (i32 GPR:$index), 1, 3))>;
 
-def : Pat<(i32 (vector_extract GPRAV2:$rs1, (i32 GPR:$rs2))),
+def : Pat<(i32 (vector_extract (v2i16 GPRAV2:$rs1), (i32 GPR:$rs2))),
           (PV_SHUFFLE_H_GPR GPRAV2:$rs1, (i32 GPR:$rs2))>;
 def : Pat<(i32 (vector_extract GPRAV4:$rs1, (i32 GPR:$rs2))),
           (PV_SHUFFLE_B_GPR GPRAV4:$rs1, (i32 GPR:$rs2))>;
 
 def : PatV2V2<dotup_h, PV_DOTUP_H>;
 
-def : Pat<(dotup_sc_h GPRAV2:$rs1, (and (i32 GPR:$rs2), 65535)),
+def : Pat<(dotup_sc_h (v2i16 GPRAV2:$rs1), (and (i32 GPR:$rs2), 65535)),
           (PV_DOTUP_SC_H GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(dotup_sc_h GPRAV2:$rs1, uimm6:$sci),
+def : Pat<(dotup_sc_h (v2i16 GPRAV2:$rs1), uimm6:$sci),
           (PV_DOTUP_SCI_H GPRAV2:$rs1, uimm6:$sci)>;
 
 def : PatV4V4<dotup_b, PV_DOTUP_B>;
@@ -1626,10 +1626,10 @@ def : Pat<(dotup_sc_b GPRAV4:$rs1, uimm6:$sci),
 
 def : PatV2V2<dotusp_h , PV_DOTUSP_H>;
 
-def : Pat<(dotup_sc_h GPRAV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16)),
+def : Pat<(dotup_sc_h (v2i16 GPRAV2:$rs1), (sext_inreg (i32 GPR:$rs2), i16)),
           (PV_DOTUSP_SC_H GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(dotup_sc_h GPRAV2:$rs1, simm6:$sci),
+def : Pat<(dotup_sc_h (v2i16 GPRAV2:$rs1), simm6:$sci),
           (PV_DOTUSP_SCI_H GPRAV2:$rs1, simm6:$sci)>;
 
 def : PatV4V4<dotusp_b, PV_DOTUSP_B>;
@@ -1643,10 +1643,10 @@ def : Pat<(dotup_sc_b GPRAV4:$rs1, simm6:$sci),
 
 def : PatV2V2<dotsp_h , PV_DOTSP_H>;
 
-def : Pat<(dotsp_sc_h GPRAV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16)),
+def : Pat<(dotsp_sc_h (v2i16 GPRAV2:$rs1), (sext_inreg (i32 GPR:$rs2), i16)),
           (PV_DOTSP_SC_H GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(dotsp_sc_h GPRAV2:$rs1, simm6:$sci),
+def : Pat<(dotsp_sc_h (v2i16 GPRAV2:$rs1), simm6:$sci),
           (PV_DOTSP_SCI_H GPRAV2:$rs1, simm6:$sci)>;
 
 def : PatV4V4<dotsp_b, PV_DOTSP_B>;
@@ -1667,13 +1667,13 @@ def : Pat<(i32 (vecreduce_add (v2i16 GPRAV2:$rs1))),
 def : Pat<(i32 (vecreduce_add (v4i8 GPRAV4:$rs1))),
           (PV_DOTSP_SCI_B GPRAV4:$rs1, 1)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_h GPRAV2:$rs1, GPRAV2:$rs2)),
+def : Pat<(add (i32 GPR:$rd), (dotup_h (v2i16 GPRAV2:$rs1), (v2i16 GPRAV2:$rs2))),
           (PV_SDOTUP_H (i32 GPR:$rd), GPRAV2:$rs1, GPRAV2:$rs2)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_h GPRAV2:$rs1, (and (i32 GPR:$rs2), 65535))),
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_h (v2i16 GPRAV2:$rs1), (and (i32 GPR:$rs2), 65535))),
           (PV_SDOTUP_SC_H (i32 GPR:$rd), GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_h GPRAV2:$rs1, uimm6:$sci)),
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_h (v2i16 GPRAV2:$rs1), uimm6:$sci)),
           (PV_SDOTUP_SCI_H (i32 GPR:$rd), GPRAV2:$rs1, uimm6:$sci)>;
 
 def : Pat<(add (i32 GPR:$rd), (dotup_b GPRAV4:$rs1, GPRAV4:$rs2)),
@@ -1685,13 +1685,13 @@ def : Pat<(add (i32 GPR:$rd), (dotup_sc_b GPRAV4:$rs1, (and (i32 GPR:$rs2), 255)
 def : Pat<(add (i32 GPR:$rd), (dotup_sc_b GPRAV4:$rs1, uimm6:$sci)),
           (PV_SDOTUP_SCI_B (i32 GPR:$rd), GPRAV4:$rs1, uimm6:$sci)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotusp_h GPRAV2:$rs1, GPRAV2:$rs2)),
+def : Pat<(add (i32 GPR:$rd), (dotusp_h (v2i16 GPRAV2:$rs1), (v2i16 GPRAV2:$rs2))),
           (PV_SDOTUSP_H (i32 GPR:$rd), GPRAV2:$rs1, GPRAV2:$rs2)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_h GPRAV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16))),
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_h (v2i16 GPRAV2:$rs1), (sext_inreg (i32 GPR:$rs2), i16))),
           (PV_SDOTUSP_SC_H (i32 GPR:$rd), GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(add (i32 GPR:$rd), (dotup_sc_h GPRAV2:$rs1, simm6:$sci)),
+def : Pat<(add (i32 GPR:$rd), (dotup_sc_h (v2i16 GPRAV2:$rs1), simm6:$sci)),
           (PV_SDOTUSP_SCI_H (i32 GPR:$rd), GPRAV2:$rs1, simm6:$sci)>;
 
 def : Pat<(add (i32 GPR:$rd), (dotusp_b GPRAV4:$rs1, GPRAV4:$rs2)),
@@ -1703,13 +1703,13 @@ def : Pat<(add (i32 GPR:$rd), (dotup_sc_b GPRAV4:$rs1, (sext_inreg (i32 GPR:$rs2
 def : Pat<(add (i32 GPR:$rd), (dotup_sc_b GPRAV4:$rs1, simm6:$sci)),
           (PV_SDOTUSP_SCI_B (i32 GPR:$rd), GPRAV4:$rs1, simm6:$sci)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotsp_h GPRAV2:$rs1, GPRAV2:$rs2)),
+def : Pat<(add (i32 GPR:$rd), (dotsp_h (v2i16 GPRAV2:$rs1), (v2i16 GPRAV2:$rs2))),
           (PV_SDOTSP_H (i32 GPR:$rd), GPRAV2:$rs1, GPRAV2:$rs2)>;
 
-def : Pat<(add (i32 GPR:$rd), (dotsp_sc_h GPRAV2:$rs1, (sext_inreg (i32 GPR:$rs2), i16))),
+def : Pat<(add (i32 GPR:$rd), (dotsp_sc_h (v2i16 GPRAV2:$rs1), (sext_inreg (i32 GPR:$rs2), i16))),
           (PV_SDOTSP_SC_H (i32 GPR:$rd), GPRAV2:$rs1, (i32 GPR:$rs2))>;
 
-def : Pat<(add (i32 GPR:$rd), (dotsp_sc_h GPRAV2:$rs1, simm6:$sci)),
+def : Pat<(add (i32 GPR:$rd), (dotsp_sc_h (v2i16 GPRAV2:$rs1), simm6:$sci)),
           (PV_SDOTSP_SCI_H (i32 GPR:$rd), GPRAV2:$rs1, simm6:$sci)>;
 
 def : Pat<(add (i32 GPR:$rd), (dotsp_b GPRAV4:$rs1, GPRAV4:$rs2)),
@@ -1721,8 +1721,8 @@ def : Pat<(add (i32 GPR:$rd), (dotsp_sc_b GPRAV4:$rs1, (sext_inreg (i32 GPR:$rs2
 def : Pat<(add (i32 GPR:$rd), (dotsp_sc_b GPRAV4:$rs1, simm6:$sci)),
           (PV_SDOTSP_SCI_B (i32 GPR:$rd), GPRAV4:$rs1, simm6:$sci)>;
 
-def : Pat<(v2i16 (build_vector (i32 (vector_extract GPRAV2:$rs1, (i32 GPR:$index0))),
-                               (i32 (vector_extract GPRAV2:$rs1, (i32 GPR:$index1))))),
+def : Pat<(v2i16 (build_vector (i32 (vector_extract (v2i16 GPRAV2:$rs1), (i32 GPR:$index0))),
+                               (i32 (vector_extract (v2i16 GPRAV2:$rs1), (i32 GPR:$index1))))),
           (PV_SHUFFLE_H GPRAV2:$rs1, (PV_PACK_H (i32 GPR:$index1), (i32 GPR:$index0)))>;
 
 def : Pat<(v4i8 (build_vector (i32 (vector_extract GPRAV4:$rs1, (i32 GPR:$index0))),
@@ -1766,7 +1766,7 @@ defm : GeneralUVectorPattern<setule, "CMPLEU">;
 
 def : Pat<(v2i16 (bitconvert (i32 GPR:$rs1))), (v2i16 GPRAV2:$rs1)>;
 def : Pat<(v4i8 (bitconvert (i32 GPR:$rs1))), (v4i8 GPRAV4:$rs1)>;
-def : Pat<(i32 (bitconvert GPRAV2:$rs1)), (i32 (i32 GPR:$rs1))>;
+def : Pat<(i32 (bitconvert (v2i16 GPRAV2:$rs1))), (i32 (i32 GPR:$rs1))>;
 def : Pat<(i32 (bitconvert GPRAV4:$rs1)), (i32 (i32 GPR:$rs1))>;
 
 // Bitcasts between f32 and the GPR-held packed vectors (v2i16, v4i8; v2f16 and
@@ -1900,7 +1900,7 @@ defm : BinaryVectorBuiltin<"sra",  "SRA">;
 defm : BinaryVectorBuiltin<"sll",  "SLL">;
 def : Pat<(int_riscv_pulp_abs2 GPRAV2:$rs1), (PV_ABS_H GPRAV2:$rs1)>;
 def : Pat<(int_riscv_pulp_abs4 GPRAV4:$rs1), (PV_ABS_B GPRAV4:$rs1)>;
-def : Pat<(int_riscv_pulp_neg2 GPRAV2:$rs1), (PV_SUB_H X0, GPRAV2:$rs1)>;
+def : Pat<(int_riscv_pulp_neg2 (v2i16 GPRAV2:$rs1)), (PV_SUB_H (v2i16 X0), GPRAV2:$rs1)>;
 def : Pat<(int_riscv_pulp_neg4 GPRAV4:$rs1), (PV_SUB_B X0, GPRAV4:$rs1)>;
 
 class PatV2V2GPR<SDPatternOperator op, Instruction instr>

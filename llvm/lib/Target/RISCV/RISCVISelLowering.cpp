@@ -144,6 +144,9 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
     addRegisterClass(MVT::v2i16, &RISCV::GPRAV2RegClass);
     addRegisterClass(MVT::v4i8, &RISCV::GPRAV4RegClass);
   }
+  // GAP9 v2h / v2ah (Xpulpfvec): two binary16 / bfloat16 lanes in one GPR.
+  for (MVT VT : getPULPFPVecVTs())
+    addRegisterClass(VT, &RISCV::GPRAV2RegClass);
 
   static const MVT::SimpleValueType BoolVecVTs[] = {
       MVT::nxv1i1,  MVT::nxv2i1,  MVT::nxv4i1, MVT::nxv8i1,
@@ -771,6 +774,65 @@ RISCVTargetLowering::RISCVTargetLowering(const TargetMachine &TM,
     setLoadExtAction(ISD::ZEXTLOAD, MVT::v2i16, MVT::v2i8, Expand);
 
     setTruncStoreAction(MVT::v2i16, MVT::v2i8, Expand);
+
+    // GAP9 packed half precision (Xpulpfvec, B90 decision 6.3, task 20/F060):
+    // v2f16 (v2h) and v2bf16 (v2ah) in one GPR. Everything is expanded
+    // (scalarized onto the Zhinx / Xpulpf16alt scalar ops) unless GAP9 has a
+    // packed instruction for it, as upstream starts its fixed-length RVV
+    // types. Reference: fork f94442e8f886 by Marco Fariselli.
+    for (MVT VT : getPULPFPVecVTs()) {
+      for (unsigned Op = 0; Op < ISD::BUILTIN_OP_END; ++Op)
+        setOperationAction(Op, VT, Expand);
+      // vfadd, vfsub, vfmul, vfmin, vfmax, vfsgnj[n,x] and vfmac/vfmre (FMA).
+      // fdiv and fsqrt stay expanded: GAP9 GCC scalarizes them (fdiv.h per
+      // lane), and GAP9 GNU as does not accept vfdiv/vfsqrt (design Q9).
+      setOperationAction({ISD::FADD, ISD::FSUB, ISD::FMUL, ISD::FMA,
+                          ISD::FMINNUM, ISD::FMAXNUM, ISD::FMINIMUMNUM,
+                          ISD::FMAXIMUMNUM, ISD::FNEG, ISD::FABS,
+                          ISD::FCOPYSIGN},
+                         VT, Legal);
+      // Register moves: bitcasts are free, lane 0/1 extracts and pv.pack.h
+      // builds are selected by patterns; constants and a run-time lane
+      // number are custom-lowered.
+      setOperationAction(ISD::BITCAST, VT, Legal);
+      setOperationAction({ISD::BUILD_VECTOR, ISD::EXTRACT_VECTOR_ELT}, VT,
+                         Custom);
+      // Lane insert: pv.insert.h, or the v2i16 p.insertr sequence for a
+      // run-time lane number. Shuffles are expanded to BUILD_VECTORs of
+      // lane extracts, which patterns turn into pv.shuffle.sci.h,
+      // pv.insert.h or pv.pack.h (pv.shuffle2.h is not used: it needs a
+      // mask register, and GVSoC swaps its sources, B113).
+      setOperationAction(ISD::INSERT_VECTOR_ELT, VT, Custom);
+      // Compares: vfeq/vfne/vflt/vfle/vfgt/vfge write 0 or 1 per lane on
+      // GAP9 silicon (B99, board-pack t3); patterns turn that into the 0/-1
+      // lanes of a v2i16 boolean vector (ONE, UEQ, O and UO use two
+      // compares).
+      setOperationAction(ISD::SETCC, VT, Legal);
+      // A lane-wise select is three v2i16 bit operations.
+      setOperationAction(ISD::VSELECT, VT, Custom);
+      // 32-bit lw/sw, as for v2i16.
+      setOperationPromotedToType(ISD::LOAD, VT, MVT::i32);
+      setOperationPromotedToType(ISD::STORE, VT, MVT::i32);
+      // A scalar-condition select is a select of the GPR (as v2i16).
+      setOperationPromotedToType(ISD::SELECT, VT, MVT::i32);
+      // Post-increment (p.lw/p.sw) comes with the i32 promotion. A loop
+      // whose pointer is advanced by p.sw loses its hardware loop, as for any
+      // i32 store loop (B23, task 20/F056).
+    }
+    if (!getPULPFPVecVTs().empty()) {
+      // v2i16 -> v2f16/v2bf16 is vfcvt.{h,ah}.{x,xu} (rounding as the
+      // scalar fcvt). These actions are looked up on the v2i16 operand, and
+      // after type legalization the result can only be a legal 32-bit
+      // packed float type. The other direction is expanded to the scalar
+      // conversion of each lane (fcvt.w.h rtz; fcvt.w.ah as GAP9 GCC, D6),
+      // because vfcvt.x{,u}.h rounds with the dynamic rounding mode; those
+      // actions are looked up on the v2i16 result.
+      setOperationAction({ISD::SINT_TO_FP, ISD::UINT_TO_FP}, MVT::v2i16,
+                         Legal);
+      setOperationAction({ISD::FP_TO_SINT, ISD::FP_TO_UINT,
+                          ISD::FP_TO_SINT_SAT, ISD::FP_TO_UINT_SAT},
+                         MVT::v2i16, Expand);
+    }
 
     setTargetDAGCombine(ISD::BR);
 
@@ -7042,8 +7104,12 @@ SDValue RISCVTargetLowering::LowerOperation(SDValue Op,
   case ISD::SPLAT_VECTOR_PARTS:
     return lowerSPLAT_VECTOR_PARTS(Op, DAG);
   case ISD::INSERT_VECTOR_ELT:
+    if (isPULPFPVecVT(Op.getSimpleValueType()))
+      return lowerPULPFPVecINSERT_VECTOR_ELT(Op, DAG);
     return lowerINSERT_VECTOR_ELT(Op, DAG);
   case ISD::EXTRACT_VECTOR_ELT:
+    if (isPULPFPVecVT(Op.getOperand(0).getSimpleValueType()))
+      return lowerPULPFPVecEXTRACT_VECTOR_ELT(Op, DAG);
     return lowerEXTRACT_VECTOR_ELT(Op, DAG);
   case ISD::SCALAR_TO_VECTOR: {
     MVT VT = Op.getSimpleValueType();
@@ -7483,6 +7549,8 @@ SDValue RISCVTargetLowering::LowerOperation(SDValue Op,
   case ISD::VECTOR_SPLICE:
     return lowerVECTOR_SPLICE(Op, DAG);
   case ISD::BUILD_VECTOR:
+    if (isPULPFPVecVT(Op.getSimpleValueType()))
+      return lowerPULPFPVecBUILD_VECTOR(Op, DAG);
     return lowerBUILD_VECTOR(Op, DAG, Subtarget);
   case ISD::SPLAT_VECTOR: {
     MVT VT = Op.getSimpleValueType();
@@ -7786,6 +7854,8 @@ SDValue RISCVTargetLowering::LowerOperation(SDValue Op,
     assert(Op.getOpcode() != ISD::CTTZ);
     return lowerCTLZ_CTTZ_ZERO_UNDEF(Op, DAG);
   case ISD::VSELECT:
+    if (isPULPFPVecVT(Op.getSimpleValueType()))
+      return lowerPULPFPVecVSELECT(Op, DAG);
     return lowerFixedLengthVectorSelectToRVV(Op, DAG);
   case ISD::FCOPYSIGN:
     if (Op.getValueType() == MVT::f16 || Op.getValueType() == MVT::bf16)
@@ -22420,6 +22490,114 @@ bool RISCVTargetLowering::getIndexedAddressParts(SDNode *Op, SDValue &Base,
   return false;
 }
 
+SmallVector<MVT, 2> RISCVTargetLowering::getPULPFPVecVTs() const {
+  SmallVector<MVT, 2> VTs;
+  if (Subtarget.hasVendorXpulpfvec() && Subtarget.hasStdExtZhinx())
+    VTs.push_back(MVT::v2f16);
+  if (Subtarget.hasVendorXpulpfvec() && Subtarget.hasVendorXpulpf16alt())
+    VTs.push_back(MVT::v2bf16);
+  return VTs;
+}
+
+bool RISCVTargetLowering::isPULPFPVecVT(MVT VT) const {
+  return is_contained(getPULPFPVecVTs(), VT);
+}
+
+bool RISCVTargetLowering::isFNegFree(EVT VT) const {
+  return VT.isSimple() && isPULPFPVecVT(VT.getSimpleVT());
+}
+
+bool RISCVTargetLowering::isFAbsFree(EVT VT) const {
+  return VT.isSimple() && isPULPFPVecVT(VT.getSimpleVT());
+}
+
+// v2f16 / v2bf16 BUILD_VECTOR. Two scalars are one pv.pack.h (a pattern in
+// RISCVInstrInfoXpulpfloat.td, as GAP9 GCC); a constant vector is the i32 of
+// its bits (one lui/addi, or a load of nothing at all for zero). An undef lane
+// costs nothing: lane 0 alone is the scalar's register, lane 1 alone is a
+// splat. Reference: fork f94442e8f886 by Marco Fariselli (constant case).
+SDValue RISCVTargetLowering::lowerPULPFPVecBUILD_VECTOR(SDValue Op,
+                                                        SelectionDAG &DAG) const {
+  SDLoc DL(Op);
+  MVT VT = Op.getSimpleValueType();
+  SDValue Lo = Op.getOperand(0), Hi = Op.getOperand(1);
+  auto Bits = [](SDValue V) -> std::optional<uint32_t> {
+    if (V.isUndef())
+      return 0;
+    if (auto *C = dyn_cast<ConstantFPSDNode>(V))
+      return C->getValueAPF().bitcastToAPInt().getZExtValue() & 0xffff;
+    return std::nullopt;
+  };
+  std::optional<uint32_t> LoBits = Bits(Lo), HiBits = Bits(Hi);
+  if (LoBits && HiBits)
+    return DAG.getBitcast(
+        VT, DAG.getConstant(*LoBits | (*HiBits << 16), DL, MVT::i32));
+  if (Hi.isUndef())
+    return DAG.getBitcast(
+        VT, DAG.getNode(RISCVISD::FMV_X_ANYEXTH, DL, MVT::i32, Lo));
+  if (Lo.isUndef())
+    return DAG.getBuildVector(VT, DL, {Hi, Hi});
+  return Op;
+}
+
+// v2f16 / v2bf16 EXTRACT_VECTOR_ELT. Lane 0 or 1 is a pattern (nothing, or a
+// shift by 16); a run-time lane number is a shift by 16 * lane.
+SDValue RISCVTargetLowering::lowerPULPFPVecEXTRACT_VECTOR_ELT(
+    SDValue Op, SelectionDAG &DAG) const {
+  SDValue Idx = Op.getOperand(1);
+  if (isa<ConstantSDNode>(Idx))
+    return Op;
+  SDLoc DL(Op);
+  SDValue Word = DAG.getBitcast(MVT::i32, Op.getOperand(0));
+  SDValue Shamt = DAG.getNode(ISD::SHL, DL, MVT::i32,
+                              DAG.getZExtOrTrunc(Idx, DL, MVT::i32),
+                              DAG.getConstant(4, DL, MVT::i32));
+  return DAG.getNode(RISCVISD::FMV_H_X, DL, Op.getValueType(),
+                     DAG.getNode(ISD::SRL, DL, MVT::i32, Word, Shamt));
+}
+
+// v2f16 / v2bf16 INSERT_VECTOR_ELT. A constant lane is a BUILD_VECTOR with
+// the other lane extracted, which a pattern selects as pv.insert.h (as GAP9
+// GCC). A run-time lane number goes through the v2i16 lowering (p.insertr).
+SDValue RISCVTargetLowering::lowerPULPFPVecINSERT_VECTOR_ELT(
+    SDValue Op, SelectionDAG &DAG) const {
+  SDLoc DL(Op);
+  MVT VT = Op.getSimpleValueType();
+  SDValue Vec = Op.getOperand(0), Elt = Op.getOperand(1),
+          Idx = Op.getOperand(2);
+  if (auto *C = dyn_cast<ConstantSDNode>(Idx)) {
+    if (C->getZExtValue() > 1)
+      return DAG.getUNDEF(VT);
+    unsigned Other = 1 - C->getZExtValue();
+    SDValue Ops[2];
+    Ops[C->getZExtValue()] = Elt;
+    Ops[Other] = DAG.getNode(ISD::EXTRACT_VECTOR_ELT, DL,
+                             VT.getVectorElementType(), Vec,
+                             DAG.getVectorIdxConstant(Other, DL));
+    return DAG.getBuildVector(VT, DL, Ops);
+  }
+  SDValue Res = DAG.getNode(
+      ISD::INSERT_VECTOR_ELT, DL, MVT::v2i16, DAG.getBitcast(MVT::v2i16, Vec),
+      DAG.getNode(RISCVISD::FMV_X_ANYEXTH, DL, MVT::i32, Elt), Idx);
+  return DAG.getBitcast(VT, Res);
+}
+
+// v2f16 / v2bf16 VSELECT with a 0/-1 v2i16 mask: F ^ ((T ^ F) & Mask).
+SDValue RISCVTargetLowering::lowerPULPFPVecVSELECT(SDValue Op,
+                                                   SelectionDAG &DAG) const {
+  SDLoc DL(Op);
+  SDValue Mask = Op.getOperand(0);
+  if (Mask.getValueType() != MVT::v2i16)
+    return SDValue();
+  SDValue T = DAG.getBitcast(MVT::v2i16, Op.getOperand(1));
+  SDValue F = DAG.getBitcast(MVT::v2i16, Op.getOperand(2));
+  SDValue Diff = DAG.getNode(ISD::XOR, DL, MVT::v2i16, T, F);
+  SDValue Res =
+      DAG.getNode(ISD::XOR, DL, MVT::v2i16, F,
+                  DAG.getNode(ISD::AND, DL, MVT::v2i16, Diff, Mask));
+  return DAG.getBitcast(Op.getValueType(), Res);
+}
+
 bool RISCVTargetLowering::getIndexedAddressPartsPulp(
     const SDNode *Op, SDValue &Base, SDValue &Offset,
     const ISD::MemIndexedMode &AM, const SelectionDAG &DAG, EVT VT) const {
@@ -22540,10 +22718,19 @@ bool RISCVTargetLowering::isFMAFasterThanFMulAndFAdd(const MachineFunction &MF,
 
   switch (SVT.getSimpleVT().SimpleTy) {
   case MVT::f16:
+    // GAP9 v2f16: vfmac.h (task 20/F060).
+    if (VT.isVector() && Subtarget.hasVendorXpulpfvec() &&
+        Subtarget.hasStdExtZhinx())
+      return VT == MVT::v2f16;
     return VT.isVector() ? Subtarget.hasVInstructionsF16()
                          : Subtarget.hasStdExtZfhOrZhinx();
   case MVT::bf16:
-    return !VT.isVector() && Subtarget.hasVendorXpulpf16alt();
+    // GAP9 v2bf16: vfmac.ah (task 20/F060).
+    if (VT.isVector())
+      return Subtarget.hasVendorXpulpfvec() &&
+             Subtarget.hasVendorXpulpf16alt() &&
+             VT == MVT::v2bf16;
+    return Subtarget.hasVendorXpulpf16alt();
   case MVT::f32:
     return Subtarget.hasStdExtFOrZfinx();
   case MVT::f64:
@@ -22665,7 +22852,10 @@ bool RISCVTargetLowering::allowsMisalignedMemoryAccesses(
   // element-alignment rule below. Answering "element aligned is fine" here
   // made the DAG combiner merge two adjacent i16 (or four i8) copies into one
   // v2i16 (v4i8) access that legalization split back up, forever.
-  if (Subtarget.hasPULPExtV2() && (VT == MVT::v2i16 || VT == MVT::v4i8)) {
+  // The same holds for GAP9's v2f16 / v2bf16 (task 20/F060).
+  if (Subtarget.hasPULPExtV2() &&
+      (VT == MVT::v2i16 || VT == MVT::v4i8 || VT == MVT::v2f16 ||
+       VT == MVT::v2bf16)) {
     if (Fast)
       *Fast = Subtarget.enableUnalignedScalarMem();
     return Subtarget.enableUnalignedScalarMem();
