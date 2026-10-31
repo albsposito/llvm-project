@@ -77,8 +77,8 @@ define void @misc(<2 x i16> %a, <2 x i16> %b, <4 x i8> %c, i16 %s) {
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %i = insertelement <2 x i16> %a, i16 %s, i32 0
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 2 for instruction: %sh = shufflevector <2 x i16> %a, <2 x i16> %b, <2 x i32> <i32 1, i32 2>
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %sp = shufflevector <2 x i16> %i, <2 x i16> poison, <2 x i32> zeroinitializer
-; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %cmp = icmp slt <2 x i16> %a, %b
-; THRU-NEXT:  Cost Model: Found an estimated cost of 4 for instruction: %sel = select <2 x i1> %cmp, <2 x i16> %a, <2 x i16> %b
+; THRU-NEXT:  Cost Model: Invalid cost for instruction: %cmp = icmp slt <2 x i16> %a, %b
+; THRU-NEXT:  Cost Model: Invalid cost for instruction: %sel = select <2 x i1> %cmp, <2 x i16> %a, <2 x i16> %b
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 10 for instruction: %sx = sext <4 x i8> %c to <4 x i16>
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 0 for instruction: %tr = trunc <2 x i16> %a to <2 x i8>
 ; THRU-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %bc = bitcast <2 x i16> %a to i32
@@ -90,8 +90,8 @@ define void @misc(<2 x i16> %a, <2 x i16> %b, <4 x i8> %c, i16 %s) {
 ; SIZE-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %i = insertelement <2 x i16> %a, i16 %s, i32 0
 ; SIZE-NEXT:  Cost Model: Found an estimated cost of 2 for instruction: %sh = shufflevector <2 x i16> %a, <2 x i16> %b, <2 x i32> <i32 1, i32 2>
 ; SIZE-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %sp = shufflevector <2 x i16> %i, <2 x i16> poison, <2 x i32> zeroinitializer
-; SIZE-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %cmp = icmp slt <2 x i16> %a, %b
-; SIZE-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %sel = select <2 x i1> %cmp, <2 x i16> %a, <2 x i16> %b
+; SIZE-NEXT:  Cost Model: Invalid cost for instruction: %cmp = icmp slt <2 x i16> %a, %b
+; SIZE-NEXT:  Cost Model: Invalid cost for instruction: %sel = select <2 x i1> %cmp, <2 x i16> %a, <2 x i16> %b
 ; SIZE-NEXT:  Cost Model: Found an estimated cost of 3 for instruction: %sx = sext <4 x i8> %c to <4 x i16>
 ; SIZE-NEXT:  Cost Model: Found an estimated cost of 0 for instruction: %tr = trunc <2 x i16> %a to <2 x i8>
 ; SIZE-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %bc = bitcast <2 x i16> %a to i32
