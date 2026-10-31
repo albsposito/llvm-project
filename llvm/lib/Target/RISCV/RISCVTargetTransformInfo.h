@@ -66,9 +66,22 @@ class RISCVTTIImpl : public BasicTTIImplBase<RISCVTTIImpl> {
     return ST->hasPULPExtV2() && !ST->hasVInstructions();
   }
 
-  /// PULP without V: \p I is a boolean whose widened form (type \p Ty)
-  /// would be carried in a recurrence phi, which the back end cannot reduce.
-  bool isPULPMaskRecurrence(Type *Ty, const Instruction *I) const;
+  /// PULP without V, and a cost kind the vectorizers decide with
+  /// (reciprocal throughput; code size for the loop vectorizer under minsize).
+  /// Latency and size-and-latency queries (unroller, SimplifyCFG, inliner on
+  /// existing code) are left alone.
+  bool isPULPVectorizerCost(TTI::TargetCostKind CostKind) const {
+    return hasPULPPackedSIMDOnly() && (CostKind == TTI::TCK_RecipThroughput ||
+                                       CostKind == TTI::TCK_CodeSize);
+  }
+
+  /// PULP without V (isPULPVectorizerCost): the cost query involves a vector
+  /// of i1 (one of \p Tys), or the vector value of \p I leaves the loop to be
+  /// truncated below 8 bits, which InstCombine turns into a bitcast to a
+  /// vector of i1. The back end cannot lower such vectors, so every hook
+  /// refuses them.
+  bool isPULPBoolVector(TTI::TargetCostKind CostKind, ArrayRef<Type *> Tys,
+                        const Instruction *I = nullptr) const;
 
   /// Shuffle cost for a fixed vector when the packed types live in GPRs.
   InstructionCost getPULPShuffleCost(TTI::ShuffleKind Kind,
@@ -129,6 +142,11 @@ public:
   bool enableScalableVectorization() const { return ST->hasVInstructions(); }
   TailFoldingStyle
   getPreferredTailFoldingStyle(bool IVUpdateMayOverflow) const {
+    // PULP without V: a folded tail needs an <N x i1> lane mask, which no
+    // cost hook sees (isPULPBoolVector), so the loop vectorizer never folds
+    // the tail; it keeps a scalar remainder loop instead.
+    if (hasPULPPackedSIMDOnly())
+      return TailFoldingStyle::None;
     return ST->hasVInstructions() ? TailFoldingStyle::Data
                                   : TailFoldingStyle::DataWithoutLaneMask;
   }
@@ -240,6 +258,15 @@ public:
 
   InstructionCost getCFInstrCost(unsigned Opcode, TTI::TargetCostKind CostKind,
                                  const Instruction *I = nullptr);
+
+  InstructionCost getCallInstrCost(Function *F, Type *RetTy,
+                                   ArrayRef<Type *> Tys,
+                                   TTI::TargetCostKind CostKind) {
+    // PULP without V: no vector of i1 returned (see isPULPBoolVector).
+    if (isPULPBoolVector(CostKind, RetTy))
+      return InstructionCost::getInvalid();
+    return BaseT::getCallInstrCost(F, RetTy, Tys, CostKind);
+  }
 
   using BaseT::getVectorInstrCost;
   InstructionCost getVectorInstrCost(unsigned Opcode, Type *Val,

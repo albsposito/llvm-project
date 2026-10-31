@@ -37,6 +37,15 @@ static cl::opt<unsigned> SLPMaxVF(
         "exclusively by SLP vectorizer."),
     cl::Hidden);
 
+// PULP (see isPULPBoolVector): a fixed vector of more than one lane. The loop
+// vectorizer's scalar (VF 1) cost of a select asks with a <1 x i1> condition
+// (VectorType::get(i1, 1)); refusing it would make the scalar loop invalid
+// too, which LV asserts on. No vectorizer emits a one-lane vector for PULP.
+static bool isPULPMultiLaneVector(const Type *Ty) {
+  const auto *VTy = dyn_cast_or_null<FixedVectorType>(Ty);
+  return VTy && VTy->getNumElements() > 1;
+}
+
 InstructionCost
 RISCVTTIImpl::getRISCVInstructionCost(ArrayRef<unsigned> OpCodes, MVT VT,
                                       TTI::TargetCostKind CostKind) {
@@ -457,6 +466,10 @@ InstructionCost RISCVTTIImpl::getShuffleCost(TTI::ShuffleKind Kind,
                                              const Instruction *CxtI) {
   Kind = improveShuffleKindFromMask(Kind, Mask, Tp, Index, SubTp);
 
+  // PULP without V: no vector of i1 (see isPULPBoolVector).
+  if (isPULPBoolVector(CostKind, {Tp, SubTp}, CxtI))
+    return InstructionCost::getInvalid();
+
   // PULP Xpulpv2 packed SIMD vectors (v2i16/v4i8) live in GPRs, not RVV
   // registers, and V is normally not enabled. Skip the RVV cost analysis,
   // which asserts in getMinRVVVectorSizeInBits(). Mirrors upstream's guard for
@@ -754,6 +767,10 @@ InstructionCost RISCVTTIImpl::getScalarizationOverhead(
     TTI::TargetCostKind CostKind, ArrayRef<Value *> VL) {
   if (isa<ScalableVectorType>(Ty))
     return InstructionCost::getInvalid();
+  // PULP without V: no vector of i1 (see isPULPBoolVector); building one
+  // from scalars produces it, extracting its lanes only consumes it.
+  if (Insert && isPULPBoolVector(CostKind, Ty))
+    return InstructionCost::getInvalid();
 
   // PULP Xpulpv2 packed SIMD vectors (v2i16/v4i8) live in GPRs, not RVV
   // registers, and V is normally not enabled. Skip the RVV cost analysis,
@@ -813,6 +830,10 @@ InstructionCost
 RISCVTTIImpl::getMaskedMemoryOpCost(unsigned Opcode, Type *Src, Align Alignment,
                                     unsigned AddressSpace,
                                     TTI::TargetCostKind CostKind) {
+  // PULP without V: no vector of i1 (see isPULPBoolVector); the mask of a
+  // masked access is one.
+  if (isPULPVectorizerCost(CostKind) && isPULPMultiLaneVector(Src))
+    return InstructionCost::getInvalid();
   if (!isLegalMaskedLoadStore(Src, Alignment) ||
       CostKind != TTI::TCK_RecipThroughput)
     return BaseT::getMaskedMemoryOpCost(Opcode, Src, Alignment, AddressSpace,
@@ -825,6 +846,11 @@ InstructionCost RISCVTTIImpl::getInterleavedMemoryOpCost(
     unsigned Opcode, Type *VecTy, unsigned Factor, ArrayRef<unsigned> Indices,
     Align Alignment, unsigned AddressSpace, TTI::TargetCostKind CostKind,
     bool UseMaskForCond, bool UseMaskForGaps) {
+  // PULP without V: no vector of i1 (see isPULPBoolVector), including the
+  // mask of a masked interleave group.
+  if (isPULPBoolVector(CostKind, VecTy) ||
+      (isPULPVectorizerCost(CostKind) && (UseMaskForCond || UseMaskForGaps)))
+    return InstructionCost::getInvalid();
 
   // The interleaved memory access pass will lower interleaved memory ops (i.e
   // a load and store followed by a specific shuffle) to vlseg/vsseg
@@ -920,6 +946,11 @@ InstructionCost RISCVTTIImpl::getInterleavedMemoryOpCost(
 InstructionCost RISCVTTIImpl::getGatherScatterOpCost(
     unsigned Opcode, Type *DataTy, const Value *Ptr, bool VariableMask,
     Align Alignment, TTI::TargetCostKind CostKind, const Instruction *I) {
+  // PULP without V: no vector of i1 (see isPULPBoolVector), including the
+  // mask of a masked gather or scatter.
+  if (isPULPBoolVector(CostKind, DataTy, I) ||
+      (isPULPVectorizerCost(CostKind) && VariableMask))
+    return InstructionCost::getInvalid();
   if (CostKind != TTI::TCK_RecipThroughput)
     return BaseT::getGatherScatterOpCost(Opcode, DataTy, Ptr, VariableMask,
                                          Alignment, CostKind, I);
@@ -945,6 +976,10 @@ InstructionCost RISCVTTIImpl::getGatherScatterOpCost(
 InstructionCost RISCVTTIImpl::getStridedMemoryOpCost(
     unsigned Opcode, Type *DataTy, const Value *Ptr, bool VariableMask,
     Align Alignment, TTI::TargetCostKind CostKind, const Instruction *I) {
+  // PULP without V: no vector of i1 (see isPULPBoolVector).
+  if (isPULPBoolVector(CostKind, DataTy, I) ||
+      (isPULPVectorizerCost(CostKind) && VariableMask))
+    return InstructionCost::getInvalid();
   if (((Opcode == Instruction::Load || Opcode == Instruction::Store) &&
        !isLegalStridedLoadStore(DataTy, Alignment)) ||
       (Opcode != Instruction::Load && Opcode != Instruction::Store))
@@ -1067,8 +1102,11 @@ InstructionCost
 RISCVTTIImpl::getIntrinsicInstrCost(const IntrinsicCostAttributes &ICA,
                                     TTI::TargetCostKind CostKind) {
   auto *RetTy = ICA.getReturnType();
-  // PULP without V: no boolean recurrences (see isPULPMaskRecurrence).
-  if (isPULPMaskRecurrence(RetTy, ICA.getInst()))
+  // PULP without V: no vector of i1 (see isPULPBoolVector). Only the result
+  // is checked: an <N x i1> argument is consumed, not produced (and the
+  // vectorizers widen immediate i1 flags such as llvm.abs's to <N x i1> in
+  // the parameter types).
+  if (isPULPBoolVector(CostKind, RetTy, ICA.getInst()))
     return InstructionCost::getInvalid();
   switch (ICA.getID()) {
   case Intrinsic::lrint:
@@ -1400,8 +1438,8 @@ InstructionCost RISCVTTIImpl::getCastInstrCost(unsigned Opcode, Type *Dst,
                                                TTI::CastContextHint CCH,
                                                TTI::TargetCostKind CostKind,
                                                const Instruction *I) {
-  // PULP without V: no boolean recurrences (see isPULPMaskRecurrence).
-  if (isPULPMaskRecurrence(Dst, I))
+  // PULP without V: no vector of i1 (see isPULPBoolVector).
+  if (isPULPBoolVector(CostKind, {Dst, Src}, I))
     return InstructionCost::getInvalid();
   bool IsVectorType = isa<VectorType>(Dst) && isa<VectorType>(Src);
   if (!IsVectorType)
@@ -1641,12 +1679,8 @@ InstructionCost
 RISCVTTIImpl::getMinMaxReductionCost(Intrinsic::ID IID, VectorType *Ty,
                                      FastMathFlags FMF,
                                      TTI::TargetCostKind CostKind) {
-  // PULP packed SIMD without V: the back end cannot lower an <N x i1>
-  // reduction (or the bitcast <N x i1> -> iN that InstCombine turns it into):
-  // the promoted mask is stored with an extending truncstore and ISel asserts
-  // (int-20 llc, plain RV32 does not). Keep the vectorizers from forming one.
-  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(Ty) &&
-      Ty->getElementType()->isIntegerTy(1))
+  // PULP without V: no vector of i1 (see isPULPBoolVector).
+  if (isPULPBoolVector(CostKind, Ty))
     return InstructionCost::getInvalid();
   if (isa<FixedVectorType>(Ty) && !ST->useRVVForFixedLengthVectors())
     return BaseT::getMinMaxReductionCost(IID, Ty, FMF, CostKind);
@@ -1754,9 +1788,8 @@ InstructionCost
 RISCVTTIImpl::getArithmeticReductionCost(unsigned Opcode, VectorType *Ty,
                                          std::optional<FastMathFlags> FMF,
                                          TTI::TargetCostKind CostKind) {
-  // PULP without V: no <N x i1> reductions (see getMinMaxReductionCost).
-  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(Ty) &&
-      Ty->getElementType()->isIntegerTy(1))
+  // PULP without V: no vector of i1 (see isPULPBoolVector).
+  if (isPULPBoolVector(CostKind, Ty))
     return InstructionCost::getInvalid();
   if (isa<FixedVectorType>(Ty) && !ST->useRVVForFixedLengthVectors())
     return BaseT::getArithmeticReductionCost(Opcode, Ty, FMF, CostKind);
@@ -1876,6 +1909,9 @@ RISCVTTIImpl::getArithmeticReductionCost(unsigned Opcode, VectorType *Ty,
 InstructionCost RISCVTTIImpl::getExtendedReductionCost(
     unsigned Opcode, bool IsUnsigned, Type *ResTy, VectorType *ValTy,
     FastMathFlags FMF, TTI::TargetCostKind CostKind) {
+  // PULP without V: no vector of i1 (see isPULPBoolVector).
+  if (isPULPBoolVector(CostKind, {ResTy, ValTy}))
+    return InstructionCost::getInvalid();
   if (isa<FixedVectorType>(ValTy) && !ST->useRVVForFixedLengthVectors())
     return BaseT::getExtendedReductionCost(Opcode, IsUnsigned, ResTy, ValTy,
                                            FMF, CostKind);
@@ -1933,10 +1969,8 @@ InstructionCost RISCVTTIImpl::getMemoryOpCost(unsigned Opcode, Type *Src,
                                               TTI::TargetCostKind CostKind,
                                               TTI::OperandValueInfo OpInfo,
                                               const Instruction *I) {
-  // PULP without V: a load or store of an <N x i1> mask asserts in ISel (the
-  // same truncstore problem as the <N x i1> reductions).
-  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(Src) &&
-      Src->getScalarType()->isIntegerTy(1))
+  // PULP without V: no vector of i1 (see isPULPBoolVector).
+  if (isPULPBoolVector(CostKind, Src, I))
     return InstructionCost::getInvalid();
   EVT VT = TLI->getValueType(DL, Src, true);
   // Type legalization can't handle structs
@@ -2017,65 +2051,79 @@ InstructionCost RISCVTTIImpl::getMemoryOpCost(unsigned Opcode, Type *Src,
 
 }
 
-// PULP packed SIMD without V: the back end cannot reduce an <N x i1> vector.
-// The reduction (vector.reduce.or/and/xor on <N x i1>, which InstCombine
-// turns into a bitcast <N x i1> -> iN) is legalized through a vector
-// truncstore and ISel asserts in SelectionDAG::getTruncStore (int-20 llc
-// too; plain RV32 is fine). The loop vectorizer forms such a reduction for
-// every boolean recurrence: any-of flags (`if (a[i] == 0) f = 1`,
-// `f = c ? f : 3`), _Bool flags updated with &, |, ^, +, != (`f ^= a[i] & 1`)
-// and conjunctions of these. It never asks the target about the boolean phi
-// itself (VPHeaderPHIRecipe costs a phi with getCFInstrCost(PHI), without a
-// type or an instruction) nor about the reduction in the middle block. What
-// it does cost is every widened value of the loop body, and the arithmetic,
-// cast, compare/select and intrinsic hooks get the scalar instruction as
-// context. So each of those hooks asks this: is the queried type a vector,
-// is the scalar value a boolean (i1), and does that boolean feed a
-// recurrence, i.e. reach a phi that in turn feeds the same chain back? The
-// walk follows every boolean-typed user and the any-of select (a select on
-// the boolean between the phi and a value not computed in the loop body);
-// it stops at anything wider (zext/sext: `acc |= a[i] == 0` on a short is a
-// full-width packed vector, which works). A boolean that is only used after
-// the loop (an LCSSA phi with no user in the chain, lowered as a lane
-// extract) and a select between two in-loop values (min/max) do not count.
-bool RISCVTTIImpl::isPULPMaskRecurrence(Type *Ty, const Instruction *I) const {
-  if (!hasPULPPackedSIMDOnly() || !I || !isa<FixedVectorType>(Ty) ||
-      !I->getType()->isIntegerTy(1))
+// PULP packed SIMD without V (owner decision D14): no vector of i1, of any
+// shape, anywhere. The back end cannot lower <N x i1> values outside an
+// instruction that consumes them right away: an i1 vector carried in a phi,
+// reduced, loaded, stored, or bitcast to or from an integer or another vector
+// (`bitcast <4 x i8> to <32 x i1>`) aborts ISel in SelectionDAG::getTruncStore
+// or getLoad (int-20 llc too; plain RV32 is fine). That is a lowering bug
+// (BACKLOG B181); until it is fixed the vectorizers must not create such
+// values. Rounds 3 and 4 refused only the shapes found to crash, and each
+// round a new shape got through, so this refuses every one:
+//
+// (1) Every operation that produces a vector of i1. Each <N x i1> value of
+// a vectorized loop has a producer, and the loop vectorizer (legacy model
+// and VPlan, LLVM 20) costs every widened producer, with the scalar
+// instruction attached, through one of these hooks: compares
+// (getCmpSelInstrCost with the operand type; the result is always <N x i1>),
+// i1 and/or/xor/not and logical selects (getArithmeticInstrCost, or
+// getCmpSelInstrCost on <N x i1>), casts to or from i1 (getCastInstrCost),
+// loads of i1 (getMemoryOpCost), intrinsics and calls returning one
+// (getIntrinsicInstrCost, getCallInstrCost), first-order recurrences and
+// shuffles of one (getShuffleCost) and building one from scalars
+// (getScalarizationOverhead with Insert, getVectorInstrCost InsertElement).
+// Masked, gather/scatter, strided and masked-interleaved accesses take a
+// mask, and <N x i1> reductions consume one; they are refused as well.
+// A boolean header phi is costed without a type (getCFInstrCost(PHI)), but
+// its value from the latch has a producer above. Consumers that only read a
+// mask (blends, lane extracts of predicated scalar code) are left alone:
+// without a producer there is no mask. VPlan's own mask bookkeeping (Not,
+// LogicalAnd) costs 0 but starts from a compare. The one mask with no
+// producer in the scalar loop is the header mask of a tail-folded loop (a
+// VPInstruction, cost 0): getPreferredTailFoldingStyle returns None on PULP,
+// so the loop vectorizer never folds a tail (at -Os it vectorizes only loops
+// that need no remainder).
+//
+// (2) A vector of i1 can also appear after the vectorizer has run: when a
+// vectorized value leaves the loop, the vectorizer extracts its last lane,
+// and if the code after the loop then truncates that value below 8 bits
+// (`_Bool l = b[i]` used as a condition: `trunc i8 %l.lcssa to i1`),
+// InstCombine rewrites trunc(extractelement <4 x i8> %v, 3) into
+// extractelement(bitcast <4 x i8> %v to <32 x i1>, 24). So a vector value
+// whose scalar instruction reaches such a trunc, directly or through phis
+// (the loop-closed phi after the loop, a recurrence phi), is refused too.
+// Lanes truncated to 8 bits or more give a legal packed bitcast and are
+// fine.
+// One-lane vectors do not count (see isPULPMultiLaneVector). Only the cost
+// kinds the vectorizers decide with are refused (isPULPVectorizerCost), so
+// the unroller and SimplifyCFG still see normal costs for vector compares in
+// hand-written vector code, which the back end selects fine (pv.cmp*).
+bool RISCVTTIImpl::isPULPBoolVector(TTI::TargetCostKind CostKind,
+                                    ArrayRef<Type *> Tys,
+                                    const Instruction *I) const {
+  if (!isPULPVectorizerCost(CostKind))
+    return false;
+  bool AnyVector = false;
+  for (Type *Ty : Tys) {
+    if (!isPULPMultiLaneVector(Ty))
+      continue;
+    if (Ty->getScalarType()->isIntegerTy(1))
+      return true;
+    AnyVector = true;
+  }
+  if (!AnyVector || !I)
     return false;
   SmallVector<const Instruction *, 8> Work{I};
   SmallPtrSet<const Instruction *, 8> Seen{I};
   while (!Work.empty()) {
     const Instruction *V = Work.pop_back_val();
     for (const User *U : V->users()) {
-      const auto *UI = dyn_cast<Instruction>(U);
-      if (!UI)
-        continue;
-      if (const auto *Phi = dyn_cast<PHINode>(UI)) {
-        // A recurrence: the phi feeds the chain that reached it.
-        if (any_of(Phi->users(), [&](const User *PU) {
-              return isa<Instruction>(PU) &&
-                     Seen.contains(cast<Instruction>(PU));
-            }))
-          return true;
-      } else if (const auto *Sel = dyn_cast<SelectInst>(UI);
-                 Sel && Sel->getCondition() == V &&
-                 !Sel->getType()->isIntegerTy(1)) {
-        // Any-of shape: select(c, phi, x) or select(c, x, phi) with x not
-        // computed in the loop body (a loop-invariant value or constant).
-        const Value *T = Sel->getTrueValue(), *F = Sel->getFalseValue();
-        auto InBlock = [&](const Value *X) {
-          const auto *XI = dyn_cast<Instruction>(X);
-          return XI && !isa<PHINode>(XI) &&
-                 XI->getParent() == Sel->getParent();
-        };
-        if (!((isa<PHINode>(T) && !InBlock(F)) ||
-              (isa<PHINode>(F) && !InBlock(T))))
-          continue;
-      } else if (!UI->getType()->isIntegerTy(1)) {
-        continue;
-      }
-      if (Seen.insert(UI).second)
-        Work.push_back(UI);
+      if (const auto *T = dyn_cast<TruncInst>(U);
+          T && T->getType()->getScalarSizeInBits() < 8)
+        return true;
+      if (const auto *Phi = dyn_cast<PHINode>(U);
+          Phi && Seen.insert(Phi).second)
+        Work.push_back(Phi);
     }
   }
   return false;
@@ -2085,8 +2133,15 @@ InstructionCost RISCVTTIImpl::getCmpSelInstrCost(
     unsigned Opcode, Type *ValTy, Type *CondTy, CmpInst::Predicate VecPred,
     TTI::TargetCostKind CostKind, TTI::OperandValueInfo Op1Info,
     TTI::OperandValueInfo Op2Info, const Instruction *I) {
-  // PULP without V: no boolean recurrences (see isPULPMaskRecurrence).
-  if (isPULPMaskRecurrence(ValTy, I))
+  // PULP without V: no vector of i1 (see isPULPBoolVector). A vector
+  // compare always produces one. A query with no instruction but a condition
+  // type is a cost model's own breakdown of another operation (BasicTTIImpl
+  // prices llvm.abs as icmp + select + sub) or a blend of a mask whose
+  // producer is refused; it is not refused itself.
+  if ((I || !CondTy) &&
+      (isPULPBoolVector(CostKind, {ValTy, CondTy}, I) ||
+       (isPULPVectorizerCost(CostKind) && isPULPMultiLaneVector(ValTy) &&
+        (Opcode == Instruction::ICmp || Opcode == Instruction::FCmp))))
     return InstructionCost::getInvalid();
 
   if (CostKind != TTI::TCK_RecipThroughput)
@@ -2270,6 +2325,11 @@ InstructionCost RISCVTTIImpl::getVectorInstrCost(unsigned Opcode, Type *Val,
                                                  Value *Op1) {
   assert(Val->isVectorTy() && "This must be a vector type");
 
+  // PULP without V: no vector of i1 (see isPULPBoolVector); inserting a lane
+  // produces one, extracting a lane only consumes it.
+  if (Opcode == Instruction::InsertElement && isPULPBoolVector(CostKind, Val))
+    return InstructionCost::getInvalid();
+
   if (Opcode != Instruction::ExtractElement &&
       Opcode != Instruction::InsertElement)
     return BaseT::getVectorInstrCost(Opcode, Val, CostKind, Index, Op0, Op1);
@@ -2426,8 +2486,8 @@ InstructionCost RISCVTTIImpl::getArithmeticInstrCost(
     unsigned Opcode, Type *Ty, TTI::TargetCostKind CostKind,
     TTI::OperandValueInfo Op1Info, TTI::OperandValueInfo Op2Info,
     ArrayRef<const Value *> Args, const Instruction *CxtI) {
-  // PULP without V: no boolean recurrences (see isPULPMaskRecurrence).
-  if (isPULPMaskRecurrence(Ty, CxtI))
+  // PULP without V: no vector of i1 (see isPULPBoolVector).
+  if (isPULPBoolVector(CostKind, Ty, CxtI))
     return InstructionCost::getInvalid();
 
   // TODO: Handle more cost kinds.
