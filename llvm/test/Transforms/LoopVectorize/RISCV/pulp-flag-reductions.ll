@@ -5,9 +5,11 @@
 ; SelectionDAG::getTruncStore), so the vectorizer must leave any-of flags
 ; (`if (a[i] == 0) flag = 1`, `flag &= a[i] != b[i]`), _Bool flag
 ; recurrences (from compares or from a trunc to i1, e.g. parity `f ^= a[i] & 1`)
-; scalar. A 16-bit accumulator of a compare (`acc |= a[i] == 0`), a
-; select-based max, a count of a compare and a compare used only after the
-; loop are full-width vectors or lane extracts and stay vectorized.
+; scalar. Since round 5 (owner decision D14: no vector of i1 at all on PULP)
+; a 16-bit accumulator of a compare (`acc |= a[i] == 0`), a count of a
+; compare and a compare used only after the loop stay scalar too, because each
+; needs an <N x i1> compare; the select-based max becomes llvm.smax before the
+; vectorizer and still vectorizes.
 ; The second RUN line compiles the vectorized IR, after InstCombine has
 ; turned the mask reductions into bitcasts, with llc: it aborted before this
 ; guard.
@@ -172,42 +174,16 @@ define range(i16 0, 2) i16 @orflag_s16(ptr nocapture readonly %a, i32 %n) {
 ; PULP-NEXT:    [[CMP8:%.*]] = icmp sgt i32 [[N]], 0
 ; PULP-NEXT:    br i1 [[CMP8]], label %[[FOR_BODY_PREHEADER:.*]], label %[[FOR_COND_CLEANUP:.*]]
 ; PULP:       [[FOR_BODY_PREHEADER]]:
-; PULP-NEXT:    [[MIN_ITERS_CHECK:%.*]] = icmp ult i32 [[N]], 2
-; PULP-NEXT:    br i1 [[MIN_ITERS_CHECK]], label %[[SCALAR_PH:.*]], label %[[VECTOR_PH:.*]]
-; PULP:       [[VECTOR_PH]]:
-; PULP-NEXT:    [[N_MOD_VF:%.*]] = urem i32 [[N]], 2
-; PULP-NEXT:    [[N_VEC:%.*]] = sub i32 [[N]], [[N_MOD_VF]]
-; PULP-NEXT:    br label %[[VECTOR_BODY:.*]]
-; PULP:       [[VECTOR_BODY]]:
-; PULP-NEXT:    [[INDEX:%.*]] = phi i32 [ 0, %[[VECTOR_PH]] ], [ [[INDEX_NEXT:%.*]], %[[VECTOR_BODY]] ]
-; PULP-NEXT:    [[VEC_PHI:%.*]] = phi <2 x i16> [ zeroinitializer, %[[VECTOR_PH]] ], [ [[TMP5:%.*]], %[[VECTOR_BODY]] ]
-; PULP-NEXT:    [[TMP0:%.*]] = add i32 [[INDEX]], 0
-; PULP-NEXT:    [[TMP1:%.*]] = getelementptr inbounds nuw i8, ptr [[A]], i32 [[TMP0]]
-; PULP-NEXT:    [[TMP2:%.*]] = getelementptr inbounds nuw i8, ptr [[TMP1]], i32 0
-; PULP-NEXT:    [[WIDE_LOAD:%.*]] = load <2 x i8>, ptr [[TMP2]], align 1
-; PULP-NEXT:    [[TMP3:%.*]] = icmp eq <2 x i8> [[WIDE_LOAD]], zeroinitializer
-; PULP-NEXT:    [[TMP4:%.*]] = zext <2 x i1> [[TMP3]] to <2 x i16>
-; PULP-NEXT:    [[TMP5]] = or <2 x i16> [[VEC_PHI]], [[TMP4]]
-; PULP-NEXT:    [[INDEX_NEXT]] = add nuw i32 [[INDEX]], 2
-; PULP-NEXT:    [[TMP6:%.*]] = icmp eq i32 [[INDEX_NEXT]], [[N_VEC]]
-; PULP-NEXT:    br i1 [[TMP6]], label %[[MIDDLE_BLOCK:.*]], label %[[VECTOR_BODY]], !llvm.loop [[LOOP0:![0-9]+]]
-; PULP:       [[MIDDLE_BLOCK]]:
-; PULP-NEXT:    [[TMP7:%.*]] = call i16 @llvm.vector.reduce.or.v2i16(<2 x i16> [[TMP5]])
-; PULP-NEXT:    [[CMP_N:%.*]] = icmp eq i32 [[N]], [[N_VEC]]
-; PULP-NEXT:    br i1 [[CMP_N]], label %[[FOR_COND_CLEANUP_LOOPEXIT:.*]], label %[[SCALAR_PH]]
-; PULP:       [[SCALAR_PH]]:
-; PULP-NEXT:    [[BC_RESUME_VAL:%.*]] = phi i32 [ [[N_VEC]], %[[MIDDLE_BLOCK]] ], [ 0, %[[FOR_BODY_PREHEADER]] ]
-; PULP-NEXT:    [[BC_MERGE_RDX:%.*]] = phi i16 [ [[TMP7]], %[[MIDDLE_BLOCK]] ], [ 0, %[[FOR_BODY_PREHEADER]] ]
 ; PULP-NEXT:    br label %[[FOR_BODY:.*]]
-; PULP:       [[FOR_COND_CLEANUP_LOOPEXIT]]:
-; PULP-NEXT:    [[DOTLCSSA:%.*]] = phi i16 [ [[TMP10:%.*]], %[[FOR_BODY]] ], [ [[TMP7]], %[[MIDDLE_BLOCK]] ]
+; PULP:       [[FOR_COND_CLEANUP_LOOPEXIT:.*]]:
+; PULP-NEXT:    [[DOTLCSSA:%.*]] = phi i16 [ [[TMP10:%.*]], %[[FOR_BODY]] ]
 ; PULP-NEXT:    br label %[[FOR_COND_CLEANUP]]
 ; PULP:       [[FOR_COND_CLEANUP]]:
 ; PULP-NEXT:    [[ACC_0_LCSSA:%.*]] = phi i16 [ 0, %[[ENTRY]] ], [ [[DOTLCSSA]], %[[FOR_COND_CLEANUP_LOOPEXIT]] ]
 ; PULP-NEXT:    ret i16 [[ACC_0_LCSSA]]
 ; PULP:       [[FOR_BODY]]:
-; PULP-NEXT:    [[I_010:%.*]] = phi i32 [ [[INC:%.*]], %[[FOR_BODY]] ], [ [[BC_RESUME_VAL]], %[[SCALAR_PH]] ]
-; PULP-NEXT:    [[ACC_09:%.*]] = phi i16 [ [[TMP10]], %[[FOR_BODY]] ], [ [[BC_MERGE_RDX]], %[[SCALAR_PH]] ]
+; PULP-NEXT:    [[I_010:%.*]] = phi i32 [ [[INC:%.*]], %[[FOR_BODY]] ], [ 0, %[[FOR_BODY_PREHEADER]] ]
+; PULP-NEXT:    [[ACC_09:%.*]] = phi i16 [ [[TMP10]], %[[FOR_BODY]] ], [ 0, %[[FOR_BODY_PREHEADER]] ]
 ; PULP-NEXT:    [[ARRAYIDX:%.*]] = getelementptr inbounds nuw i8, ptr [[A]], i32 [[I_010]]
 ; PULP-NEXT:    [[TMP8:%.*]] = load i8, ptr [[ARRAYIDX]], align 1
 ; PULP-NEXT:    [[CMP1:%.*]] = icmp eq i8 [[TMP8]], 0
@@ -215,7 +191,7 @@ define range(i16 0, 2) i16 @orflag_s16(ptr nocapture readonly %a, i32 %n) {
 ; PULP-NEXT:    [[TMP10]] = or i16 [[ACC_09]], [[TMP9]]
 ; PULP-NEXT:    [[INC]] = add nuw nsw i32 [[I_010]], 1
 ; PULP-NEXT:    [[EXITCOND_NOT:%.*]] = icmp eq i32 [[INC]], [[N]]
-; PULP-NEXT:    br i1 [[EXITCOND_NOT]], label %[[FOR_COND_CLEANUP_LOOPEXIT]], label %[[FOR_BODY]], !llvm.loop [[LOOP3:![0-9]+]]
+; PULP-NEXT:    br i1 [[EXITCOND_NOT]], label %[[FOR_COND_CLEANUP_LOOPEXIT]], label %[[FOR_BODY]]
 ;
 entry:
   %cmp8 = icmp sgt i32 %n, 0
@@ -262,7 +238,7 @@ define i16 @smax_s16(ptr nocapture readonly %a, i32 %n) {
 ; PULP-NEXT:    [[TMP3]] = call <2 x i16> @llvm.smax.v2i16(<2 x i16> [[WIDE_LOAD]], <2 x i16> [[VEC_PHI]])
 ; PULP-NEXT:    [[INDEX_NEXT]] = add nuw i32 [[INDEX]], 2
 ; PULP-NEXT:    [[TMP4:%.*]] = icmp eq i32 [[INDEX_NEXT]], [[N_VEC]]
-; PULP-NEXT:    br i1 [[TMP4]], label %[[MIDDLE_BLOCK:.*]], label %[[VECTOR_BODY]], !llvm.loop [[LOOP4:![0-9]+]]
+; PULP-NEXT:    br i1 [[TMP4]], label %[[MIDDLE_BLOCK:.*]], label %[[VECTOR_BODY]], !llvm.loop [[LOOP0:![0-9]+]]
 ; PULP:       [[MIDDLE_BLOCK]]:
 ; PULP-NEXT:    [[TMP5:%.*]] = call i16 @llvm.vector.reduce.smax.v2i16(<2 x i16> [[TMP3]])
 ; PULP-NEXT:    [[CMP_N:%.*]] = icmp eq i32 [[N]], [[N_VEC]]
@@ -285,7 +261,7 @@ define i16 @smax_s16(ptr nocapture readonly %a, i32 %n) {
 ; PULP-NEXT:    [[DOTM_0]] = tail call i16 @llvm.smax.i16(i16 [[TMP6]], i16 [[M_015]])
 ; PULP-NEXT:    [[INC]] = add nuw nsw i32 [[I_016]], 1
 ; PULP-NEXT:    [[EXITCOND_NOT:%.*]] = icmp eq i32 [[INC]], [[N]]
-; PULP-NEXT:    br i1 [[EXITCOND_NOT]], label %[[FOR_COND_CLEANUP_LOOPEXIT]], label %[[FOR_BODY]], !llvm.loop [[LOOP5:![0-9]+]]
+; PULP-NEXT:    br i1 [[EXITCOND_NOT]], label %[[FOR_COND_CLEANUP_LOOPEXIT]], label %[[FOR_BODY]], !llvm.loop [[LOOP3:![0-9]+]]
 ;
 entry:
   %cmp14 = icmp sgt i32 %n, 0
@@ -314,42 +290,16 @@ define i8 @cnt_u8(ptr nocapture readonly %a, i32 %n) {
 ; PULP-NEXT:    [[CMP8:%.*]] = icmp sgt i32 [[N]], 0
 ; PULP-NEXT:    br i1 [[CMP8]], label %[[FOR_BODY_PREHEADER:.*]], label %[[FOR_COND_CLEANUP:.*]]
 ; PULP:       [[FOR_BODY_PREHEADER]]:
-; PULP-NEXT:    [[MIN_ITERS_CHECK:%.*]] = icmp ult i32 [[N]], 4
-; PULP-NEXT:    br i1 [[MIN_ITERS_CHECK]], label %[[SCALAR_PH:.*]], label %[[VECTOR_PH:.*]]
-; PULP:       [[VECTOR_PH]]:
-; PULP-NEXT:    [[N_MOD_VF:%.*]] = urem i32 [[N]], 4
-; PULP-NEXT:    [[N_VEC:%.*]] = sub i32 [[N]], [[N_MOD_VF]]
-; PULP-NEXT:    br label %[[VECTOR_BODY:.*]]
-; PULP:       [[VECTOR_BODY]]:
-; PULP-NEXT:    [[INDEX:%.*]] = phi i32 [ 0, %[[VECTOR_PH]] ], [ [[INDEX_NEXT:%.*]], %[[VECTOR_BODY]] ]
-; PULP-NEXT:    [[VEC_PHI:%.*]] = phi <4 x i8> [ zeroinitializer, %[[VECTOR_PH]] ], [ [[TMP5:%.*]], %[[VECTOR_BODY]] ]
-; PULP-NEXT:    [[TMP0:%.*]] = add i32 [[INDEX]], 0
-; PULP-NEXT:    [[TMP1:%.*]] = getelementptr inbounds nuw i8, ptr [[A]], i32 [[TMP0]]
-; PULP-NEXT:    [[TMP2:%.*]] = getelementptr inbounds nuw i8, ptr [[TMP1]], i32 0
-; PULP-NEXT:    [[WIDE_LOAD:%.*]] = load <4 x i8>, ptr [[TMP2]], align 1
-; PULP-NEXT:    [[TMP3:%.*]] = icmp eq <4 x i8> [[WIDE_LOAD]], zeroinitializer
-; PULP-NEXT:    [[TMP4:%.*]] = zext <4 x i1> [[TMP3]] to <4 x i8>
-; PULP-NEXT:    [[TMP5]] = add <4 x i8> [[VEC_PHI]], [[TMP4]]
-; PULP-NEXT:    [[INDEX_NEXT]] = add nuw i32 [[INDEX]], 4
-; PULP-NEXT:    [[TMP6:%.*]] = icmp eq i32 [[INDEX_NEXT]], [[N_VEC]]
-; PULP-NEXT:    br i1 [[TMP6]], label %[[MIDDLE_BLOCK:.*]], label %[[VECTOR_BODY]], !llvm.loop [[LOOP6:![0-9]+]]
-; PULP:       [[MIDDLE_BLOCK]]:
-; PULP-NEXT:    [[TMP7:%.*]] = call i8 @llvm.vector.reduce.add.v4i8(<4 x i8> [[TMP5]])
-; PULP-NEXT:    [[CMP_N:%.*]] = icmp eq i32 [[N]], [[N_VEC]]
-; PULP-NEXT:    br i1 [[CMP_N]], label %[[FOR_COND_CLEANUP_LOOPEXIT:.*]], label %[[SCALAR_PH]]
-; PULP:       [[SCALAR_PH]]:
-; PULP-NEXT:    [[BC_RESUME_VAL:%.*]] = phi i32 [ [[N_VEC]], %[[MIDDLE_BLOCK]] ], [ 0, %[[FOR_BODY_PREHEADER]] ]
-; PULP-NEXT:    [[BC_MERGE_RDX:%.*]] = phi i8 [ [[TMP7]], %[[MIDDLE_BLOCK]] ], [ 0, %[[FOR_BODY_PREHEADER]] ]
 ; PULP-NEXT:    br label %[[FOR_BODY:.*]]
-; PULP:       [[FOR_COND_CLEANUP_LOOPEXIT]]:
-; PULP-NEXT:    [[ADD_LCSSA:%.*]] = phi i8 [ [[ADD:%.*]], %[[FOR_BODY]] ], [ [[TMP7]], %[[MIDDLE_BLOCK]] ]
+; PULP:       [[FOR_COND_CLEANUP_LOOPEXIT:.*]]:
+; PULP-NEXT:    [[ADD_LCSSA:%.*]] = phi i8 [ [[ADD:%.*]], %[[FOR_BODY]] ]
 ; PULP-NEXT:    br label %[[FOR_COND_CLEANUP]]
 ; PULP:       [[FOR_COND_CLEANUP]]:
 ; PULP-NEXT:    [[C_0_LCSSA:%.*]] = phi i8 [ 0, %[[ENTRY]] ], [ [[ADD_LCSSA]], %[[FOR_COND_CLEANUP_LOOPEXIT]] ]
 ; PULP-NEXT:    ret i8 [[C_0_LCSSA]]
 ; PULP:       [[FOR_BODY]]:
-; PULP-NEXT:    [[I_010:%.*]] = phi i32 [ [[INC:%.*]], %[[FOR_BODY]] ], [ [[BC_RESUME_VAL]], %[[SCALAR_PH]] ]
-; PULP-NEXT:    [[C_09:%.*]] = phi i8 [ [[ADD]], %[[FOR_BODY]] ], [ [[BC_MERGE_RDX]], %[[SCALAR_PH]] ]
+; PULP-NEXT:    [[I_010:%.*]] = phi i32 [ [[INC:%.*]], %[[FOR_BODY]] ], [ 0, %[[FOR_BODY_PREHEADER]] ]
+; PULP-NEXT:    [[C_09:%.*]] = phi i8 [ [[ADD]], %[[FOR_BODY]] ], [ 0, %[[FOR_BODY_PREHEADER]] ]
 ; PULP-NEXT:    [[ARRAYIDX:%.*]] = getelementptr inbounds nuw i8, ptr [[A]], i32 [[I_010]]
 ; PULP-NEXT:    [[TMP8:%.*]] = load i8, ptr [[ARRAYIDX]], align 1
 ; PULP-NEXT:    [[CMP1:%.*]] = icmp eq i8 [[TMP8]], 0
@@ -357,7 +307,7 @@ define i8 @cnt_u8(ptr nocapture readonly %a, i32 %n) {
 ; PULP-NEXT:    [[ADD]] = add i8 [[C_09]], [[CONV2]]
 ; PULP-NEXT:    [[INC]] = add nuw nsw i32 [[I_010]], 1
 ; PULP-NEXT:    [[EXITCOND_NOT:%.*]] = icmp eq i32 [[INC]], [[N]]
-; PULP-NEXT:    br i1 [[EXITCOND_NOT]], label %[[FOR_COND_CLEANUP_LOOPEXIT]], label %[[FOR_BODY]], !llvm.loop [[LOOP7:![0-9]+]]
+; PULP-NEXT:    br i1 [[EXITCOND_NOT]], label %[[FOR_COND_CLEANUP_LOOPEXIT]], label %[[FOR_BODY]]
 ;
 entry:
   %cmp8 = icmp sgt i32 %n, 0
@@ -578,38 +528,9 @@ define i1 @lastcmp(ptr noalias %d, ptr noalias %a, ptr noalias %b, i32 %n) {
 ; PULP-NEXT:    [[CMP0:%.*]] = icmp sgt i32 [[N]], 0
 ; PULP-NEXT:    br i1 [[CMP0]], label %[[FOR_BODY_PREHEADER:.*]], label %[[EXIT:.*]]
 ; PULP:       [[FOR_BODY_PREHEADER]]:
-; PULP-NEXT:    [[MIN_ITERS_CHECK:%.*]] = icmp ult i32 [[N]], 2
-; PULP-NEXT:    br i1 [[MIN_ITERS_CHECK]], label %[[SCALAR_PH:.*]], label %[[VECTOR_PH:.*]]
-; PULP:       [[VECTOR_PH]]:
-; PULP-NEXT:    [[N_MOD_VF:%.*]] = urem i32 [[N]], 2
-; PULP-NEXT:    [[N_VEC:%.*]] = sub i32 [[N]], [[N_MOD_VF]]
-; PULP-NEXT:    br label %[[VECTOR_BODY:.*]]
-; PULP:       [[VECTOR_BODY]]:
-; PULP-NEXT:    [[INDEX:%.*]] = phi i32 [ 0, %[[VECTOR_PH]] ], [ [[INDEX_NEXT:%.*]], %[[VECTOR_BODY]] ]
-; PULP-NEXT:    [[TMP0:%.*]] = add i32 [[INDEX]], 0
-; PULP-NEXT:    [[TMP1:%.*]] = getelementptr inbounds nuw i16, ptr [[A]], i32 [[TMP0]]
-; PULP-NEXT:    [[TMP2:%.*]] = getelementptr inbounds nuw i16, ptr [[TMP1]], i32 0
-; PULP-NEXT:    [[WIDE_LOAD:%.*]] = load <2 x i16>, ptr [[TMP2]], align 2
-; PULP-NEXT:    [[TMP3:%.*]] = getelementptr inbounds nuw i16, ptr [[B]], i32 [[TMP0]]
-; PULP-NEXT:    [[TMP4:%.*]] = getelementptr inbounds nuw i16, ptr [[TMP3]], i32 0
-; PULP-NEXT:    [[WIDE_LOAD1:%.*]] = load <2 x i16>, ptr [[TMP4]], align 2
-; PULP-NEXT:    [[TMP5:%.*]] = add <2 x i16> [[WIDE_LOAD1]], [[WIDE_LOAD]]
-; PULP-NEXT:    [[TMP6:%.*]] = getelementptr inbounds nuw i16, ptr [[D]], i32 [[TMP0]]
-; PULP-NEXT:    [[TMP7:%.*]] = getelementptr inbounds nuw i16, ptr [[TMP6]], i32 0
-; PULP-NEXT:    store <2 x i16> [[TMP5]], ptr [[TMP7]], align 2
-; PULP-NEXT:    [[TMP8:%.*]] = icmp sgt <2 x i16> [[WIDE_LOAD]], [[WIDE_LOAD1]]
-; PULP-NEXT:    [[INDEX_NEXT]] = add nuw i32 [[INDEX]], 2
-; PULP-NEXT:    [[TMP9:%.*]] = icmp eq i32 [[INDEX_NEXT]], [[N_VEC]]
-; PULP-NEXT:    br i1 [[TMP9]], label %[[MIDDLE_BLOCK:.*]], label %[[VECTOR_BODY]], !llvm.loop [[LOOP8:![0-9]+]]
-; PULP:       [[MIDDLE_BLOCK]]:
-; PULP-NEXT:    [[TMP10:%.*]] = extractelement <2 x i1> [[TMP8]], i32 1
-; PULP-NEXT:    [[CMP_N:%.*]] = icmp eq i32 [[N]], [[N_VEC]]
-; PULP-NEXT:    br i1 [[CMP_N]], label %[[EXIT_LOOPEXIT:.*]], label %[[SCALAR_PH]]
-; PULP:       [[SCALAR_PH]]:
-; PULP-NEXT:    [[BC_RESUME_VAL:%.*]] = phi i32 [ [[N_VEC]], %[[MIDDLE_BLOCK]] ], [ 0, %[[FOR_BODY_PREHEADER]] ]
 ; PULP-NEXT:    br label %[[FOR_BODY:.*]]
 ; PULP:       [[FOR_BODY]]:
-; PULP-NEXT:    [[I:%.*]] = phi i32 [ [[INC:%.*]], %[[FOR_BODY]] ], [ [[BC_RESUME_VAL]], %[[SCALAR_PH]] ]
+; PULP-NEXT:    [[I:%.*]] = phi i32 [ [[INC:%.*]], %[[FOR_BODY]] ], [ 0, %[[FOR_BODY_PREHEADER]] ]
 ; PULP-NEXT:    [[PA:%.*]] = getelementptr inbounds nuw i16, ptr [[A]], i32 [[I]]
 ; PULP-NEXT:    [[VA:%.*]] = load i16, ptr [[PA]], align 2
 ; PULP-NEXT:    [[PB:%.*]] = getelementptr inbounds nuw i16, ptr [[B]], i32 [[I]]
@@ -620,9 +541,9 @@ define i1 @lastcmp(ptr noalias %d, ptr noalias %a, ptr noalias %b, i32 %n) {
 ; PULP-NEXT:    [[CMP:%.*]] = icmp sgt i16 [[VA]], [[VB]]
 ; PULP-NEXT:    [[INC]] = add nuw nsw i32 [[I]], 1
 ; PULP-NEXT:    [[DONE:%.*]] = icmp eq i32 [[INC]], [[N]]
-; PULP-NEXT:    br i1 [[DONE]], label %[[EXIT_LOOPEXIT]], label %[[FOR_BODY]], !llvm.loop [[LOOP9:![0-9]+]]
+; PULP-NEXT:    br i1 [[DONE]], label %[[EXIT_LOOPEXIT:.*]], label %[[FOR_BODY]]
 ; PULP:       [[EXIT_LOOPEXIT]]:
-; PULP-NEXT:    [[CMP_LCSSA:%.*]] = phi i1 [ [[CMP]], %[[FOR_BODY]] ], [ [[TMP10]], %[[MIDDLE_BLOCK]] ]
+; PULP-NEXT:    [[CMP_LCSSA:%.*]] = phi i1 [ [[CMP]], %[[FOR_BODY]] ]
 ; PULP-NEXT:    br label %[[EXIT]]
 ; PULP:       [[EXIT]]:
 ; PULP-NEXT:    [[L:%.*]] = phi i1 [ false, %[[ENTRY]] ], [ [[CMP_LCSSA]], %[[EXIT_LOOPEXIT]] ]
@@ -655,10 +576,4 @@ exit:
 ; PULP: [[META1]] = !{!"llvm.loop.isvectorized", i32 1}
 ; PULP: [[META2]] = !{!"llvm.loop.unroll.runtime.disable"}
 ; PULP: [[LOOP3]] = distinct !{[[LOOP3]], [[META2]], [[META1]]}
-; PULP: [[LOOP4]] = distinct !{[[LOOP4]], [[META1]], [[META2]]}
-; PULP: [[LOOP5]] = distinct !{[[LOOP5]], [[META2]], [[META1]]}
-; PULP: [[LOOP6]] = distinct !{[[LOOP6]], [[META1]], [[META2]]}
-; PULP: [[LOOP7]] = distinct !{[[LOOP7]], [[META2]], [[META1]]}
-; PULP: [[LOOP8]] = distinct !{[[LOOP8]], [[META1]], [[META2]]}
-; PULP: [[LOOP9]] = distinct !{[[LOOP9]], [[META2]], [[META1]]}
 ;.

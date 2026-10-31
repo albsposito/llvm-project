@@ -80,10 +80,10 @@ define void @casts(<2 x i16> %a, <4 x i8> %c, <2 x i32> %x, <4 x i32> %y, <4 x i
 
 define void @cmp_select(<2 x i16> %a, <2 x i16> %b, <4 x i8> %c, <4 x i8> %d) {
 ; CHECK-LABEL: 'cmp_select'
-; CHECK-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %cmp.v2i16 = icmp slt <2 x i16> %a, %b
-; CHECK-NEXT:  Cost Model: Found an estimated cost of 4 for instruction: %sel.v2i16 = select <2 x i1> %cmp.v2i16, <2 x i16> %a, <2 x i16> %b
-; CHECK-NEXT:  Cost Model: Found an estimated cost of 1 for instruction: %cmp.v4i8 = icmp ugt <4 x i8> %c, %d
-; CHECK-NEXT:  Cost Model: Found an estimated cost of 4 for instruction: %sel.v4i8 = select <4 x i1> %cmp.v4i8, <4 x i8> %c, <4 x i8> %d
+; CHECK-NEXT:  Cost Model: Invalid cost for instruction: %cmp.v2i16 = icmp slt <2 x i16> %a, %b
+; CHECK-NEXT:  Cost Model: Invalid cost for instruction: %sel.v2i16 = select <2 x i1> %cmp.v2i16, <2 x i16> %a, <2 x i16> %b
+; CHECK-NEXT:  Cost Model: Invalid cost for instruction: %cmp.v4i8 = icmp ugt <4 x i8> %c, %d
+; CHECK-NEXT:  Cost Model: Invalid cost for instruction: %sel.v4i8 = select <4 x i1> %cmp.v4i8, <4 x i8> %c, <4 x i8> %d
 ; CHECK-NEXT:  Cost Model: Found an estimated cost of 0 for instruction: ret void
 ;
   %cmp.v2i16 = icmp slt <2 x i16> %a, %b
