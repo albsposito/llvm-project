@@ -83,6 +83,11 @@ class RISCVTTIImpl : public BasicTTIImplBase<RISCVTTIImpl> {
   bool isPULPBoolVector(TTI::TargetCostKind CostKind, ArrayRef<Type *> Tys,
                         const Instruction *I = nullptr) const;
 
+  /// PULP without V with -pulp-vectorize-dotprod (off by default, owner
+  /// decision D15): the vectorizer hooks of the dot-product reductions
+  /// (preferInLoopReduction, getPULPReductionStepCost, ...) are active.
+  bool hasPULPDotProdVectorization() const;
+
   /// The number of dot-product instructions combinePULPVecReduceAdd makes of
   /// the in-loop reduction step RedOp vectorized at VF lanes, or std::nullopt
   /// when it does not take it.

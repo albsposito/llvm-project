@@ -38,6 +38,25 @@ static cl::opt<unsigned> SLPMaxVF(
         "exclusively by SLP vectorizer."),
     cl::Hidden);
 
+// PULP dot-product vectorization (B156 list B, 20/F057; owner decision D15).
+// Off by default: with it the loop vectorizer also vectorizes short loops
+// whose trip count it cannot bound (filter taps, remainders), which made the
+// GAP9 SDK's CNN SQ8 kernels 7.7% slower on average and up to 1.79x
+// (sim=legacy, backlog B184), while dot-product heavy code such as IREE's
+// int8 matmul gains 3.7x (B185). It gates every vectorizer decision of
+// 20/F057 (in-loop reductions, the reduction step costs, the declined
+// reduction pattern costs, sinking the scalar of a .sc dot product); the
+// instruction selector's combinePULPVecReduceAdd is always on, since it only
+// rewrites reductions that already have the dot-product shape.
+static cl::opt<bool> PULPVectorizeDotProd(
+    "pulp-vectorize-dotprod", cl::init(false), cl::Hidden,
+    cl::desc("PULP: let the vectorizers form in-loop add reductions that "
+             "become packed dot products (pv.sdot*)"));
+
+bool RISCVTTIImpl::hasPULPDotProdVectorization() const {
+  return PULPVectorizeDotProd && hasPULPPackedSIMDOnly();
+}
+
 // PULP (see isPULPBoolVector): a fixed vector of more than one lane. The loop
 // vectorizer's scalar (VF 1) cost of a select asks with a <1 x i1> condition
 // (VectorType::get(i1, 1)); refusing it would make the scalar loop invalid
@@ -1930,7 +1949,7 @@ RISCVTTIImpl::getArithmeticReductionCost(unsigned Opcode, VectorType *Ty,
 // Narrow accumulators keep the vectorizer's out-of-loop form.
 bool RISCVTTIImpl::preferInLoopReduction(unsigned Opcode, Type *Ty,
                                          TTI::ReductionFlags Flags) const {
-  if (!hasPULPPackedSIMDOnly())
+  if (!hasPULPDotProdVectorization())
     return false;
   return Opcode == Instruction::Add && Ty->isIntegerTy(32);
 }
@@ -1945,7 +1964,7 @@ InstructionCost
 RISCVTTIImpl::getMulAccReductionCost(bool IsUnsigned, Type *ResTy,
                                      VectorType *ValTy,
                                      TTI::TargetCostKind CostKind) {
-  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(ValTy) &&
+  if (hasPULPDotProdVectorization() && isa<FixedVectorType>(ValTy) &&
       ResTy->isIntegerTy(32))
     return InstructionCost::getInvalid();
   return BaseT::getMulAccReductionCost(IsUnsigned, ResTy, ValTy, CostKind);
@@ -1957,7 +1976,7 @@ InstructionCost RISCVTTIImpl::getExtendedReductionCost(
   // PULP without V: no vector of i1 (see isPULPBoolVector).
   if (isPULPBoolVector(CostKind, {ResTy, ValTy}))
     return InstructionCost::getInvalid();
-  if (hasPULPPackedSIMDOnly() && isa<FixedVectorType>(ValTy) &&
+  if (hasPULPDotProdVectorization() && isa<FixedVectorType>(ValTy) &&
       Opcode == Instruction::Add && ResTy->isIntegerTy(32))
     return InstructionCost::getInvalid();
   if (isa<FixedVectorType>(ValTy) && !ST->useRVVForFixedLengthVectors())
@@ -2692,7 +2711,7 @@ RISCVTTIImpl::getPULPDotReductionStep(const Instruction *RedOp,
   // A step the reduction subtracts is vectorized as vecreduce_add(0 - step),
   // which the combine does not take (dot16_sub, 1.25x slower lane by lane,
   // sim=legacy).
-  if (!hasPULPPackedSIMDOnly() || !RedOp->getType()->isIntegerTy() ||
+  if (!hasPULPDotProdVectorization() || !RedOp->getType()->isIntegerTy() ||
       !isPULPReductionStepOperand(RedOp) ||
       RedOp->user_back()->getOpcode() != Instruction::Add)
     return std::nullopt;
@@ -2782,7 +2801,7 @@ std::optional<InstructionCost>
 RISCVTTIImpl::getPULPReductionStepCost(const Instruction *I,
                                        Type *VecTy) const {
   auto *FVT = dyn_cast_or_null<FixedVectorType>(VecTy);
-  if (!I || !FVT || !hasPULPPackedSIMDOnly())
+  if (!I || !FVT || !hasPULPDotProdVectorization())
     return std::nullopt;
   unsigned VF = FVT->getNumElements();
   if (isPULPReductionStepOperand(I)) {
@@ -3320,7 +3339,7 @@ bool RISCVTTIImpl::isProfitableToSinkOperands(
   // lane. Sinking the splat next to the multiply that feeds the reduction
   // lets combinePULPVecReduceAdd see the scalar, as the RVV code below does
   // for the .vx forms.
-  if (hasPULPPackedSIMDOnly() && I->getOpcode() == Instruction::Mul &&
+  if (hasPULPDotProdVectorization() && I->getOpcode() == Instruction::Mul &&
       isa<FixedVectorType>(I->getType()) && I->hasOneUse() &&
       match(I->user_back(), m_Intrinsic<Intrinsic::vector_reduce_add>())) {
     for (Use &U : I->operands()) {
